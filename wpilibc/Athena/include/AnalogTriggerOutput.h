@@ -67,12 +67,13 @@ class AnalogTriggerOutput : public DigitalSource {
   virtual bool GetAnalogTriggerForRouting() const override;
 
  protected:
-  AnalogTriggerOutput(const AnalogTrigger &trigger, AnalogTriggerType outputType);
+  AnalogTriggerOutput(const AnalogTrigger& trigger,
+                      AnalogTriggerType outputType);
 
  private:
   // Uses reference rather than smart pointer because a user can not construct
   // an AnalogTriggerOutput themselves and because the AnalogTriggerOutput
   // should always be in scope at the same time as an AnalogTrigger.
-  const AnalogTrigger &m_trigger;
+  const AnalogTrigger& m_trigger;
   AnalogTriggerType m_outputType;
 };

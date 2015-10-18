@@ -15,7 +15,7 @@
  * Creates a subsystem with the given name
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const std::string &name) {
+Subsystem::Subsystem(const std::string& name) {
   m_name = name;
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
@@ -41,7 +41,7 @@ void Subsystem::InitDefaultCommand() {}
  *
  * @param command the default command (or null if there should be none)
  */
-void Subsystem::SetDefaultCommand(Command *command) {
+void Subsystem::SetDefaultCommand(Command* command) {
   if (command == nullptr) {
     m_defaultCommand = nullptr;
   } else {
@@ -77,7 +77,7 @@ void Subsystem::SetDefaultCommand(Command *command) {
  * Returns the default command (or null if there is none).
  * @return the default command
  */
-Command *Subsystem::GetDefaultCommand() {
+Command* Subsystem::GetDefaultCommand() {
   if (!m_initializedDefaultCommand) {
     m_initializedDefaultCommand = true;
     InitDefaultCommand();
@@ -89,7 +89,7 @@ Command *Subsystem::GetDefaultCommand() {
  * Sets the current command
  * @param command the new current command
  */
-void Subsystem::SetCurrentCommand(Command *command) {
+void Subsystem::SetCurrentCommand(Command* command) {
   m_currentCommand = command;
   m_currentCommandChanged = true;
 }
@@ -98,7 +98,7 @@ void Subsystem::SetCurrentCommand(Command *command) {
  * Returns the command which currently claims this subsystem.
  * @return the command which currently claims this subsystem
  */
-Command *Subsystem::GetCurrentCommand() const { return m_currentCommand; }
+Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
 
 /**
  * Call this to alert Subsystem that the current command is actually the

@@ -8,11 +8,11 @@
 #include "CANJaguar.h"
 #include "Timer.h"
 #define tNIRIO_i32 int
+#include <cassert>
+#include <cstdio>
+#include "LiveWindow/LiveWindow.h"
 #include "NetworkCommunication/CANSessionMux.h"
 #include "WPIErrors.h"
-#include <cstdio>
-#include <cassert>
-#include "LiveWindow/LiveWindow.h"
 
 /* we are on ARM-LE now, not Freescale so no need to swap */
 #define swap16(x) (x)
@@ -33,7 +33,7 @@ static const int32_t kReceiveStatusAttempts = 50;
 
 static std::unique_ptr<Resource> allocated;
 
-static int32_t sendMessageHelper(uint32_t messageID, const uint8_t *data,
+static int32_t sendMessageHelper(uint32_t messageID, const uint8_t* data,
                                  uint8_t dataSize, int32_t period) {
   static const uint32_t kTrustedMessages[] = {
       LM_API_VOLT_T_EN,  LM_API_VOLT_T_SET,  LM_API_SPD_T_EN, LM_API_SPD_T_SET,
@@ -174,8 +174,7 @@ void CANJaguar::InitCANJaguar() {
  * @see CANJaguar#SetVoltageMode(EncoderTag, int)
  * @see CANJaguar#SetVoltageMode(QuadEncoderTag, int)
  */
-CANJaguar::CANJaguar(uint8_t deviceNumber)
-    : m_deviceNumber(deviceNumber) {
+CANJaguar::CANJaguar(uint8_t deviceNumber) : m_deviceNumber(deviceNumber) {
   std::stringstream buf;
   buf << "CANJaguar device number " << m_deviceNumber;
   Resource::CreateResourceObject(allocated, 63);
@@ -339,59 +338,59 @@ void CANJaguar::PIDWrite(float output) {
   }
 }
 
-uint8_t CANJaguar::packPercentage(uint8_t *buffer, double value) {
+uint8_t CANJaguar::packPercentage(uint8_t* buffer, double value) {
   int16_t intValue = (int16_t)(value * 32767.0);
-  *((int16_t *)buffer) = swap16(intValue);
+  *((int16_t*)buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packFXP8_8(uint8_t *buffer, double value) {
+uint8_t CANJaguar::packFXP8_8(uint8_t* buffer, double value) {
   int16_t intValue = (int16_t)(value * 256.0);
-  *((int16_t *)buffer) = swap16(intValue);
+  *((int16_t*)buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packFXP16_16(uint8_t *buffer, double value) {
+uint8_t CANJaguar::packFXP16_16(uint8_t* buffer, double value) {
   int32_t intValue = (int32_t)(value * 65536.0);
-  *((int32_t *)buffer) = swap32(intValue);
+  *((int32_t*)buffer) = swap32(intValue);
   return sizeof(int32_t);
 }
 
-uint8_t CANJaguar::packint16_t(uint8_t *buffer, int16_t value) {
-  *((int16_t *)buffer) = swap16(value);
+uint8_t CANJaguar::packint16_t(uint8_t* buffer, int16_t value) {
+  *((int16_t*)buffer) = swap16(value);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packint32_t(uint8_t *buffer, int32_t value) {
-  *((int32_t *)buffer) = swap32(value);
+uint8_t CANJaguar::packint32_t(uint8_t* buffer, int32_t value) {
+  *((int32_t*)buffer) = swap32(value);
   return sizeof(int32_t);
 }
 
-double CANJaguar::unpackPercentage(uint8_t *buffer) const {
-  int16_t value = *((int16_t *)buffer);
+double CANJaguar::unpackPercentage(uint8_t* buffer) const {
+  int16_t value = *((int16_t*)buffer);
   value = swap16(value);
   return value / 32767.0;
 }
 
-double CANJaguar::unpackFXP8_8(uint8_t *buffer) const {
-  int16_t value = *((int16_t *)buffer);
+double CANJaguar::unpackFXP8_8(uint8_t* buffer) const {
+  int16_t value = *((int16_t*)buffer);
   value = swap16(value);
   return value / 256.0;
 }
 
-double CANJaguar::unpackFXP16_16(uint8_t *buffer) const {
-  int32_t value = *((int32_t *)buffer);
+double CANJaguar::unpackFXP16_16(uint8_t* buffer) const {
+  int32_t value = *((int32_t*)buffer);
   value = swap32(value);
   return value / 65536.0;
 }
 
-int16_t CANJaguar::unpackint16_t(uint8_t *buffer) const {
-  int16_t value = *((int16_t *)buffer);
+int16_t CANJaguar::unpackint16_t(uint8_t* buffer) const {
+  int16_t value = *((int16_t*)buffer);
   return swap16(value);
 }
 
-int32_t CANJaguar::unpackint32_t(uint8_t *buffer) const {
-  int32_t value = *((int32_t *)buffer);
+int32_t CANJaguar::unpackint32_t(uint8_t* buffer) const {
+  int32_t value = *((int32_t*)buffer);
   return swap32(value);
 }
 
@@ -405,7 +404,7 @@ int32_t CANJaguar::unpackint32_t(uint8_t *buffer) const {
  * @param periodic If positive, tell Network Communications to send the message
  * 	every "period" milliseconds.
  */
-void CANJaguar::sendMessage(uint32_t messageID, const uint8_t *data,
+void CANJaguar::sendMessage(uint32_t messageID, const uint8_t* data,
                             uint8_t dataSize, int32_t period) {
   int32_t localStatus =
       sendMessageHelper(messageID | m_deviceNumber, data, dataSize, period);
@@ -440,7 +439,7 @@ void CANJaguar::requestMessage(uint32_t messageID, int32_t period) {
  * available.
  */
 bool CANJaguar::getMessage(uint32_t messageID, uint32_t messageMask,
-                           uint8_t *data, uint8_t *dataSize) const {
+                           uint8_t* data, uint8_t* dataSize) const {
   uint32_t targetedMessageID = messageID | m_deviceNumber;
   int32_t status = 0;
   uint32_t timeStamp;
@@ -1940,9 +1939,7 @@ uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
  *
  * @deprecated Call DisableControl instead.
  */
-void CANJaguar::StopMotor() {
-	m_stopped = true;
-}
+void CANJaguar::StopMotor() { m_stopped = true; }
 
 /**
 * Common interface for inverting direction of a speed controller.
@@ -1961,20 +1958,22 @@ bool CANJaguar::GetInverted() const { return m_isInverted; }
 
 void CANJaguar::ValueChanged(ITable* source, llvm::StringRef key,
                              std::shared_ptr<nt::Value> value, bool isNew) {
-  if(key == "Mode" && value->IsDouble()) SetControlMode(static_cast<CANSpeedController::ControlMode>(value->GetDouble()));
-  if(IsModePID(m_controlMode) && value->IsDouble()) {
-    if(key == "p") SetP(value->GetDouble());
-    if(key == "i") SetI(value->GetDouble());
-    if(key == "d") SetD(value->GetDouble());
+  if (key == "Mode" && value->IsDouble())
+    SetControlMode(
+        static_cast<CANSpeedController::ControlMode>(value->GetDouble()));
+  if (IsModePID(m_controlMode) && value->IsDouble()) {
+    if (key == "p") SetP(value->GetDouble());
+    if (key == "i") SetI(value->GetDouble());
+    if (key == "d") SetD(value->GetDouble());
   }
-  if(key == "Enabled" && value->IsBoolean()) {
-      if (value->GetBoolean()) {
-        EnableControl();
-      } else {
-        DisableControl();
-      }
+  if (key == "Enabled" && value->IsBoolean()) {
+    if (value->GetBoolean()) {
+      EnableControl();
+    } else {
+      DisableControl();
+    }
   }
-  if(key == "Value" && value->IsDouble()) Set(value->GetDouble());
+  if (key == "Value" && value->IsDouble()) Set(value->GetDouble());
 }
 
 bool CANJaguar::IsModePID(CANSpeedController::ControlMode mode) const {
@@ -1987,9 +1986,9 @@ void CANJaguar::UpdateTable() {
     m_table->PutString("Type", "CANJaguar");
     m_table->PutNumber("Mode", m_controlMode);
     if (IsModePID(m_controlMode)) {
-        m_table->PutNumber("p", GetP());
-        m_table->PutNumber("i", GetI());
-        m_table->PutNumber("d", GetD());
+      m_table->PutNumber("p", GetP());
+      m_table->PutNumber("i", GetI());
+      m_table->PutNumber("d", GetD());
     }
     m_table->PutBoolean("Enabled", m_controlEnabled);
     m_table->PutNumber("Value", Get());

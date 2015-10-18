@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "MotorSafety.h"
-#include "PWM.h"
-#include "MotorSafetyHelper.h"
 #include <memory>
 #include <sstream>
+#include "MotorSafety.h"
+#include "MotorSafetyHelper.h"
+#include "PWM.h"
 
 /**
  * A safe version of the PWM class.

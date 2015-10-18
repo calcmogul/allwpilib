@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Counter.h"
 #include <memory>
+#include "Counter.h"
 
 /**
  * Alias for counter class.
@@ -23,7 +23,7 @@ class GearTooth : public Counter {
   /// 55 uSec for threshold
   static constexpr double kGearToothThreshold = 55e-6;
   GearTooth(uint32_t channel, bool directionSensitive = false);
-  GearTooth(DigitalSource *source, bool directionSensitive = false);
+  GearTooth(DigitalSource* source, bool directionSensitive = false);
   GearTooth(std::shared_ptr<DigitalSource> source,
             bool directionSensitive = false);
   virtual ~GearTooth() = default;

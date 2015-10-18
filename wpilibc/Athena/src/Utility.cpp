@@ -8,15 +8,15 @@
 #include "Utility.h"
 
 //#include "NetworkCommunication/FRCComm.h"
-#include "HAL/HAL.hpp"
-#include "Task.h"
-#include <iostream>
-#include <sstream>
+#include <cxxabi.h>
+#include <execinfo.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <execinfo.h>
-#include <cxxabi.h>
+#include <iostream>
+#include <sstream>
+#include "HAL/HAL.hpp"
+#include "Task.h"
 #include "nivision.h"
 
 /**
@@ -25,9 +25,9 @@
  * The users don't call this, but instead use the wpi_assert macros in
  * Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue, const char *conditionText,
-                     const char *message, const char *fileName,
-                     uint32_t lineNumber, const char *funcName) {
+bool wpi_assert_impl(bool conditionValue, const char* conditionText,
+                     const char* message, const char* fileName,
+                     uint32_t lineNumber, const char* funcName) {
   if (!conditionValue) {
     std::stringstream locStream;
     locStream << funcName << " [";
@@ -60,12 +60,10 @@ bool wpi_assert_impl(bool conditionValue, const char *conditionText,
  * wpi_assertEqual_impl
  * and wpi_assertNotEqual_impl.
  */
-void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
-                                 const char *equalityType,
-                                 const char *message,
-                                 const char *fileName,
-                                 uint32_t lineNumber,
-                                 const char *funcName) {
+void wpi_assertEqual_common_impl(const char* valueA, const char* valueB,
+                                 const char* equalityType, const char* message,
+                                 const char* fileName, uint32_t lineNumber,
+                                 const char* funcName) {
   std::stringstream locStream;
   locStream << funcName << " [";
   locStream << basename(fileName) << ":" << lineNumber << "]";
@@ -96,10 +94,10 @@ void wpi_assertEqual_common_impl(const char *valueA, const char *valueB,
  * The users don't call this, but instead use the wpi_assertEqual macros in
  * Utility.h.
  */
-bool wpi_assertEqual_impl(int valueA, int valueB, const char *valueAString,
-                          const char *valueBString, const char *message,
-                          const char *fileName, uint32_t lineNumber,
-                          const char *funcName) {
+bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
+                          const char* valueBString, const char* message,
+                          const char* fileName, uint32_t lineNumber,
+                          const char* funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "==", message,
                                 fileName, lineNumber, funcName);
@@ -114,10 +112,10 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const char *valueAString,
  * The users don't call this, but instead use the wpi_assertNotEqual macros in
  * Utility.h.
  */
-bool wpi_assertNotEqual_impl(int valueA, int valueB, const char *valueAString,
-                             const char *valueBString, const char *message,
-                             const char *fileName, uint32_t lineNumber,
-                             const char *funcName) {
+bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
+                             const char* valueBString, const char* message,
+                             const char* fileName, uint32_t lineNumber,
+                             const char* funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "!=", message,
                                 fileName, lineNumber, funcName);
@@ -181,13 +179,13 @@ bool GetUserButton() {
 /**
  * Demangle a C++ symbol, used for printing stack traces.
  */
-static std::string demangle(char const *mangledSymbol) {
+static std::string demangle(char const* mangledSymbol) {
   char buffer[256];
   size_t length;
   int status;
 
   if (sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
-    char *symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
+    char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
     if (status == 0) {
       return symbol;
     } else {
@@ -206,9 +204,9 @@ static std::string demangle(char const *mangledSymbol) {
  * @param offset The number of symbols at the top of the stack to ignore
  */
 std::string GetStackTrace(uint32_t offset) {
-  void *stackTrace[128];
+  void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
-  char **mangledSymbols = backtrace_symbols(stackTrace, stackSize);
+  char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
   std::stringstream trace;
 
   for (int i = offset; i < stackSize; i++) {

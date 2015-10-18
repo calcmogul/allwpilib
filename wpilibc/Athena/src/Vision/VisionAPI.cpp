@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <stdlib.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include "Vision/BaeUtilities.h"
 #include "Vision/FrcError.h"
@@ -192,7 +192,8 @@ int frcWriteImage(const Image* image, const char* fileName) {
 *  Parameter Discussion	:
 * 		Relevant parameters of the HistogramReport include:
 * 			min, max, mean and stdDev
-*		min/max —Setting both min and max to 0 causes the function to set
+*		min/max —Setting both min and max to 0 causes the function to
+*set
 * min to 0
 * 			and the max to 255 for 8-bit images and to the actual
 * minimum value and
@@ -270,7 +271,8 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
 * @param mask An optional mask image. This image must be an IMAQ_IMAGE_U8 image.
 * The function calculates the histogram using only those pixels in the image
 * whose
-* corresponding pixels in the mask are non-zero. Set this parameter to nullptr to
+* corresponding pixels in the mask are non-zero. Set this parameter to nullptr
+* to
 * calculate
 * the histogram of the entire image, or use the simplified call.
 *
@@ -530,17 +532,20 @@ int frcParticleAnalysis(Image* image, int particleNumber,
 * @param dest The destination image.
 * @param source The image to equalize
 * @param min the smallest value used for processing. After processing, all pixel
-* values that are less than or equal to the Minimum in the original image are set
+* values that are less than or equal to the Minimum in the original image are
+* set
 * to 0 for an 8-bit image. In 16-bit and floating-point images, these pixel
 * values are set to the smallest pixel value found in the original image.
 * @param max the largest value used for processing. After processing, all pixel
 * values that are greater than or equal to the Maximum in the original image are
-* set to 255 for an 8-bit image. In 16-bit and floating-point images, these pixel
+* set to 255 for an 8-bit image. In 16-bit and floating-point images, these
+* pixel
 * values are set to the largest pixel value found in the original image.
 * @param mask an 8-bit image that specifies the region of the small image that
 * will be copied. Only those pixels in the Image Src (Small) image that
 * correspond to an equivalent non-zero pixel in the mask image are copied. All
-* other pixels keep their original values. The entire image is processed if Image
+* other pixels keep their original values. The entire image is processed if
+* Image
 * Mask is nullptr or this parameter is omitted.
 * @return On success: 1. On failure: 0. To get extended error information, call
 * GetLastError().
@@ -569,7 +574,8 @@ int frcEqualize(Image* dest, const Image* source, float min, float max,
 * @param dest The destination image.
 * @param source The image to equalize
 * @param colorEqualization Set this parameter to TRUE to equalize all three
-* planes of the image (the default). Set this parameter to FALSE to equalize only
+* planes of the image (the default). Set this parameter to FALSE to equalize
+* only
 * the luminance plane.
 */
 int frcColorEqualize(Image* dest, const Image* source) {
@@ -786,11 +792,14 @@ int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
 * @param image The source image that the function extracts the planes from.
 * @param mode The color space that the function extracts the planes from. Valid
 * values are IMAQ_RGB, IMAQ_HSL, IMAQ_HSV, IMAQ_HSI.
-* @param plane1 On return, the first extracted plane. Set this parameter to nullptr
+* @param plane1 On return, the first extracted plane. Set this parameter to
+* nullptr
 * if you do not need this information. RGB-Red, HSL/HSV/HSI-Hue.
 * @param plane2 On return, the second extracted plane. Set this parameter to
-* nullptr if you do not need this information. RGB-Green, HSL/HSV/HSI-Saturation.
-* @param plane3 On return, the third extracted plane. Set this parameter to nullptr
+* nullptr if you do not need this information. RGB-Green,
+* HSL/HSV/HSI-Saturation.
+* @param plane3 On return, the third extracted plane. Set this parameter to
+* nullptr
 * if you do not need this information. RGB-Blue, HSL-Luminance, HSV-Value,
 * HSI-Intensity.
 *

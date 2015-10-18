@@ -6,12 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/Command.h"
+#include <typeinfo>
 #include "Commands/CommandGroup.h"
 #include "Commands/Scheduler.h"
 #include "RobotState.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-#include <typeinfo>
 
 static const std::string kName = "name";
 static const std::string kRunning = "running";
@@ -29,7 +29,7 @@ Command::Command() : Command("", -1.0) {}
  * Creates a new command with the given name and no timeout.
  * @param name the name for this command
  */
-Command::Command(const std::string &name) : Command(name, -1.0) {}
+Command::Command(const std::string& name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
@@ -44,7 +44,7 @@ Command::Command(double timeout) : Command("", timeout) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(const std::string &name, double timeout) {
+Command::Command(const std::string& name, double timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
@@ -54,8 +54,7 @@ Command::Command(const std::string &name, double timeout) {
   // If name contains an empty string
   if (name.length() == 0) {
     m_name = std::string("Command_") + std::string(typeid(*this).name());
-  }
-  else {
+  } else {
     m_name = name;
   }
 }
@@ -106,7 +105,7 @@ double Command::TimeSinceInitialized() const {
  * @param subsystem the {@link Subsystem} required
  * @see Subsystem
  */
-void Command::Requires(Subsystem *subsystem) {
+void Command::Requires(Subsystem* subsystem) {
   if (!AssertUnlocked("Can not add new requirement to command")) return;
 
   if (subsystem != nullptr)
@@ -223,9 +222,10 @@ void Command::LockChanges() { m_locked = true; }
  * message)
  * @return true if assert passed, false if assert failed
  */
-bool Command::AssertUnlocked(const std::string &message) {
+bool Command::AssertUnlocked(const std::string& message) {
   if (m_locked) {
-    std::string buf = message + " after being started or being added to a command group";
+    std::string buf =
+        message + " after being started or being added to a command group";
     wpi_setWPIErrorWithContext(CommandIllegalUse, buf);
     return false;
   }
@@ -236,7 +236,7 @@ bool Command::AssertUnlocked(const std::string &message) {
  * Sets the parent of this command.  No actual change is made to the group.
  * @param parent the parent
  */
-void Command::SetParent(CommandGroup *parent) {
+void Command::SetParent(CommandGroup* parent) {
   if (parent == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "parent");
   } else if (m_parent != nullptr) {
@@ -332,7 +332,7 @@ void Command::SetInterruptible(bool interruptible) {
  * @param system the system
  * @return whether or not the subsystem is required (false if given nullptr)
  */
-bool Command::DoesRequire(Subsystem *system) const {
+bool Command::DoesRequire(Subsystem* system) const {
   return m_requirements.count(system) > 0;
 }
 
@@ -342,7 +342,7 @@ bool Command::DoesRequire(Subsystem *system) const {
  * @return the {@link CommandGroup} that this command is a part of (or null if
  * not in group)
  */
-CommandGroup *Command::GetGroup() const { return m_parent; }
+CommandGroup* Command::GetGroup() const { return m_parent; }
 
 /**
  * Sets whether or not this {@link Command} should run when the robot is
@@ -362,9 +362,7 @@ void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
  */
 bool Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
 
-std::string Command::GetName() const {
-  return m_name;
-}
+std::string Command::GetName() const { return m_name; }
 
 std::string Command::GetSmartDashboardType() const { return "Command"; }
 

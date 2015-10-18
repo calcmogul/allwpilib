@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include "SensorBase.h"
-#include "Counter.h"
-#include "Task.h"
-#include "PIDSource.h"
-#include "LiveWindow/LiveWindowSendable.h"
 #include <atomic>
 #include <memory>
 #include <set>
+#include "Counter.h"
+#include "LiveWindow/LiveWindowSendable.h"
+#include "PIDSource.h"
+#include "SensorBase.h"
+#include "Task.h"
 
 class DigitalInput;
 class DigitalOutput;
@@ -41,10 +41,10 @@ class Ultrasonic : public SensorBase,
  public:
   enum DistanceUnit { kInches = 0, kMilliMeters = 1 };
 
-  Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
+  Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel,
              DistanceUnit units = kInches);
 
-  Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
+  Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel,
              DistanceUnit units = kInches);
 
   Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
@@ -88,8 +88,8 @@ class Ultrasonic : public SensorBase,
   static constexpr double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
 
   static Task m_task;  // task doing the round-robin automatic sensing
-  static std::set<Ultrasonic*> m_sensors; // ultrasonic sensors
-  static std::atomic<bool> m_automaticEnabled; // automatic round robin mode
+  static std::set<Ultrasonic*> m_sensors;       // ultrasonic sensors
+  static std::atomic<bool> m_automaticEnabled;  // automatic round robin mode
 
   std::shared_ptr<DigitalOutput> m_pingChannel;
   std::shared_ptr<DigitalInput> m_echoChannel;

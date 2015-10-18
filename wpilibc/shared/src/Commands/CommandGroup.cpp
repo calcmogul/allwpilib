@@ -12,7 +12,7 @@
  * Creates a new {@link CommandGroup CommandGroup} with the given name.
  * @param name the name for this command group
  */
-CommandGroup::CommandGroup(const std::string &name) : Command(name) {}
+CommandGroup::CommandGroup(const std::string& name) : Command(name) {}
 
 /**
  * Adds a new {@link Command Command} to the group.  The {@link Command Command}
@@ -29,7 +29,7 @@ CommandGroup::CommandGroup(const std::string &name) : Command(name) {}
  *
  * @param command The {@link Command Command} to be added
  */
-void CommandGroup::AddSequential(Command *command) {
+void CommandGroup::AddSequential(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -69,7 +69,7 @@ void CommandGroup::AddSequential(Command *command) {
  * @param command The {@link Command Command} to be added
  * @param timeout The timeout (in seconds)
  */
-void CommandGroup::AddSequential(Command *command, double timeout) {
+void CommandGroup::AddSequential(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -116,7 +116,7 @@ void CommandGroup::AddSequential(Command *command, double timeout) {
  *
  * @param command The command to be added
  */
-void CommandGroup::AddParallel(Command *command) {
+void CommandGroup::AddParallel(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -167,7 +167,7 @@ void CommandGroup::AddParallel(Command *command) {
  * @param command The command to be added
  * @param timeout The timeout (in seconds)
  */
-void CommandGroup::AddParallel(Command *command, double timeout) {
+void CommandGroup::AddParallel(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -193,7 +193,7 @@ void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
 
 void CommandGroup::_Execute() {
   CommandGroupEntry entry;
-  Command *cmd = nullptr;
+  Command* cmd = nullptr;
   bool firstRun = false;
 
   if (m_currentCommandIndex == -1) {
@@ -247,7 +247,7 @@ void CommandGroup::_Execute() {
   auto iter = m_children.begin();
   for (; iter != m_children.end();) {
     entry = *iter;
-    Command *child = entry.m_command;
+    Command* child = entry.m_command;
     if (entry.IsTimedOut()) child->_Cancel();
 
     if (!child->Run()) {
@@ -264,14 +264,14 @@ void CommandGroup::_End() {
   // IsFinished method
   if (m_currentCommandIndex != -1 &&
       (unsigned)m_currentCommandIndex < m_commands.size()) {
-    Command *cmd = m_commands[m_currentCommandIndex].m_command;
+    Command* cmd = m_commands[m_currentCommandIndex].m_command;
     cmd->_Cancel();
     cmd->Removed();
   }
 
   auto iter = m_children.begin();
   for (; iter != m_children.end(); iter++) {
-    Command *cmd = iter->m_command;
+    Command* cmd = iter->m_command;
     cmd->_Cancel();
     cmd->Removed();
   }
@@ -302,7 +302,7 @@ bool CommandGroup::IsInterruptible() const {
 
   if (m_currentCommandIndex != -1 &&
       (unsigned)m_currentCommandIndex < m_commands.size()) {
-    Command *cmd = m_commands[m_currentCommandIndex].m_command;
+    Command* cmd = m_commands[m_currentCommandIndex].m_command;
     if (!cmd->IsInterruptible()) return false;
   }
 
@@ -314,10 +314,10 @@ bool CommandGroup::IsInterruptible() const {
   return true;
 }
 
-void CommandGroup::CancelConflicts(Command *command) {
+void CommandGroup::CancelConflicts(Command* command) {
   auto childIter = m_children.begin();
   for (; childIter != m_children.end();) {
-    Command *child = childIter->m_command;
+    Command* child = childIter->m_command;
     bool erased = false;
 
     Command::SubsystemSet requirements = command->GetRequirements();

@@ -7,10 +7,10 @@
 
 #include "PWM.h"
 
+#include "HAL/HAL.hpp"
 #include "Resource.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "HAL/HAL.hpp"
 
 #include <sstream>
 
@@ -158,11 +158,11 @@ void PWM::SetPosition(float pos) {
   unsigned short rawValue =
       (int32_t)((pos * (float)GetFullRangeScaleFactor()) + GetMinNegativePwm());
   //	printf("MinNegPWM: %d FullRangeScaleFactor: %d Raw value: %5d   Input
-  //value: %4.4f\n", GetMinNegativePwm(), GetFullRangeScaleFactor(), rawValue,
-  //pos);
+  // value: %4.4f\n", GetMinNegativePwm(), GetFullRangeScaleFactor(), rawValue,
+  // pos);
 
   //	wpi_assert((rawValue >= GetMinNegativePwm()) && (rawValue <=
-  //GetMaxPositivePwm()));
+  // GetMaxPositivePwm()));
   wpi_assert(rawValue != kPwmDisabled);
 
   // send the computed pwm value to the FPGA

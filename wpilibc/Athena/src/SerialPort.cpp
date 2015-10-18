@@ -7,8 +7,8 @@
 
 #include "SerialPort.h"
 
-#include "HAL/HAL.hpp"
 #include <stdarg.h>
+#include "HAL/HAL.hpp"
 
 // static ViStatus _VI_FUNCH ioCompleteHandler (ViSession vi, ViEventType
 // eventType, ViEvent event, ViAddr userHandle);
@@ -25,8 +25,8 @@
  * StopBits.
  */
 SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
-                       SerialPort::Parity parity, SerialPort::StopBits stopBits)
-{
+                       SerialPort::Parity parity,
+                       SerialPort::StopBits stopBits) {
   int32_t status = 0;
 
   m_port = port;
@@ -120,7 +120,7 @@ int32_t SerialPort::GetBytesReceived() {
  * @param count The maximum number of bytes to read.
  * @return The number of bytes actually read into the buffer.
  */
-uint32_t SerialPort::Read(char *buffer, int32_t count) {
+uint32_t SerialPort::Read(char* buffer, int32_t count) {
   int32_t status = 0;
   int32_t retVal = serialRead(m_port, buffer, count, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -134,7 +134,7 @@ uint32_t SerialPort::Read(char *buffer, int32_t count) {
  * @param count The maximum number of bytes to write.
  * @return The number of bytes actually written into the port.
  */
-uint32_t SerialPort::Write(const std::string &buffer, int32_t count) {
+uint32_t SerialPort::Write(const std::string& buffer, int32_t count) {
   int32_t status = 0;
   int32_t retVal = serialWrite(m_port, buffer.c_str(), count, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));

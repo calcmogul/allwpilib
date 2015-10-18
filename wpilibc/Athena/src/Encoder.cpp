@@ -7,9 +7,9 @@
 
 #include "Encoder.h"
 #include "DigitalInput.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
 
 /**
  * Common initialization code for Encoders.
@@ -58,7 +58,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
     case k2X: {
       m_encodingScale = encodingType == k1X ? 1 : 2;
       m_counter = std::make_unique<Counter>(m_encodingType, m_aSource,
-                                              m_bSource, reverseDirection);
+                                            m_bSource, reverseDirection);
       m_index = m_counter->GetFPGAIndex();
       break;
     }
@@ -124,7 +124,7 @@ Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
  * match the spec'd count
  * or be double (2x) the spec'd count.
  */
-Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
+Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
                  bool reverseDirection, EncodingType encodingType)
     : m_aSource(aSource, NullDeleter<DigitalSource>()),
       m_bSource(bSource, NullDeleter<DigitalSource>()) {
@@ -135,8 +135,8 @@ Encoder::Encoder(DigitalSource *aSource, DigitalSource *bSource,
 }
 
 Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
-                 std::shared_ptr<DigitalSource> bSource,
-                 bool reverseDirection, EncodingType encodingType)
+                 std::shared_ptr<DigitalSource> bSource, bool reverseDirection,
+                 EncodingType encodingType)
     : m_aSource(aSource), m_bSource(bSource) {
   if (m_aSource == nullptr || m_bSource == nullptr)
     wpi_setWPIError(NullParameter);
@@ -169,11 +169,10 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
  * match the spec'd count
  * or be double (2x) the spec'd count.
  */
-Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource,
+Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
                  bool reverseDirection, EncodingType encodingType)
     : m_aSource(&aSource, NullDeleter<DigitalSource>()),
-      m_bSource(&bSource, NullDeleter<DigitalSource>())
-{
+      m_bSource(&bSource, NullDeleter<DigitalSource>()) {
   InitEncoder(reverseDirection, encodingType);
 }
 
@@ -509,7 +508,7 @@ void Encoder::SetIndexSource(uint32_t channel, Encoder::IndexingType type) {
  * @param type The state that will cause the encoder to reset
  */
 DEPRECATED("Use pass-by-reference instead.")
-void Encoder::SetIndexSource(DigitalSource *source,
+void Encoder::SetIndexSource(DigitalSource* source,
                              Encoder::IndexingType type) {
   SetIndexSource(*source, type);
 }
@@ -521,7 +520,7 @@ void Encoder::SetIndexSource(DigitalSource *source,
  * @param channel A digital source to set as the encoder index
  * @param type The state that will cause the encoder to reset
  */
-void Encoder::SetIndexSource(const DigitalSource &source,
+void Encoder::SetIndexSource(const DigitalSource& source,
                              Encoder::IndexingType type) {
   int32_t status = 0;
   bool activeHigh = (type == kResetWhileHigh) || (type == kResetOnRisingEdge);

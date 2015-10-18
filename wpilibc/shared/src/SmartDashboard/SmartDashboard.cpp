@@ -8,13 +8,13 @@
 #include "SmartDashboard/SmartDashboard.h"
 
 //#include "NetworkCommunication/UsageReporting.h"
+#include "HLUsageReporting.h"
 #include "SmartDashboard/NamedSendable.h"
 #include "WPIErrors.h"
 #include "networktables/NetworkTable.h"
-#include "HLUsageReporting.h"
 
 std::shared_ptr<ITable> SmartDashboard::m_table;
-std::map<std::shared_ptr<ITable> , Sendable *> SmartDashboard::m_tablesToData;
+std::map<std::shared_ptr<ITable>, Sendable*> SmartDashboard::m_tablesToData;
 
 void SmartDashboard::init() {
   m_table = NetworkTable::GetTable("SmartDashboard");
@@ -30,7 +30,7 @@ void SmartDashboard::init() {
  * @param keyName the key
  * @param value the value
  */
-void SmartDashboard::PutData(llvm::StringRef key, Sendable *data) {
+void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
   if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
@@ -49,7 +49,7 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable *data) {
  * to the original key.
  * @param value the value
  */
-void SmartDashboard::PutData(NamedSendable *value) {
+void SmartDashboard::PutData(NamedSendable* value) {
   if (value == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
@@ -62,9 +62,9 @@ void SmartDashboard::PutData(NamedSendable *value) {
  * @param keyName the key
  * @return the value
  */
-Sendable *SmartDashboard::GetData(llvm::StringRef key) {
+Sendable* SmartDashboard::GetData(llvm::StringRef key) {
   std::shared_ptr<ITable> subtable(m_table->GetSubTable(key));
-  Sendable *data = m_tablesToData[subtable];
+  Sendable* data = m_tablesToData[subtable];
   if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key);
     return nullptr;

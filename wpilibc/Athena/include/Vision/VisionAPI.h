@@ -11,7 +11,7 @@
 
 /*   Constants */
 
-#define DEFAULT_BORDER_SIZE 3  // VisionAPI.frcCreateImage
+#define DEFAULT_BORDER_SIZE 3            // VisionAPI.frcCreateImage
 #define DEFAULT_SATURATION_THRESHOLD 40  // TrackAPI.FindColor
 
 /*   Forward Declare Data Structures */
@@ -33,7 +33,7 @@ typedef struct ParticleAnalysisReport_struct {
   /* Y-coordinate of the point representing the average position of the
    * total particle mass, assuming every point in the particle has a constant
    * density */
-  int center_mass_y;  // MeasurementType: IMAQ_MT_CENTER_OF_MASS_Y
+  int center_mass_y;                // MeasurementType: IMAQ_MT_CENTER_OF_MASS_Y
   double center_mass_x_normalized;  // Center of mass x value normalized to -1.0
                                     // to +1.0 range
   double center_mass_y_normalized;  // Center of mass y value normalized to -1.0

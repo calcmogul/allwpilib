@@ -16,7 +16,7 @@ class MotorSafety;
 
 class MotorSafetyHelper : public ErrorBase {
  public:
-  MotorSafetyHelper(MotorSafety *safeObject);
+  MotorSafetyHelper(MotorSafety* safeObject);
   ~MotorSafetyHelper();
   void Feed();
   void SetExpiration(float expirationTime);
@@ -33,7 +33,7 @@ class MotorSafetyHelper : public ErrorBase {
   double m_stopTime;    // the FPGA clock value when this motor has expired
   mutable priority_recursive_mutex
       m_syncMutex;            // protect accesses to the state for this object
-  MotorSafety *m_safeObject;  // the object that is using the helper
+  MotorSafety* m_safeObject;  // the object that is using the helper
   // List of all existing MotorSafetyHelper objects.
   static std::set<MotorSafetyHelper*> m_helperList;
   static priority_recursive_mutex

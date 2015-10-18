@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nivision.h"
 #include "Vision/FrcError.h"
+#include "nivision.h"
 
 /**
  * Get the error code returned from the NI Vision library

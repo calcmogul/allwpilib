@@ -7,8 +7,8 @@
 
 #include "SPI.h"
 
-#include "WPIErrors.h"
 #include "HAL/Digital.hpp"
+#include "WPIErrors.h"
 
 #include <string.h>
 
@@ -220,8 +220,10 @@ void SPI::ResetAccumulator() {
 /**
  * Set the center value of the accumulator.
  *
- * The center value is subtracted from each value before it is added to the accumulator. This
- * is used for the center value of devices like gyros and accelerometers to make integration work
+ * The center value is subtracted from each value before it is added to the
+ * accumulator. This
+ * is used for the center value of devices like gyros and accelerometers to make
+ * integration work
  * and to take the device offset into account when integrating.
  */
 void SPI::SetAccumulatorCenter(int32_t center) {
@@ -264,7 +266,8 @@ int64_t SPI::GetAccumulatorValue() const {
 /**
  * Read the number of accumulated values.
  *
- * Read the count of the accumulated values since the accumulator was last Reset().
+ * Read the count of the accumulated values since the accumulator was last
+ * Reset().
  *
  * @return The number of times samples from the channel were accumulated.
  */
@@ -296,7 +299,7 @@ double SPI::GetAccumulatorAverage() const {
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void SPI::GetAccumulatorOutput(int64_t &value, uint32_t &count) const {
+void SPI::GetAccumulatorOutput(int64_t& value, uint32_t& count) const {
   int32_t status = 0;
   spiGetAccumulatorOutput(m_port, &value, &count, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));

@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "SensorBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "SensorBase.h"
 #include "tables/ITableListener.h"
 
 #include <memory>

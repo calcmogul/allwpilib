@@ -38,10 +38,11 @@ class AnalogGyro : public GyroBase {
   static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
 
   explicit AnalogGyro(int32_t channel);
-  explicit AnalogGyro(AnalogInput *channel);
+  explicit AnalogGyro(AnalogInput* channel);
   explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
   AnalogGyro(int32_t channel, uint32_t center, float offset);
-  AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center, float offset);
+  AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center,
+             float offset);
   virtual ~AnalogGyro() = default;
 
   float GetAngle() const override;

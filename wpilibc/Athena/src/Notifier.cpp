@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Notifier.h"
+#include "HAL/HAL.hpp"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "HAL/HAL.hpp"
 
 /**
  * Create a Notifier for timer event notification.
@@ -52,7 +52,7 @@ void Notifier::UpdateAlarm() {
  * Notify is called by the HAL layer.  We simply need to pass it through to
  * the user handler.
  */
-void Notifier::Notify(uint64_t currentTimeInt, void *param) {
+void Notifier::Notify(uint64_t currentTimeInt, void* param) {
   Notifier* notifier = static_cast<Notifier*>(param);
 
   notifier->m_processMutex.lock();

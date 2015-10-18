@@ -7,14 +7,14 @@
 
 #include "Preferences.h"
 
-#include "WPIErrors.h"
 #include "HAL/HAL.hpp"
+#include "WPIErrors.h"
 
 #include <stdio.h>
 #include <algorithm>
 
 /** The Preferences table name */
-static const char *kTableName = "Preferences";
+static const char* kTableName = "Preferences";
 
 void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
                                          std::shared_ptr<nt::Value> value,
@@ -34,7 +34,7 @@ Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
  * Get the one and only {@link Preferences} object
  * @return pointer to the {@link Preferences}
  */
-Preferences *Preferences::GetInstance() {
+Preferences* Preferences::GetInstance() {
   static Preferences instance;
   return &instance;
 }
@@ -213,6 +213,4 @@ bool Preferences::ContainsKey(llvm::StringRef key) {
  * Remove a preference
  * @param key the key
  */
-void Preferences::Remove(llvm::StringRef key) {
-  m_table->Delete(key);
-}
+void Preferences::Remove(llvm::StringRef key) { m_table->Delete(key); }

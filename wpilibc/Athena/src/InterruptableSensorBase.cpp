@@ -12,8 +12,7 @@
 std::unique_ptr<Resource> InterruptableSensorBase::m_interrupts =
     std::make_unique<Resource>(interrupt_kNumSystems);
 
-InterruptableSensorBase::InterruptableSensorBase() {
-}
+InterruptableSensorBase::InterruptableSensorBase() {}
 
 /**
 * Request one of the 8 interrupts asynchronously on this digital input.
@@ -25,7 +24,7 @@ InterruptableSensorBase::InterruptableSensorBase() {
 * The default is interrupt on rising edges only.
 */
 void InterruptableSensorBase::RequestInterrupts(
-    InterruptHandlerFunction handler, void *param) {
+    InterruptHandlerFunction handler, void* param) {
   if (StatusIsFatal()) return;
   uint32_t index = m_interrupts->Allocate("Async Interrupt");
   if (index == std::numeric_limits<uint32_t>::max()) {

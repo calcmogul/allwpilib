@@ -6,11 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
+#include "HAL/Port.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
-#include "HAL/Port.h"
 
 #include <sstream>
 
@@ -363,7 +363,7 @@ uint32_t AnalogInput::GetAccumulatorCount() const {
  * @param value Reference to the 64-bit accumulated output.
  * @param count Reference to the number of accumulation cycles.
  */
-void AnalogInput::GetAccumulatorOutput(int64_t &value, uint32_t &count) const {
+void AnalogInput::GetAccumulatorOutput(int64_t& value, uint32_t& count) const {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   getAccumulatorOutput(m_port, &value, &count, &status);

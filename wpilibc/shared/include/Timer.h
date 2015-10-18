@@ -10,7 +10,7 @@
 #include "Base.h"
 #include "HAL/cpp/priority_mutex.h"
 
-typedef void (*TimerInterruptHandler)(void *param);
+typedef void (*TimerInterruptHandler)(void* param);
 
 void Wait(double seconds);
 double GetClock();

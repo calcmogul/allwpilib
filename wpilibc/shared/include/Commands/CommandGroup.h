@@ -8,10 +8,10 @@
 #ifndef __COMMAND_GROUP_H__
 #define __COMMAND_GROUP_H__
 
-#include "Commands/Command.h"
-#include "Commands/CommandGroupEntry.h"
 #include <list>
 #include <vector>
+#include "Commands/Command.h"
+#include "Commands/CommandGroupEntry.h"
 
 /**
  * A {@link CommandGroup} is a list of commands which are executed in sequence.
@@ -37,13 +37,13 @@
 class CommandGroup : public Command {
  public:
   CommandGroup() = default;
-  CommandGroup(const std::string &name);
+  CommandGroup(const std::string& name);
   virtual ~CommandGroup() = default;
 
-  void AddSequential(Command *command);
-  void AddSequential(Command *command, double timeout);
-  void AddParallel(Command *command);
-  void AddParallel(Command *command, double timeout);
+  void AddSequential(Command* command);
+  void AddSequential(Command* command, double timeout);
+  void AddParallel(Command* command);
+  void AddParallel(Command* command, double timeout);
   bool IsInterruptible() const;
   int GetSize() const;
 
@@ -59,7 +59,7 @@ class CommandGroup : public Command {
   virtual void _End();
 
  private:
-  void CancelConflicts(Command *command);
+  void CancelConflicts(Command* command);
 
   /** The commands in this group (stored in entries) */
   std::vector<CommandGroupEntry> m_commands;

@@ -8,9 +8,9 @@
 #pragma once
 
 #include "HAL/HAL.hpp"
-#include "SensorBase.h"
-#include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "PIDSource.h"
+#include "SensorBase.h"
 
 #include <memory>
 
@@ -64,7 +64,7 @@ class AnalogInput : public SensorBase,
   void SetAccumulatorDeadband(int32_t deadband);
   int64_t GetAccumulatorValue() const;
   uint32_t GetAccumulatorCount() const;
-  void GetAccumulatorOutput(int64_t &value, uint32_t &count) const;
+  void GetAccumulatorOutput(int64_t& value, uint32_t& count) const;
 
   static void SetSampleRate(float samplesPerSecond);
   static float GetSampleRate();
@@ -80,8 +80,8 @@ class AnalogInput : public SensorBase,
 
  private:
   uint32_t m_channel;
-  //TODO: Adjust HAL to avoid use of raw pointers.
-  void *m_port;
+  // TODO: Adjust HAL to avoid use of raw pointers.
+  void* m_port;
   int64_t m_accumulatorOffset;
 
   std::shared_ptr<ITable> m_table;

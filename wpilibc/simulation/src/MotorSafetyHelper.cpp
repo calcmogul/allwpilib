@@ -31,7 +31,7 @@ priority_recursive_mutex MotorSafetyHelper::m_listMutex;
  * This is used
  * to call the Stop() method on the motor.
  */
-MotorSafetyHelper::MotorSafetyHelper(MotorSafety *safeObject)
+MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
     : m_safeObject(safeObject) {
   m_enabled = false;
   m_expiration = DEFAULT_SAFETY_EXPIRATION;
@@ -91,16 +91,15 @@ bool MotorSafetyHelper::IsAlive() const {
  * its value is
  * updated again.
  */
-void MotorSafetyHelper::Check()
-{
-	DriverStation &ds = DriverStation::GetInstance();
-	if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
+void MotorSafetyHelper::Check() {
+  DriverStation& ds = DriverStation::GetInstance();
+  if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
 
   std::lock_guard<priority_recursive_mutex> sync(m_syncMutex);
   if (m_stopTime < Timer::GetFPGATimestamp()) {
     std::ostringstream desc;
     m_safeObject->GetDescription(desc);
-    desc <<  "... Output not updated often enough.";
+    desc << "... Output not updated often enough.";
     wpi_setWPIErrorWithContext(Timeout, desc.str().c_str());
     m_safeObject->StopMotor();
   }

@@ -7,15 +7,15 @@
 
 #pragma once
 
-#include "SensorBase.h"
-#include "RobotState.h"
-#include "Task.h"
+#include <atomic>
+#include <condition_variable>
 #include "HAL/HAL.hpp"
 #include "HAL/cpp/Semaphore.hpp"
-#include "HAL/cpp/priority_mutex.h"
 #include "HAL/cpp/priority_condition_variable.h"
-#include <condition_variable>
-#include <atomic>
+#include "HAL/cpp/priority_mutex.h"
+#include "RobotState.h"
+#include "SensorBase.h"
+#include "Task.h"
 
 struct HALControlWord;
 class AnalogInput;
@@ -29,7 +29,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   enum Alliance { kRed, kBlue, kInvalid };
 
   virtual ~DriverStation();
-  static DriverStation &GetInstance();
+  static DriverStation& GetInstance();
   static void ReportError(std::string error);
   static void ReportWarning(std::string error);
   static void ReportError(bool is_error, int32_t code, const std::string& error,
@@ -99,7 +99,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void GetData();
 
  private:
-  static DriverStation *m_instance;
+  static DriverStation* m_instance;
   void ReportJoystickUnpluggedError(std::string message);
   void ReportJoystickUnpluggedWarning(std::string message);
   void Run();

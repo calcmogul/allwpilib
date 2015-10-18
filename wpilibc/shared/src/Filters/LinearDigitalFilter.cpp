@@ -18,9 +18,12 @@
  */
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                                          std::initializer_list<double> ffGains,
-                                         std::initializer_list<double> fbGains) :
-    Filter(source), m_inputs(ffGains.size()), m_outputs(fbGains.size()),
-    m_inputGains(ffGains), m_outputGains(fbGains) {}
+                                         std::initializer_list<double> fbGains)
+    : Filter(source),
+      m_inputs(ffGains.size()),
+      m_outputs(fbGains.size()),
+      m_inputGains(ffGains),
+      m_outputGains(fbGains) {}
 
 /**
  * Create a linear FIR or IIR filter
@@ -31,9 +34,12 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  */
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                                          std::initializer_list<double> ffGains,
-                                         const std::vector<double>& fbGains) :
-    Filter(source), m_inputs(ffGains.size()), m_outputs(fbGains.size()),
-    m_inputGains(ffGains), m_outputGains(fbGains) {}
+                                         const std::vector<double>& fbGains)
+    : Filter(source),
+      m_inputs(ffGains.size()),
+      m_outputs(fbGains.size()),
+      m_inputGains(ffGains),
+      m_outputGains(fbGains) {}
 
 /**
  * Create a linear FIR or IIR filter
@@ -44,9 +50,12 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  */
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                                          const std::vector<double>& ffGains,
-                                         std::initializer_list<double> fbGains) :
-    Filter(source), m_inputs(ffGains.size()), m_outputs(fbGains.size()),
-    m_inputGains(ffGains), m_outputGains(fbGains) {}
+                                         std::initializer_list<double> fbGains)
+    : Filter(source),
+      m_inputs(ffGains.size()),
+      m_outputs(fbGains.size()),
+      m_inputGains(ffGains),
+      m_outputGains(fbGains) {}
 
 /**
  * Create a linear FIR or IIR filter
@@ -57,9 +66,12 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  */
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                                          const std::vector<double>& ffGains,
-                                         const std::vector<double>& fbGains) :
-    Filter(source), m_inputs(ffGains.size()), m_outputs(fbGains.size()),
-    m_inputGains(ffGains), m_outputGains(fbGains) {}
+                                         const std::vector<double>& fbGains)
+    : Filter(source),
+      m_inputs(ffGains.size()),
+      m_outputs(fbGains.size()),
+      m_inputGains(ffGains),
+      m_outputGains(fbGains) {}
 
 /**
  * Creates a one-pole IIR low-pass filter of the form:
@@ -72,9 +84,8 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  * @param timeConstant The discrete-time time constant in seconds
  * @param period The period in seconds between samples taken by the user
  */
-LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(std::shared_ptr<PIDSource> source,
-                                                       double timeConstant,
-                                                       double period) {
+LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(
+    std::shared_ptr<PIDSource> source, double timeConstant, double period) {
   double gain = std::exp(-period / timeConstant);
   return LinearDigitalFilter(std::move(source), {1.0 - gain}, {-gain});
 }
@@ -90,9 +101,8 @@ LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(std::shared_ptr<PIDSource
  * @param timeConstant The discrete-time time constant in seconds
  * @param period The period in seconds between samples taken by the user
  */
-LinearDigitalFilter LinearDigitalFilter::HighPass(std::shared_ptr<PIDSource> source,
-                                                  double timeConstant,
-                                                  double period) {
+LinearDigitalFilter LinearDigitalFilter::HighPass(
+    std::shared_ptr<PIDSource> source, double timeConstant, double period) {
   double gain = std::exp(-period / timeConstant);
   return LinearDigitalFilter(std::move(source), {gain, -gain}, {-gain});
 }
@@ -107,8 +117,8 @@ LinearDigitalFilter LinearDigitalFilter::HighPass(std::shared_ptr<PIDSource> sou
  * @param taps The number of samples to average over. Higher = smoother but
  *        slower
  */
-LinearDigitalFilter LinearDigitalFilter::MovingAverage(std::shared_ptr<PIDSource> source,
-                                                       unsigned int taps) {
+LinearDigitalFilter LinearDigitalFilter::MovingAverage(
+    std::shared_ptr<PIDSource> source, unsigned int taps) {
   assert(taps > 0);
 
   std::vector<double> gains(taps, 1.0 / taps);

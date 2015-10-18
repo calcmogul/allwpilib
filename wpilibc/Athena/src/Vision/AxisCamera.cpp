@@ -9,13 +9,13 @@
 
 #include "WPIErrors.h"
 
-#include <cstring>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <netdb.h>
 #include <Timer.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cstring>
 #include <iostream>
 #include <sstream>
 
@@ -43,7 +43,7 @@ static const std::string kRotationStrings[] = {
  * AxisCamera constructor
  * @param cameraHost The host to find the camera at, typically an IP address
  */
-AxisCamera::AxisCamera(std::string const &cameraHost)
+AxisCamera::AxisCamera(std::string const& cameraHost)
     : m_cameraHost(cameraHost) {
   m_captureThread = std::thread(&AxisCamera::Capture, this);
 }
@@ -66,7 +66,7 @@ bool AxisCamera::IsFreshImage() const { return m_freshImage; }
  * RGB image.
  * @return 1 upon success, zero on a failure
  */
-int AxisCamera::GetImage(Image *image) {
+int AxisCamera::GetImage(Image* image) {
   if (m_imageData.size() == 0) {
     return 0;
   }
@@ -86,7 +86,7 @@ int AxisCamera::GetImage(Image *image) {
  * image
  * @return 1 upon success, zero on a failure
  */
-int AxisCamera::GetImage(ColorImage *image) {
+int AxisCamera::GetImage(ColorImage* image) {
   return GetImage(image->GetImaqImage());
 }
 
@@ -98,7 +98,7 @@ int AxisCamera::GetImage(ColorImage *image) {
  * delete.
  * @return a pointer to an HSLImage object
  */
-HSLImage *AxisCamera::GetImage() {
+HSLImage* AxisCamera::GetImage() {
   auto image = new HSLImage();
   GetImage(image);
   return image;
@@ -115,8 +115,8 @@ HSLImage *AxisCamera::GetImage() {
  * @param numBytes The size of the destination image.
  * @return 0 if failed (no source image or no memory), 1 if success.
  */
-int AxisCamera::CopyJPEG(char **destImage, unsigned int &destImageSize,
-                         unsigned int &destImageBufferSize) {
+int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
+                         unsigned int& destImageBufferSize) {
   std::lock_guard<priority_mutex> lock(m_imageDataMutex);
   if (destImage == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "destImage must not be nullptr");
@@ -404,7 +404,7 @@ void AxisCamera::Capture() {
  * This function actually reads the images from the camera.
  */
 void AxisCamera::ReadImagesFromCamera() {
-  char *imgBuffer = nullptr;
+  char* imgBuffer = nullptr;
   int imgBufferLength = 0;
 
   // TODO: these recv calls must be non-blocking. Otherwise if the camera
@@ -415,7 +415,7 @@ void AxisCamera::ReadImagesFromCamera() {
   while (!m_done) {
     char initialReadBuffer[kMaxPacketSize] = "";
     char intermediateBuffer[1];
-    char *trailingPtr = initialReadBuffer;
+    char* trailingPtr = initialReadBuffer;
     int trailingCounter = 0;
     while (counter) {
       // TODO: fix me... this cannot be the most efficient way to approach this,
@@ -438,7 +438,7 @@ void AxisCamera::ReadImagesFromCamera() {
       }
     }
     counter = 1;
-    char *contentLength = strstr(initialReadBuffer, "Content-Length: ");
+    char* contentLength = strstr(initialReadBuffer, "Content-Length: ");
     if (contentLength == nullptr) {
       wpi_setWPIErrorWithContext(IncompatibleMode,
                                  "No content-length token found in packet");
@@ -555,9 +555,9 @@ bool AxisCamera::WriteParameters() {
  * cause an error message to be printed if it immediately recovers.
  * @return -1 if failed, socket handle if successful.
  */
-int AxisCamera::CreateCameraSocket(std::string const &requestString,
+int AxisCamera::CreateCameraSocket(std::string const& requestString,
                                    bool setError) {
-  struct addrinfo *address = nullptr;
+  struct addrinfo* address = nullptr;
   int camSocket;
 
   /* create socket */

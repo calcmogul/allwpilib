@@ -10,8 +10,8 @@
 #include "WPIErrors.h"
 
 #include <errno.h>
-#include <cstring>
 #include <cstdio>
+#include <cstring>
 #include <sstream>
 
 priority_mutex ErrorBase::_globalErrorMutex;

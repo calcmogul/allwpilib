@@ -6,12 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PIDController.h"
-#include "Notifier.h"
-#include "PIDSource.h"
-#include "PIDOutput.h"
 #include <math.h>
 #include <vector>
 #include "HAL/HAL.hpp"
+#include "Notifier.h"
+#include "PIDOutput.h"
+#include "PIDSource.h"
 
 static const std::string kP = "p";
 static const std::string kI = "i";
@@ -31,8 +31,8 @@ static const std::string kEnabled = "enabled";
  * calculations of the
  * integral and differental terms. The default is 50ms.
  */
-PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource *source,
-                             PIDOutput *output, float period) {
+PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource* source,
+                             PIDOutput* output, float period) {
   Initialize(Kp, Ki, Kd, 0.0f, source, output, period);
 }
 
@@ -48,12 +48,13 @@ PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource *source,
  * integral and differental terms. The default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
-                             PIDSource *source, PIDOutput *output, float period) {
+                             PIDSource* source, PIDOutput* output,
+                             float period) {
   Initialize(Kp, Ki, Kd, Kf, source, output, period);
 }
 
 void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
-                               PIDSource *source, PIDOutput *output,
+                               PIDSource* source, PIDOutput* output,
                                float period) {
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
 
@@ -84,8 +85,8 @@ PIDController::~PIDController() {
  */
 void PIDController::Calculate() {
   bool enabled;
-  PIDSource *pidInput;
-  PIDOutput *pidOutput;
+  PIDSource* pidInput;
+  PIDOutput* pidOutput;
 
   {
     std::lock_guard<priority_recursive_mutex> sync(m_mutex);
@@ -101,7 +102,7 @@ void PIDController::Calculate() {
     std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     float input = pidInput->PIDGet();
     float result;
-    PIDOutput *pidOutput;
+    PIDOutput* pidOutput;
 
     m_error = m_setpoint - input;
     if (m_continuous) {
@@ -128,8 +129,7 @@ void PIDController::Calculate() {
       }
 
       m_result = m_D * m_error + m_P * m_totalError + CalculateFeedForward();
-    }
-    else {
+    } else {
       if (m_I != 0) {
         double potentialIGain = (m_totalError + m_error) * m_I;
         if (potentialIGain < m_maximumOutput) {
@@ -186,8 +186,7 @@ void PIDController::Calculate() {
 double PIDController::CalculateFeedForward() {
   if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
     return m_F * GetSetpoint();
-  }
-  else {
+  } else {
     double temp = m_F * GetDeltaSetpoint();
     m_prevSetpoint = m_setpoint;
     m_setpointTimer.Reset();
@@ -496,7 +495,8 @@ bool PIDController::OnTarget() const {
   double error = GetAvgError();
   switch (m_toleranceType) {
     case kPercentTolerance:
-      return fabs(error) < m_tolerance / 100 * (m_maximumInput - m_minimumInput);
+      return fabs(error) <
+             m_tolerance / 100 * (m_maximumInput - m_minimumInput);
       break;
     case kAbsoluteTolerance:
       return fabs(error) < m_tolerance;

@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Solenoid.h"
-#include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 #include <sstream>
 

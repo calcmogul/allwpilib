@@ -8,12 +8,12 @@
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
+#include <memory>
+#include <set>
+#include <string>
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
 #include "tables/ITableListener.h"
-#include <set>
-#include <string>
-#include <memory>
 
 class CommandGroup;
 class Subsystem;
@@ -57,12 +57,12 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
  public:
   Command();
-  Command(const std::string &name);
+  Command(const std::string& name);
   Command(double timeout);
-  Command(const std::string &name, double timeout);
+  Command(const std::string& name, double timeout);
   virtual ~Command();
   double TimeSinceInitialized() const;
-  void Requires(Subsystem *s);
+  void Requires(Subsystem* s);
   bool IsCanceled() const;
   void Start();
   bool Run();
@@ -70,10 +70,10 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   bool IsRunning() const;
   bool IsInterruptible() const;
   void SetInterruptible(bool interruptible);
-  bool DoesRequire(Subsystem *subsystem) const;
-  typedef std::set<Subsystem *> SubsystemSet;
+  bool DoesRequire(Subsystem* subsystem) const;
+  typedef std::set<Subsystem*> SubsystemSet;
   SubsystemSet GetRequirements() const;
-  CommandGroup *GetGroup() const;
+  CommandGroup* GetGroup() const;
   void SetRunWhenDisabled(bool run);
   bool WillRunWhenDisabled() const;
   int GetID() const;
@@ -81,8 +81,8 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
  protected:
   void SetTimeout(double timeout);
   bool IsTimedOut() const;
-  bool AssertUnlocked(const std::string &message);
-  void SetParent(CommandGroup *parent);
+  bool AssertUnlocked(const std::string& message);
+  void SetParent(CommandGroup* parent);
   /**
    * The initialize method is called the first time this Command is run after
    * being started.
@@ -170,7 +170,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   bool m_runWhenDisabled = false;
 
   /** The {@link CommandGroup} this is in */
-  CommandGroup *m_parent = nullptr;
+  CommandGroup* m_parent = nullptr;
 
   int m_commandID = m_commandCounter++;
   static int m_commandCounter;

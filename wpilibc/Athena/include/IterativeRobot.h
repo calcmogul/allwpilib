@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Timer.h"
 #include "RobotBase.h"
+#include "Timer.h"
 
 /**
  * IterativeRobot implements a specific type of Robot Program framework,

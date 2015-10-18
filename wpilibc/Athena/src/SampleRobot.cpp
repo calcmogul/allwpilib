@@ -8,9 +8,9 @@
 #include "SampleRobot.h"
 
 #include "DriverStation.h"
-#include "Timer.h"
-#include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SmartDashboard.h"
+#include "Timer.h"
 #include "networktables/NetworkTable.h"
 
 SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
@@ -105,7 +105,7 @@ void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
  * robot to be enabled again.
  */
 void SampleRobot::StartCompetition() {
-  LiveWindow *lw = LiveWindow::GetInstance();
+  LiveWindow* lw = LiveWindow::GetInstance();
 
   HALReport(HALUsageReporting::kResourceType_Framework,
             HALUsageReporting::kFramework_Sample);

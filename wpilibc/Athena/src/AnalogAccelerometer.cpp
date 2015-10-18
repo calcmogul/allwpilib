@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogAccelerometer.h"
-#include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 /**
  * Common function for initializing the accelerometer.
@@ -38,7 +38,7 @@ AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
  * @param channel The existing AnalogInput object for the analog input the
  * accelerometer is connected to
  */
-AnalogAccelerometer::AnalogAccelerometer(AnalogInput *channel)
+AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
     : m_analogInput(channel, NullDeleter<AnalogInput>()) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -125,4 +125,6 @@ void AnalogAccelerometer::InitTable(std::shared_ptr<ITable> subTable) {
   UpdateTable();
 }
 
-std::shared_ptr<ITable> AnalogAccelerometer::GetTable() const { return m_table; }
+std::shared_ptr<ITable> AnalogAccelerometer::GetTable() const {
+  return m_table;
+}

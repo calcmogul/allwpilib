@@ -9,8 +9,8 @@
 
 #include "DriverStation.h"
 #include "HAL/HAL.hpp"
-#include "SmartDashboard/SmartDashboard.h"
 #include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SmartDashboard.h"
 #include "networktables/NetworkTable.h"
 
 constexpr double IterativeRobot::kDefaultPeriod;
@@ -25,7 +25,7 @@ void IterativeRobot::StartCompetition() {
   HALReport(HALUsageReporting::kResourceType_Framework,
             HALUsageReporting::kFramework_Iterative);
 
-  LiveWindow *lw = LiveWindow::GetInstance();
+  LiveWindow* lw = LiveWindow::GetInstance();
   // first and one-time initialization
   SmartDashboard::init();
   NetworkTable::GetTable("LiveWindow")

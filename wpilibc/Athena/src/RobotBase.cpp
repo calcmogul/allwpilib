@@ -7,26 +7,26 @@
 
 #include "RobotBase.h"
 
+#include <cstdio>
+#include <cstring>
 #include "DriverStation.h"
-#include "RobotState.h"
+#include "HAL/HAL.hpp"
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"
+#include "RobotState.h"
 #include "Utility.h"
 #include "networktables/NetworkTable.h"
-#include <cstring>
-#include "HAL/HAL.hpp"
-#include <cstdio>
 
-RobotBase *RobotBase::m_instance = nullptr;
+RobotBase* RobotBase::m_instance = nullptr;
 
-void RobotBase::setInstance(RobotBase *robot) {
+void RobotBase::setInstance(RobotBase* robot) {
   wpi_assert(m_instance == nullptr);
   m_instance = robot;
 }
 
-RobotBase &RobotBase::getInstance() { return *m_instance; }
+RobotBase& RobotBase::getInstance() { return *m_instance; }
 
-void RobotBase::robotSetup(RobotBase *robot) {
+void RobotBase::robotSetup(RobotBase* robot) {
   printf("\n********** Robot program starting **********\n");
   robot->StartCompetition();
 }
@@ -52,7 +52,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   NetworkTable::SetNetworkIdentity("Robot");
   NetworkTable::SetPersistentFilename("/home/lvuser/networktables.ini");
 
-  FILE *file = nullptr;
+  FILE* file = nullptr;
   file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   if (file != nullptr) {

@@ -9,9 +9,9 @@
 
 #include <time.h>
 
+#include <iostream>
 #include "HAL/HAL.hpp"
 #include "Utility.h"
-#include <iostream>
 
 /**
  * Pause the task for a specified time.
@@ -51,7 +51,7 @@ double GetTime() {
   return (realTime);
 }
 
-//for compatibility with msvc12--see C2864
+// for compatibility with msvc12--see C2864
 const double Timer::kRolloverTime = (1ll << 32) / 1e6;
 /**
  * Create a new timer object.

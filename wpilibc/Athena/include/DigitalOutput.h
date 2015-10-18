@@ -50,7 +50,7 @@ class DigitalOutput : public DigitalSource,
 
  private:
   uint32_t m_channel;
-  void *m_pwmGenerator;
+  void* m_pwmGenerator;
 
   std::shared_ptr<ITable> m_table;
 };

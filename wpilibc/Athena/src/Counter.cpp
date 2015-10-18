@@ -45,7 +45,7 @@ Counter::Counter(Mode mode) {
  * @param source A pointer to the existing DigitalSource object. It will be set
  * as the Up Source.
  */
-Counter::Counter(DigitalSource *source) : Counter(kTwoPulse) {
+Counter::Counter(DigitalSource* source) : Counter(kTwoPulse) {
   SetUpSource(source);
   ClearDownSource();
 }
@@ -89,7 +89,7 @@ Counter::Counter(int32_t channel) : Counter(kTwoPulse) {
  * @param trigger The pointer to the existing AnalogTrigger object.
  */
 DEPRECATED("Use pass-by-reference instead.")
-Counter::Counter(AnalogTrigger *trigger) : Counter(kTwoPulse) {
+Counter::Counter(AnalogTrigger* trigger) : Counter(kTwoPulse) {
   SetUpSource(trigger->CreateOutput(kState));
   ClearDownSource();
 }
@@ -102,7 +102,7 @@ Counter::Counter(AnalogTrigger *trigger) : Counter(kTwoPulse) {
  * The counter will start counting immediately.
  * @param trigger The reference to the existing AnalogTrigger object.
  */
-Counter::Counter(const AnalogTrigger &trigger) : Counter(kTwoPulse) {
+Counter::Counter(const AnalogTrigger& trigger) : Counter(kTwoPulse) {
   SetUpSource(trigger.CreateOutput(kState));
   ClearDownSource();
 }
@@ -115,13 +115,12 @@ Counter::Counter(const AnalogTrigger &trigger) : Counter(kTwoPulse) {
  * @param downSource The pointer to the DigitalSource to set as the down source
  * @param inverted True to invert the output (reverse the direction)
  */
-Counter::Counter(EncodingType encodingType, DigitalSource *upSource,
-                 DigitalSource *downSource, bool inverted)
-    : Counter(encodingType,
-              std::shared_ptr<DigitalSource>(upSource,
-                                               NullDeleter<DigitalSource>()),
+Counter::Counter(EncodingType encodingType, DigitalSource* upSource,
+                 DigitalSource* downSource, bool inverted)
+    : Counter(encodingType, std::shared_ptr<DigitalSource>(
+                                upSource, NullDeleter<DigitalSource>()),
               std::shared_ptr<DigitalSource>(downSource,
-                                               NullDeleter<DigitalSource>()),
+                                             NullDeleter<DigitalSource>()),
               inverted) {}
 
 /**
@@ -185,10 +184,10 @@ void Counter::SetUpSource(int32_t channel) {
  * @param analogTrigger The analog trigger object that is used for the Up Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
-void Counter::SetUpSource(AnalogTrigger *analogTrigger,
+void Counter::SetUpSource(AnalogTrigger* analogTrigger,
                           AnalogTriggerType triggerType) {
   SetUpSource(std::shared_ptr<AnalogTrigger>(analogTrigger,
-                                               NullDeleter<AnalogTrigger>()),
+                                             NullDeleter<AnalogTrigger>()),
               triggerType);
 }
 
@@ -221,7 +220,7 @@ void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
   }
 }
 
-void Counter::SetUpSource(DigitalSource *source) {
+void Counter::SetUpSource(DigitalSource* source) {
   SetUpSource(
       std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
 }
@@ -231,7 +230,7 @@ void Counter::SetUpSource(DigitalSource *source) {
  * Set the up counting DigitalSource.
  * @param source Reference to the DigitalSource object to set as the up source
  */
-void Counter::SetUpSource(DigitalSource &source) {
+void Counter::SetUpSource(DigitalSource& source) {
   SetUpSource(
       std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
 }
@@ -281,9 +280,11 @@ void Counter::SetDownSource(int32_t channel) {
  * Source
  * @param triggerType The analog trigger output that will trigger the counter.
  */
-void Counter::SetDownSource(AnalogTrigger *analogTrigger,
+void Counter::SetDownSource(AnalogTrigger* analogTrigger,
                             AnalogTriggerType triggerType) {
-  SetDownSource(std::shared_ptr<AnalogTrigger>(analogTrigger, NullDeleter<AnalogTrigger>()), triggerType);
+  SetDownSource(std::shared_ptr<AnalogTrigger>(analogTrigger,
+                                               NullDeleter<AnalogTrigger>()),
+                triggerType);
 }
 
 /**
@@ -316,8 +317,9 @@ void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
   }
 }
 
-void Counter::SetDownSource(DigitalSource *source) {
-  SetDownSource(std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+void Counter::SetDownSource(DigitalSource* source) {
+  SetDownSource(
+      std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
 }
 
 /**
@@ -325,8 +327,9 @@ void Counter::SetDownSource(DigitalSource *source) {
  * Set the down counting DigitalSource.
  * @param source Reference to the DigitalSource object to set as the down source
  */
-void Counter::SetDownSource(DigitalSource &source) {
-  SetDownSource(std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+void Counter::SetDownSource(DigitalSource& source) {
+  SetDownSource(
+      std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
 }
 
 /**

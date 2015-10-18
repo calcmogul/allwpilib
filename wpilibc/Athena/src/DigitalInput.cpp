@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DigitalInput.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
 
 #include <limits>
 #include <sstream>

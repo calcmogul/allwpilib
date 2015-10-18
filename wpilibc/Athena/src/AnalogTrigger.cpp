@@ -8,9 +8,9 @@
 #include "AnalogTrigger.h"
 
 #include "AnalogInput.h"
+#include "HAL/Port.h"
 #include "Resource.h"
 #include "WPIErrors.h"
-#include "HAL/Port.h"
 
 #include <memory>
 
@@ -38,9 +38,8 @@ AnalogTrigger::AnalogTrigger(int32_t channel) {
  * trigger and an analog input object.
  * @param channel The pointer to the existing AnalogInput object
  */
-AnalogTrigger::AnalogTrigger(AnalogInput *input) :
-    AnalogTrigger(input->GetChannel()) {
-}
+AnalogTrigger::AnalogTrigger(AnalogInput* input)
+    : AnalogTrigger(input->GetChannel()) {}
 
 AnalogTrigger::~AnalogTrigger() {
   int32_t status = 0;

@@ -19,13 +19,13 @@ static uint8_t kDataRegister = 0x0E;
 static uint8_t kFilterCtlRegister = 0x2C;
 static uint8_t kPowerCtlRegister = 0x2D;
 
-//static uint8_t kFilterCtl_Range2G = 0x00;
-//static uint8_t kFilterCtl_Range4G = 0x40;
-//static uint8_t kFilterCtl_Range8G = 0x80;
+// static uint8_t kFilterCtl_Range2G = 0x00;
+// static uint8_t kFilterCtl_Range4G = 0x40;
+// static uint8_t kFilterCtl_Range8G = 0x80;
 static uint8_t kFilterCtl_ODR_100Hz = 0x03;
 
 static uint8_t kPowerCtl_UltraLowNoise = 0x20;
-//static uint8_t kPowerCtl_AutoSleep = 0x04;
+// static uint8_t kPowerCtl_AutoSleep = 0x04;
 static uint8_t kPowerCtl_Measure = 0x02;
 
 /**

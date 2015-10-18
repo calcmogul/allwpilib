@@ -7,20 +7,20 @@
 
 #include "RobotDrive.h"
 
+#include <math.h>
 #include "CANJaguar.h"
 #include "GenericHID.h"
 #include "Joystick.h"
 #include "Talon.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include <math.h>
 
 #undef max
 #include <algorithm>
 
 const int32_t RobotDrive::kMaxNumberOfMotors;
 
-static auto make_shared_nodelete(SpeedController *ptr) {
+static auto make_shared_nodelete(SpeedController* ptr) {
   return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
 }
 
@@ -96,8 +96,8 @@ RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
  * @param leftMotor The left SpeedController object used to drive the robot.
  * @param rightMotor the right SpeedController object used to drive the robot.
  */
-RobotDrive::RobotDrive(SpeedController *leftMotor,
-                       SpeedController *rightMotor) {
+RobotDrive::RobotDrive(SpeedController* leftMotor,
+                       SpeedController* rightMotor) {
   InitRobotDrive();
   if (leftMotor == nullptr || rightMotor == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -108,9 +108,9 @@ RobotDrive::RobotDrive(SpeedController *leftMotor,
   m_rearRightMotor = make_shared_nodelete(rightMotor);
 }
 
-//TODO: Change to rvalue references & move syntax.
-RobotDrive::RobotDrive(SpeedController &leftMotor,
-                       SpeedController &rightMotor) {
+// TODO: Change to rvalue references & move syntax.
+RobotDrive::RobotDrive(SpeedController& leftMotor,
+                       SpeedController& rightMotor) {
   InitRobotDrive();
   m_rearLeftMotor = make_shared_nodelete(&leftMotor);
   m_rearRightMotor = make_shared_nodelete(&rightMotor);
@@ -141,10 +141,10 @@ RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
  * @param frontRightMotor The front right SpeedController object used to drive
  * the robot.
  */
-RobotDrive::RobotDrive(SpeedController *frontLeftMotor,
-                       SpeedController *rearLeftMotor,
-                       SpeedController *frontRightMotor,
-                       SpeedController *rearRightMotor) {
+RobotDrive::RobotDrive(SpeedController* frontLeftMotor,
+                       SpeedController* rearLeftMotor,
+                       SpeedController* frontRightMotor,
+                       SpeedController* rearRightMotor) {
   InitRobotDrive();
   if (frontLeftMotor == nullptr || rearLeftMotor == nullptr ||
       frontRightMotor == nullptr || rearRightMotor == nullptr) {
@@ -157,10 +157,10 @@ RobotDrive::RobotDrive(SpeedController *frontLeftMotor,
   m_rearRightMotor = make_shared_nodelete(rearRightMotor);
 }
 
-RobotDrive::RobotDrive(SpeedController &frontLeftMotor,
-                       SpeedController &rearLeftMotor,
-                       SpeedController &frontRightMotor,
-                       SpeedController &rearRightMotor) {
+RobotDrive::RobotDrive(SpeedController& frontLeftMotor,
+                       SpeedController& rearLeftMotor,
+                       SpeedController& frontRightMotor,
+                       SpeedController& rearRightMotor) {
   InitRobotDrive();
   m_frontLeftMotor = make_shared_nodelete(&frontLeftMotor);
   m_rearLeftMotor = make_shared_nodelete(&rearLeftMotor);
@@ -239,7 +239,7 @@ void RobotDrive::Drive(float outputMagnitude, float curve) {
  * @param leftStick The joystick to control the left side of the robot.
  * @param rightStick The joystick to control the right side of the robot.
  */
-void RobotDrive::TankDrive(GenericHID *leftStick, GenericHID *rightStick,
+void RobotDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
                            bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -248,7 +248,7 @@ void RobotDrive::TankDrive(GenericHID *leftStick, GenericHID *rightStick,
   TankDrive(leftStick->GetY(), rightStick->GetY(), squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID &leftStick, GenericHID &rightStick,
+void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
                            bool squaredInputs) {
   TankDrive(leftStick.GetY(), rightStick.GetY(), squaredInputs);
 }
@@ -263,8 +263,8 @@ void RobotDrive::TankDrive(GenericHID &leftStick, GenericHID &rightStick,
  * @param rightStick The Joystick object to use for the right side of the robot.
  * @param rightAxis The axis to select on the right side Joystick object.
  */
-void RobotDrive::TankDrive(GenericHID *leftStick, uint32_t leftAxis,
-                           GenericHID *rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
+                           GenericHID* rightStick, uint32_t rightAxis,
                            bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -274,8 +274,8 @@ void RobotDrive::TankDrive(GenericHID *leftStick, uint32_t leftAxis,
             squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID &leftStick, uint32_t leftAxis,
-                           GenericHID &rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID& leftStick, uint32_t leftAxis,
+                           GenericHID& rightStick, uint32_t rightAxis,
                            bool squaredInputs) {
   TankDrive(leftStick.GetRawAxis(leftAxis), rightStick.GetRawAxis(rightAxis),
             squaredInputs);
@@ -328,7 +328,7 @@ void RobotDrive::TankDrive(float leftValue, float rightValue,
  * @param squaredInputs If true, the sensitivity will be increased for small
  * values
  */
-void RobotDrive::ArcadeDrive(GenericHID *stick, bool squaredInputs) {
+void RobotDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs) {
   // simply call the full-featured ArcadeDrive with the appropriate values
   ArcadeDrive(stick->GetY(), stick->GetX(), squaredInputs);
 }
@@ -345,7 +345,7 @@ void RobotDrive::ArcadeDrive(GenericHID *stick, bool squaredInputs) {
  * @param squaredInputs If true, the sensitivity will be increased for small
  * values
  */
-void RobotDrive::ArcadeDrive(GenericHID &stick, bool squaredInputs) {
+void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
   // simply call the full-featured ArcadeDrive with the appropriate values
   ArcadeDrive(stick.GetY(), stick.GetX(), squaredInputs);
 }
@@ -365,8 +365,8 @@ void RobotDrive::ArcadeDrive(GenericHID &stick, bool squaredInputs) {
  * @param squaredInputs Setting this parameter to true increases the sensitivity
  * at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID *moveStick, uint32_t moveAxis,
-                             GenericHID *rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
+                             GenericHID* rotateStick, uint32_t rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick->GetRawAxis(moveAxis);
   float rotateValue = rotateStick->GetRawAxis(rotateAxis);
@@ -390,8 +390,8 @@ void RobotDrive::ArcadeDrive(GenericHID *moveStick, uint32_t moveAxis,
  * at lower speeds
  */
 
-void RobotDrive::ArcadeDrive(GenericHID &moveStick, uint32_t moveAxis,
-                             GenericHID &rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID& moveStick, uint32_t moveAxis,
+                             GenericHID& rotateStick, uint32_t rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick.GetRawAxis(moveAxis);
   float rotateValue = rotateStick.GetRawAxis(rotateAxis);
@@ -635,7 +635,7 @@ float RobotDrive::Limit(float num) {
 /**
  * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
  */
-void RobotDrive::Normalize(double *wheelSpeeds) {
+void RobotDrive::Normalize(double* wheelSpeeds) {
   double maxMagnitude = fabs(wheelSpeeds[0]);
   int32_t i;
   for (i = 1; i < kMaxNumberOfMotors; i++) {
@@ -652,7 +652,7 @@ void RobotDrive::Normalize(double *wheelSpeeds) {
 /**
  * Rotate a vector in Cartesian space.
  */
-void RobotDrive::RotateVector(double &x, double &y, double angle) {
+void RobotDrive::RotateVector(double& x, double& y, double angle) {
   double cosA = cos(angle * (3.14159 / 180.0));
   double sinA = sin(angle * (3.14159 / 180.0));
   double xOut = x * cosA - y * sinA;

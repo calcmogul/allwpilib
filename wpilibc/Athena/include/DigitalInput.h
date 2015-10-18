@@ -10,8 +10,8 @@
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
-#include <memory>
 #include <cstdint>
+#include <memory>
 
 class DigitalGlitchFilter;
 

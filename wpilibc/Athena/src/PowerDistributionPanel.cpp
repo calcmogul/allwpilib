@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PowerDistributionPanel.h"
-#include "WPIErrors.h"
 #include "HAL/PDP.hpp"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 #include <sstream>
 
@@ -187,4 +187,6 @@ void PowerDistributionPanel::InitTable(std::shared_ptr<ITable> subTable) {
   UpdateTable();
 }
 
-std::shared_ptr<ITable> PowerDistributionPanel::GetTable() const { return m_table; }
+std::shared_ptr<ITable> PowerDistributionPanel::GetTable() const {
+  return m_table;
+}

@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"
-#include "tables/ITableListener.h"
-#include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
+#include "tables/ITableListener.h"
 
 #include <memory>
 

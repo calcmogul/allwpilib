@@ -6,14 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DriverStation.h"
+#include <string.h>
 #include "AnalogInput.h"
-#include "Timer.h"
-#include "NetworkCommunication/FRCComm.h"
+#include "Log.hpp"
 #include "MotorSafetyHelper.h"
+#include "NetworkCommunication/FRCComm.h"
+#include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include <string.h>
-#include "Log.hpp"
 
 // set the logging level
 TLogLevel dsLogLevel = logDEBUG;
@@ -87,8 +87,8 @@ void DriverStation::Run() {
  * Return a pointer to the singleton DriverStation.
  * @return Pointer to the DS instance
  */
-DriverStation &DriverStation::GetInstance() {
-  static DriverStation *instance = new DriverStation();
+DriverStation& DriverStation::GetInstance() {
+  static DriverStation* instance = new DriverStation();
   return *instance;
 }
 
@@ -552,9 +552,9 @@ void DriverStation::ReportWarning(std::string error) {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(bool is_error, int32_t code,
-                                const std::string &error,
-                                const std::string &location,
-                                const std::string &stack) {
+                                const std::string& error,
+                                const std::string& location,
+                                const std::string& stack) {
   HALSendError(is_error, code, 0, error.c_str(), location.c_str(),
                stack.c_str(), 1);
 }

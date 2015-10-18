@@ -12,8 +12,7 @@
  * @param channel The PWM channel that the controller is attached to. 0-9 are
  * on-board, 10-19 are on the MXP port
  */
-PWMSpeedController::PWMSpeedController(uint32_t channel) : SafePWM(channel) {
-}
+PWMSpeedController::PWMSpeedController(uint32_t channel) : SafePWM(channel) {}
 
 /**
  * Set the PWM value.
@@ -44,7 +43,9 @@ void PWMSpeedController::Disable() { SetRaw(kPwmDisabled); }
 * Common interface for inverting direction of a speed controller.
 * @param isInverted The state of inversion, true is inverted.
 */
-void PWMSpeedController::SetInverted(bool isInverted) { m_isInverted = isInverted; }
+void PWMSpeedController::SetInverted(bool isInverted) {
+  m_isInverted = isInverted;
+}
 
 /**
  * Common interface for the inverting direction of a speed controller.

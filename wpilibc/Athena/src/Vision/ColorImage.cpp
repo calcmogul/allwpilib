@@ -18,7 +18,7 @@ ColorImage::ColorImage(ImageType type) : ImageBase(type) {}
  * @param colorMode The type of colorspace this operation should be performed in
  * @returns a pointer to a binary image
  */
-BinaryImage *ColorImage::ComputeThreshold(ColorMode colorMode, int low1,
+BinaryImage* ColorImage::ComputeThreshold(ColorMode colorMode, int low1,
                                           int high1, int low2, int high2,
                                           int low3, int high3) {
   auto result = new BinaryImage();
@@ -41,7 +41,7 @@ BinaryImage *ColorImage::ComputeThreshold(ColorMode colorMode, int low1,
  * @returns A pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdRGB(int redLow, int redHigh, int greenLow,
+BinaryImage* ColorImage::ThresholdRGB(int redLow, int redHigh, int greenLow,
                                       int greenHigh, int blueLow,
                                       int blueHigh) {
   return ComputeThreshold(IMAQ_RGB, redLow, redHigh, greenLow, greenHigh,
@@ -54,7 +54,7 @@ BinaryImage *ColorImage::ThresholdRGB(int redLow, int redHigh, int greenLow,
  * @returns A pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdRGB(Threshold &t) {
+BinaryImage* ColorImage::ThresholdRGB(Threshold& t) {
   return ComputeThreshold(IMAQ_RGB, t.plane1Low, t.plane1High, t.plane2Low,
                           t.plane2High, t.plane3Low, t.plane3High);
 }
@@ -70,7 +70,7 @@ BinaryImage *ColorImage::ThresholdRGB(Threshold &t) {
  * @returns a pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdHSL(int hueLow, int hueHigh,
+BinaryImage* ColorImage::ThresholdHSL(int hueLow, int hueHigh,
                                       int saturationLow, int saturationHigh,
                                       int luminenceLow, int luminenceHigh) {
   return ComputeThreshold(IMAQ_HSL, hueLow, hueHigh, saturationLow,
@@ -83,7 +83,7 @@ BinaryImage *ColorImage::ThresholdHSL(int hueLow, int hueHigh,
  * @returns A pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdHSL(Threshold &t) {
+BinaryImage* ColorImage::ThresholdHSL(Threshold& t) {
   return ComputeThreshold(IMAQ_HSL, t.plane1Low, t.plane1High, t.plane2Low,
                           t.plane2High, t.plane3Low, t.plane3High);
 }
@@ -99,7 +99,7 @@ BinaryImage *ColorImage::ThresholdHSL(Threshold &t) {
  * @returns a pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdHSV(int hueLow, int hueHigh,
+BinaryImage* ColorImage::ThresholdHSV(int hueLow, int hueHigh,
                                       int saturationLow, int saturationHigh,
                                       int valueLow, int valueHigh) {
   return ComputeThreshold(IMAQ_HSV, hueLow, hueHigh, saturationLow,
@@ -112,7 +112,7 @@ BinaryImage *ColorImage::ThresholdHSV(int hueLow, int hueHigh,
  * @returns A pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdHSV(Threshold &t) {
+BinaryImage* ColorImage::ThresholdHSV(Threshold& t) {
   return ComputeThreshold(IMAQ_HSV, t.plane1Low, t.plane1High, t.plane2Low,
                           t.plane2High, t.plane3Low, t.plane3High);
 }
@@ -128,7 +128,7 @@ BinaryImage *ColorImage::ThresholdHSV(Threshold &t) {
  * @returns a pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdHSI(int hueLow, int hueHigh,
+BinaryImage* ColorImage::ThresholdHSI(int hueLow, int hueHigh,
                                       int saturationLow, int saturationHigh,
                                       int intensityLow, int intensityHigh) {
   return ComputeThreshold(IMAQ_HSI, hueLow, hueHigh, saturationLow,
@@ -141,7 +141,7 @@ BinaryImage *ColorImage::ThresholdHSI(int hueLow, int hueHigh,
  * @returns A pointer to a BinaryImage that represents the result of the
  * threshold operation.
  */
-BinaryImage *ColorImage::ThresholdHSI(Threshold &t) {
+BinaryImage* ColorImage::ThresholdHSI(Threshold& t) {
   return ComputeThreshold(IMAQ_HSI, t.plane1Low, t.plane1High, t.plane2Low,
                           t.plane2High, t.plane3Low, t.plane3High);
 }
@@ -152,7 +152,7 @@ BinaryImage *ColorImage::ThresholdHSI(Threshold &t) {
  * @param planeNumber Which plane is to be extracted
  * @returns A pointer to a MonoImage that represents the extracted plane.
  */
-MonoImage *ColorImage::ExtractColorPlane(ColorMode mode, int planeNumber) {
+MonoImage* ColorImage::ExtractColorPlane(ColorMode mode, int planeNumber) {
   auto result = new MonoImage();
   if (m_imaqImage == nullptr) wpi_setWPIError(NullParameter);
   int success = imaqExtractColorPlanes(
@@ -168,7 +168,7 @@ MonoImage *ColorImage::ExtractColorPlane(ColorMode mode, int planeNumber) {
  * @param mode The color mode in which to operate
  * @returns a pointer to a MonoImage that is the extracted plane.
  */
-MonoImage *ColorImage::ExtractFirstColorPlane(ColorMode mode) {
+MonoImage* ColorImage::ExtractFirstColorPlane(ColorMode mode) {
   return ExtractColorPlane(mode, 1);
 }
 
@@ -177,7 +177,7 @@ MonoImage *ColorImage::ExtractFirstColorPlane(ColorMode mode) {
  * @param mode The color mode in which to operate
  * @returns a pointer to a MonoImage that is the extracted plane.
  */
-MonoImage *ColorImage::ExtractSecondColorPlane(ColorMode mode) {
+MonoImage* ColorImage::ExtractSecondColorPlane(ColorMode mode) {
   return ExtractColorPlane(mode, 2);
 }
 
@@ -186,7 +186,7 @@ MonoImage *ColorImage::ExtractSecondColorPlane(ColorMode mode) {
  * @param mode The color mode in which to operate
  * @returns a pointer to a MonoImage that is the extracted plane.
  */
-MonoImage *ColorImage::ExtractThirdColorPlane(ColorMode mode) {
+MonoImage* ColorImage::ExtractThirdColorPlane(ColorMode mode) {
   return ExtractColorPlane(mode, 3);
 }
 
@@ -194,7 +194,7 @@ MonoImage *ColorImage::ExtractThirdColorPlane(ColorMode mode) {
  * Extract the red plane from an RGB image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetRedPlane() {
+MonoImage* ColorImage::GetRedPlane() {
   return ExtractFirstColorPlane(IMAQ_RGB);
 }
 
@@ -202,7 +202,7 @@ MonoImage *ColorImage::GetRedPlane() {
  * Extract the green plane from an RGB image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetGreenPlane() {
+MonoImage* ColorImage::GetGreenPlane() {
   return ExtractSecondColorPlane(IMAQ_RGB);
 }
 
@@ -210,7 +210,7 @@ MonoImage *ColorImage::GetGreenPlane() {
  * Extract the blue plane from an RGB image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetBluePlane() {
+MonoImage* ColorImage::GetBluePlane() {
   return ExtractThirdColorPlane(IMAQ_RGB);
 }
 
@@ -218,7 +218,7 @@ MonoImage *ColorImage::GetBluePlane() {
  * Extract the Hue plane from an HSL image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetHSLHuePlane() {
+MonoImage* ColorImage::GetHSLHuePlane() {
   return ExtractFirstColorPlane(IMAQ_HSL);
 }
 
@@ -226,7 +226,7 @@ MonoImage *ColorImage::GetHSLHuePlane() {
  * Extract the Hue plane from an HSV image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetHSVHuePlane() {
+MonoImage* ColorImage::GetHSVHuePlane() {
   return ExtractFirstColorPlane(IMAQ_HSV);
 }
 
@@ -234,7 +234,7 @@ MonoImage *ColorImage::GetHSVHuePlane() {
  * Extract the Hue plane from an HSI image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetHSIHuePlane() {
+MonoImage* ColorImage::GetHSIHuePlane() {
   return ExtractFirstColorPlane(IMAQ_HSI);
 }
 
@@ -242,7 +242,7 @@ MonoImage *ColorImage::GetHSIHuePlane() {
  * Extract the Luminance plane from an HSL image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetLuminancePlane() {
+MonoImage* ColorImage::GetLuminancePlane() {
   return ExtractThirdColorPlane(IMAQ_HSL);
 }
 
@@ -250,7 +250,7 @@ MonoImage *ColorImage::GetLuminancePlane() {
  * Extract the Value plane from an HSV image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetValuePlane() {
+MonoImage* ColorImage::GetValuePlane() {
   return ExtractThirdColorPlane(IMAQ_HSV);
 }
 
@@ -258,7 +258,7 @@ MonoImage *ColorImage::GetValuePlane() {
  * Extract the Intensity plane from an HSI image.
  * @returns a pointer to a MonoImage that is the extraced plane.
  */
-MonoImage *ColorImage::GetIntensityPlane() {
+MonoImage* ColorImage::GetIntensityPlane() {
   return ExtractThirdColorPlane(IMAQ_HSI);
 }
 
@@ -269,13 +269,13 @@ MonoImage *ColorImage::GetIntensityPlane() {
  * @param plane The pointer to the replacement plane as a MonoImage
  * @param planeNumber The plane number (1, 2, 3) to replace
  */
-void ColorImage::ReplacePlane(ColorMode mode, MonoImage *plane,
+void ColorImage::ReplacePlane(ColorMode mode, MonoImage* plane,
                               int planeNumber) {
-  int success =
-      imaqReplaceColorPlanes(m_imaqImage, (const Image *)m_imaqImage, mode,
-                             (planeNumber == 1) ? plane->GetImaqImage() : nullptr,
-                             (planeNumber == 2) ? plane->GetImaqImage() : nullptr,
-                             (planeNumber == 3) ? plane->GetImaqImage() : nullptr);
+  int success = imaqReplaceColorPlanes(
+      m_imaqImage, (const Image*)m_imaqImage, mode,
+      (planeNumber == 1) ? plane->GetImaqImage() : nullptr,
+      (planeNumber == 2) ? plane->GetImaqImage() : nullptr,
+      (planeNumber == 3) ? plane->GetImaqImage() : nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq ReplaceColorPlanes failed");
 }
 
@@ -285,7 +285,7 @@ void ColorImage::ReplacePlane(ColorMode mode, MonoImage *plane,
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceFirstColorPlane(ColorMode mode, MonoImage *plane) {
+void ColorImage::ReplaceFirstColorPlane(ColorMode mode, MonoImage* plane) {
   ReplacePlane(mode, plane, 1);
 }
 
@@ -295,7 +295,7 @@ void ColorImage::ReplaceFirstColorPlane(ColorMode mode, MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceSecondColorPlane(ColorMode mode, MonoImage *plane) {
+void ColorImage::ReplaceSecondColorPlane(ColorMode mode, MonoImage* plane) {
   ReplacePlane(mode, plane, 2);
 }
 
@@ -305,7 +305,7 @@ void ColorImage::ReplaceSecondColorPlane(ColorMode mode, MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceThirdColorPlane(ColorMode mode, MonoImage *plane) {
+void ColorImage::ReplaceThirdColorPlane(ColorMode mode, MonoImage* plane) {
   ReplacePlane(mode, plane, 3);
 }
 
@@ -315,7 +315,7 @@ void ColorImage::ReplaceThirdColorPlane(ColorMode mode, MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceRedPlane(MonoImage *plane) {
+void ColorImage::ReplaceRedPlane(MonoImage* plane) {
   ReplaceFirstColorPlane(IMAQ_RGB, plane);
 }
 
@@ -325,7 +325,7 @@ void ColorImage::ReplaceRedPlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceGreenPlane(MonoImage *plane) {
+void ColorImage::ReplaceGreenPlane(MonoImage* plane) {
   ReplaceSecondColorPlane(IMAQ_RGB, plane);
 }
 
@@ -335,7 +335,7 @@ void ColorImage::ReplaceGreenPlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceBluePlane(MonoImage *plane) {
+void ColorImage::ReplaceBluePlane(MonoImage* plane) {
   ReplaceThirdColorPlane(IMAQ_RGB, plane);
 }
 
@@ -345,7 +345,7 @@ void ColorImage::ReplaceBluePlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceHSLHuePlane(MonoImage *plane) {
+void ColorImage::ReplaceHSLHuePlane(MonoImage* plane) {
   return ReplaceFirstColorPlane(IMAQ_HSL, plane);
 }
 
@@ -355,7 +355,7 @@ void ColorImage::ReplaceHSLHuePlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceHSVHuePlane(MonoImage *plane) {
+void ColorImage::ReplaceHSVHuePlane(MonoImage* plane) {
   return ReplaceFirstColorPlane(IMAQ_HSV, plane);
 }
 
@@ -365,7 +365,7 @@ void ColorImage::ReplaceHSVHuePlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceHSIHuePlane(MonoImage *plane) {
+void ColorImage::ReplaceHSIHuePlane(MonoImage* plane) {
   return ReplaceFirstColorPlane(IMAQ_HSI, plane);
 }
 
@@ -375,7 +375,7 @@ void ColorImage::ReplaceHSIHuePlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceHSLSaturationPlane(MonoImage *plane) {
+void ColorImage::ReplaceHSLSaturationPlane(MonoImage* plane) {
   return ReplaceSecondColorPlane(IMAQ_HSL, plane);
 }
 
@@ -385,7 +385,7 @@ void ColorImage::ReplaceHSLSaturationPlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceHSVSaturationPlane(MonoImage *plane) {
+void ColorImage::ReplaceHSVSaturationPlane(MonoImage* plane) {
   return ReplaceSecondColorPlane(IMAQ_HSV, plane);
 }
 
@@ -395,7 +395,7 @@ void ColorImage::ReplaceHSVSaturationPlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceHSISaturationPlane(MonoImage *plane) {
+void ColorImage::ReplaceHSISaturationPlane(MonoImage* plane) {
   return ReplaceSecondColorPlane(IMAQ_HSI, plane);
 }
 
@@ -405,7 +405,7 @@ void ColorImage::ReplaceHSISaturationPlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceLuminancePlane(MonoImage *plane) {
+void ColorImage::ReplaceLuminancePlane(MonoImage* plane) {
   return ReplaceThirdColorPlane(IMAQ_HSL, plane);
 }
 
@@ -415,7 +415,7 @@ void ColorImage::ReplaceLuminancePlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceValuePlane(MonoImage *plane) {
+void ColorImage::ReplaceValuePlane(MonoImage* plane) {
   return ReplaceThirdColorPlane(IMAQ_HSV, plane);
 }
 
@@ -425,7 +425,7 @@ void ColorImage::ReplaceValuePlane(MonoImage *plane) {
  * @param plane A pointer to a MonoImage that will replace the specified color
  * plane.
  */
-void ColorImage::ReplaceIntensityPlane(MonoImage *plane) {
+void ColorImage::ReplaceIntensityPlane(MonoImage* plane) {
   return ReplaceThirdColorPlane(IMAQ_HSI, plane);
 }
 
@@ -435,7 +435,7 @@ void ColorImage::ReplaceIntensityPlane(MonoImage *plane) {
 // to imaqColorEqualize.
 void ColorImage::Equalize(bool allPlanes) {
   // Note that this call uses NI-defined TRUE and FALSE
-  int success = imaqColorEqualize(m_imaqImage, (const Image *)m_imaqImage,
+  int success = imaqColorEqualize(m_imaqImage, (const Image*)m_imaqImage,
                                   (allPlanes) ? TRUE : FALSE);
   wpi_setImaqErrorWithContext(success, "Imaq ColorEqualize error");
 }

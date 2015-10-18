@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogOutput.h"
+#include "HAL/Port.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
-#include "HAL/Port.h"
 
 #include <limits>
 #include <sstream>

@@ -10,10 +10,10 @@
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
 
 // Time (sec) for the ping trigger pulse.
 constexpr double Ultrasonic::kPingTime;
@@ -43,10 +43,10 @@ void Ultrasonic::UltrasonicChecker() {
       if (!m_automaticEnabled) break;
 
       if (sensor->IsEnabled()) {
-        sensor->m_pingChannel->Pulse(kPingTime); // do the ping
+        sensor->m_pingChannel->Pulse(kPingTime);  // do the ping
       }
 
-      Wait(0.1); // wait for ping to return
+      Wait(0.1);  // wait for ping to return
     }
   }
 }
@@ -63,7 +63,7 @@ void Ultrasonic::UltrasonicChecker() {
  */
 void Ultrasonic::Initialize() {
   bool originalMode = m_automaticEnabled;
-  SetAutomaticMode(false);     // kill task when adding a new sensor
+  SetAutomaticMode(false);  // kill task when adding a new sensor
   // link this instance on the list
   m_sensors.insert(this);
 
@@ -111,7 +111,7 @@ Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
  * determine the range.
  * @param units The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
+Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel,
                        DistanceUnit units)
     : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
       m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
@@ -135,7 +135,7 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel,
  * determine the range.
  * @param units The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel,
+Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel,
                        DistanceUnit units)
     : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),
       m_echoChannel(&echoChannel, NullDeleter<DigitalInput>()),
@@ -214,7 +214,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // TODO: Currently, lvuser does not have permissions to set task priorities.
     // Until that is the case, uncommenting this will break user code that calls
     // Ultrasonic::SetAutomicMode().
-    //m_task.SetPriority(kPriority);
+    // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
     m_task.join();

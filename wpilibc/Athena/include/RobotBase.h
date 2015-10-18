@@ -20,7 +20,7 @@ class DriverStation;
     }                                                                        \
     HALReport(HALUsageReporting::kResourceType_Language,                     \
               HALUsageReporting::kLanguage_CPlusPlus);                       \
-    _ClassName_ *robot = new _ClassName_();                                  \
+    _ClassName_* robot = new _ClassName_();                                  \
     RobotBase::robotSetup(robot);                                            \
     return 0;                                                                \
   }
@@ -41,8 +41,8 @@ class RobotBase {
   friend class RobotDeleter;
 
  public:
-  static RobotBase &getInstance();
-  static void setInstance(RobotBase *robot);
+  static RobotBase& getInstance();
+  static void setInstance(RobotBase* robot);
 
   bool IsEnabled() const;
   bool IsDisabled() const;
@@ -51,10 +51,10 @@ class RobotBase {
   bool IsTest() const;
   bool IsNewDataAvailable() const;
   static void startRobotTask(FUNCPTR factory);
-  static void robotTask(FUNCPTR factory, Task *task);
+  static void robotTask(FUNCPTR factory, Task* task);
   virtual void StartCompetition() = 0;
 
-  static void robotSetup(RobotBase *robot);
+  static void robotSetup(RobotBase* robot);
 
  protected:
   RobotBase();
@@ -63,9 +63,9 @@ class RobotBase {
   RobotBase(const RobotBase&) = delete;
   RobotBase& operator=(const RobotBase&) = delete;
 
-  Task *m_task = nullptr;
-  DriverStation &m_ds;
+  Task* m_task = nullptr;
+  DriverStation& m_ds;
 
  private:
-  static RobotBase *m_instance;
+  static RobotBase* m_instance;
 };

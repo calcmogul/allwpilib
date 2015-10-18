@@ -8,8 +8,8 @@
 #ifndef __SMART_DASHBOARD_DATA__
 #define __SMART_DASHBOARD_DATA__
 
-#include <string>
 #include <memory>
+#include <string>
 #include "tables/ITable.h"
 
 class Sendable {

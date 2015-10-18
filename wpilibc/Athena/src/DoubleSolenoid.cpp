@@ -6,8 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DoubleSolenoid.h"
-#include "WPIErrors.h"
 #include "LiveWindow/LiveWindow.h"
+#include "WPIErrors.h"
 
 #include <sstream>
 
@@ -18,7 +18,8 @@
  * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
 DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
-    : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel, reverseChannel) {}
+    : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel,
+                     reverseChannel) {}
 
 /**
  * Constructor.
@@ -48,8 +49,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
-  Resource::CreateResourceObject(
-      m_allocated, m_maxModules * m_maxPorts);
+  Resource::CreateResourceObject(m_allocated, m_maxModules * m_maxPorts);
 
   buf << "Solenoid " << m_forwardChannel << " (Module: " << m_moduleNumber
       << ")";

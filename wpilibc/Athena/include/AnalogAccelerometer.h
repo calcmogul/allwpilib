@@ -8,9 +8,9 @@
 #pragma once
 
 #include "AnalogInput.h"
-#include "SensorBase.h"
-#include "PIDSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
+#include "PIDSource.h"
+#include "SensorBase.h"
 
 #include <memory>
 
@@ -27,7 +27,7 @@ class AnalogAccelerometer : public SensorBase,
                             public LiveWindowSendable {
  public:
   explicit AnalogAccelerometer(int32_t channel);
-  explicit AnalogAccelerometer(AnalogInput *channel);
+  explicit AnalogAccelerometer(AnalogInput* channel);
   explicit AnalogAccelerometer(std::shared_ptr<AnalogInput> channel);
   virtual ~AnalogAccelerometer() = default;
 

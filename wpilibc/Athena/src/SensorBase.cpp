@@ -7,10 +7,10 @@
 
 #include "SensorBase.h"
 
-#include "NetworkCommunication/LoadOut.h"
-#include "WPIErrors.h"
 #include "HAL/HAL.hpp"
 #include "HAL/Port.h"
+#include "NetworkCommunication/LoadOut.h"
+#include "WPIErrors.h"
 
 const uint32_t SensorBase::kDigitalChannels;
 const uint32_t SensorBase::kAnalogInputs;

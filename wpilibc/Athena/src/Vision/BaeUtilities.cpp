@@ -5,18 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
 #include <math.h>
-#include <stdlib.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include "Vision/BaeUtilities.h"
 #include "Servo.h"
 #include "Timer.h"
+#include "Vision/BaeUtilities.h"
 
 /** @file
  *   Utility functions
@@ -43,19 +43,19 @@ void SetDebugFlag(DebugOutputType flag) { dprintfFlag = flag; }
  * The file line number will also be printed.
  * @param tempString The format string.
  */
-void dprintf(const char *tempString, ...) /* Variable argument list */
+void dprintf(const char* tempString, ...) /* Variable argument list */
 {
   va_list args;    /* Input argument list */
   int line_number; /* Line number passed in argument */
   int type;
-  const char *functionName; /* Format passed in argument */
-  const char *fmt;          /* Format passed in argument */
+  const char* functionName; /* Format passed in argument */
+  const char* fmt;          /* Format passed in argument */
   char text[512];           /* Text string */
   char outtext[512];        /* Text string */
-  FILE *outfile_fd;         /* Output file pointer */
+  FILE* outfile_fd;         /* Output file pointer */
   char filepath[128];       /* Text string */
   int fatalFlag = 0;
-  const char *filename;
+  const char* filename;
   int index;
   int tempStringLen;
 
@@ -78,7 +78,7 @@ void dprintf(const char *tempString, ...) /* Variable argument list */
   }
 
   /* Extract function name */
-  functionName = va_arg(args, const char *);
+  functionName = va_arg(args, const char*);
 
   /* Extract line number from argument list */
   line_number = va_arg(args, int);
@@ -87,7 +87,7 @@ void dprintf(const char *tempString, ...) /* Variable argument list */
   type = va_arg(args, int);
 
   /* Extract format from argument list */
-  fmt = va_arg(args, const char *);
+  fmt = va_arg(args, const char*);
 
   vsprintf(text, fmt, args);
 
@@ -188,7 +188,7 @@ float NormalizeToRange(float normalizedValue) {
  * Call this function like you would call printf.
  * @param fmt The format string
 */
-void ShowActivity(char *fmt, ...) {
+void ShowActivity(char* fmt, ...) {
   static char activity_indication_string[] = "|/-\\";
   static int ai = 3;
   va_list args;
@@ -218,7 +218,7 @@ void ShowActivity(char *fmt, ...) {
  * @param period length of time to complete a complete wave
  * @param sinStart Where to start the sine wave (0.0 = 2 pi, pi/2 = 1.0, etc.)
  */
-double SinPosition(double *period, double sinStart) {
+double SinPosition(double* period, double sinStart) {
   double rtnVal;
   static double sinePeriod = 0.0;
   static double timestamp;
@@ -269,9 +269,9 @@ void panInit(double period) {
  * @param panServo The servo object to move
  * @param sinStart The position on the sine wave to begin the pan
  */
-void panForTarget(Servo *panServo) { panForTarget(panServo, 0.0); }
+void panForTarget(Servo* panServo) { panForTarget(panServo, 0.0); }
 
-void panForTarget(Servo *panServo, double sinStart) {
+void panForTarget(Servo* panServo, double sinStart) {
   float normalizedSinPosition = (float)SinPosition(nullptr, sinStart);
   float newServoPosition = NormalizeToRange(normalizedSinPosition);
   panServo->Set(newServoPosition);
@@ -290,8 +290,8 @@ be one property=value entry on each line, i.e. "exposure=auto"
  * @param lineNumber if 0, return number of lines; else return that line number
  * @return int number of lines or -1 if error
  **/
-int processFile(char *inputFile, char *outputString, int lineNumber) {
-  FILE *infile;
+int processFile(char* inputFile, char* outputString, int lineNumber) {
+  FILE* infile;
   const int stringSize = 80;  // max size of one line in file
   char inputStr[stringSize];
   inputStr[0] = '\0';
@@ -335,7 +335,7 @@ int processFile(char *inputFile, char *outputString, int lineNumber) {
 /** Ignore empty string
  * @param string to check if empty
  **/
-int emptyString(char *string) {
+int emptyString(char* string) {
   int i, len;
 
   if (string == nullptr) return (1);
@@ -354,7 +354,7 @@ int emptyString(char *string) {
 /** Remove special characters from string
  * @param string to process
  **/
-void stripString(char *string) {
+void stripString(char* string) {
   int i, j, len;
 
   if (string == nullptr) return;

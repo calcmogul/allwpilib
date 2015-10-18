@@ -101,8 +101,7 @@ uint16_t ADXRS450_Gyro::ReadRegister(uint8_t reg) {
 
   // big endian
   uint8_t buf[4] = {(uint8_t)((cmd >> 24) & 0xff),
-                    (uint8_t)((cmd >> 16) & 0xff),
-                    (uint8_t)((cmd >> 8) & 0xff),
+                    (uint8_t)((cmd >> 16) & 0xff), (uint8_t)((cmd >> 8) & 0xff),
                     (uint8_t)(cmd & 0xff)};
 
   m_spi.Write(buf, 4);
@@ -117,9 +116,7 @@ uint16_t ADXRS450_Gyro::ReadRegister(uint8_t reg) {
  * significant
  * drift in the gyro and it needs to be recalibrated after it has been running.
  */
-void ADXRS450_Gyro::Reset() {
-  m_spi.ResetAccumulator();
-}
+void ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.

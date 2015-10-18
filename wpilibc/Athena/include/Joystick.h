@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "GenericHID.h"
 #include "ErrorBase.h"
+#include "GenericHID.h"
 
 class DriverStation;
 
@@ -86,7 +86,7 @@ class Joystick : public GenericHID, public ErrorBase {
   virtual bool GetRawButton(uint32_t button) const override;
   virtual int GetPOV(uint32_t pov = 0) const override;
   bool GetButton(ButtonType button) const;
-  static Joystick *GetStickForPort(uint32_t port);
+  static Joystick* GetStickForPort(uint32_t port);
 
   virtual float GetMagnitude() const;
   virtual float GetDirectionRadians() const;
@@ -106,7 +106,7 @@ class Joystick : public GenericHID, public ErrorBase {
   void SetOutputs(uint32_t value);
 
  private:
-  DriverStation &m_ds;
+  DriverStation& m_ds;
   uint32_t m_port;
   std::vector<uint32_t> m_axes;
   std::vector<uint32_t> m_buttons;

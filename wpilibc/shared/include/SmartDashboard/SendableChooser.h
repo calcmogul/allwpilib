@@ -8,11 +8,11 @@
 #ifndef __SENDABLE_CHOOSER_H__
 #define __SENDABLE_CHOOSER_H__
 
-#include "SmartDashboard/Sendable.h"
-#include "tables/ITable.h"
 #include <map>
 #include <memory>
 #include <string>
+#include "SmartDashboard/Sendable.h"
+#include "tables/ITable.h"
 
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection
@@ -35,9 +35,9 @@ class SendableChooser : public Sendable {
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(const std::string &name, void *object);
-  void AddDefault(const std::string &name, void *object);
-  void *GetSelected();
+  void AddObject(const std::string& name, void* object);
+  void AddDefault(const std::string& name, void* object);
+  void* GetSelected();
 
   virtual void InitTable(std::shared_ptr<ITable> subtable);
   virtual std::shared_ptr<ITable> GetTable() const;
@@ -45,7 +45,7 @@ class SendableChooser : public Sendable {
 
  private:
   std::string m_defaultChoice;
-  std::map<std::string, void *> m_choices;
+  std::map<std::string, void*> m_choices;
   std::shared_ptr<ITable> m_table;
 };
 

@@ -7,11 +7,11 @@
 
 #include "Relay.h"
 
+#include "HAL/HAL.hpp"
+#include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "Resource.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
-#include "HAL/HAL.hpp"
 
 #include <sstream>
 
@@ -194,9 +194,7 @@ Relay::Value Relay::Get() const {
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
-uint32_t Relay::GetChannel() const {
-  return m_channel;
-}
+uint32_t Relay::GetChannel() const { return m_channel; }
 
 /**
  * Set the expiration time for the Relay object
@@ -250,10 +248,14 @@ void Relay::GetDescription(std::ostringstream& desc) const {
 void Relay::ValueChanged(ITable* source, llvm::StringRef key,
                          std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsString()) return;
-  if (value->GetString() == "Off") Set(kOff);
-  else if (value->GetString() == "Forward") Set(kForward);
-  else if (value->GetString() == "Reverse") Set(kReverse);
-  else if (value->GetString() == "On") Set(kOn);
+  if (value->GetString() == "Off")
+    Set(kOff);
+  else if (value->GetString() == "Forward")
+    Set(kForward);
+  else if (value->GetString() == "Reverse")
+    Set(kReverse);
+  else if (value->GetString() == "On")
+    Set(kOn);
 }
 
 void Relay::UpdateTable() {

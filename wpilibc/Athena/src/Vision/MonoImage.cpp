@@ -21,11 +21,11 @@ MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
  * @param roi Region of Interest
  * @returns a vector of EllipseMatch structures (0 length vector on no match)
  */
-vector<EllipseMatch> *MonoImage::DetectEllipses(
-    EllipseDescriptor *ellipseDescriptor, CurveOptions *curveOptions,
-    ShapeDetectionOptions *shapeDetectionOptions, ROI *roi) {
+vector<EllipseMatch>* MonoImage::DetectEllipses(
+    EllipseDescriptor* ellipseDescriptor, CurveOptions* curveOptions,
+    ShapeDetectionOptions* shapeDetectionOptions, ROI* roi) {
   int numberOfMatches;
-  EllipseMatch *e =
+  EllipseMatch* e =
       imaqDetectEllipses(m_imaqImage, ellipseDescriptor, curveOptions,
                          shapeDetectionOptions, roi, &numberOfMatches);
   auto ellipses = new vector<EllipseMatch>;
@@ -39,9 +39,9 @@ vector<EllipseMatch> *MonoImage::DetectEllipses(
   return ellipses;
 }
 
-vector<EllipseMatch> *MonoImage::DetectEllipses(
-    EllipseDescriptor *ellipseDescriptor) {
-  vector<EllipseMatch> *ellipses =
+vector<EllipseMatch>* MonoImage::DetectEllipses(
+    EllipseDescriptor* ellipseDescriptor) {
+  vector<EllipseMatch>* ellipses =
       DetectEllipses(ellipseDescriptor, nullptr, nullptr, nullptr);
   return ellipses;
 }

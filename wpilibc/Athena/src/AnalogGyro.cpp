@@ -6,11 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogGyro.h"
+#include <climits>
 #include "AnalogInput.h"
+#include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-#include "LiveWindow/LiveWindow.h"
-#include <climits>
 const uint32_t AnalogGyro::kOversampleBits;
 const uint32_t AnalogGyro::kAverageBits;
 constexpr float AnalogGyro::kSamplesPerSecond;
@@ -23,8 +23,8 @@ constexpr float AnalogGyro::kDefaultVoltsPerDegreePerSecond;
  * @param channel The analog channel the gyro is connected to. Gyros
                       can only be used on on-board Analog Inputs 0-1.
  */
-AnalogGyro::AnalogGyro(int32_t channel) :
-    AnalogGyro(std::make_shared<AnalogInput>(channel)) {}
+AnalogGyro::AnalogGyro(int32_t channel)
+    : AnalogGyro(std::make_shared<AnalogInput>(channel)) {}
 
 /**
  * Gyro constructor with a precreated AnalogInput object.
@@ -35,7 +35,7 @@ AnalogGyro::AnalogGyro(int32_t channel) :
  * @param channel A pointer to the AnalogInput object that the gyro is connected
  * to.
  */
-AnalogGyro::AnalogGyro(AnalogInput *channel)
+AnalogGyro::AnalogGyro(AnalogInput* channel)
     : AnalogGyro(
           std::shared_ptr<AnalogInput>(channel, NullDeleter<AnalogInput>())) {}
 
@@ -63,7 +63,8 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
  *
  * @param channel The analog channel the gyro is connected to. Gyros
  *        can only be used on on-board Analog Inputs 0-1.
- * @param center Preset uncalibrated value to use as the accumulator center value.
+ * @param center Preset uncalibrated value to use as the accumulator center
+ * value.
  * @param offset Preset uncalibrated value to use as the gyro offset.
  */
 AnalogGyro::AnalogGyro(int32_t channel, uint32_t center, float offset) {
@@ -76,14 +77,17 @@ AnalogGyro::AnalogGyro(int32_t channel, uint32_t center, float offset) {
 }
 
 /**
- * Gyro constructor with a precreated AnalogInput object and calibrated parameters.
+ * Gyro constructor with a precreated AnalogInput object and calibrated
+ * parameters.
  * Use this constructor when the analog channel needs to be shared.
  * This object will not clean up the AnalogInput object when using this
  * constructor
  * @param channel A pointer to the AnalogInput object that the gyro is
  * connected to.
  */
-AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center, float offset) : m_analog(channel) {
+AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center,
+                       float offset)
+    : m_analog(channel) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {
@@ -132,7 +136,8 @@ void AnalogGyro::InitGyro() {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("AnalogGyro", m_analog->GetChannel(), this);
+  LiveWindow::GetInstance()->AddSensor("AnalogGyro", m_analog->GetChannel(),
+                                       this);
 }
 
 void AnalogGyro::Calibrate() {
@@ -205,9 +210,7 @@ double AnalogGyro::GetRate() const {
  *
  * @return the current offset value
  */
-float AnalogGyro::GetOffset() const {
-  return m_offset;
-}
+float AnalogGyro::GetOffset() const { return m_offset; }
 
 /**
  * Return the gyro center value. If run after calibration,
@@ -215,9 +218,7 @@ float AnalogGyro::GetOffset() const {
  *
  * @return the current center value
  */
-uint32_t AnalogGyro::GetCenter() const {
-  return m_center;
-}
+uint32_t AnalogGyro::GetCenter() const { return m_center; }
 
 /**
  * Set the gyro sensitivity.

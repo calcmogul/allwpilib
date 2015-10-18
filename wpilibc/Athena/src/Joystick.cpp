@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Joystick.h"
-#include "DriverStation.h"
-#include "WPIErrors.h"
 #include <math.h>
 #include <string.h>
+#include "DriverStation.h"
+#include "WPIErrors.h"
 
 const uint32_t Joystick::kDefaultXAxis;
 const uint32_t Joystick::kDefaultYAxis;
@@ -18,7 +18,7 @@ const uint32_t Joystick::kDefaultTwistAxis;
 const uint32_t Joystick::kDefaultThrottleAxis;
 const uint32_t Joystick::kDefaultTriggerButton;
 const uint32_t Joystick::kDefaultTopButton;
-static Joystick *joysticks[DriverStation::kJoystickPorts];
+static Joystick* joysticks[DriverStation::kJoystickPorts];
 static bool joySticksInitialized = false;
 
 /**
@@ -69,8 +69,8 @@ Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
   }
 }
 
-Joystick *Joystick::GetStickForPort(uint32_t port) {
-  Joystick *stick = joysticks[port];
+Joystick* Joystick::GetStickForPort(uint32_t port) {
+  Joystick* stick = joysticks[port];
   if (stick == nullptr) {
     stick = new Joystick(port);
     joysticks[port] = stick;

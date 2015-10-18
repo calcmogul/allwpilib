@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include "ErrorBase.h"
-#include "Task.h"
 #include <map>
 #include <string>
 #include <vector>
+#include "ErrorBase.h"
 #include "HAL/cpp/Semaphore.hpp"
-#include "tables/ITableListener.h"
+#include "Task.h"
 #include "networktables/NetworkTable.h"
+#include "tables/ITableListener.h"
 
 /**
  * The preferences class provides a relatively simple way to save important
@@ -34,7 +34,7 @@
  */
 class Preferences : public ErrorBase {
  public:
-  static Preferences *GetInstance();
+  static Preferences* GetInstance();
 
   std::vector<std::string> GetKeys();
   std::string GetString(llvm::StringRef key, llvm::StringRef defaultValue = "");

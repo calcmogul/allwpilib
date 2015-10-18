@@ -22,7 +22,7 @@
 DigitalOutput::DigitalOutput(uint32_t channel) {
   std::stringstream buf;
 
-  m_pwmGenerator = (void *)std::numeric_limits<uint32_t>::max();
+  m_pwmGenerator = (void*)std::numeric_limits<uint32_t>::max();
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
@@ -130,7 +130,7 @@ void DigitalOutput::SetPWMRate(float rate) {
  * @param initialDutyCycle The duty-cycle to start generating. [0..1]
  */
 void DigitalOutput::EnablePWM(float initialDutyCycle) {
-  if (m_pwmGenerator != (void *)std::numeric_limits<uint32_t>::max()) return;
+  if (m_pwmGenerator != (void*)std::numeric_limits<uint32_t>::max()) return;
 
   int32_t status = 0;
 
@@ -154,7 +154,7 @@ void DigitalOutput::EnablePWM(float initialDutyCycle) {
  */
 void DigitalOutput::DisablePWM() {
   if (StatusIsFatal()) return;
-  if (m_pwmGenerator == (void *)std::numeric_limits<uint32_t>::max()) return;
+  if (m_pwmGenerator == (void*)std::numeric_limits<uint32_t>::max()) return;
 
   int32_t status = 0;
 
@@ -165,7 +165,7 @@ void DigitalOutput::DisablePWM() {
   freePWM(m_pwmGenerator, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  m_pwmGenerator = (void *)std::numeric_limits<uint32_t>::max();
+  m_pwmGenerator = (void*)std::numeric_limits<uint32_t>::max();
 }
 
 /**

@@ -32,7 +32,7 @@ AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
  * @param offset The angular value (in desired units) representing the angular
  * output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput *input, double fullRange,
+AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
                                          double offset)
     : m_analog_input(input, NullDeleter<AnalogInput>()),
       m_fullRange(fullRange),
@@ -91,4 +91,6 @@ void AnalogPotentiometer::UpdateTable() {
   }
 }
 
-std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const { return m_table; }
+std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
+  return m_table;
+}

@@ -20,7 +20,7 @@ static const std::string kSelected = "selected";
  * @param name the name of the option
  * @param object the option
  */
-void SendableChooser::AddObject(const std::string &name, void *object) {
+void SendableChooser::AddObject(const std::string& name, void* object) {
   m_choices[name] = object;
 }
 
@@ -33,7 +33,7 @@ void SendableChooser::AddObject(const std::string &name, void *object) {
  * @param name the name of the option
  * @param object the option
  */
-void SendableChooser::AddDefault(const std::string &name, void *object) {
+void SendableChooser::AddDefault(const std::string& name, void* object) {
   m_defaultChoice = name;
   AddObject(name, object);
 }
@@ -44,7 +44,7 @@ void SendableChooser::AddDefault(const std::string &name, void *object) {
  * and no default, then it will return {@code nullptr}.
  * @return the option selected
  */
-void *SendableChooser::GetSelected() {
+void* SendableChooser::GetSelected() {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
   if (selected == "")
     return nullptr;
@@ -56,7 +56,7 @@ void SendableChooser::InitTable(std::shared_ptr<ITable> subtable) {
   std::vector<std::string> keys;
   m_table = subtable;
   if (m_table != nullptr) {
-    std::map<std::string, void *>::iterator iter;
+    std::map<std::string, void*>::iterator iter;
     for (iter = m_choices.begin(); iter != m_choices.end(); iter++) {
       keys.push_back(iter->first);
     }

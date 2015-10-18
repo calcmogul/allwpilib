@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "ErrorBase.h"
 #include <stdio.h>
 #include "Base.h"
+#include "ErrorBase.h"
 
 /**
  * Base class for all sensors.

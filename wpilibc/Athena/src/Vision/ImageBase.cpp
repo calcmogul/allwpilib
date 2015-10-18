@@ -31,7 +31,7 @@ ImageBase::~ImageBase() {
  * Write the image to a file in the flash on the cRIO.
  * @param fileName The name of the file to write
  */
-void ImageBase::Write(const char *fileName) {
+void ImageBase::Write(const char* fileName) {
   int success = imaqWriteFile(m_imaqImage, fileName, nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq Image writeFile error");
 }
@@ -61,4 +61,4 @@ int ImageBase::GetWidth() {
  *
  * @return A pointer to the internal IMAQ Image data structure.
  */
-Image *ImageBase::GetImaqImage() { return m_imaqImage; }
+Image* ImageBase::GetImaqImage() { return m_imaqImage; }

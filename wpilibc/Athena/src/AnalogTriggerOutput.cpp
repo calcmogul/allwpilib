@@ -21,7 +21,7 @@
  * @param outputType An enum that specifies the output on the trigger to
  * represent.
  */
-AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger &trigger,
+AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
                                          AnalogTriggerType outputType)
     : m_trigger(trigger), m_outputType(outputType) {
   HALReport(HALUsageReporting::kResourceType_AnalogTriggerOutput,
