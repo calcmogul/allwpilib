@@ -113,8 +113,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoder(
  * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderPeriod(JNIEnv* env, jclass,
-                                                           jlong id) {
+Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderPeriod(
+    JNIEnv* env, jclass, jlong id) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderPeriod";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
   int32_t status = 0;
@@ -131,9 +131,8 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderPeriod(JNIEnv* env, jclass,
  * Signature: (JD)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderMaxPeriod(JNIEnv* env,
-                                                              jclass, jlong id,
-                                                              jdouble value) {
+Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderMaxPeriod(
+    JNIEnv* env, jclass, jlong id, jdouble value) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderMaxPeriod";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
   int32_t status = 0;
@@ -148,8 +147,8 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderMaxPeriod(JNIEnv* env,
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderStopped(JNIEnv* env, jclass,
-                                                            jlong id) {
+Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderStopped(
+    JNIEnv* env, jclass, jlong id) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderStopped";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
   int32_t status = 0;
@@ -166,9 +165,8 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderStopped(JNIEnv* env, jclass,
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDirection(JNIEnv* env,
-                                                              jclass,
-                                                              jlong id) {
+Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDirection(
+    JNIEnv* env, jclass, jlong id) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderDirection";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Ptr = " << (void*)id;
   int32_t status = 0;

@@ -31,8 +31,8 @@ extern "C" {
  * Signature: (J)J;
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDigitalPort(JNIEnv *env, jclass,
-                                                            jlong id) {
+Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDigitalPort(
+    JNIEnv *env, jclass, jlong id) {
   DIOJNI_LOG(logDEBUG) << "Calling DIOJNI initializeDigitalPort";
   DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
   int32_t status = 0;
@@ -126,8 +126,8 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIO(JNIEnv *env, jclass, jlong id) {
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection(JNIEnv *env, jclass,
-                                                      jlong id) {
+Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection(
+    JNIEnv *env, jclass, jlong id) {
   DIOJNI_LOG(logDEBUG) << "Calling DIOJNI getDIODirection (RR upd)";
   // DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
   int32_t status = 0;

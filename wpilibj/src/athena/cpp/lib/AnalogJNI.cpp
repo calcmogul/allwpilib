@@ -31,9 +31,8 @@ extern "C" {
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(JNIEnv *env,
-                                                                   jclass,
-                                                                   jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
   int32_t status = 0;
   void *analog = initializeAnalogInputPort((void *)id, &status);
@@ -49,8 +48,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(JNIEnv *env,
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogInputPort(JNIEnv *env,
-                                                             jclass, jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogInputPort(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
   freeAnalogInputPort((void *)id);
 }
@@ -61,9 +60,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogInputPort(JNIEnv *env,
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(JNIEnv *env,
-                                                                    jclass,
-                                                                    jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
   int32_t status = 0;
   void *analog = initializeAnalogOutputPort((void *)id, &status);
@@ -79,9 +77,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(JNIEnv *env,
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogOutputPort(JNIEnv *env,
-                                                              jclass,
-                                                              jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogOutputPort(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
   freeAnalogOutputPort((void *)id);
 }
@@ -92,8 +89,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogOutputPort(JNIEnv *env,
  * Signature: (B)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogModule(JNIEnv *, jclass,
-                                                           jbyte value) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogModule(
+    JNIEnv *, jclass, jbyte value) {
   // ANALOGJNI_LOG(logDEBUG) << "Module = " << (jint)value;
   jboolean returnValue = checkAnalogModule(value);
   // ANALOGJNI_LOG(logDEBUG) << "checkAnalogModuleResult = " <<
@@ -107,9 +104,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogModule(JNIEnv *, jclass,
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogInputChannel(JNIEnv *,
-                                                                 jclass,
-                                                                 jint value) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogInputChannel(
+    JNIEnv *, jclass, jint value) {
   // ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
   jboolean returnValue = checkAnalogInputChannel(value);
   // ANALOGJNI_LOG(logDEBUG) << "checkAnalogChannelResult = " <<
@@ -123,9 +119,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogInputChannel(JNIEnv *,
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogOutputChannel(JNIEnv *,
-                                                                  jclass,
-                                                                  jint value) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_checkAnalogOutputChannel(
+    JNIEnv *, jclass, jint value) {
   // ANALOGJNI_LOG(logDEBUG) << "Channel = " << value;
   jboolean returnValue = checkAnalogOutputChannel(value);
   // ANALOGJNI_LOG(logDEBUG) << "checkAnalogChannelResult = " <<
@@ -154,8 +149,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOutput(
  * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutput(JNIEnv *env, jclass,
-                                                         jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutput(
+    JNIEnv *env, jclass, jlong id) {
   int32_t status = 0;
   double val = getAnalogOutput((void *)id, &status);
   CheckStatus(env, status);
@@ -168,9 +163,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOutput(JNIEnv *env, jclass,
  * Signature: (D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogSampleRate(JNIEnv *env,
-                                                             jclass,
-                                                             jdouble value) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogSampleRate(
+    JNIEnv *env, jclass, jdouble value) {
   ANALOGJNI_LOG(logDEBUG) << "SampleRate = " << value;
   int32_t status = 0;
   setAnalogSampleRate(value, &status);
@@ -184,8 +178,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogSampleRate(JNIEnv *env,
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSampleRate(JNIEnv *env,
-                                                             jclass) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSampleRate(
+    JNIEnv *env, jclass) {
   int32_t status = 0;
   double returnValue = getAnalogSampleRate(&status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
@@ -200,9 +194,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogSampleRate(JNIEnv *env,
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogAverageBits(JNIEnv *env,
-                                                              jclass, jlong id,
-                                                              jint value) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogAverageBits(
+    JNIEnv *env, jclass, jlong id, jint value) {
   ANALOGJNI_LOG(logDEBUG) << "AverageBits = " << value;
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
@@ -217,9 +210,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogAverageBits(JNIEnv *env,
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageBits(JNIEnv *env,
-                                                              jclass,
-                                                              jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageBits(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
   jint returnValue = getAnalogAverageBits((void *)id, &status);
@@ -235,10 +227,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageBits(JNIEnv *env,
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOversampleBits(JNIEnv *env,
-                                                                 jclass,
-                                                                 jlong id,
-                                                                 jint value) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOversampleBits(
+    JNIEnv *env, jclass, jlong id, jint value) {
   ANALOGJNI_LOG(logDEBUG) << "OversampleBits = " << value;
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
@@ -253,9 +243,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogOversampleBits(JNIEnv *env,
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOversampleBits(JNIEnv *env,
-                                                                 jclass,
-                                                                 jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOversampleBits(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
   jint returnValue = getAnalogOversampleBits((void *)id, &status);
@@ -271,8 +260,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOversampleBits(JNIEnv *env,
  * Signature: (J)S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogValue(JNIEnv *env, jclass,
-                                                        jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogValue(
+    JNIEnv *env, jclass, jlong id) {
   // ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void*)id;
   int32_t status = 0;
   jshort returnValue = getAnalogValue((void *)id, &status);
@@ -288,9 +277,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogValue(JNIEnv *env, jclass,
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageValue(JNIEnv *env,
-                                                               jclass,
-                                                               jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageValue(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
   jint returnValue = getAnalogAverageValue((void *)id, &status);
@@ -324,8 +312,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltsToValue(
  * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltage(JNIEnv *env, jclass,
-                                                          jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltage(
+    JNIEnv *env, jclass, jlong id) {
   // ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void*)id;
   int32_t status = 0;
   jdouble returnValue = getAnalogVoltage((void *)id, &status);
@@ -341,9 +329,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogVoltage(JNIEnv *env, jclass,
  * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageVoltage(JNIEnv *env,
-                                                                 jclass,
-                                                                 jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageVoltage(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
   jdouble returnValue = getAnalogAverageVoltage((void *)id, &status);
@@ -359,8 +346,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogAverageVoltage(JNIEnv *env,
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogLSBWeight(JNIEnv *env, jclass,
-                                                            jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogLSBWeight(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
 
@@ -394,9 +381,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogOffset(
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_isAccumulatorChannel(JNIEnv *env,
-                                                              jclass,
-                                                              jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_isAccumulatorChannel(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "isAccumulatorChannel";
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
@@ -428,8 +414,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initAccumulator(
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_resetAccumulator(JNIEnv *env, jclass,
-                                                          jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_resetAccumulator(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
 
@@ -444,9 +430,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_resetAccumulator(JNIEnv *env, jclass,
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorCenter(JNIEnv *env,
-                                                              jclass, jlong id,
-                                                              jint center) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorCenter(
+    JNIEnv *env, jclass, jlong id, jint center) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
 
@@ -461,10 +446,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorCenter(JNIEnv *env,
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorDeadband(JNIEnv *env,
-                                                                jclass,
-                                                                jlong id,
-                                                                jint deadband) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorDeadband(
+    JNIEnv *env, jclass, jlong id, jint deadband) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
 
@@ -479,8 +462,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAccumulatorDeadband(JNIEnv *env,
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorValue(JNIEnv *env,
-                                                             jclass, jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorValue(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
 
@@ -498,8 +481,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorValue(JNIEnv *env,
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorCount(JNIEnv *env,
-                                                             jclass, jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorCount(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
 
@@ -516,10 +499,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorCount(JNIEnv *env,
  * Signature: (JLjava/nio/LongBuffer;Ljava/nio/IntBuffer;)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput(JNIEnv *env,
-                                                              jclass, jlong id,
-                                                              jobject value,
-                                                              jobject count) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput(
+    JNIEnv *env, jclass, jlong id, jobject value, jobject count) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << (void *)id;
   int32_t status = 0;
 
@@ -562,8 +543,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogTrigger(
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_cleanAnalogTrigger(JNIEnv *env, jclass,
-                                                            jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_cleanAnalogTrigger(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Ptr = " << (void *)id;
 
   int32_t status = 0;
@@ -637,9 +618,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_setAnalogTriggerFiltered(
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerInWindow(JNIEnv *env,
-                                                                  jclass,
-                                                                  jlong id) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerInWindow(
+    JNIEnv *env, jclass, jlong id) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Ptr = " << (void *)id;
 
   int32_t status = 0;
@@ -670,10 +650,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerTriggerState(
  * Signature: (JI)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerOutput(JNIEnv *env,
-                                                                jclass,
-                                                                jlong id,
-                                                                jint type) {
+Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAnalogTriggerOutput(
+    JNIEnv *env, jclass, jlong id, jint type) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Trigger Ptr = " << (void *)id;
 
   int32_t status = 0;

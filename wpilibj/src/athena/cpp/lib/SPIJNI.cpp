@@ -149,9 +149,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetOpts(
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh(JNIEnv *env,
-                                                                 jclass,
-                                                                 jbyte port) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh(
+    JNIEnv *env, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveHigh";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
@@ -166,9 +165,8 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh(JNIEnv *env,
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow(JNIEnv *env,
-                                                                jclass,
-                                                                jbyte port) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow(
+    JNIEnv *env, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveLow";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
@@ -225,8 +223,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiFreeAccumulator(
  * Signature: (B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiResetAccumulator(JNIEnv *env, jclass,
-                                                          jbyte port) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiResetAccumulator(
+    JNIEnv *env, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiResetAccumulator";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
@@ -241,10 +239,8 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiResetAccumulator(JNIEnv *env, jclass,
  * Signature: (BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorCenter(JNIEnv *env,
-                                                              jclass,
-                                                              jbyte port,
-                                                              jint center) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorCenter(
+    JNIEnv *env, jclass, jbyte port, jint center) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetAccumulatorCenter";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   SPIJNI_LOG(logDEBUG) << "Center = " << center;
@@ -260,10 +256,8 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorCenter(JNIEnv *env,
  * Signature: (BI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorDeadband(JNIEnv *env,
-                                                                jclass,
-                                                                jbyte port,
-                                                                jint deadband) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorDeadband(
+    JNIEnv *env, jclass, jbyte port, jint deadband) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetAccumulatorDeadband";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   SPIJNI_LOG(logDEBUG) << "Deadband = " << deadband;
@@ -279,9 +273,8 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorDeadband(JNIEnv *env,
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorLastValue(JNIEnv *env,
-                                                                 jclass,
-                                                                 jbyte port) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorLastValue(
+    JNIEnv *env, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorLastValue";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
@@ -298,9 +291,8 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorLastValue(JNIEnv *env,
  * Signature: (B)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorValue(JNIEnv *env,
-                                                             jclass,
-                                                             jbyte port) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorValue(
+    JNIEnv *env, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorValue";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
@@ -317,9 +309,8 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorValue(JNIEnv *env,
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorCount(JNIEnv *env,
-                                                             jclass,
-                                                             jbyte port) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorCount(
+    JNIEnv *env, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorCount";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
@@ -336,9 +327,8 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorCount(JNIEnv *env,
  * Signature: (B)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage(JNIEnv *env,
-                                                               jclass,
-                                                               jbyte port) {
+Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage(
+    JNIEnv *env, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorAverage";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;

@@ -41,8 +41,8 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_checkCompressorModule(
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressor(JNIEnv *env, jclass,
-                                                           jlong pcm_pointer) {
+Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressor(
+    JNIEnv *env, jclass, jlong pcm_pointer) {
   int32_t status = 0;
   bool val = getCompressor((void *)pcm_pointer, &status);
   CheckStatus(env, status);

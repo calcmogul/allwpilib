@@ -60,8 +60,8 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort(
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_freeSolenoidPort(JNIEnv *env, jclass,
-                                                            jlong id) {
+Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_freeSolenoidPort(
+    JNIEnv *env, jclass, jlong id) {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
 
   SOLENOIDJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
@@ -74,10 +74,8 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_freeSolenoidPort(JNIEnv *env, jclass,
  * Signature: (BB)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWithModule(JNIEnv *env,
-                                                             jclass,
-                                                             jbyte module,
-                                                             jbyte channel) {
+Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWithModule(
+    JNIEnv *env, jclass, jbyte module, jbyte channel) {
   void *port_pointer = getPortWithModule(module, channel);
 
   return (jlong)port_pointer;
@@ -106,8 +104,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setSolenoid(
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid(JNIEnv *env, jclass,
-                                                       jlong solenoid_port) {
+Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid(
+    JNIEnv *env, jclass, jlong solenoid_port) {
   int32_t status = 0;
   jboolean val = getSolenoid((void *)solenoid_port, &status);
   CheckStatus(env, status);

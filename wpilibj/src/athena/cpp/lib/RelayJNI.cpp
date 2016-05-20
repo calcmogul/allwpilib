@@ -63,8 +63,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_setRelayReverse(
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelayForward(JNIEnv* env, jclass,
-                                                        jlong id) {
+Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelayForward(
+    JNIEnv* env, jclass, jlong id) {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI getRelayForward";
   RELAYJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
   int32_t status = 0;
@@ -81,8 +81,8 @@ Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelayForward(JNIEnv* env, jclass,
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelayReverse(JNIEnv* env, jclass,
-                                                        jlong id) {
+Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelayReverse(
+    JNIEnv* env, jclass, jlong id) {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI getRelayReverse";
   RELAYJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
   int32_t status = 0;

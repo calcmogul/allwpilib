@@ -118,9 +118,8 @@ extern "C" {
  * Signature: (Ljava/lang/Runnable;)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(JNIEnv *env,
-                                                              jclass,
-                                                              jobject func) {
+Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
+    JNIEnv *env, jclass, jobject func) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
 
   jclass cls = env->GetObjectClass(func);

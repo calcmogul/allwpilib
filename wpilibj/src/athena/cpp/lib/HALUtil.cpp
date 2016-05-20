@@ -318,8 +318,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
  * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutexNormal(JNIEnv *env,
-                                                             jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutexNormal(
+    JNIEnv *env, jclass) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMutex";
   MUTEX_ID mutex = initializeMutexNormal();
   HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << mutex;
@@ -356,8 +356,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMutex(
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait(JNIEnv *env,
-                                                           jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait(
+    JNIEnv *env, jclass) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMultiWait";
   MULTIWAIT_ID multiWait = initializeMultiWait();
   HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << multiWait;
@@ -456,9 +456,8 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv *env, jclass) {
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(JNIEnv *paramEnv,
-                                                          jclass,
-                                                          jint paramId) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
+    JNIEnv *paramEnv, jclass, jint paramId) {
   const char *msg = getHALErrorMessage(paramId);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALErrorMessage id=" << paramId
                         << " msg=" << msg;

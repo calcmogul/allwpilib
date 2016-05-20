@@ -39,8 +39,8 @@ Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_setAccelerometerRange(
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX(JNIEnv *,
-                                                                  jclass) {
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX(
+    JNIEnv *, jclass) {
   return getAccelerometerX();
 }
 
@@ -50,8 +50,8 @@ Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerX(JNIEnv *,
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY(JNIEnv *,
-                                                                  jclass) {
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY(
+    JNIEnv *, jclass) {
   return getAccelerometerY();
 }
 
@@ -61,8 +61,8 @@ Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerY(JNIEnv *,
  * Signature: ()D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ(JNIEnv *,
-                                                                  jclass) {
+Java_edu_wpi_first_wpilibj_hal_AccelerometerJNI_getAccelerometerZ(
+    JNIEnv *, jclass) {
   return getAccelerometerZ();
 }
 

@@ -31,8 +31,8 @@ extern "C" {
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMChannel(JNIEnv* env, jclass,
-                                                         jlong id) {
+Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMChannel(
+    JNIEnv* env, jclass, jlong id) {
   PWMJNI_LOG(logDEBUG) << "Calling DIOJNI allocatePWMChannel";
   PWMJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
   int32_t status = 0;
@@ -186,9 +186,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDutyCycle(
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMOutputChannel(JNIEnv* env, jclass,
-                                                          jlong id,
-                                                          jint value) {
+Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMOutputChannel(
+    JNIEnv* env, jclass, jlong id, jint value) {
   PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMOutputChannel";
   PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << (void*)id;
   PWMJNI_LOG(logDEBUG) << "Pin= " << value;
