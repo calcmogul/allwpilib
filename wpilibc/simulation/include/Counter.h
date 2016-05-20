@@ -16,11 +16,10 @@
 
 /**
  * Class for counting the number of ticks on a digital input channel.
+ *
  * This is a general purpose class for counting repetitive events. It can return
- * the number
- * of counts, the period of the most recent cycle, and detect when the signal
- * being counted
- * has stopped by supplying a maximum cycle time.
+ * the number of counts, the period of the most recent cycle, and detect when
+ * the signal being counted has stopped by supplying a maximum cycle time.
  *
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
@@ -87,11 +86,10 @@ class Counter : public SensorBase,
   std::shared_ptr<ITable> GetTable() const override;
 
  protected:
-  // TODO: [Not Supported] DigitalSource *m_upSource;		///< What makes
-  // the
-  // counter count up.
-  // TODO: [Not Supported] DigitalSource *m_downSource;	///< What makes the
-  // counter count down.
+  // What makes the counter count up.
+  // TODO: [Not Supported] DigitalSource *m_upSource;
+  // What makes the counter count down.
+  // TODO: [Not Supported] DigitalSource *m_downSource;
   void* m_counter;  ///< The FPGA counter object.
  private:
   bool m_allocatedUpSource;    ///< Was the upSource allocated locally?

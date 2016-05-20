@@ -57,8 +57,7 @@ bool wpi_assert_impl(bool conditionValue, const char* conditionText,
 /**
  * Common error routines for wpi_assertEqual_impl and wpi_assertNotEqual_impl
  * This should not be called directly; it should only be used by
- * wpi_assertEqual_impl
- * and wpi_assertNotEqual_impl.
+ * wpi_assertEqual_impl and wpi_assertNotEqual_impl.
  */
 void wpi_assertEqual_common_impl(const char* valueA, const char* valueB,
                                  const char* equalityType, const char* message,
@@ -125,6 +124,7 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
 
 /**
  * Return the FPGA Version number.
+ *
  * For now, expect this to be competition year.
  * @return FPGA Version number.
  */
@@ -154,7 +154,7 @@ uint32_t GetFPGARevision() {
  * Read the microsecond-resolution timer on the FPGA.
  *
  * @return The current time in microseconds according to the FPGA (since FPGA
- * reset).
+ *         reset).
  */
 uint64_t GetFPGATime() {
   int32_t status = 0;
@@ -164,7 +164,8 @@ uint64_t GetFPGATime() {
 }
 
 /**
- * Get the state of the "USER" button on the RoboRIO
+ * Get the state of the "USER" button on the RoboRIO.
+ *
  * @return True if the button is currently pressed down
  */
 bool GetUserButton() {

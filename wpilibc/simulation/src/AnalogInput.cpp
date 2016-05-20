@@ -25,8 +25,10 @@ AnalogInput::AnalogInput(uint32_t channel) {
 
 /**
  * Get a scaled sample straight from this channel.
+ *
  * The value is scaled to units of Volts using the calibrated scaling data from
  * GetLSBWeight() and GetOffset().
+ *
  * @return A scaled sample straight from this channel.
  */
 float AnalogInput::GetVoltage() const { return m_impl->Get(); }
@@ -34,19 +36,20 @@ float AnalogInput::GetVoltage() const { return m_impl->Get(); }
 /**
  * Get a scaled sample from the output of the oversample and average engine for
  * this channel.
+ *
  * The value is scaled to units of Volts using the calibrated scaling data from
- * GetLSBWeight() and GetOffset().
- * Using oversampling will cause this value to be higher resolution, but it will
- * update more slowly.
- * Using averaging will cause this value to be more stable, but it will update
- * more slowly.
+ * GetLSBWeight() and GetOffset(). Using oversampling will cause this value to
+ * be higher resolution, but it will update more slowly. Using averaging will
+ * cause this value to be more stable, but it will update more slowly.
+ *
  * @return A scaled sample from the output of the oversample and average engine
- * for this channel.
+ *         for this channel.
  */
 float AnalogInput::GetAverageVoltage() const { return m_impl->Get(); }
 
 /**
  * Get the channel number.
+ *
  * @return The channel number.
  */
 uint32_t AnalogInput::GetChannel() const { return m_channel; }

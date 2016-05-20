@@ -23,6 +23,7 @@ static bool joySticksInitialized = false;
 
 /**
  * Construct an instance of a joystick.
+ *
  * The joystick index is the usb port on the drivers station.
  *
  * @param port The port on the driver station that the joystick is plugged into.
@@ -45,8 +46,9 @@ Joystick::Joystick(uint32_t port)
  * This constructor allows the subclass to configure the number of constants
  * for axes and buttons.
  *
- * @param port The port on the driver station that the joystick is plugged into.
- * @param numAxisTypes The number of axis types in the enum.
+ * @param port           The port on the driver station that the joystick is
+ *                       plugged into.
+ * @param numAxisTypes   The number of axis types in the enum.
  * @param numButtonTypes The number of button types in the enum.
  */
 Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
@@ -74,6 +76,7 @@ Joystick* Joystick::GetStickForPort(uint32_t port) {
 
 /**
  * Get the X value of the joystick.
+ *
  * This depends on the mapping of the joystick connected to the current port.
  */
 float Joystick::GetX(JoystickHand hand) const {
@@ -82,6 +85,7 @@ float Joystick::GetX(JoystickHand hand) const {
 
 /**
  * Get the Y value of the joystick.
+ *
  * This depends on the mapping of the joystick connected to the current port.
  */
 float Joystick::GetY(JoystickHand hand) const {
@@ -90,18 +94,21 @@ float Joystick::GetY(JoystickHand hand) const {
 
 /**
  * Get the Z value of the current joystick.
+ *
  * This depends on the mapping of the joystick connected to the current port.
  */
 float Joystick::GetZ() const { return GetRawAxis(m_axes[kZAxis]); }
 
 /**
  * Get the twist value of the current joystick.
+ *
  * This depends on the mapping of the joystick connected to the current port.
  */
 float Joystick::GetTwist() const { return GetRawAxis(m_axes[kTwistAxis]); }
 
 /**
  * Get the throttle value of the current joystick.
+ *
  * This depends on the mapping of the joystick connected to the current port.
  */
 float Joystick::GetThrottle() const {
@@ -122,8 +129,8 @@ float Joystick::GetRawAxis(uint32_t axis) const {
  * For the current joystick, return the axis determined by the argument.
  *
  * This is for cases where the joystick axis is returned programatically,
- * otherwise one of the
- * previous functions would be preferable (for example GetX()).
+ * otherwise one of the previous functions would be preferable (for example
+ * GetX()).
  *
  * @param axis The axis to read.
  * @return The value of the axis.
@@ -152,7 +159,7 @@ float Joystick::GetAxis(AxisType axis) const {
  * Look up which button has been assigned to the trigger and read its state.
  *
  * @param hand This parameter is ignored for the Joystick class and is only here
- * to complete the GenericHID interface.
+ *             to complete the GenericHID interface.
  * @return The state of the trigger.
  */
 bool Joystick::GetTrigger(JoystickHand hand) const {
@@ -165,7 +172,7 @@ bool Joystick::GetTrigger(JoystickHand hand) const {
  * Look up which button has been assigned to the top and read its state.
  *
  * @param hand This parameter is ignored for the Joystick class and is only here
- * to complete the GenericHID interface.
+ *             to complete the GenericHID interface.
  * @return The state of the top button.
  */
 bool Joystick::GetTop(JoystickHand hand) const {
@@ -174,6 +181,7 @@ bool Joystick::GetTop(JoystickHand hand) const {
 
 /**
  * This is not supported for the Joystick.
+ *
  * This method is only here to complete the GenericHID interface.
  */
 bool Joystick::GetBumper(JoystickHand hand) const {
@@ -185,21 +193,21 @@ bool Joystick::GetBumper(JoystickHand hand) const {
  * Get the button value for buttons 1 through 12.
  *
  * The buttons are returned in a single 16 bit value with one bit representing
- *the state
- * of each button. The appropriate button is returned as a boolean value.
+ * the state of each button. The appropriate button is returned as a boolean
+ * value.
  *
  * @param button The button number to be read.
  * @return The state of the button.
- **/
+ */
 bool Joystick::GetRawButton(uint32_t button) const {
   return m_ds.GetStickButton(m_port, button);
 }
 
 /**
-* Get the state of a POV on the joystick.
-*
-* @return the angle of the POV in degrees, or -1 if the POV is not pressed.
-*/
+ * Get the state of a POV on the joystick.
+ *
+ * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+ */
 int Joystick::GetPOV(uint32_t pov) const {
   return 0;  // TODO
 }
@@ -243,7 +251,7 @@ void Joystick::SetAxisChannel(AxisType axis, uint32_t channel) {
 
 /**
  * Get the magnitude of the direction vector formed by the joystick's
- * current position relative to its origin
+ * current position relative to its origin.
  *
  * @return The magnitude of the direction vector
  */
@@ -253,7 +261,7 @@ float Joystick::GetMagnitude() const {
 
 /**
  * Get the direction of the vector formed by the joystick and its origin
- * in radians
+ * in radians.
  *
  * @return The direction of the vector in radians
  */
@@ -261,9 +269,9 @@ float Joystick::GetDirectionRadians() const { return atan2(GetX(), -GetY()); }
 
 /**
  * Get the direction of the vector formed by the joystick and its origin
- * in degrees
+ * in degrees.
  *
- * uses acos(-1) to represent Pi due to absence of readily accessable Pi
+ * uses acos(-1) to represent Pi due to absence of readily accessable PI
  * constant in C++
  *
  * @return The direction of the vector in degrees

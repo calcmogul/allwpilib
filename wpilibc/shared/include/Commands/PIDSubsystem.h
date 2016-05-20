@@ -21,10 +21,8 @@
  * an elevator which attempts to stay at a constant height).
  *
  * <p>It provides some convenience methods to run an internal {@link
- * PIDController}.
- * It also allows access to the internal {@link PIDController} in order to give
- * total control
- * to the programmer.</p>
+ * PIDController}. It also allows access to the internal {@link PIDController}
+ * in order to give total control to the programmer.</p>
  *
  */
 class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {

@@ -26,18 +26,17 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   /**
    * AnalogPotentiometer constructor.
    *
-   * Use the scaling and offset values so that the output produces
-   * meaningful values. I.E: you have a 270 degree potentiometer and
-   * you want the output to be degrees with the halfway point as 0
-   * degrees. The scale value is 270.0(degrees)/5.0(volts) and the
-   * offset is -135.0 since the halfway point after scaling is 135
-   * degrees.
+   * Use the scaling and offset values so that the output produces meaningful
+   * values. I.E: you have a 270 degree potentiometer and you want the output
+   * to be degrees with the halfway point as 0 degrees. The scale value is
+   * 270.0(degrees)/5.0(volts) and the offset is -135.0 since the halfway point
+   * after scaling is 135 degrees.
    *
    * @param channel The analog channel this potentiometer is plugged into.
-   * @param scale The scaling to multiply the voltage by to get a meaningful
-   * unit.
-   * @param offset The offset to add to the scaled value for controlling the
-   * zero value
+   * @param scale   The scaling to multiply the voltage by to get a meaningful
+   *                unit.
+   * @param offset  The offset to add to the scaled value for controlling the
+   *                zero value
    */
   AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
 

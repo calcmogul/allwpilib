@@ -118,8 +118,7 @@ bool checkAnalogModule(uint8_t module) { return module == 1; }
 /**
  * Check that the analog output channel number is value.
  * Verify that the analog channel number is one of the legal channel numbers.
- * Channel numbers
- * are 0-based.
+ * Channel numbers are 0-based.
  *
  * @return Analog channel is valid
  */
@@ -131,8 +130,7 @@ bool checkAnalogInputChannel(uint32_t pin) {
 /**
  * Check that the analog output channel number is value.
  * Verify that the analog channel number is one of the legal channel numbers.
- * Channel numbers
- * are 0-based.
+ * Channel numbers are 0-based.
  *
  * @return Analog channel is valid
  */
@@ -216,10 +214,8 @@ float getAnalogSampleRate(int32_t* status) {
  * Set the number of averaging bits.
  *
  * This sets the number of averaging bits. The actual number of averaged samples
- * is 2**bits.
- * Use averaging to improve the stability of your measurement at the expense of
- * sampling rate.
- * The averaging is done automatically in the FPGA.
+ * is 2**bits. Use averaging to improve the stability of your measurement at the
+ * expense of sampling rate. The averaging is done automatically in the FPGA.
  *
  * @param analog_port_pointer Pointer to the analog port to configure.
  * @param bits Number of bits to average.
@@ -234,8 +230,7 @@ void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits,
  * Get the number of averaging bits.
  *
  * This gets the number of averaging bits from the FPGA. The actual number of
- * averaged samples is 2**bits.
- * The averaging is done automatically in the FPGA.
+ * averaged samples is 2**bits. The averaging is done automatically in the FPGA.
  *
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Bits to average.
@@ -250,10 +245,9 @@ uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t* status) {
  * Set the number of oversample bits.
  *
  * This sets the number of oversample bits. The actual number of oversampled
- * values is 2**bits.
- * Use oversampling to improve the resolution of your measurements at the
- * expense of sampling rate.
- * The oversampling is done automatically in the FPGA.
+ * values is 2**bits. Use oversampling to improve the resolution of your
+ * measurements at the expense of sampling rate. The oversampling is done
+ * automatically in the FPGA.
  *
  * @param analog_port_pointer Pointer to the analog port to use.
  * @param bits Number of bits to oversample.
@@ -268,8 +262,8 @@ void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits,
  * Get the number of oversample bits.
  *
  * This gets the number of oversample bits from the FPGA. The actual number of
- * oversampled values is
- * 2**bits. The oversampling is done automatically in the FPGA.
+ * oversampled values is 2**bits. The oversampling is done automatically in the
+ * FPGA.
  *
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Bits to oversample.
@@ -285,9 +279,8 @@ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t* status) {
  * Get a sample straight from the channel on this module.
  *
  * The sample is a 12-bit value representing the 0V to 5V range of the A/D
- * converter in the module.
- * The units are in A/D converter codes.  Use GetVoltage() to get the analog
- * value in calibrated units.
+ * converter in the module. The units are in A/D converter codes.  Use
+ * GetVoltage() to get the analog value in calibrated units.
  *
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A sample straight from the channel on this module.
@@ -319,11 +312,10 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t* status) {
  *
  * The sample is 12-bit + the value configured in SetOversampleBits().
  * The value configured in SetAverageBits() will cause this value to be averaged
- * 2**bits number of samples.
- * This is not a sliding window.  The sample will not change until
- * 2**(OversamplBits + AverageBits) samples
- * have been acquired from the module on this channel.
- * Use GetAverageVoltage() to get the analog value in calibrated units.
+ * 2**bits number of samples. This is not a sliding window.  The sample will not
+ * change until 2**(OversamplBits + AverageBits) samples have been acquired from
+ * the module on this channel. Use GetAverageVoltage() to get the analog value
+ * in calibrated units.
  *
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A sample from the oversample and average engine for the channel.
@@ -371,11 +363,9 @@ float getAnalogVoltage(void* analog_port_pointer, int32_t* status) {
  * the channel.
  *
  * The value is scaled to units of Volts using the calibrated scaling data from
- * GetLSBWeight() and GetOffset().
- * Using oversampling will cause this value to be higher resolution, but it will
- * update more slowly.
- * Using averaging will cause this value to be more stable, but it will update
- * more slowly.
+ * GetLSBWeight() and GetOffset(). Using oversampling will cause this value to
+ * be higher resolution, but it will update more slowly. Using averaging will
+ * cause this value to be more stable, but it will update more slowly.
  *
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A scaled sample from the output of the oversample and average engine
@@ -424,8 +414,7 @@ int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage,
 /**
  * Get the factory scaling least significant bit weight constant.
  * The least significant bit weight constant for the channel that was calibrated
- * in
- * manufacturing and stored in an eeprom in the module.
+ * in manufacturing and stored in an eeprom in the module.
  *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
  *
@@ -442,8 +431,7 @@ uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t* status) {
 /**
  * Get the factory scaling offset constant.
  * The offset constant for the channel that was calibrated in manufacturing and
- * stored
- * in an eeprom in the module.
+ * stored in an eeprom in the module.
  *
  * Volts = ((LSB_Weight * 1e-9) * raw) - (Offset * 1e-9)
  *
@@ -537,15 +525,13 @@ void resetAccumulator(void* analog_port_pointer, int32_t* status) {
  * Set the center value of the accumulator.
  *
  * The center value is subtracted from each A/D value before it is added to the
- * accumulator. This
- * is used for the center value of devices like gyros and accelerometers to make
- * integration work
- * and to take the device offset into account when integrating.
+ * accumulator. This is used for the center value of devices like gyros and
+ * accelerometers to make integration work and to take the device offset into
+ * account when integrating.
  *
  * This center value is based on the output of the oversampled and averaged
- * source from channel 1.
- * Because of this, any non-zero oversample bits will affect the size of the
- * value for this field.
+ * source from channel 1. Because of this, any non-zero oversample bits will
+ * affect the size of the value for this field.
  */
 void setAccumulatorCenter(void* analog_port_pointer, int32_t center,
                           int32_t* status) {
@@ -698,8 +684,7 @@ void setAnalogTriggerLimitsVoltage(void* analog_trigger_pointer, double lower,
 /**
  * Configure the analog trigger to use the averaged vs. raw values.
  * If the value is true, then the averaged value is selected for the analog
- * trigger, otherwise
- * the immediate value is used.
+ * trigger, otherwise the immediate value is used.
  */
 void setAnalogTriggerAveraged(void* analog_trigger_pointer,
                               bool useAveragedValue, int32_t* status) {
@@ -715,17 +700,16 @@ void setAnalogTriggerAveraged(void* analog_trigger_pointer,
 /**
  * Configure the analog trigger to use a filtered value.
  * The analog trigger will operate with a 3 point average rejection filter. This
- * is designed to
- * help with 360 degree pot applications for the period where the pot crosses
- * through zero.
+ * is designed to help with 360 degree pot applications for the period where the
+ * pot crosses through zero.
  */
 void setAnalogTriggerFiltered(void* analog_trigger_pointer,
                               bool useFilteredValue, int32_t* status) {
   AnalogTrigger* trigger = (AnalogTrigger*)analog_trigger_pointer;
   if (trigger->trigger->readSourceSelect_Averaged(status) != 0) {
     *status = INCOMPATIBLE_STATE;
-    // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not
-    // support average and filtering at the same time.");
+    // TODO: wpi_setWPIErrorWithContext(IncompatibleMode, "Hardware does not "
+    // "support average and filtering at the same time.");
   }
   trigger->trigger->writeSourceSelect_Filter(useFilteredValue, status);
 }

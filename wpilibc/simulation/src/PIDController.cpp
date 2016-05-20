@@ -19,15 +19,16 @@ static const std::string kSetpoint = "setpoint";
 static const std::string kEnabled = "enabled";
 
 /**
- * Allocate a PID object with the given constants for P, I, D
- * @param Kp the proportional coefficient
- * @param Ki the integral coefficient
- * @param Kd the derivative coefficient
+ * Allocate a PID object with the given constants for P, I, D.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly effects
- * calculations of the
- * integral and differental terms. The default is 50ms.
+ *               calculations of the integral and differental terms. The
+ *               default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource* source,
                              PIDOutput* output, float period) {
@@ -35,15 +36,16 @@ PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource* source,
 }
 
 /**
- * Allocate a PID object with the given constants for P, I, D
- * @param Kp the proportional coefficient
- * @param Ki the integral coefficient
- * @param Kd the derivative coefficient
+ * Allocate a PID object with the given constants for P, I, D.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly effects
- * calculations of the
- * integral and differental terms. The default is 50ms.
+ *               calculations of the integral and differental terms. The
+ *               default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
                              PIDSource* source, PIDOutput* output,
@@ -96,6 +98,7 @@ PIDController::~PIDController() {
 
 /**
  * Read the input, calculate the output accordingly, and write to the output.
+ *
  * This should only be called by the Notifier.
  */
 void PIDController::Calculate() {
@@ -176,11 +179,11 @@ void PIDController::Calculate() {
 }
 
 /**
- * Calculate the feed forward term
+ * Calculate the feed forward term.
  *
  * Both of the provided feed forward calculations are velocity feed forwards.
  * If a different feed forward calculation is desired, the user can override
- * this function and provide his or her own. This function  does no
+ * this function and provide his or her own. This function does no
  * synchronization because the PIDController class only calls it in synchronized
  * code, so be careful if calling it oneself.
  *
@@ -203,7 +206,9 @@ double PIDController::CalculateFeedForward() {
 
 /**
  * Set the PID Controller gain parameters.
+ *
  * Set the proportional, integral, and differential coefficients.
+ *
  * @param p Proportional coefficient
  * @param i Integral coefficient
  * @param d Differential coefficient
@@ -225,7 +230,9 @@ void PIDController::SetPID(double p, double i, double d) {
 
 /**
  * Set the PID Controller gain parameters.
+ *
  * Set the proportional, integral, and differential coefficients.
+ *
  * @param p Proportional coefficient
  * @param i Integral coefficient
  * @param d Differential coefficient
@@ -249,7 +256,8 @@ void PIDController::SetPID(double p, double i, double d, double f) {
 }
 
 /**
- * Get the Proportional coefficient
+ * Get the Proportional coefficient.
+ *
  * @return proportional coefficient
  */
 double PIDController::GetP() const {
@@ -258,7 +266,8 @@ double PIDController::GetP() const {
 }
 
 /**
- * Get the Integral coefficient
+ * Get the Integral coefficient.
+ *
  * @return integral coefficient
  */
 double PIDController::GetI() const {
@@ -267,7 +276,8 @@ double PIDController::GetI() const {
 }
 
 /**
- * Get the Differential coefficient
+ * Get the Differential coefficient.
+ *
  * @return differential coefficient
  */
 double PIDController::GetD() const {
@@ -276,7 +286,8 @@ double PIDController::GetD() const {
 }
 
 /**
- * Get the Feed forward coefficient
+ * Get the Feed forward coefficient.
+ *
  * @return Feed forward coefficient
  */
 double PIDController::GetF() const {
@@ -285,8 +296,10 @@ double PIDController::GetF() const {
 }
 
 /**
- * Return the current PID result
- * This is always centered on zero and constrained the the max and min outs
+ * Return the current PID result.
+ *
+ * This is always centered on zero and constrained the the max and min outs.
+ *
  * @return the latest calculated output
  */
 float PIDController::Get() const {
@@ -295,10 +308,12 @@ float PIDController::Get() const {
 }
 
 /**
- *  Set the PID controller to consider the input to be continuous,
- *  Rather then using the max and min in as constraints, it considers them to
- *  be the same point and automatically calculates the shortest route to
- *  the setpoint.
+ * Set the PID controller to consider the input to be continuous.
+ *
+ * Rather then using the max and min in as constraints, it considers them to
+ * be the same point and automatically calculates the shortest route to
+ * the setpoint.
+ *
  * @param continuous Set to true turns on continuous, false turns off continuous
  */
 void PIDController::SetContinuous(bool continuous) {
@@ -335,7 +350,8 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
 }
 
 /**
- * Set the setpoint for the PIDController
+ * Set the setpoint for the PIDController.
+ *
  * @param setpoint the desired setpoint
  */
 void PIDController::SetSetpoint(float setpoint) {
@@ -360,7 +376,8 @@ void PIDController::SetSetpoint(float setpoint) {
 }
 
 /**
- * Returns the current setpoint of the PIDController
+ * Returns the current setpoint of the PIDController.
+ *
  * @return the current setpoint
  */
 double PIDController::GetSetpoint() const {
@@ -369,7 +386,8 @@ double PIDController::GetSetpoint() const {
 }
 
 /**
- * Returns the change in setpoint over time of the PIDController
+ * Returns the change in setpoint over time of the PIDController.
+ *
  * @return the change in setpoint over time
  */
 double PIDController::GetDeltaSetpoint() const {
@@ -378,7 +396,8 @@ double PIDController::GetDeltaSetpoint() const {
 }
 
 /**
- * Retruns the current difference of the input from the setpoint
+ * Returns the current difference of the input from the setpoint.
+ *
  * @return the current error
  */
 float PIDController::GetError() const {
@@ -391,14 +410,15 @@ float PIDController::GetError() const {
 }
 
 /**
- * Sets what type of input the PID controller will use
+ * Sets what type of input the PID controller will use.
  */
 void PIDController::SetPIDSourceType(PIDSourceType pidSource) {
   m_pidInput->SetPIDSourceType(pidSource);
 }
 
 /**
- * Returns the type of input the PID controller is using
+ * Returns the type of input the PID controller is using.
+ *
  * @return the PID controller input type
  */
 PIDSourceType PIDController::GetPIDSourceType() const {
@@ -407,8 +427,10 @@ PIDSourceType PIDController::GetPIDSourceType() const {
 
 /**
  * Returns the current average of the error over the past few iterations.
+ *
  * You can specify the number of iterations to average with SetToleranceBuffer()
  * (defaults to 1). This is the same value that is used for OnTarget().
+ *
  * @return the average error
  */
 float PIDController::GetAvgError() const {
@@ -421,10 +443,11 @@ float PIDController::GetAvgError() const {
   return avgError;
 }
 
-/*
+/**
  * Set the percentage error which is considered tolerable for use with
  * OnTarget.
- * @param percentage error which is tolerable
+ *
+ * @param percent percentage error which is tolerable
  */
 void PIDController::SetTolerance(float percent) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
@@ -432,10 +455,11 @@ void PIDController::SetTolerance(float percent) {
   m_tolerance = percent;
 }
 
-/*
+/**
  * Set the percentage error which is considered tolerable for use with
  * OnTarget.
- * @param percentage error which is tolerable
+ *
+ * @param percent percentage error which is tolerable
  */
 void PIDController::SetPercentTolerance(float percent) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
@@ -443,10 +467,11 @@ void PIDController::SetPercentTolerance(float percent) {
   m_tolerance = percent;
 }
 
-/*
+/**
  * Set the absolute error which is considered tolerable for use with
  * OnTarget.
- * @param percentage error which is tolerable
+ *
+ * @param absTolerance absolute error which is tolerable
  */
 void PIDController::SetAbsoluteTolerance(float absTolerance) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
@@ -454,9 +479,10 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
   m_tolerance = absTolerance;
 }
 
-/*
- * Set the number of previous error samples to average for tolerancing. When
- * determining whether a mechanism is on target, the user may want to use a
+/**
+ * Set the number of previous error samples to average for tolerancing.
+ *
+ * When determining whether a mechanism is on target, the user may want to use a
  * rolling average of previous measurements instead of a precise position or
  * velocity. This is useful for noisy sensors which return a few erroneous
  * measurements when the mechanism is on target. However, the mechanism will
@@ -474,14 +500,14 @@ void PIDController::SetToleranceBuffer(unsigned bufLength) {
   }
 }
 
-/*
+/**
  * Return true if the error is within the percentage of the total input range,
- * determined by SetTolerance. This asssumes that the maximum and minimum input
- * were set using SetInput.
+ * determined by SetTolerance.
+ *
+ * This asssumes that the maximum and minimum input were set using SetInput.
  * Currently this just reports on target as the actual value passes through the
- * setpoint.
- * Ideally it should be based on being within the tolerance for some period of
- * time.
+ * setpoint. Ideally it should be based on being within the tolerance for some
+ * period of time.
  */
 bool PIDController::OnTarget() const {
   std::lock_guard<priority_recursive_mutex> sync(m_mutex);
@@ -502,7 +528,7 @@ bool PIDController::OnTarget() const {
 }
 
 /**
- * Begin running the PIDController
+ * Begin running the PIDController.
  */
 void PIDController::Enable() {
   {

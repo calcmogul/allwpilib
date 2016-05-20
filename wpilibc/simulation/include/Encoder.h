@@ -18,18 +18,15 @@
 
 /**
  * Class to read quad encoders.
+ *
  * Quadrature encoders are devices that count shaft rotation and can sense
- * direction. The output of
- * the QuadEncoder class is an integer that can count either up or down, and can
- * go negative for
- * reverse direction counting. When creating QuadEncoders, a direction is
- * supplied that changes the
- * sense of the output to make code more readable if the encoder is mounted such
- * that forward movement
- * generates negative values. Quadrature encoders have two digital outputs, an A
- * Channel and a B Channel
- * that are out of phase with each other to allow the FPGA to do direction
- * sensing.
+ * direction. The output of the QuadEncoder class is an integer that can count
+ * either up or down, and can go negative for reverse direction counting. When
+ * creating QuadEncoders, a direction is supplied that changes the sense of the
+ * output to make code more readable if the encoder is mounted such that
+ * forward movement generates negative values. Quadrature encoders have two
+ * digital outputs, an A Channel and a B Channel that are out of phase with
+ * each other to allow the FPGA to do direction sensing.
  *
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
@@ -81,20 +78,14 @@ class Encoder : public SensorBase,
                    EncodingType encodingType);
   double DecodingScaleFactor() const;
 
-  // TODO: [Not Supported] DigitalSource *m_aSource;		// the A phase
-  // of
-  // the
-  // quad encoder
-  // TODO: [Not Supported] DigitalSource *m_bSource;		// the B phase
-  // of
-  // the
-  // quad encoder
-  // TODO: [Not Supported] bool m_allocatedASource;		// was the A
-  // source
-  // allocated locally?
-  // TODO: [Not Supported] bool m_allocatedBSource;		// was the B
-  // source
-  // allocated locally?
+  // the A phase of the quad encoder
+  // TODO: [Not Supported] DigitalSource *m_aSource;
+  // the B phase of the quad encoder
+  // TODO: [Not Supported] DigitalSource *m_bSource;
+  // was the A source allocated locally?
+  // TODO: [Not Supported] bool m_allocatedASource;
+  // was the B source allocated locally?
+  // TODO: [Not Supported] bool m_allocatedBSource;
   int channelA, channelB;
   double m_distancePerPulse;    // distance of travel for each encoder tick
   EncodingType m_encodingType;  // Encoding type

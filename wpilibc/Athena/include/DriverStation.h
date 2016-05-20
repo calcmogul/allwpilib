@@ -70,26 +70,22 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   float GetBatteryVoltage() const;
 
   /** Only to be used to tell the Driver Station what code you claim to be
-   * executing
-   *   for diagnostic purposes only
+   * executing for diagnostic purposes only
    * @param entering If true, starting disabled code; if false, leaving disabled
    * code */
   void InDisabled(bool entering) { m_userInDisabled = entering; }
   /** Only to be used to tell the Driver Station what code you claim to be
-   * executing
-   *   for diagnostic purposes only
+   * executing for diagnostic purposes only
    * @param entering If true, starting autonomous code; if false, leaving
    * autonomous code */
   void InAutonomous(bool entering) { m_userInAutonomous = entering; }
   /** Only to be used to tell the Driver Station what code you claim to be
-   * executing
-   *   for diagnostic purposes only
+   * executing for diagnostic purposes only
    * @param entering If true, starting teleop code; if false, leaving teleop
    * code */
   void InOperatorControl(bool entering) { m_userInTeleop = entering; }
   /** Only to be used to tell the Driver Station what code you claim to be
-   * executing
-   *   for diagnostic purposes only
+   * executing for diagnostic purposes only
    * @param entering If true, starting test code; if false, leaving test code */
   void InTest(bool entering) { m_userInTest = entering; }
 

@@ -32,23 +32,19 @@ static const uint32_t kNumHeaders = 10;  // Number of non-MXP pins
  * kDefaultPwmPeriod is in ms
  *
  * - 20ms periods (50 Hz) are the "safest" setting in that this works for all
- * devices
+ *   devices
  * - 20ms periods seem to be desirable for Vex Motors
  * - 20ms periods are the specified period for HS-322HD servos, but work
- * reliably down
- *      to 10.0 ms; starting at about 8.5ms, the servo sometimes hums and get
- * hot;
- *      by 5.0ms the hum is nearly continuous
+ *   reliably down to 10.0 ms; starting at about 8.5ms, the servo sometimes hums
+ *   and get hot; by 5.0ms the hum is nearly continuous
  * - 10ms periods work well for Victor 884
  * - 5ms periods allows higher update rates for Luminary Micro Jaguar speed
- * controllers.
- *      Due to the shipping firmware on the Jaguar, we can't run the update
- * period less
- *      than 5.05 ms.
+ *   controllers. Due to the shipping firmware on the Jaguar, we can't run the
+ *   update period less than 5.05 ms.
  *
  * kDefaultPwmPeriod is the 1x period (5.05 ms).  In hardware, the period
- * scaling is implemented as an
- * output squelch to get longer periods for old devices.
+ * scaling is implemented as an output squelch to get longer periods for old
+ * devices.
  */
 static const float kDefaultPwmPeriod = 5.05;
 /**
@@ -494,8 +490,7 @@ bool getRelayReverse(void* digital_port_pointer, int32_t* status) {
 /**
  * Allocate Digital I/O channels.
  * Allocate channels so that they are not accidently reused. Also the direction
- * is set at the
- * time of the allocation.
+ * is set at the time of the allocation.
  *
  * @param channel The Digital I/O channel
  * @param input If true open as input; if false open as output
@@ -877,8 +872,7 @@ void setCounterAverageSize(void* counter_pointer, int32_t size,
 /**
  * remap the digital source pin and set the module.
  * If it's an analog trigger, determine the module from the high order routing
- * channel
- * else do normal digital input remapping based on pin number (MXP)
+ * channel else do normal digital input remapping based on pin number (MXP)
  */
 extern "C++" void remapDigitalSource(bool analogTrigger, uint32_t& pin,
                                      uint8_t& module) {
@@ -1050,8 +1044,7 @@ int32_t getCounterSamplesToAverage(void* counter_pointer, int32_t* status) {
 
 /**
  * Set the Samples to Average which specifies the number of samples of the timer
- * to
- * average when calculating the period. Perform averaging to account for
+ * to average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
@@ -1067,8 +1060,7 @@ void setCounterSamplesToAverage(void* counter_pointer, int samplesToAverage,
 /**
  * Reset the Counter to zero.
  * Set the counter value to zero. This doesn't effect the running state of the
- * counter, just sets
- * the current value to zero.
+ * counter, just sets the current value to zero.
  */
 void resetCounter(void* counter_pointer, int32_t* status) {
   Counter* counter = (Counter*)counter_pointer;
@@ -1078,8 +1070,7 @@ void resetCounter(void* counter_pointer, int32_t* status) {
 /**
  * Read the current counter value.
  * Read the value at this instant. It may still be running, so it reflects the
- * current value. Next
- * time it is read, it might have a different value.
+ * current value. Next time it is read, it might have a different value.
  */
 int32_t getCounter(void* counter_pointer, int32_t* status) {
   Counter* counter = (Counter*)counter_pointer;
@@ -1090,8 +1081,7 @@ int32_t getCounter(void* counter_pointer, int32_t* status) {
 /*
  * Get the Period of the most recent count.
  * Returns the time interval of the most recent count. This can be used for
- * velocity calculations
- * to determine shaft speed.
+ * velocity calculations to determine shaft speed.
  * @returns The period of the last two pulses in units of seconds.
  */
 double getCounterPeriod(void* counter_pointer, int32_t* status) {
@@ -1113,11 +1103,10 @@ double getCounterPeriod(void* counter_pointer, int32_t* status) {
 /**
  * Set the maximum period where the device is still considered "moving".
  * Sets the maximum period where the device is considered moving. This value is
- * used to determine
- * the "stopped" state of the counter using the GetStopped method.
+ * used to determine the "stopped" state of the counter using the GetStopped
+ * method.
  * @param maxPeriod The maximum period where the counted device is considered
- * moving in
- * seconds.
+ * moving in seconds.
  */
 void setCounterMaxPeriod(void* counter_pointer, double maxPeriod,
                          int32_t* status) {
@@ -1128,24 +1117,16 @@ void setCounterMaxPeriod(void* counter_pointer, double maxPeriod,
 
 /**
  * Select whether you want to continue updating the event timer output when
- * there are no samples captured.
- * The output of the event timer has a buffer of periods that are averaged and
- * posted to
- * a register on the FPGA.  When the timer detects that the event source has
- * stopped
- * (based on the MaxPeriod) the buffer of samples to be averaged is emptied.  If
- * you
- * enable the update when empty, you will be notified of the stopped source and
- * the event
- * time will report 0 samples.  If you disable update when empty, the most
- * recent average
+ * there are no samples captured. The output of the event timer has a buffer of
+ * periods that are averaged and posted to a register on the FPGA.  When the
+ * timer detects that the event source has stopped (based on the MaxPeriod) the
+ * buffer of samples to be averaged is emptied.  If you enable the update when
+ * empty, you will be notified of the stopped source and the event time will
+ * report 0 samples.  If you disable update when empty, the most recent average
  * will remain on the output until a new sample is acquired.  You will never see
- * 0 samples
- * output (except when there have been no events since an FPGA reset) and you
- * will likely not
- * see the stopped bit become true (since it is updated at the end of an average
- * and there are
- * no samples to average).
+ * 0 samples output (except when there have been no events since an FPGA reset)
+ * and you will likely not see the stopped bit become true (since it is updated
+ * at the end of an average and there are no samples to average).
  */
 void setCounterUpdateWhenEmpty(void* counter_pointer, bool enabled,
                                int32_t* status) {
@@ -1156,13 +1137,10 @@ void setCounterUpdateWhenEmpty(void* counter_pointer, bool enabled,
 /**
  * Determine if the clock is stopped.
  * Determine if the clocked input is stopped based on the MaxPeriod value set
- * using the
- * SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the device (and
- * counter) are
- * assumed to be stopped and it returns true.
+ * using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
+ * device (and counter) are assumed to be stopped and it returns true.
  * @return Returns true if the most recent counter period exceeds the MaxPeriod
- * value set by
- * SetMaxPeriod.
+ * value set by SetMaxPeriod.
  */
 bool getCounterStopped(void* counter_pointer, int32_t* status) {
   Counter* counter = (Counter*)counter_pointer;
@@ -1182,8 +1160,7 @@ bool getCounterDirection(void* counter_pointer, int32_t* status) {
 /**
  * Set the Counter to return reversed sensing on the direction.
  * This allows counters to change the direction they are counting in the case of
- * 1X and 2X
- * quadrature encoding only. Any other counter mode isn't supported.
+ * 1X and 2X quadrature encoding only. Any other counter mode isn't supported.
  * @param reverseDirection true if the value counted should be negated.
  */
 void setCounterReverseDirection(void* counter_pointer, bool reverseDirection,
@@ -1294,10 +1271,8 @@ double getEncoderPeriod(void* encoder_pointer, int32_t* status) {
 /**
  * Sets the maximum period for stopped detection.
  * Sets the value that represents the maximum period of the Encoder before it
- * will assume
- * that the attached device is stopped. This timeout allows users to determine
- * if the wheels or
- * other shaft has stopped rotating.
+ * will assume that the attached device is stopped. This timeout allows users
+ * to determine if the wheels or other shaft has stopped rotating.
  * This method compensates for the decoding type.
  *
  * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled
@@ -1317,10 +1292,8 @@ void setEncoderMaxPeriod(void* encoder_pointer, double maxPeriod,
 /**
  * Determine if the encoder is stopped.
  * Using the MaxPeriod value, a boolean is returned that is true if the encoder
- * is considered
- * stopped and false if it is still moving. A stopped encoder is one where the
- * most recent pulse
- * width exceeds the MaxPeriod.
+ * is considered stopped and false if it is still moving. A stopped encoder is
+ * one where the most recent pulse width exceeds the MaxPeriod.
  * @return True if the encoder is considered stopped.
  */
 bool getEncoderStopped(void* encoder_pointer, int32_t* status) {
@@ -1340,8 +1313,7 @@ bool getEncoderDirection(void* encoder_pointer, int32_t* status) {
 /**
  * Set the direction sensing for this encoder.
  * This sets the direction sensing on the encoder so that it could count in the
- * correct
- * software direction regardless of the mounting.
+ * correct software direction regardless of the mounting.
  * @param reverseDirection true if the encoder direction should be reversed
  */
 void setEncoderReverseDirection(void* encoder_pointer, bool reverseDirection,
@@ -1352,8 +1324,7 @@ void setEncoderReverseDirection(void* encoder_pointer, bool reverseDirection,
 
 /**
  * Set the Samples to Average which specifies the number of samples of the timer
- * to
- * average when calculating the period. Perform averaging to account for
+ * to average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
@@ -1368,8 +1339,7 @@ void setEncoderSamplesToAverage(void* encoder_pointer,
 
 /**
  * Get the Samples to Average which specifies the number of samples of the timer
- * to
- * average when calculating the period. Perform averaging to account for
+ * to average when calculating the period. Perform averaging to account for
  * mechanical imperfections or as oversampling to increase resolution.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
@@ -1490,7 +1460,7 @@ int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize) {
 /**
  * Execute a read from the device.
  *
- *   This methdod does not write any data out to the device
+ *   This method does not write any data out to the device
  *   Most spi devices will require a register address to be written before
  *   they begin returning data
  *

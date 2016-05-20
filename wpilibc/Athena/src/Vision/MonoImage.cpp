@@ -14,11 +14,13 @@ MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
 
 /**
  * Look for ellipses in an image.
+ *
  * Given some input parameters, look for any number of ellipses in an image.
- * @param ellipseDescriptor Ellipse descriptor
- * @param curveOptions Curve options
+ *
+ * @param ellipseDescriptor     Ellipse descriptor
+ * @param curveOptions          Curve options
  * @param shapeDetectionOptions Shape detection options
- * @param roi Region of Interest
+ * @param roi                   Region of Interest
  * @returns a vector of EllipseMatch structures (0 length vector on no match)
  */
 vector<EllipseMatch>* MonoImage::DetectEllipses(

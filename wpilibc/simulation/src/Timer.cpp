@@ -32,11 +32,9 @@ void time_callback(const msgs::ConstFloat64Ptr& msg) {
  * Pause the task for a specified time.
  *
  * Pause the execution of the program for a specified period of time given in
- * seconds.
- * Motors will continue to run at their last assigned values, and sensors will
- * continue to
- * update. Only the task containing the wait will pause until the wait time is
- * expired.
+ * seconds. Motors will continue to run at their last assigned values, and
+ * sensors will continue to update. Only the task containing the wait will
+ * pause until the wait time is expired.
  *
  * @param seconds Length of time to pause, in seconds.
  */
@@ -53,7 +51,9 @@ void Wait(double seconds) {
 
 /*
  * Return the FPGA system clock time in seconds.
+ *
  * This is deprecated and just forwards to Timer::GetFPGATimestamp().
+ *
  * @returns Robot running time in seconds.
  */
 double GetClock() { return Timer::GetFPGATimestamp(); }
@@ -61,8 +61,8 @@ double GetClock() { return Timer::GetFPGATimestamp(); }
 /**
  * @brief Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
- * on Saturday (except in simulation).
-*/
+ *         on Saturday (except in simulation).
+ */
 double GetTime() {
   return Timer::GetFPGATimestamp();  // The epoch starts when Gazebo starts
 }
@@ -73,8 +73,7 @@ const double Timer::kRolloverTime = (1ll << 32) / 1e6;
  * Create a new timer object.
  *
  * Create a new timer object and reset the time to zero. The timer is initially
- * not running and
- * must be started.
+ * not running and must be started.
  */
 Timer::Timer() : m_startTime(0.0), m_accumulatedTime(0.0), m_running(false) {
   // Creates a semaphore to control access to critical regions.
@@ -83,11 +82,11 @@ Timer::Timer() : m_startTime(0.0), m_accumulatedTime(0.0), m_running(false) {
 }
 
 /**
- * Get the current time from the timer. If the clock is running it is derived
- * from
- * the current system clock the start time stored in the timer class. If the
- * clock
- * is not running, then return the time when it was last stopped.
+ * Get the current time from the timer.
+ *
+ * If the clock is running it is derived from the current system clock the
+ * start time stored in the timer class. If the clock is not running, then
+ * return the time when it was last stopped.
  *
  * @return unsigned Current time value for this timer in seconds
  */
@@ -111,7 +110,7 @@ double Timer::Get() const {
  * Reset the timer by setting the time to 0.
  *
  * Make the timer startTime the current time so new requests will be relative to
- * now
+ * now.
  */
 void Timer::Reset() {
   std::lock_guard<priority_mutex> sync(m_mutex);
@@ -121,6 +120,7 @@ void Timer::Reset() {
 
 /**
  * Start the timer running.
+ *
  * Just set the running flag to true indicating that all time requests should be
  * relative to the system clock.
  */
@@ -134,6 +134,7 @@ void Timer::Start() {
 
 /**
  * Stop the timer.
+ *
  * This computes the time as of now and clears the running flag, causing all
  * subsequent time requests to be read from the accumulated time rather than
  * looking at the system clock.
@@ -171,9 +172,9 @@ bool Timer::HasPeriodPassed(double period) {
  * Return the FPGA system clock time in seconds.
  *
  * Return the time from the FPGA hardware clock in seconds since the FPGA
- * started.
- * Rolls over after 71 minutes.
- * @returns Robot running time in seconds.
+ * started. Rolls over after 71 minutes.
+ *
+ * @return Robot running time in seconds.
  */
 double Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds

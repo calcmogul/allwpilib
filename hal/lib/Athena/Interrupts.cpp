@@ -65,8 +65,8 @@ uint32_t waitForInterrupt(void* interrupt_pointer, double timeout,
 /**
  * Enable interrupts to occur on this input.
  * Interrupts are disabled when the RequestInterrupt call is made. This gives
- * time to do the
- * setup of the other options before starting to field interrupts.
+ * time to do the setup of the other options before starting to field
+ * interrupts.
  */
 void enableInterrupts(void* interrupt_pointer, int32_t* status) {
   Interrupt* anInterrupt = (Interrupt*)interrupt_pointer;

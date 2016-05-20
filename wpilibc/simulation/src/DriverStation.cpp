@@ -84,7 +84,7 @@ float DriverStation::GetBatteryVoltage() const {
  * This depends on the mapping of the joystick connected to the specified port.
  *
  * @param stick The joystick to read.
- * @param axis The analog axis value to read from the joystick.
+ * @param axis  The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
 float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
@@ -106,10 +106,11 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
 
 /**
  * The state of a specific button (1 - 12) on the joystick.
+ *
  * This method only works in simulation, but is more efficient than
  * GetStickButtons.
  *
- * @param stick The joystick to read.
+ * @param stick  The joystick to read.
  * @param button The button number to check.
  * @return If the button is pressed.
  */
@@ -130,6 +131,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button) {
 
 /**
  * The state of the buttons on the joystick.
+ *
  * 12 buttons (4 msb are unused) from the joystick.
  *
  * @param stick The joystick to read.
@@ -158,14 +160,14 @@ short DriverStation::GetStickButtons(uint32_t stick) {
 
 /**
  * Get an analog voltage from the Driver Station.
+ *
  * The analog values are returned as voltage values for the Driver Station
- * analog inputs.
- * These inputs are typically used for advanced operator interfaces consisting
- * of potentiometers
- * or resistor networks representing values on a rotary switch.
+ * analog inputs. These inputs are typically used for advanced operator
+ * interfaces consisting of potentiometers or resistor networks representing
+ * values on a rotary switch.
  *
  * @param channel The analog input channel on the driver station to read from.
- * Valid range is 1 - 4.
+ *                Valid range is 1 - 4.
  * @return The analog voltage on the input.
  */
 float DriverStation::GetAnalogIn(uint32_t channel) {
@@ -175,9 +177,10 @@ float DriverStation::GetAnalogIn(uint32_t channel) {
 
 /**
  * Get values from the digital inputs on the Driver Station.
+ *
  * Return digital values from the Drivers Station. These values are typically
- * used for buttons
- * and switches on advanced operator interfaces.
+ * used for buttons and switches on advanced operator interfaces.
+ *
  * @param channel The digital input to get. Valid range is 1 - 8.
  */
 bool DriverStation::GetDigitalIn(uint32_t channel) {
@@ -189,11 +192,10 @@ bool DriverStation::GetDigitalIn(uint32_t channel) {
  * Set a value for the digital outputs on the Driver Station.
  *
  * Control digital outputs on the Drivers Station. These values are typically
- * used for
- * giving feedback on a custom operator station such as LEDs.
+ * used for giving feedback on a custom operator station such as LEDs.
  *
  * @param channel The digital output to set. Valid range is 1 - 8.
- * @param value The state to set the digital output.
+ * @param value   The state to set the digital output.
  */
 void DriverStation::SetDigitalOut(uint32_t channel, bool value) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "SetDigitalOut");
@@ -201,6 +203,7 @@ void DriverStation::SetDigitalOut(uint32_t channel, bool value) {
 
 /**
  * Get a value that was set for the digital outputs on the Driver Station.
+ *
  * @param channel The digital ouput to monitor. Valid range is 1 through 8.
  * @return A digital value being output on the Drivers Station.
  */
@@ -236,7 +239,7 @@ bool DriverStation::IsTest() const {
  * Is the driver station attached to a Field Management System?
  * Note: This does not work with the Blue DS.
  * @return True if the robot is competing on a field being controlled by a Field
- * Management System
+ *         Management System
  */
 bool DriverStation::IsFMSAttached() const {
   return false;  // No FMS in simulation
@@ -244,7 +247,7 @@ bool DriverStation::IsFMSAttached() const {
 
 /**
  * Return the alliance that the driver station says it is on.
- * This could return kRed or kBlue
+ * This could return kRed or kBlue.
  * @return The Alliance enum
  */
 DriverStation::Alliance DriverStation::GetAlliance() const {
@@ -255,8 +258,8 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
 }
 
 /**
- * Return the driver station location on the field
- * This could return 1, 2, or 3
+ * Return the driver station location on the field.
+ * This could return 1, 2, or 3.
  * @return The location of the driver station
  */
 uint32_t DriverStation::GetLocation() const {
@@ -264,10 +267,10 @@ uint32_t DriverStation::GetLocation() const {
 }
 
 /**
- * Wait until a new packet comes from the driver station
+ * Wait until a new packet comes from the driver station.
  * This blocks on a semaphore, so the waiting is efficient.
  * This is a good way to delay processing until there is new driver station data
- * to act on
+ * to act on.
  */
 void DriverStation::WaitForData() {
   std::unique_lock<std::mutex> lock(m_waitForDataMutex);
@@ -275,7 +278,7 @@ void DriverStation::WaitForData() {
 }
 
 /**
- * Return the approximate match time
+ * Return the approximate match time.
  * The FMS does not currently send the official match time to the robots
  * This returns the time since the enable signal sent from the Driver Station
  * At the beginning of autonomous, the time is reset to 0.0 seconds
@@ -321,7 +324,7 @@ void DriverStation::ReportError(bool is_error, int32_t code,
 }
 
 /**
- * Return the team number that the Driver Station is configured for
+ * Return the team number that the Driver Station is configured for.
  * @return The team number
  */
 uint16_t DriverStation::GetTeamNumber() const { return 348; }

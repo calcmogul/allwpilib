@@ -97,6 +97,6 @@ class CANSpeedController : public SpeedController {
   virtual void ConfigMaxOutputVoltage(double voltage) = 0;
   virtual void ConfigFaultTime(float faultTime) = 0;
   // Hold off on interface until we figure out ControlMode enums.
-  //	virtual void SetControlMode(ControlMode mode) = 0;
-  //	virtual ControlMode GetControlMode() const = 0;
+  // virtual void SetControlMode(ControlMode mode) = 0;
+  // virtual ControlMode GetControlMode() const = 0;
 };

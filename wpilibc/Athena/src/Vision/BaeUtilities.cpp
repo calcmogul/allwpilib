@@ -30,17 +30,20 @@
 static DebugOutputType dprintfFlag = DEBUG_OFF;
 
 /**
- * Set the debug flag to print to screen, file on cRIO, both or neither
+ * Set the debug flag to print to screen, file on cRIO, both or neither.
+ *
  * @param tempString The format string.
  */
 void SetDebugFlag(DebugOutputType flag) { dprintfFlag = flag; }
 
 /**
  * Debug print to a file and/or a terminal window.
+ *
  * Call like you would call printf.
  * Set functionName in the function if you want the correct function name to
  * print out.
  * The file line number will also be printed.
+ *
  * @param tempString The format string.
  */
 void dprintf(const char* tempString, ...) /* Variable argument list */
@@ -157,9 +160,9 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
 }
 
 /**
- * @brief Normalizes a value in a range, used for drive input
+ * @brief Normalizes a value in a range, used for drive input.
  * @param position The position in the range, starting at 0
- * @param range The size of the range that position is in
+ * @param range    The size of the range that position is in
  * @return The normalized position from -1 to +1
  */
 double RangeToNormalized(double position, int range) {
@@ -170,8 +173,8 @@ double RangeToNormalized(double position, int range) {
  * @brief Convert a normalized value to the corresponding value in a range.
  * This is used to convert normalized values to the servo command range.
  * @param normalizedValue The normalized value (in the -1 to +1 range)
- * @param minRange The minimum of the range (0 is default)
- * @param maxRange The maximum of the range (1 is default)
+ * @param minRange        The minimum of the range (0 is default)
+ * @param maxRange        The maximum of the range (1 is default)
  * @return The value in the range corresponding to the input normalized value
  */
 float NormalizeToRange(float normalizedValue, float minRange, float maxRange) {
@@ -210,12 +213,11 @@ void ShowActivity(char* fmt, ...) {
 /**
  * @brief Calculate sine wave increments (-1.0 to 1.0).
  * The first time this is called, it sets up the time increment. Subsequent
- * calls
- * will give values along the sine wave depending on current time. If the wave
- * is
- * stopped and restarted, it must be reinitialized with a new "first call".
+ * calls will give values along the sine wave depending on current time. If
+ * the wave is stopped and restarted, it must be reinitialized with a new
+ * "first call".
  *
- * @param period length of time to complete a complete wave
+ * @param period   length of time to complete a complete wave
  * @param sinStart Where to start the sine wave (0.0 = 2 pi, pi/2 = 1.0, etc.)
  */
 double SinPosition(double* period, double sinStart) {
@@ -276,18 +278,19 @@ void panForTarget(Servo* panServo, double sinStart) {
   float newServoPosition = NormalizeToRange(normalizedSinPosition);
   panServo->Set(newServoPosition);
   // ShowActivity ("pan x: normalized %f newServoPosition = %f" ,
-  //		normalizedSinPosition, newServoPosition );
+  //    normalizedSinPosition, newServoPosition );
 }
 
 /** @brief Read a file and return non-comment output string
-
-Call the first time with 0 lineNumber to get the number of lines to read
-Then call with each lineNumber to get one camera parameter. There should
-be one property=value entry on each line, i.e. "exposure=auto"
-
- * @param inputFile filename to read
+ *
+ * Call the first time with 0 lineNumber to get the number of lines to read
+ * Then call with each lineNumber to get one camera parameter. There should
+ * be one property=value entry on each line, i.e. "exposure=auto"
+ *
+ * @param inputFile    filename to read
  * @param outputString one string
- * @param lineNumber if 0, return number of lines; else return that line number
+ * @param lineNumber   if 0, return number of lines; else return that line
+ *                     number
  * @return int number of lines or -1 if error
  **/
 int processFile(char* inputFile, char* outputString, int lineNumber) {
@@ -332,7 +335,8 @@ int processFile(char* inputFile, char* outputString, int lineNumber) {
   return (lineCount);
 }
 
-/** Ignore empty string
+/**
+ * Ignore empty string.
  * @param string to check if empty
  **/
 int emptyString(char* string) {
@@ -351,7 +355,8 @@ int emptyString(char* string) {
   return (1);
 }
 
-/** Remove special characters from string
+/**
+ * Remove special characters from string.
  * @param string to process
  **/
 void stripString(char* string) {

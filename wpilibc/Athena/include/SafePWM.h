@@ -16,11 +16,9 @@
 /**
  * A safe version of the PWM class.
  * It is safe because it implements the MotorSafety interface that provides
- * timeouts
- * in the event that the motor value is not updated before the expiration time.
- * This delegates the actual work to a MotorSafetyHelper object that is used for
- * all
- * objects that implement MotorSafety.
+ * timeouts in the event that the motor value is not updated before the
+ * expiration time. This delegates the actual work to a MotorSafetyHelper
+ * object that is used for all objects that implement MotorSafety.
  */
 class SafePWM : public PWM, public MotorSafety {
  public:

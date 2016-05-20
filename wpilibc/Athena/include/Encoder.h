@@ -22,17 +22,13 @@ class DigitalGlitchFilter;
 /**
  * Class to read quad encoders.
  * Quadrature encoders are devices that count shaft rotation and can sense
- * direction. The output of
- * the QuadEncoder class is an integer that can count either up or down, and can
- * go negative for
- * reverse direction counting. When creating QuadEncoders, a direction is
- * supplied that changes the
- * sense of the output to make code more readable if the encoder is mounted such
- * that forward movement
- * generates negative values. Quadrature encoders have two digital outputs, an A
- * Channel and a B Channel
- * that are out of phase with each other to allow the FPGA to do direction
- * sensing.
+ * direction. The output of the QuadEncoder class is an integer that can count
+ * either up or down, and can go negative for reverse direction counting. When
+ * creating QuadEncoders, a direction is supplied that changes the sense of the
+ * output to make code more readable if the encoder is mounted such that forward
+ * movement generates negative values. Quadrature encoders have two digital
+ * outputs, an A Channel and a B Channel that are out of phase with each other
+ * to allow the FPGA to do direction sensing.
  *
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.

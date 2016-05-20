@@ -17,8 +17,7 @@
  * Solenoid class for running high voltage Digital Output (PCM).
  *
  * The Solenoid class is typically used for pneumatics solenoids, but could be
- * used
- * for any device within the current spec of the PCM.
+ * used for any device within the current spec of the PCM.
  */
 class Solenoid : public SolenoidBase,
                  public LiveWindowSendable,

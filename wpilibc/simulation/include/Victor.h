@@ -12,7 +12,7 @@
 #include "SpeedController.h"
 
 /**
- * IFI Victor Speed Controller
+ * IFI Victor Speed Controller.
  */
 class Victor : public SafePWM, public SpeedController {
  public:

@@ -12,7 +12,7 @@
 #include "SpeedController.h"
 
 /**
- * CTRE Talon Speed Controller
+ * CTRE Talon Speed Controller.
  */
 class Talon : public SafePWM, public SpeedController {
  public:

@@ -12,7 +12,7 @@
 #include "SpeedController.h"
 
 /**
- * Luminary Micro Jaguar Speed Control
+ * Luminary Micro Jaguar Speed Control.
  */
 class Jaguar : public SafePWM, public SpeedController {
  public:

@@ -9,9 +9,9 @@
 
 /**
  * Interface for counting the number of ticks on a digital input channel.
+ *
  * Encoders, Gear tooth sensors, and counters should all subclass this so it can
- * be used to
- * build more advanced classes for control and driving.
+ * be used to build more advanced classes for control and driving.
  *
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.

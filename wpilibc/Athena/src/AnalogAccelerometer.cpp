@@ -21,9 +21,11 @@ void AnalogAccelerometer::InitAccelerometer() {
 
 /**
  * Create a new instance of an accelerometer.
+ *
  * The constructor allocates desired analog input.
+ *
  * @param channel The channel number for the analog input the accelerometer is
- * connected to
+ *                connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
   m_analogInput = std::make_shared<AnalogInput>(channel);
@@ -32,11 +34,13 @@ AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
 
 /**
  * Create a new instance of Accelerometer from an existing AnalogInput.
+ *
  * Make a new instance of accelerometer given an AnalogInput. This is
  * particularly useful if the port is going to be read as an analog channel as
  * well as through the Accelerometer class.
+ *
  * @param channel The existing AnalogInput object for the analog input the
- * accelerometer is connected to
+ *                accelerometer is connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
     : m_analogInput(channel, NullDeleter<AnalogInput>()) {
@@ -49,11 +53,13 @@ AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
 
 /**
  * Create a new instance of Accelerometer from an existing AnalogInput.
+ *
  * Make a new instance of accelerometer given an AnalogInput. This is
  * particularly useful if the port is going to be read as an analog channel as
  * well as through the Accelerometer class.
+ *
  * @param channel The existing AnalogInput object for the analog input the
- * accelerometer is connected to
+ *                accelerometer is connected to
  */
 AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
     : m_analogInput(channel) {
@@ -79,9 +85,8 @@ float AnalogAccelerometer::GetAcceleration() const {
  * Set the accelerometer sensitivity.
  *
  * This sets the sensitivity of the accelerometer used for calculating the
- * acceleration.
- * The sensitivity varies by accelerometer model. There are constants defined
- * for various models.
+ * acceleration. The sensitivity varies by accelerometer model. There are
+ * constants defined for various models.
  *
  * @param sensitivity The sensitivity of accelerometer in Volts per G.
  */

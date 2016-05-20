@@ -22,8 +22,9 @@ const int32_t PWM::kPwmDisabled = 0;
  * Checks channel value range and allocates the appropriate channel.
  * The allocation is only done to help users ensure that they don't double
  * assign channels.
+ *
  * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP
- * port
+ *                port
  */
 PWM::PWM(uint32_t channel) {
   char buf[64];
@@ -48,11 +49,11 @@ PWM::~PWM() {
 
 /**
  * Optionally eliminate the deadband from a speed controller.
+ *
  * @param eliminateDeadband If true, set the motor curve on the Jaguar to
- * eliminate
- * the deadband in the middle of the range. Otherwise, keep the full range
- * without
- * modifying any values.
+ *                          eliminate the deadband in the middle of the range.
+ *                          Otherwise, keep the full range without modifying
+ *                          any values.
  */
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   m_eliminateDeadband = eliminateDeadband;
@@ -60,14 +61,16 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
 
 /**
  * Set the bounds on the PWM values.
+ *
  * This sets the bounds on the PWM values for a particular each type of
- * controller. The values
- * determine the upper and lower speeds as well as the deadband bracket.
- * @param max The Minimum pwm value
+ * controller. The values determine the upper and lower speeds as well as the
+ * deadband bracket.
+ *
+ * @param max         The Minimum pwm value
  * @param deadbandMax The high end of the deadband range
- * @param center The center speed (off)
+ * @param center      The center speed (off)
  * @param deadbandMin The low end of the deadband range
- * @param min The minimum pwm value
+ * @param min         The minimum pwm value
  */
 void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
                     int32_t deadbandMin, int32_t min) {
@@ -76,14 +79,16 @@ void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
 
 /**
  * Set the bounds on the PWM pulse widths.
+ *
  * This sets the bounds on the PWM values for a particular type of controller.
- * The values
- * determine the upper and lower speeds as well as the deadband bracket.
- * @param max The max PWM pulse width in ms
+ * The values determine the upper and lower speeds as well as the deadband
+ * bracket.
+ *
+ * @param max         The max PWM pulse width in ms
  * @param deadbandMax The high end of the deadband range pulse width in ms
- * @param center The center (off) pulse width in ms
+ * @param center      The center (off) pulse width in ms
  * @param deadbandMin The low end of the deadband pulse width in ms
- * @param min The minimum pulse width in ms
+ * @param min         The minimum pulse width in ms
  */
 void PWM::SetBounds(double max, double deadbandMax, double center,
                     double deadbandMin, double min) {

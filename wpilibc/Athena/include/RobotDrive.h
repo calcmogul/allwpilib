@@ -22,16 +22,11 @@ class GenericHID;
  * Utility class for handling Robot drive based on a definition of the motor
  * configuration.
  * The robot drive class handles basic driving for a robot. Currently, 2 and 4
- * motor tank and
- * mecanum drive trains are supported. In the future other drive types like
- * swerve might be
- * implemented. Motor channel numbers are passed supplied on creation of the
- * class. Those
- * are used for either the Drive function (intended for hand created drive code,
- * such as
- * autonomous) or with the Tank/Arcade functions intended to be used for
- * Operator Control
- * driving.
+ * motor tank and mecanum drive trains are supported. In the future other drive
+ * types like swerve might be implemented. Motor channel numbers are passed
+ * supplied on creation of the class. Those are used for either the Drive
+ * function (intended for hand created drive code, such as autonomous) or with
+ * the Tank/Arcade functions intended to be used for Operator Control driving.
  */
 class RobotDrive : public MotorSafety, public ErrorBase {
  public:

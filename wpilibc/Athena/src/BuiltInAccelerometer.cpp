@@ -12,6 +12,7 @@
 
 /**
  * Constructor.
+ *
  * @param range The range the accelerometer will measure
  */
 BuiltInAccelerometer::BuiltInAccelerometer(Range range) {

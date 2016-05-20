@@ -18,15 +18,13 @@ const float AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
 
 /**
  * Initialize the gyro.
+ *
  * Calibrate the gyro by running for a number of samples and computing the
- * center value for this
- * part. Then use the center value as the Accumulator center value for
- * subsequent measurements.
- * It's important to make sure that the robot is not moving while the centering
- * calculations are
- * in progress, this is typically done when the robot is first turned on while
- * it's sitting at
- * rest before the competition starts.
+ * center value for this part. Then use the center value as the Accumulator
+ * center value for subsequent measurements. It's important to make sure that
+ * the robot is not moving while the centering calculations are in progress,
+ * this is typically done when the robot is first turned on while it's sitting
+ * at rest before the competition starts.
  */
 void AnalogGyro::InitAnalogGyro(int channel) {
   SetPIDSourceType(PIDSourceType::kDisplacement);
@@ -39,7 +37,7 @@ void AnalogGyro::InitAnalogGyro(int channel) {
 }
 
 /**
- * AnalogGyro constructor with only a channel..
+ * AnalogGyro constructor with only a channel.
  *
  * @param channel The analog channel the gyro is connected to.
  */
@@ -47,9 +45,10 @@ AnalogGyro::AnalogGyro(uint32_t channel) { InitAnalogGyro(channel); }
 
 /**
  * Reset the gyro.
+ *
  * Resets the gyro to a heading of zero. This can be used if there is
- * significant
- * drift in the gyro and it needs to be recalibrated after it has been running.
+ * significant drift in the gyro and it needs to be recalibrated after it has
+ * been running.
  */
 void AnalogGyro::Reset() { impl->Reset(); }
 
@@ -59,16 +58,13 @@ void AnalogGyro::Calibrate() { Reset(); }
  * Return the actual angle in degrees that the robot is currently facing.
  *
  * The angle is based on the current accumulator value corrected by the
- * oversampling rate, the
- * gyro type and the A/D calibration values.
- * The angle is continuous, that is can go beyond 360 degrees. This make
- * algorithms that wouldn't
- * want to see a discontinuity in the gyro output as it sweeps past 0 on the
- * second time around.
+ * oversampling rate, the gyro type and the A/D calibration values. The angle
+ * is continuous, that is can go beyond 360 degrees. This make algorithms that
+ * wouldn't want to see a discontinuity in the gyro output as it sweeps past 0
+ * on the second time around.
  *
  * @return the current heading of the robot in degrees. This heading is based on
- * integration
- * of the returned rate from the gyro.
+ *         integration of the returned rate from the gyro.
  */
 float AnalogGyro::GetAngle() const { return impl->GetAngle(); }
 

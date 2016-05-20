@@ -38,7 +38,7 @@ ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
 /**
  * Constructor.
  *
- * @param port The SPI port the accelerometer is attached to
+ * @param port  The SPI port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure.
  */
 ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
@@ -128,7 +128,7 @@ double ADXL362::GetAcceleration(ADXL362::Axes axis) {
  * Get the acceleration of all axes in Gs.
  *
  * @return An object containing the acceleration measured on each axis of the
- * ADXL362 in Gs.
+ *         ADXL362 in Gs.
  */
 ADXL362::AllAxes ADXL362::GetAccelerations() {
   AllAxes data = AllAxes();

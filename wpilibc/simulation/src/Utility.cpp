@@ -5,12 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/* Copyright (c) FIRST 2008. All Rights Reserved.
- */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
-/*----------------------------------------------------------------------------*/
-
 #include "Utility.h"
 
 #include <stdio.h>
@@ -38,10 +32,10 @@ void wpi_stackTraceOnAssertEnable(bool enabled) { stackTraceEnabled = enabled; }
 
 /**
  * Enable suspend on asssert.
+ *
  * If enabled, the user task will be suspended whenever an assert fails. This
  * will allow the user to attach to the task with the debugger and examine
- * variables
- * around the failure.
+ * variables around the failure.
  */
 void wpi_suspendOnAssertEnabled(bool enabled) {
   suspendOnAssertEnabled = enabled;
@@ -89,8 +83,7 @@ bool wpi_assert_impl(bool conditionValue, const char* conditionText,
 /**
  * Common error routines for wpi_assertEqual_impl and wpi_assertNotEqual_impl
  * This should not be called directly; it should only be used by
- * wpi_assertEqual_impl
- * and wpi_assertNotEqual_impl.
+ * wpi_assertEqual_impl and wpi_assertNotEqual_impl.
  */
 void wpi_assertEqual_common_impl(int valueA, int valueB,
                                  const std::string& equalityType,

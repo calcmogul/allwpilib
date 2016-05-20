@@ -17,16 +17,15 @@
  * A {@link CommandGroup} is a list of commands which are executed in sequence.
  *
  * <p>Commands in a {@link CommandGroup} are added using the {@link
- * CommandGroup#AddSequential(Command) AddSequential(...)} method
- * and are called sequentially.
- * {@link CommandGroup CommandGroups} are themselves {@link Command Commands}
- * and can be given to other {@link CommandGroup CommandGroups}.</p>
+ * CommandGroup#AddSequential(Command) AddSequential(...)} method and are
+ * called sequentially. {@link CommandGroup CommandGroups} are themselves
+ * {@link Command Commands} and can be given to other
+ * {@link CommandGroup CommandGroups}.</p>
  *
  * <p>{@link CommandGroup CommandGroups} will carry all of the requirements of
- * their {@link Command subcommands}.  Additional
- * requirements can be specified by calling {@link
- *CommandGroup#Requires(Subsystem) Requires(...)}
- * normally in the constructor.</P>
+ * their {@link Command subcommands}.  Additional requirements can be specified
+ * by calling {@link CommandGroup#Requires(Subsystem) Requires(...)} normally
+ * in the constructor.</P>
  *
  * <p>CommandGroups can also execute commands in parallel, simply by adding them
  * using {@link CommandGroup#AddParallel(Command) AddParallel(...)}.</p>

@@ -22,15 +22,14 @@ RobotBase& RobotBase::getInstance() { return *m_instance; }
 
 /**
  * Constructor for a generic robot program.
+ *
  * User code should be placed in the constuctor that runs before the Autonomous
- * or Operator
- * Control period starts. The constructor will run to completion before
- * Autonomous is entered.
+ * or Operator Control period starts. The constructor will run to completion
+ * before Autonomous is entered.
  *
  * This must be used to ensure that the communications code starts. In the
- * future it would be
- * nice to put this code into it's own task that loads on boot so ensure that it
- * runs.
+ * future it would be nice to put this code into it's own task that loads on
+ * boot so ensure that it runs.
  */
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotState::SetImplementation(DriverStation::GetInstance());
@@ -39,45 +38,49 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
 /**
  * Determine if the Robot is currently enabled.
+ *
  * @return True if the Robot is currently enabled by the field controls.
  */
 bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
 
 /**
  * Determine if the Robot is currently disabled.
+ *
  * @return True if the Robot is currently disabled by the field controls.
  */
 bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
 
 /**
  * Determine if the robot is currently in Autnomous mode.
+ *
  * @return True if the robot is currently operating Autonomously as determined
- * by the field controls.
+ *         by the field controls.
  */
 bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
 
 /**
  * Determine if the robot is currently in Operator Control mode.
+ *
  * @return True if the robot is currently operating in Tele-Op mode as
- * determined by the field controls.
+ *         determined by the field controls.
  */
 bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
 
 /**
  * Determine if the robot is currently in Test mode.
+ *
  * @return True if the robot is currently running tests as determined by the
- * field controls.
+ *         field controls.
  */
 bool RobotBase::IsTest() const { return m_ds.IsTest(); }
 
 /**
  * This class exists for the sole purpose of getting its destructor called when
  * the module unloads.
+ *
  * Before the module is done unloading, we need to delete the RobotBase derived
- * singleton.  This should delete
- * the other remaining singletons that were registered.  This should also stop
- * all tasks that are using
- * the Task class.
+ * singleton.  This should delete the other remaining singletons that were
+ * registered.  This should also stop all tasks that are using the Task class.
  */
 class RobotDeleter {
  public:

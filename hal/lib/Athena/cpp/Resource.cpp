@@ -17,9 +17,8 @@ priority_recursive_mutex Resource::m_createLock;
 /**
  * Allocate storage for a new instance of Resource.
  * Allocate a bool array of values that will get initialized to indicate that no
- * resources
- * have been allocated yet. The indicies of the resources are [0 .. elements -
- * 1].
+ * resources have been allocated yet. The indicies of the resources are [0 ..
+ * elements - 1].
  */
 Resource::Resource(uint32_t elements) {
   std::lock_guard<priority_recursive_mutex> sync(m_createLock);
@@ -65,8 +64,7 @@ uint32_t Resource::Allocate(const char* resourceDesc) {
 /**
  * Allocate a specific resource value.
  * The user requests a specific resource value, i.e. channel number and it is
- * verified
- * unallocated, then returned.
+ * verified unallocated, then returned.
  */
 uint32_t Resource::Allocate(uint32_t index, const char* resourceDesc) {
   std::lock_guard<priority_recursive_mutex> sync(m_allocateLock);
@@ -85,9 +83,8 @@ uint32_t Resource::Allocate(uint32_t index, const char* resourceDesc) {
 /**
  * Free an allocated resource.
  * After a resource is no longer needed, for example a destructor is called for
- * a channel assignment
- * class, Free will release the resource value so it can be reused somewhere
- * else in the program.
+ * a channel assignment class, Free will release the resource value so it can
+ * be reused somewhere else in the program.
  */
 void Resource::Free(uint32_t index) {
   std::lock_guard<priority_recursive_mutex> sync(m_allocateLock);

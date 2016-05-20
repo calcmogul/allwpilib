@@ -14,6 +14,7 @@ HSLImage::HSLImage() : ColorImage(IMAQ_IMAGE_HSL) {}
 
 /**
  * Create a new image by loading a file.
+ *
  * @param fileName The path of the file to load.
  */
 HSLImage::HSLImage(const char* fileName) : ColorImage(IMAQ_IMAGE_HSL) {

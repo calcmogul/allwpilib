@@ -18,8 +18,9 @@ std::atomic<bool> Notifier::m_stopped(false);
 
 /**
  * Create a Notifier for timer event notification.
+ *
  * @param handler The handler is called at the notification time which is set
- * using StartSingle or StartPeriodic.
+ *                using StartSingle or StartPeriodic.
  */
 Notifier::Notifier(TimerEventHandler handler) {
   if (handler == nullptr)
@@ -40,6 +41,7 @@ Notifier::Notifier(TimerEventHandler handler) {
 
 /**
  * Free the resources for a timer event.
+ *
  * All resources will be freed and the timer event will be removed from the
  * queue if necessary.
  */
@@ -62,21 +64,21 @@ Notifier::~Notifier() {
 
 /**
  * Update the alarm hardware to reflect the current first element in the queue.
+ *
  * Compute the time the next alarm should occur based on the current time and
- * the
- * period for the first element in the timer queue.
+ * the period for the first element in the timer queue.
+ *
  * WARNING: this method does not do synchronization! It must be called from
- * somewhere
- * that is taking care of synchronizing access to the queue.
+ * somewhere that is taking care of synchronizing access to the queue.
  */
 void Notifier::UpdateAlarm() {}
 
 /**
  * ProcessQueue is called whenever there is a timer interrupt.
+ *
  * We need to wake up and process the current top item in the timer queue as
- * long
- * as its scheduled time is after the current time. Then the item is removed or
- * rescheduled (repetitive events) in the queue.
+ * long as its scheduled time is after the current time. Then the item is
+ * removed or rescheduled (repetitive events) in the queue.
  */
 void Notifier::ProcessQueue(uint32_t mask, void* params) {
   Notifier* current;
@@ -120,14 +122,16 @@ void Notifier::ProcessQueue(uint32_t mask, void* params) {
 
 /**
  * Insert this Notifier into the timer queue in right place.
+ *
  * WARNING: this method does not do synchronization! It must be called from
- * somewhere
- * that is taking care of synchronizing access to the queue.
+ * somewhere that is taking care of synchronizing access to the queue.
+ *
  * @param reschedule If false, the scheduled alarm is based on the curent time
- * and UpdateAlarm
- * method is called which will enable the alarm if necessary.
- * If true, update the time by adding the period (no drift) when rescheduled
- * periodic from ProcessQueue.
+ *                   and UpdateAlarm method is called which will enable the
+ *                   alarm if necessary. If true, update the time by adding the
+ *                   period (no drift) when rescheduled periodic from
+ *                   ProcessQueue.
+ *
  * This ensures that the public methods only update the queue after finishing
  * inserting.
  */
@@ -165,12 +169,12 @@ void Notifier::InsertInQueue(bool reschedule) {
 
 /**
  * Delete this Notifier from the timer queue.
+ *
  * WARNING: this method does not do synchronization! It must be called from
- * somewhere
- * that is taking care of synchronizing access to the queue.
+ * somewhere that is taking care of synchronizing access to the queue.
+ *
  * Remove this Notifier from the timer queue and adjust the next interrupt time
- * to reflect
- * the current top of the queue.
+ * to reflect the current top of the queue.
  */
 void Notifier::DeleteFromQueue() {
   if (m_queued) {
@@ -188,7 +192,9 @@ void Notifier::DeleteFromQueue() {
 
 /**
  * Register for single event notification.
+ *
  * A timer event is queued for a single event after the specified delay.
+ *
  * @param delay Seconds to wait before the handler is called.
  */
 void Notifier::StartSingle(double delay) {
@@ -201,11 +207,13 @@ void Notifier::StartSingle(double delay) {
 
 /**
  * Register for periodic event notification.
+ *
  * A timer event is queued for periodic event notification. Each time the
- * interrupt
- * occurs, the event will be immediately requeued for the same time interval.
+ * interrupt occurs, the event will be immediately requeued for the same time
+ * interval.
+ *
  * @param period Period in seconds to call the handler starting one period after
- * the call to this method.
+ *               the call to this method.
  */
 void Notifier::StartPeriodic(double period) {
   std::lock_guard<priority_recursive_mutex> sync(queueMutex);
@@ -217,12 +225,11 @@ void Notifier::StartPeriodic(double period) {
 
 /**
  * Stop timer events from occuring.
+ *
  * Stop any repeating timer events from occuring. This will also remove any
- * single
- * notification events from the queue.
- * If a timer-based call to the registered handler is in progress, this function
- * will
- * block until the handler call is complete.
+ * single notification events from the queue. If a timer-based call to the
+ * registered handler is in progress, this function will block until the
+ * handler call is complete.
  */
 void Notifier::Stop() {
   {

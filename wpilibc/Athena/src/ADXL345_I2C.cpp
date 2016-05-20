@@ -19,9 +19,9 @@ constexpr double ADXL345_I2C::kGsPerLSB;
 /**
  * Constructs the ADXL345 Accelerometer over I2C.
  *
- * @param port The I2C port the accelerometer is attached to
- * @param range The range (+ or -) that the accelerometer will measure.
- * @param deviceAddress the I2C address of the accelerometer (0x1D or 0x53)
+ * @param port          The I2C port the accelerometer is attached to
+ * @param range         The range (+ or -) that the accelerometer will measure
+ * @param deviceAddress The I2C address of the accelerometer (0x1D or 0x53)
  */
 ADXL345_I2C::ADXL345_I2C(Port port, Range range, int deviceAddress)
     : I2C(port, deviceAddress) {
@@ -61,7 +61,7 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
  * Get the acceleration of all axes in Gs.
  *
  * @return An object containing the acceleration measured on each axis of the
- * ADXL345 in Gs.
+ *         ADXL345 in Gs.
  */
 ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   AllAxes data = AllAxes();

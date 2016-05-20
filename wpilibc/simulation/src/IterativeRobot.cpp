@@ -23,7 +23,7 @@ const double IterativeRobot::kDefaultPeriod = 0;
  * Set the period for the periodic functions.
  *
  * @param period The period of the periodic function calls.  0.0 means sync to
- * driver station control data.
+ *               driver station control data.
  */
 void IterativeRobot::SetPeriod(double period) {
   if (period > 0.0) {
@@ -39,13 +39,16 @@ void IterativeRobot::SetPeriod(double period) {
 
 /**
  * Get the period for the periodic functions.
+ *
  * Returns 0.0 if configured to syncronize with DS control data packets.
+ *
  * @return Period of the periodic function calls
  */
 double IterativeRobot::GetPeriod() { return m_period; }
 
 /**
- * Get the number of loops per second for the IterativeRobot
+ * Get the number of loops per second for the IterativeRobot.
+ *
  * @return Frequency of the periodic function calls
  */
 double IterativeRobot::GetLoopsPerSec() {
@@ -59,9 +62,8 @@ double IterativeRobot::GetLoopsPerSec() {
  * Provide an alternate "main loop" via StartCompetition().
  *
  * This specific StartCompetition() implements "main loop" behavior like that of
- * the FRC
- * control system in 2008 and earlier, with a primary (slow) loop that is
- * called periodically, and a "fast loop" (a.k.a. "spin loop") that is
+ * the FRC control system in 2008 and earlier, with a primary (slow) loop that
+ * is called periodically, and a "fast loop" (a.k.a. "spin loop") that is
  * called as fast as possible with no delay between calls.
  */
 void IterativeRobot::StartCompetition() {
@@ -171,9 +173,8 @@ bool IterativeRobot::NextPeriodReady() {
  * Robot-wide initialization code should go here.
  *
  * Users should override this method for default Robot-wide initialization which
- * will
- * be called when the robot is first powered on.  It will be called exactly 1
- * time.
+ * will be called when the robot is first powered on.  It will be called
+ * exactly 1 time.
  */
 void IterativeRobot::RobotInit() {
   printf("Default %s() method... Overload me!\n", __FUNCTION__);
@@ -183,8 +184,7 @@ void IterativeRobot::RobotInit() {
  * Initialization code for disabled mode should go here.
  *
  * Users should override this method for initialization code which will be
- * called each time
- * the robot enters disabled mode.
+ * called each time the robot enters disabled mode.
  */
 void IterativeRobot::DisabledInit() {
   printf("Default %s() method... Overload me!\n", __FUNCTION__);
@@ -194,8 +194,7 @@ void IterativeRobot::DisabledInit() {
  * Initialization code for autonomous mode should go here.
  *
  * Users should override this method for initialization code which will be
- * called each time
- * the robot enters autonomous mode.
+ * called each time the robot enters autonomous mode.
  */
 void IterativeRobot::AutonomousInit() {
   printf("Default %s() method... Overload me!\n", __FUNCTION__);
@@ -205,8 +204,7 @@ void IterativeRobot::AutonomousInit() {
  * Initialization code for teleop mode should go here.
  *
  * Users should override this method for initialization code which will be
- * called each time
- * the robot enters teleop mode.
+ * called each time the robot enters teleop mode.
  */
 void IterativeRobot::TeleopInit() {
   printf("Default %s() method... Overload me!\n", __FUNCTION__);
@@ -216,8 +214,7 @@ void IterativeRobot::TeleopInit() {
  * Initialization code for test mode should go here.
  *
  * Users should override this method for initialization code which will be
- * called each time
- * the robot enters test mode.
+ * called each time the robot enters test mode.
  */
 void IterativeRobot::TestInit() {
   printf("Default %s() method... Overload me!\n", __FUNCTION__);
@@ -227,8 +224,7 @@ void IterativeRobot::TestInit() {
  * Periodic code for disabled mode should go here.
  *
  * Users should override this method for code which will be called periodically
- * at a regular
- * rate while the robot is in disabled mode.
+ * at a regular rate while the robot is in disabled mode.
  */
 void IterativeRobot::DisabledPeriodic() {
   static bool firstRun = true;
@@ -242,8 +238,7 @@ void IterativeRobot::DisabledPeriodic() {
  * Periodic code for autonomous mode should go here.
  *
  * Users should override this method for code which will be called periodically
- * at a regular
- * rate while the robot is in autonomous mode.
+ * at a regular rate while the robot is in autonomous mode.
  */
 void IterativeRobot::AutonomousPeriodic() {
   static bool firstRun = true;
@@ -257,8 +252,7 @@ void IterativeRobot::AutonomousPeriodic() {
  * Periodic code for teleop mode should go here.
  *
  * Users should override this method for code which will be called periodically
- * at a regular
- * rate while the robot is in teleop mode.
+ * at a regular rate while the robot is in teleop mode.
  */
 void IterativeRobot::TeleopPeriodic() {
   static bool firstRun = true;
@@ -272,8 +266,7 @@ void IterativeRobot::TeleopPeriodic() {
  * Periodic code for test mode should go here.
  *
  * Users should override this method for code which will be called periodically
- * at a regular
- * rate while the robot is in test mode.
+ * at a regular rate while the robot is in test mode.
  */
 void IterativeRobot::TestPeriodic() {
   static bool firstRun = true;

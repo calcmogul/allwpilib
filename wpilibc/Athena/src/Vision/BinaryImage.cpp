@@ -13,7 +13,8 @@ using namespace std;
 
 /**
  * Get then number of particles for the image.
- * @returns the number of particles found for the image.
+ *
+ * @return the number of particles found for the image.
  */
 int BinaryImage::GetNumberParticles() {
   int numParticles = 0;
@@ -24,9 +25,11 @@ int BinaryImage::GetNumberParticles() {
 
 /**
  * Get a single particle analysis report.
+ *
  * Get one (of possibly many) particle analysis reports for an image.
+ *
  * @param particleNumber Which particle analysis report to return.
- * @returns the selected particle analysis report
+ * @return the selected particle analysis report
  */
 ParticleAnalysisReport BinaryImage::GetParticleAnalysisReport(
     int particleNumber) {
@@ -37,10 +40,12 @@ ParticleAnalysisReport BinaryImage::GetParticleAnalysisReport(
 
 /**
  * Get a single particle analysis report.
+ *
  * Get one (of possibly many) particle analysis reports for an image.
  * This version could be more efficient when copying many reports.
+ *
  * @param particleNumber Which particle analysis report to return.
- * @param par the selected particle analysis report
+ * @param par            the selected particle analysis report
  */
 void BinaryImage::GetParticleAnalysisReport(int particleNumber,
                                             ParticleAnalysisReport* par) {
@@ -95,11 +100,12 @@ void BinaryImage::GetParticleAnalysisReport(int particleNumber,
 
 /**
  * Get an ordered vector of particles for the image.
+ *
  * Create a vector of particle analysis reports sorted by size for an image.
  * The vector contains the actual report structures.
- * @returns a pointer to the vector of particle analysis reports. The caller
- * must delete the
- * vector when finished using it.
+ *
+ * @return a pointer to the vector of particle analysis reports. The caller
+ *         must delete the vector when finished using it.
  */
 vector<ParticleAnalysisReport>*
 BinaryImage::GetOrderedParticleAnalysisReports() {
@@ -118,7 +124,9 @@ BinaryImage::GetOrderedParticleAnalysisReports() {
 
 /**
  * Write a binary image to flash.
+ *
  * Writes the binary image to flash on the cRIO for later inspection.
+ *
  * @param fileName the name of the image file written to the flash.
  */
 void BinaryImage::Write(const char* fileName) {
@@ -134,13 +142,14 @@ void BinaryImage::Write(const char* fileName) {
 
 /**
  * Measure a single parameter for an image.
+ *
  * Get the measurement for a single parameter about an image by calling the
- * imaqMeasureParticle
- * function for the selected parameter.
+ * imaqMeasureParticle function for the selected parameter.
+ *
  * @param particleNumber which particle in the set of particles
- * @param whatToMeasure the imaq MeasurementType (what to measure)
- * @param result the value of the measurement
- * @returns false on failure, true on success
+ * @param whatToMeasure  the imaq MeasurementType (what to measure)
+ * @param result         the value of the measurement
+ * @return false on failure, true on success
  */
 bool BinaryImage::ParticleMeasurement(int particleNumber,
                                       MeasurementType whatToMeasure,
@@ -154,12 +163,13 @@ bool BinaryImage::ParticleMeasurement(int particleNumber,
 
 /**
  * Measure a single parameter for an image.
+ *
  * Get the measurement for a single parameter about an image by calling the
- * imaqMeasureParticle
- * function for the selected parameter.
+ * imaqMeasureParticle function for the selected parameter.
+ *
  * @param particleNumber which particle in the set of particles
- * @param whatToMeasure the imaq MeasurementType (what to measure)
- * @param result the value of the measurement
+ * @param whatToMeasure  the imaq MeasurementType (what to measure)
+ * @param result         the value of the measurement
  * @returns true on failure, false on success
  */
 bool BinaryImage::ParticleMeasurement(int particleNumber,
@@ -179,8 +189,10 @@ double BinaryImage::NormalizeFromRange(double position, int range) {
 
 /**
  * The compare helper function for sort.
+ *
  * This function compares two particle analysis reports as a helper for the sort
  * function.
+ *
  * @param particle1 The first particle to compare
  * @param particle2 the second particle to compare
  * @returns true if particle1 is greater than particle2

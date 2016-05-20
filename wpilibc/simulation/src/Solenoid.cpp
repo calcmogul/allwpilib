@@ -21,7 +21,7 @@ Solenoid::Solenoid(uint32_t channel) : Solenoid(1, channel) {}
  * Constructor.
  *
  * @param moduleNumber The solenoid module (1 or 2).
- * @param channel The channel on the solenoid module to control (1..8).
+ * @param channel      The channel on the solenoid module to control (1..8).
  */
 Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel) {
   char buffer[50];

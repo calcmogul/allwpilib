@@ -20,15 +20,13 @@
 
 /**
  * Implement a Robot Program framework.
+ *
  * The RobotBase class is intended to be subclassed by a user creating a robot
- * program.
- * Overridden Autonomous() and OperatorControl() methods are called at the
- * appropriate time
- * as the match proceeds. In the current implementation, the Autonomous code
- * will run to
- * completion before the OperatorControl code could start. In the future the
- * Autonomous code
- * might be spawned as a task, then killed at the end of the Autonomous period.
+ * program. Overridden Autonomous() and OperatorControl() methods are called at
+ * the appropriate time as the match proceeds. In the current implementation,
+ * the Autonomous code will run to completion before the OperatorControl code
+ * could start. In the future the Autonomous code might be spawned as a task,
+ * then killed at the end of the Autonomous period.
  */
 class RobotBase {
   friend class RobotDeleter;

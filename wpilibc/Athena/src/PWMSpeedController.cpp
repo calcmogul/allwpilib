@@ -8,9 +8,10 @@
 #include "PWMSpeedController.h"
 
 /**
- * Constructor for a PWM Speed Controller connected via PWM
+ * Constructor for a PWM Speed Controller connected via PWM.
+ *
  * @param channel The PWM channel that the controller is attached to. 0-9 are
- * on-board, 10-19 are on the MXP port
+ *                on-board, 10-19 are on the MXP port
  */
 PWMSpeedController::PWMSpeedController(uint32_t channel) : SafePWM(channel) {}
 
@@ -20,7 +21,7 @@ PWMSpeedController::PWMSpeedController(uint32_t channel) : SafePWM(channel) {}
  * The PWM value is set using a range of -1.0 to 1.0, appropriately
  * scaling the value for the FPGA.
  *
- * @param speed The speed value between -1.0 and 1.0 to set.
+ * @param speed     The speed value between -1.0 and 1.0 to set.
  * @param syncGroup Unused interface.
  */
 void PWMSpeedController::Set(float speed, uint8_t syncGroup) {
@@ -40,9 +41,10 @@ float PWMSpeedController::Get() const { return GetSpeed(); }
 void PWMSpeedController::Disable() { SetRaw(kPwmDisabled); }
 
 /**
-* Common interface for inverting direction of a speed controller.
-* @param isInverted The state of inversion, true is inverted.
-*/
+ * Common interface for inverting direction of a speed controller.
+ *
+ * @param isInverted The state of inversion, true is inverted.
+ */
 void PWMSpeedController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }

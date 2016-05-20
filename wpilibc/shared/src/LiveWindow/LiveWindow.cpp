@@ -11,10 +11,10 @@
 #include "networktables/NetworkTable.h"
 
 /**
- * Get an instance of the LiveWindow main class
+ * Get an instance of the LiveWindow main class.
+ *
  * This is a singleton to guarantee that there is only a single instance
- * regardless of
- * how many times GetInstance is called.
+ * regardless of how many times GetInstance is called.
  */
 LiveWindow* LiveWindow::GetInstance() {
   static LiveWindow instance;
@@ -23,6 +23,7 @@ LiveWindow* LiveWindow::GetInstance() {
 
 /**
  * LiveWindow constructor.
+ *
  * Allocate the necessary tables.
  */
 LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
@@ -31,7 +32,8 @@ LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
 }
 
 /**
- * Change the enabled status of LiveWindow
+ * Change the enabled status of LiveWindow.
+ *
  * If it changes to enabled, start livewindow running otherwise stop it
  */
 void LiveWindow::SetEnabled(bool enabled) {
@@ -58,9 +60,11 @@ void LiveWindow::SetEnabled(bool enabled) {
 
 /**
  * @name AddSensor(subsystem, name, component)
+ *
  * Add a Sensor associated with the subsystem and call it by the given name.
+ *
  * @param subsystem The subsystem this component is part of.
- * @param name The name of this component.
+ * @param name      The name of this component.
  * @param component A LiveWindowSendable component that represents a sensor.
  */
 //@{
@@ -99,9 +103,11 @@ void LiveWindow::AddSensor(const std::string& subsystem,
 
 /**
  * @name AddActuator(subsystem, name, component)
+ *
  * Add an Actuator associated with the subsystem and call it by the given name.
+ *
  * @param subsystem The subsystem this component is part of.
- * @param name The name of this component.
+ * @param name      The name of this component.
  * @param component A LiveWindowSendable component that represents a actuator.
  */
 //@{
@@ -179,7 +185,8 @@ void LiveWindow::AddActuator(std::string type, int module, int channel,
 }
 
 /**
- * Tell all the sensors to update (send) their values
+ * Tell all the sensors to update (send) their values.
+ *
  * Actuators are handled through callbacks on their value changing from the
  * SmartDashboard widgets.
  */

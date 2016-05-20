@@ -44,9 +44,8 @@ class SmartDashboard : public SensorBase {
   static std::shared_ptr<ITable> m_table;
 
   /**
-   * A map linking tables in the SmartDashboard to the {@link
-   * SmartDashboardData} objects
-   * they came from.
+   * A map linking tables in the SmartDashboard to the
+   * {@link SmartDashboardData} objects they came from.
    */
   static std::map<std::shared_ptr<ITable>, Sendable*> m_tablesToData;
 };

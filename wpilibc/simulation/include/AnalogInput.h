@@ -18,16 +18,13 @@
  * Analog input class.
  *
  * Connected to each analog channel is an averaging and oversampling engine.
- * This engine accumulates
- * the specified ( by SetAverageBits() and SetOversampleBits() ) number of
- * samples before returning a new
- * value.  This is not a sliding window average.  The only difference between
- * the oversampled samples and
- * the averaged samples is that the oversampled samples are simply accumulated
- * effectively increasing the
- * resolution, while the averaged samples are divided by the number of samples
- * to retain the resolution,
- * but get more stable values.
+ * This engine accumulates the specified ( by SetAverageBits() and
+ * SetOversampleBits() ) number of samples before returning a new value.  This
+ * is not a sliding window average.  The only difference between the
+ * oversampled samples and the averaged samples is that the oversampled samples
+ * are simply accumulated effectively increasing the resolution, while the
+ * averaged samples are divided by the number of samples to retain the
+ * resolution, but get more stable values.
  */
 class AnalogInput : public SensorBase,
                     public PIDSource,

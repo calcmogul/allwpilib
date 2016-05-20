@@ -17,12 +17,12 @@
  * Create an instance of a Serial Port class.
  *
  * @param baudRate The baud rate to configure the serial port.
- * @param port The physical port to use
+ * @param port     The physical port to use
  * @param dataBits The number of data bits per transfer.  Valid values are
- * between 5 and 8 bits.
- * @param parity Select the type of parity checking to use.
+ *                 between 5 and 8 bits.
+ * @param parity   Select the type of parity checking to use.
  * @param stopBits The number of stop bits to use as defined by the enum
- * StopBits.
+ *                 StopBits.
  */
 SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
                        SerialPort::Parity parity,
@@ -82,7 +82,7 @@ void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
  *
  * Termination is currently only implemented for receive.
  * When the the terminator is recieved, the Read() or Scanf() will return
- *   fewer bytes than requested, stopping after the terminator.
+ * fewer bytes than requested, stopping after the terminator.
  *
  * @param terminator The character to use for termination.
  */
@@ -117,7 +117,7 @@ int32_t SerialPort::GetBytesReceived() {
  * Read raw bytes out of the buffer.
  *
  * @param buffer Pointer to the buffer to store the bytes in.
- * @param count The maximum number of bytes to read.
+ * @param count  The maximum number of bytes to read.
  * @return The number of bytes actually read into the buffer.
  */
 uint32_t SerialPort::Read(char* buffer, int32_t count) {
@@ -131,7 +131,7 @@ uint32_t SerialPort::Read(char* buffer, int32_t count) {
  * Write raw bytes to the buffer.
  *
  * @param buffer Pointer to the buffer to read the bytes from.
- * @param count The maximum number of bytes to write.
+ * @param count  The maximum number of bytes to write.
  * @return The number of bytes actually written into the port.
  */
 uint32_t SerialPort::Write(const std::string& buffer, int32_t count) {
@@ -191,10 +191,10 @@ void SerialPort::SetWriteBufferSize(uint32_t size) {
  * Specify the flushing behavior of the output buffer.
  *
  * When set to kFlushOnAccess, data is synchronously written to the serial port
- *   after each call to either Printf() or Write().
+ * after each call to either Printf() or Write().
  *
  * When set to kFlushWhenFull, data will only be written to the serial port when
- *   the buffer is full or when Flush() is called.
+ * the buffer is full or when Flush() is called.
  *
  * @param mode The write buffer mode.
  */

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2013. All Rights Reserved.  			      */
+/* Copyright (c) FIRST 2013. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
@@ -166,8 +166,9 @@ enum HALAllianceStationID {
 };
 
 /* The maximum number of axes that will be stored in a single HALJoystickAxes
-        struct. This is used for allocating buffers, not bounds checking, since
-        there are usually less axes in practice. */
+ * struct. This is used for allocating buffers, not bounds checking, since
+ * there are usually less axes in practice.
+ */
 static const size_t kMaxJoystickAxes = 12;
 static const size_t kMaxJoystickPOVs = 12;
 

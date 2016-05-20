@@ -15,6 +15,7 @@
 
 /**
  * Create an instance of a Digital Input class.
+ *
  * Creates a digital input given a channel.
  *
  * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
@@ -58,6 +59,7 @@ DigitalInput::~DigitalInput() {
 
 /**
  * Get the value from a digital input channel.
+ *
  * Retrieve the value of a single digital input channel from the FPGA.
  */
 bool DigitalInput::Get() const {

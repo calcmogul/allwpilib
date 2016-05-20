@@ -14,18 +14,13 @@ class AnalogInput;
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
  * The Gyro class tracks the robots heading based on the starting position. As
- * the robot
- * rotates the new heading is computed by integrating the rate of rotation
- * returned
- * by the sensor. When the class is instantiated, it does a short calibration
- * routine
- * where it samples the gyro while at rest to determine the default offset. This
- * is
- * subtracted from each sample to determine the heading. This gyro class must be
- * used
- * with a channel that is assigned one of the Analog accumulators from the FPGA.
- * See
- * AnalogInput for the current accumulator assignments.
+ * the robot rotates the new heading is computed by integrating the rate of
+ * rotation returned by the sensor. When the class is instantiated, it does a
+ * short calibration routine where it samples the gyro while at rest to
+ * determine the default offset. This is subtracted from each sample to
+ * determine the heading. This gyro class must be used with a channel that is
+ * assigned one of the Analog accumulators from the FPGA. See AnalogInput for
+ * the current accumulator assignments.
  *
  * This class is for gyro sensors that connect to an analog input.
  */

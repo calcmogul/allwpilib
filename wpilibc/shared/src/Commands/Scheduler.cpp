@@ -19,6 +19,7 @@ Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
 
 /**
  * Returns the {@link Scheduler}, creating it if one does not exist.
+ *
  * @return the {@link Scheduler}
  */
 Scheduler* Scheduler::GetInstance() {
@@ -30,9 +31,10 @@ void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
 
 /**
  * Add a command to be scheduled later.
+ *
  * In any pass through the scheduler, all commands are added to the additions
- * list, then
- * at the end of the pass, they are all scheduled.
+ * list, then at the end of the pass, they are all scheduled.
+ *
  * @param command The command to be scheduled
  */
 void Scheduler::AddCommand(Command* command) {
@@ -91,8 +93,9 @@ void Scheduler::ProcessCommandAddition(Command* command) {
 }
 
 /**
- * Runs a single iteration of the loop.  This method should be called often in
- * order to have a functioning
+ * Runs a single iteration of the loop.
+ *
+ * This method should be called often in order to have a functioning
  * {@link Command} system.  The loop has five stages:
  *
  * <ol>
@@ -154,9 +157,10 @@ void Scheduler::Run() {
 
 /**
  * Registers a {@link Subsystem} to this {@link Scheduler}, so that the {@link
- * Scheduler} might know
- * if a default {@link Command} needs to be run.  All {@link Subsystem
- * Subsystems} should call this.
+ * Scheduler} might know if a default {@link Command} needs to be run.
+ *
+ * All {@link Subsystem Subsystems} should call this.
+ *
  * @param system the system
  */
 void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
@@ -169,6 +173,7 @@ void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
 
 /**
  * Removes the {@link Command} from the {@link Scheduler}.
+ *
  * @param command the command to remove
  */
 void Scheduler::Remove(Command* command) {
@@ -209,7 +214,7 @@ void Scheduler::ResetAll() {
 
 /**
  * Update the network tables associated with the Scheduler object on the
- * SmartDashboard
+ * SmartDashboard.
  */
 void Scheduler::UpdateTable() {
   CommandSet::iterator commandIter;

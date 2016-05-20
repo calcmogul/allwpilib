@@ -10,9 +10,9 @@
 #include <cmath>
 
 /**
- * Create a linear FIR or IIR filter
+ * Create a linear FIR or IIR filter.
  *
- * @param source The PIDSource object that is used to get values
+ * @param source  The PIDSource object that is used to get values
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
@@ -26,9 +26,9 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
       m_outputGains(fbGains) {}
 
 /**
- * Create a linear FIR or IIR filter
+ * Create a linear FIR or IIR filter.
  *
- * @param source The PIDSource object that is used to get values
+ * @param source  The PIDSource object that is used to get values
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
@@ -42,9 +42,9 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
       m_outputGains(fbGains) {}
 
 /**
- * Create a linear FIR or IIR filter
+ * Create a linear FIR or IIR filter.
  *
- * @param source The PIDSource object that is used to get values
+ * @param source  The PIDSource object that is used to get values
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
@@ -58,9 +58,9 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
       m_outputGains(fbGains) {}
 
 /**
- * Create a linear FIR or IIR filter
+ * Create a linear FIR or IIR filter.
  *
- * @param source The PIDSource object that is used to get values
+ * @param source  The PIDSource object that is used to get values
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
@@ -80,9 +80,9 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  *
  * This filter is stable for time constants greater than zero
  *
- * @param source The PIDSource object that is used to get values
+ * @param source       The PIDSource object that is used to get values
  * @param timeConstant The discrete-time time constant in seconds
- * @param period The period in seconds between samples taken by the user
+ * @param period       The period in seconds between samples taken by the user
  */
 LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(
     std::shared_ptr<PIDSource> source, double timeConstant, double period) {
@@ -97,9 +97,9 @@ LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(
  *
  * This filter is stable for time constants greater than zero
  *
- * @param source The PIDSource object that is used to get values
+ * @param source       The PIDSource object that is used to get values
  * @param timeConstant The discrete-time time constant in seconds
- * @param period The period in seconds between samples taken by the user
+ * @param period       The period in seconds between samples taken by the user
  */
 LinearDigitalFilter LinearDigitalFilter::HighPass(
     std::shared_ptr<PIDSource> source, double timeConstant, double period) {
@@ -114,8 +114,8 @@ LinearDigitalFilter LinearDigitalFilter::HighPass(
  * This filter is always stable.
  *
  * @param source The PIDSource object that is used to get values
- * @param taps The number of samples to average over. Higher = smoother but
- *        slower
+ * @param taps   The number of samples to average over. Higher = smoother but
+ *               slower
  */
 LinearDigitalFilter LinearDigitalFilter::MovingAverage(
     std::shared_ptr<PIDSource> source, unsigned int taps) {

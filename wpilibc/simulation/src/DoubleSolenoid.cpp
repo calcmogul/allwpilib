@@ -22,7 +22,7 @@ DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
 /**
  * Constructor.
  *
- * @param moduleNumber The solenoid module (1 or 2).
+ * @param moduleNumber   The solenoid module (1 or 2).
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
