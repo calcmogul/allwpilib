@@ -25,7 +25,7 @@ namespace frc {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(llvm::StringRef name, const T& object) {
+void SendableChooser<T>::AddObject(llvm::StringRef name, T&& object) {
   m_choices[name] = object;
 }
 
@@ -40,26 +40,50 @@ void SendableChooser<T>::AddObject(llvm::StringRef name, const T& object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(llvm::StringRef name, const T& object) {
+void SendableChooser<T>::AddDefault(llvm::StringRef name, T&& object) {
   m_defaultChoice = name;
   AddObject(name, object);
 }
 
 /**
- * Returns the selected option.
+ * Returns the selected option (a raw pointer if T = std::unique_ptr<>).
  *
  * If there is none selected, it will return the default.  If there is none
- * selected and no default, then it will return {@code nullptr}.
+ * selected and no default, then it will return a value-initialized instance.
+ * For integer types, this is 0. For container types like std::string, this is
+ * an empty string.
  *
  * @return the option selected
  */
 template <class T>
+template <class U, typename>
 T SendableChooser<T>::GetSelected() {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
   if (selected == "") {
-    return nullptr;
+    return auto {};
   } else {
     return m_choices[selected];
+  }
+}
+
+/**
+ * Returns the selected option (a raw pointer if T = std::unique_ptr<>).
+ *
+ * If there is none selected, it will return the default.  If there is none
+ * selected and no default, then it will return a value-initialized instance.
+ * For integer types, this is 0. For container types like std::string, this is
+ * an empty string.
+ *
+ * @return the option selected
+ */
+template <class T>
+template <class U, typename>
+U* SendableChooser<T>::GetSelected() {
+  std::string selected = m_table->GetString(kSelected, m_defaultChoice);
+  if (selected == "") {
+    return auto {};
+  } else {
+    return m_choices[selected].get();
   }
 }
 
