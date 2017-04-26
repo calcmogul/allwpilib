@@ -40,14 +40,12 @@ class SendableChooser : public SendableChooserBase {
   void AddObject(llvm::StringRef name, T&& object);
   void AddDefault(llvm::StringRef name, T&& object);
 
-  template <
-      class U,
-      typename = std::enable_if_t<!std::is_same<T, std::unique_ptr<U>>::value>>
+  template <class U, typename = std::enable_if_t<
+                         !std::is_same<T, std::unique_ptr<U>>::value>>
   T GetSelected();
 
-  template <
-      class U,
-      typename = std::enable_if_t<std::is_same<T, std::unique_ptr<U>>::value>>
+  template <class U, typename = std::enable_if_t<
+                         std::is_same<T, std::unique_ptr<U>>::value>>
   U* GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;

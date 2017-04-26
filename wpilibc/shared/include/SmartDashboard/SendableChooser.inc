@@ -60,7 +60,7 @@ template <class U, typename>
 T SendableChooser<T>::GetSelected() {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
   if (selected == "") {
-    return auto{};
+    return auto {};
   } else {
     return m_choices[selected];
   }
@@ -81,7 +81,7 @@ template <class U, typename>
 U* SendableChooser<T>::GetSelected() {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
   if (selected == "") {
-    return auto{};
+    return auto {};
   } else {
     return m_choices[selected].get();
   }
