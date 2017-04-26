@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include "SmartDashboard/SendableChooserBase.h"
 #include "llvm/StringMap.h"
@@ -36,9 +37,18 @@ class SendableChooser : public SendableChooserBase {
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(llvm::StringRef name, const T& object);
-  void AddDefault(llvm::StringRef name, const T& object);
+  void AddObject(llvm::StringRef name, T&& object);
+  void AddDefault(llvm::StringRef name, T&& object);
+
+  template <
+      class U,
+      typename = std::enable_if_t<!std::is_same<T, std::unique_ptr<U>>::value>>
   T GetSelected();
+
+  template <
+      class U,
+      typename = std::enable_if_t<std::is_same<T, std::unique_ptr<U>>::value>>
+  U* GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
 
