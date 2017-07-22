@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,7 +14,6 @@
 #include <wpi/mutex.h>
 
 #include "frc/Base.h"
-#include "frc/Controller.h"
 #include "frc/Notifier.h"
 #include "frc/PIDBase.h"
 #include "frc/PIDSource.h"
@@ -35,7 +34,7 @@ class PIDOutput;
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
  */
-class PIDController : public PIDBase, public Controller {
+class PIDController : public PIDBase {
  public:
   /**
    * Allocate a PID object with the given constants for P, I, D.
@@ -105,13 +104,13 @@ class PIDController : public PIDBase, public Controller {
   /**
    * Begin running the PIDController.
    */
-  void Enable() override;
+  void Enable();
 
   /**
    * Stop running the PIDController, this sets the output to zero before
    * stopping.
    */
-  void Disable() override;
+  void Disable();
 
   /**
    * Set the enabled state of the PIDController.

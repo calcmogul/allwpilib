@@ -9,6 +9,7 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
+  Eigen/
   gtest/
   ni-libraries/include/
   ni-libraries/lib/

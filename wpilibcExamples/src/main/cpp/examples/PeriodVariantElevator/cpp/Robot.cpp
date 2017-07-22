@@ -1,19 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "Robot.h"
 
-// clang-format off
-#ifdef _MSC_VER
-#pragma message "warning: Controller.h is deprecated; include frc/Controller.h instead"
-#else
-#warning "Controller.h is deprecated; include frc/Controller.h instead"
-#endif
+Elevator Robot::m_elevator;
 
-// clang-format on
-
-#include "frc/Controller.h"
+int main() { return frc::StartRobot<Robot>(); }
