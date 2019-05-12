@@ -6,48 +6,45 @@
 /*----------------------------------------------------------------------------*/
 
 #include "TestBench.h"
+#include "frc/PIDController.h"
+#include "frc/PIDOutput.h"
+#include "frc/PIDSource.h"
 #include "frc/Timer.h"
-#include "frc/experimental/controller/ControllerRunner.h"
-#include "frc/experimental/controller/PIDController.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
 
 class PIDToleranceTest : public testing::Test {
  protected:
-  const double reference = 50.0;
+  const double setpoint = 50.0;
   const double range = 200;
   const double tolerance = 10.0;
 
-  class FakeInput {
+  class FakeInput : public PIDSource {
    public:
     double val = 0;
 
-    double Get() { return val; }
+    void SetPIDSourceType(PIDSourceType pidSource) {}
+
+    PIDSourceType GetPIDSourceType() { return PIDSourceType::kDisplacement; }
+
+    double PIDGet() { return val; }
   };
 
-  class FakeOutput {
-   public:
-    void Set(double output) {}
+  class FakeOutput : public PIDOutput {
+    void PIDWrite(double output) {}
   };
 
   FakeInput inp;
   FakeOutput out;
-  frc::experimental::PIDController* pidController;
-  frc::experimental::ControllerRunner* pidRunner;
+  PIDController* pid;
 
   void SetUp() override {
-    pidController = new frc::experimental::PIDController(
-        0.5, 0.0, 0.0, [&] { return inp.Get(); });
-    pidController->SetInputRange(-range / 2, range / 2);
-    pidRunner = new frc::experimental::ControllerRunner(
-        *pidController, [&](double output) { out.Set(output); });
+    pid = new PIDController(0.5, 0.0, 0.0, &inp, &out);
+    pid->SetInputRange(-range / 2, range / 2);
   }
 
-  void TearDown() override {
-    delete pidRunner;
-    delete pidController;
-  }
+  void TearDown() override { delete pid; }
 
   void Reset() { inp.val = 0; }
 };
@@ -55,56 +52,56 @@ class PIDToleranceTest : public testing::Test {
 TEST_F(PIDToleranceTest, Absolute) {
   Reset();
 
-  pidController->SetAbsoluteTolerance(tolerance);
-  pidController->SetReference(reference);
-  pidRunner->Enable();
+  pid->SetAbsoluteTolerance(tolerance);
+  pid->SetSetpoint(setpoint);
+  pid->Enable();
 
-  EXPECT_FALSE(pidController->AtReference())
+  EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pid->GetError();
 
-  inp.val = reference + tolerance / 2;
+  inp.val = setpoint + tolerance / 2;
   Wait(1.0);
 
-  EXPECT_TRUE(pidController->AtReference())
+  EXPECT_TRUE(pid->OnTarget())
       << "Error was not in tolerance when it should have been. Error was "
-      << pidController->GetError();
+      << pid->GetError();
 
-  inp.val = reference + 10 * tolerance;
+  inp.val = setpoint + 10 * tolerance;
   Wait(1.0);
 
-  EXPECT_FALSE(pidController->AtReference())
+  EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pid->GetError();
 }
 
 TEST_F(PIDToleranceTest, Percent) {
   Reset();
 
-  pidController->SetPercentTolerance(tolerance);
-  pidController->SetReference(reference);
-  pidRunner->Enable();
+  pid->SetPercentTolerance(tolerance);
+  pid->SetSetpoint(setpoint);
+  pid->Enable();
 
-  EXPECT_FALSE(pidController->AtReference())
+  EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pid->GetError();
 
   inp.val =
-      reference + (tolerance) / 200 *
-                      range;  // half of percent tolerance away from reference
+      setpoint + (tolerance) / 200 *
+                     range;  // half of percent tolerance away from setpoint
   Wait(1.0);
 
-  EXPECT_TRUE(pidController->AtReference())
+  EXPECT_TRUE(pid->OnTarget())
       << "Error was not in tolerance when it should have been. Error was "
-      << pidController->GetError();
+      << pid->GetError();
 
   inp.val =
-      reference +
+      setpoint +
       (tolerance) / 50 * range;  // double percent tolerance away from setPoint
 
   Wait(1.0);
 
-  EXPECT_FALSE(pidController->AtReference())
+  EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pidController->GetError();
+      << pid->GetError();
 }

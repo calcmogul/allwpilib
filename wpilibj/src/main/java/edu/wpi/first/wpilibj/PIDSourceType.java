@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 /**
  * A description for the type of output value to provide to a PIDController.
  */
-@Deprecated
 public enum PIDSourceType {
   kDisplacement,
   kRate

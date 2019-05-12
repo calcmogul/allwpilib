@@ -5,25 +5,23 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "commands/SetElevatorReference.h"
+#include "commands/SetElevatorSetpoint.h"
 
 #include <cmath>
 
 #include "Robot.h"
 
-SetElevatorReference::SetElevatorReference(double reference)
-    : frc::Command("SetElevatorReference") {
-  m_reference = reference;
+SetElevatorSetpoint::SetElevatorSetpoint(double setpoint)
+    : frc::Command("SetElevatorSetpoint") {
+  m_setpoint = setpoint;
   Requires(&Robot::elevator);
 }
 
 // Called just before this Command runs the first time
-void SetElevatorReference::Initialize() {
-  Robot::elevator.SetReference(m_reference);
+void SetElevatorSetpoint::Initialize() {
+  Robot::elevator.SetSetpoint(m_setpoint);
   Robot::elevator.Enable();
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool SetElevatorReference::IsFinished() {
-  return Robot::elevator.AtReference();
-}
+bool SetElevatorSetpoint::IsFinished() { return Robot::elevator.OnTarget(); }

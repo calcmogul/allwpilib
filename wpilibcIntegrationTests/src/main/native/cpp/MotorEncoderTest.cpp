@@ -8,11 +8,10 @@
 #include "TestBench.h"
 #include "frc/Encoder.h"
 #include "frc/Jaguar.h"
+#include "frc/PIDController.h"
 #include "frc/Talon.h"
 #include "frc/Timer.h"
 #include "frc/Victor.h"
-#include "frc/experimental/controller/ControllerRunner.h"
-#include "frc/experimental/controller/PIDController.h"
 #include "frc/filters/LinearDigitalFilter.h"
 #include "gtest/gtest.h"
 
@@ -140,24 +139,22 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
   double goal = 1000;
-  frc::experimental::PIDController pidController(
-      0.001, 0.01, 0.0, [&] { return m_encoder->GetDistance(); });
-  pidController.SetAbsoluteTolerance(50.0);
-  pidController.SetOutputRange(-0.2, 0.2);
-  pidController.SetReference(goal);
+  m_encoder->SetPIDSourceType(PIDSourceType::kDisplacement);
+  PIDController pid(0.001, 0.0005, 0.0, m_encoder, m_speedController);
+  pid.SetAbsoluteTolerance(50.0);
+  pid.SetOutputRange(-0.2, 0.2);
+  pid.SetSetpoint(goal);
 
-  /* 10 seconds should be plenty time to get to the reference */
-  frc::experimental::ControllerRunner pidRunner(
-      pidController, [&](double output) { m_speedController->Set(output); });
-  pidRunner.Enable();
+  /* 10 seconds should be plenty time to get to the setpoint */
+  pid.Enable();
   Wait(10.0);
-  pidRunner.Disable();
+  pid.Disable();
 
-  RecordProperty("PIDError", pidController.GetError());
+  RecordProperty("PIDError", pid.GetError());
 
-  EXPECT_TRUE(pidController.AtReference())
+  EXPECT_TRUE(pid.OnTarget())
       << "PID loop did not converge within 10 seconds. Goal was: " << goal
-      << " Error was: " << pidController.GetError();
+      << " Error was: " << pid.GetError();
 }
 
 /**
@@ -167,24 +164,20 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
   m_encoder->SetPIDSourceType(PIDSourceType::kRate);
-  frc::experimental::PIDController pidController(
-      1e-5, 0.0, 0.0006, [] { return 8e-5; },
-      [&] { return m_filter->PIDGet(); });
-  pidController.SetAbsoluteTolerance(200.0);
-  pidController.SetOutputRange(-0.3, 0.3);
-  pidController.SetReference(600);
+  PIDController pid(1e-5, 0.0, 3e-5, 8e-5, m_filter, m_speedController);
+  pid.SetAbsoluteTolerance(200.0);
+  pid.SetOutputRange(-0.3, 0.3);
+  pid.SetSetpoint(600);
 
-  /* 10 seconds should be plenty time to get to the reference */
-  frc::experimental::ControllerRunner pidRunner(
-      pidController, [&](double output) { m_speedController->Set(output); });
-  pidRunner.Enable();
+  /* 10 seconds should be plenty time to get to the setpoint */
+  pid.Enable();
   Wait(10.0);
-  pidRunner.Disable();
-  RecordProperty("PIDError", pidController.GetError());
+  pid.Disable();
+  RecordProperty("PIDError", pid.GetError());
 
-  EXPECT_TRUE(pidController.AtReference())
+  EXPECT_TRUE(pid.OnTarget())
       << "PID loop did not converge within 10 seconds. Goal was: " << 600
-      << " Error was: " << pidController.GetError();
+      << " Error was: " << pid.GetError();
 }
 
 /**

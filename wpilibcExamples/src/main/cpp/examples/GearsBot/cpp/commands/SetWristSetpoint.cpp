@@ -5,20 +5,21 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "commands/SetPivotReference.h"
+#include "commands/SetWristSetpoint.h"
 
 #include "Robot.h"
 
-SetPivotReference::SetPivotReference(double reference) {
-  m_reference = reference;
-  Requires(&Robot::pivot);
+SetWristSetpoint::SetWristSetpoint(double setpoint)
+    : frc::Command("SetWristSetpoint") {
+  m_setpoint = setpoint;
+  Requires(&Robot::wrist);
 }
 
 // Called just before this Command runs the first time
-void SetPivotReference::Initialize() {
-  Robot::pivot.Enable();
-  Robot::pivot.SetReference(m_reference);
+void SetWristSetpoint::Initialize() {
+  Robot::wrist.SetSetpoint(m_setpoint);
+  Robot::wrist.Enable();
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool SetPivotReference::IsFinished() { return Robot::pivot.AtReference(); }
+bool SetWristSetpoint::IsFinished() { return Robot::wrist.OnTarget(); }
