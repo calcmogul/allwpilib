@@ -23,8 +23,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.experimental.controller.ControllerRunner;
-import edu.wpi.first.wpilibj.experimental.controller.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -52,7 +50,6 @@ public class PIDTest extends AbstractComsSetup {
   private static final double outputRange = 0.25;
 
   private PIDController m_controller = null;
-  private ControllerRunner m_runner = null;
   private static MotorEncoderFixture me = null;
 
   @SuppressWarnings({"MemberName", "EmptyLineSeparator", "MultipleVariableDeclarations"})
@@ -111,18 +108,16 @@ public class PIDTest extends AbstractComsSetup {
     m_table = NetworkTableInstance.getDefault().getTable("TEST_PID");
     m_builder = new SendableBuilderImpl();
     m_builder.setTable(m_table);
-    m_controller = new PIDController(k_p, k_i, k_d, me.getEncoder()::getDistance);
-    m_runner = new ControllerRunner(m_controller, me.getMotor()::set);
+    m_controller = new PIDController(k_p, k_i, k_d, me.getEncoder(), me.getMotor());
     m_controller.initSendable(m_builder);
   }
 
   @After
   public void tearDown() throws Exception {
     logger.fine("Teardown: " + me.getType());
-    m_runner.disable();
+    m_controller.disable();
     m_controller.close();
     m_controller = null;
-    m_runner = null;
     me.reset();
   }
 
@@ -138,16 +133,16 @@ public class PIDTest extends AbstractComsSetup {
   public void testInitialSettings() {
     setupAbsoluteTolerance();
     setupOutputRange();
-    double reference = 2500.0;
-    m_controller.setReference(reference);
-    assertFalse("PID did not begin disabled", m_runner.isEnabled());
-    assertEquals("PID.getError() did not start at " + reference, reference,
+    double setpoint = 2500.0;
+    m_controller.setSetpoint(setpoint);
+    assertFalse("PID did not begin disabled", m_controller.isEnabled());
+    assertEquals("PID.getError() did not start at " + setpoint, setpoint,
         m_controller.getError(), 0);
     m_builder.updateTable();
-    assertEquals(k_p, m_table.getEntry("Kp").getDouble(9999999), 0);
-    assertEquals(k_i, m_table.getEntry("Ki").getDouble(9999999), 0);
-    assertEquals(k_d, m_table.getEntry("Kd").getDouble(9999999), 0);
-    assertEquals(reference, m_table.getEntry("reference").getDouble(9999999), 0);
+    assertEquals(k_p, m_table.getEntry("p").getDouble(9999999), 0);
+    assertEquals(k_i, m_table.getEntry("i").getDouble(9999999), 0);
+    assertEquals(k_d, m_table.getEntry("d").getDouble(9999999), 0);
+    assertEquals(setpoint, m_table.getEntry("setpoint").getDouble(9999999), 0);
     assertFalse(m_table.getEntry("enabled").getBoolean(true));
   }
 
@@ -155,46 +150,46 @@ public class PIDTest extends AbstractComsSetup {
   public void testRestartAfterEnable() {
     setupAbsoluteTolerance();
     setupOutputRange();
-    double reference = 2500.0;
-    m_controller.setReference(reference);
-    m_runner.enable();
+    double setpoint = 2500.0;
+    m_controller.setSetpoint(setpoint);
+    m_controller.enable();
     m_builder.updateTable();
     assertTrue(m_table.getEntry("enabled").getBoolean(false));
-    assertTrue(m_runner.isEnabled());
+    assertTrue(m_controller.isEnabled());
     assertThat(0.0, is(not(me.getMotor().get())));
     m_controller.reset();
     m_builder.updateTable();
     assertFalse(m_table.getEntry("enabled").getBoolean(true));
-    assertFalse(m_runner.isEnabled());
+    assertFalse(m_controller.isEnabled());
     assertEquals(0, me.getMotor().get(), 0);
   }
 
   @Test
-  public void testSetReference() {
+  public void testSetSetpoint() {
     setupAbsoluteTolerance();
     setupOutputRange();
-    Double reference = 2500.0;
-    m_runner.disable();
-    m_controller.setReference(reference);
-    m_runner.enable();
-    assertEquals("Did not correctly set reference", reference, new Double(m_controller
-        .getReference()));
+    Double setpoint = 2500.0;
+    m_controller.disable();
+    m_controller.setSetpoint(setpoint);
+    m_controller.enable();
+    assertEquals("Did not correctly set set-point", setpoint, new Double(m_controller
+        .getSetpoint()));
   }
 
   @Test(timeout = 10000)
   public void testRotateToTarget() {
     setupAbsoluteTolerance();
     setupOutputRange();
-    double reference = 1000.0;
-    assertEquals(pidData() + "did not start at 0", 0, m_controller.getOutput(), 0);
-    m_controller.setReference(reference);
-    assertEquals(pidData() + "did not have an error of " + reference, reference,
+    double setpoint = 1000.0;
+    assertEquals(pidData() + "did not start at 0", 0, m_controller.get(), 0);
+    m_controller.setSetpoint(setpoint);
+    assertEquals(pidData() + "did not have an error of " + setpoint, setpoint,
         m_controller.getError(), 0);
-    m_runner.enable();
+    m_controller.enable();
     Timer.delay(5);
-    m_runner.disable();
+    m_controller.disable();
     assertTrue(pidData() + "Was not on Target. Controller Error: " + m_controller.getError(),
-        m_controller.atReference());
+        m_controller.onTarget());
   }
 
   private String pidData() {
@@ -206,6 +201,6 @@ public class PIDTest extends AbstractComsSetup {
   @Test(expected = RuntimeException.class)
   public void testOnTargetNoToleranceSet() {
     setupOutputRange();
-    m_controller.atReference();
+    m_controller.onTarget();
   }
 }

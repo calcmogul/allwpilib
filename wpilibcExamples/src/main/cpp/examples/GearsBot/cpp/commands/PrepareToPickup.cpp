@@ -8,11 +8,11 @@
 #include "commands/PrepareToPickup.h"
 
 #include "commands/OpenClaw.h"
-#include "commands/SetElevatorReference.h"
-#include "commands/SetWristReference.h"
+#include "commands/SetElevatorSetpoint.h"
+#include "commands/SetWristSetpoint.h"
 
 PrepareToPickup::PrepareToPickup() : frc::CommandGroup("PrepareToPickup") {
   AddParallel(new OpenClaw());
-  AddParallel(new SetWristReference(0));
-  AddSequential(new SetElevatorReference(0));
+  AddParallel(new SetWristSetpoint(0));
+  AddSequential(new SetElevatorSetpoint(0));
 }
