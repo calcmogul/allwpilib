@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "frc/GenericHID.h"
+
+#include <cmath>
 
 #include <hal/HAL.h>
 
@@ -34,7 +36,7 @@ bool GenericHID::GetRawButtonReleased(int button) {
 }
 
 double GenericHID::GetRawAxis(int axis) const {
-  return m_ds.GetStickAxis(m_port, axis);
+  return ApplyDeadband(m_ds.GetStickAxis(m_port, axis), m_deadband);
 }
 
 int GenericHID::GetPOV(int pov) const { return m_ds.GetStickPOV(m_port, pov); }
@@ -82,4 +84,18 @@ void GenericHID::SetRumble(RumbleType type, double value) {
     m_rightRumble = value * 65535;
   }
   HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
+}
+
+void GenericHID::SetAxisDeadband(double deadband) { m_deadband = deadband; }
+
+double GenericHID::ApplyDeadband(double value, double deadband) {
+  if (std::abs(value) > deadband) {
+    if (value > 0.0) {
+      return (value - deadband) / (1.0 - deadband);
+    } else {
+      return (value + deadband) / (1.0 - deadband);
+    }
+  } else {
+    return 0.0;
+  }
 }
