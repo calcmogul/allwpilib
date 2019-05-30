@@ -155,8 +155,8 @@ public class KilloughDrive {
     }
 
     // Compensate for gyro angle
-    Vector2d input = new Vector2d(ySpeed, xSpeed);
-    input.rotate(-gyroAngle);
+    Vector2d input = new Vector2d(xSpeed, ySpeed);
+    input.rotate(gyroAngle);
 
     WheelSpeeds speeds = new WheelSpeeds();
     speeds.left = input.scalarProject(m_leftVec) + zRotation;
@@ -186,9 +186,9 @@ public class KilloughDrive {
     }
 
     // Convert from polar to rectangular coordinates
-    double xSpeed = magnitude * Math.sin(angle * (Math.PI / 180.0));
-    double ySpeed = magnitude * Math.cos(angle * (Math.PI / 180.0));
-    Vector2d input = new Vector2d(ySpeed, xSpeed);
+    double xSpeed = magnitude * Math.cos(angle * (Math.PI / 180.0));
+    double ySpeed = magnitude * Math.sin(angle * (Math.PI / 180.0));
+    Vector2d input = new Vector2d(xSpeed, ySpeed);
 
     WheelSpeeds speeds = new WheelSpeeds();
     speeds.left = input.scalarProject(m_leftVec) + zRotation;

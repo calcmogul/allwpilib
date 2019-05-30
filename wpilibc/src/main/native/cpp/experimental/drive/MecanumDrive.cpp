@@ -31,13 +31,13 @@ MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesian(double xSpeed,
   }
 
   // Compensate for gyro angle
-  Vector2d input{ySpeed, xSpeed};
-  input.Rotate(-gyroAngle);
+  Vector2d input{xSpeed, ySpeed};
+  input.Rotate(gyroAngle);
 
   WheelSpeeds speeds;
   speeds.frontLeft = input.x + input.y + zRotation;
-  speeds.frontRight = -input.x + input.y - zRotation;
-  speeds.rearLeft = -input.x + input.y + zRotation;
+  speeds.frontRight = input.x - input.y - zRotation;
+  speeds.rearLeft = input.x - input.y + zRotation;
   speeds.rearRight = input.x + input.y - zRotation;
 
   return speeds;
@@ -60,8 +60,8 @@ MecanumDrive::WheelSpeeds MecanumDrive::DrivePolar(double magnitude,
 
   WheelSpeeds speeds;
   speeds.frontLeft = input.x + input.y + zRotation;
-  speeds.frontRight = -input.x + input.y - zRotation;
-  speeds.rearLeft = -input.x + input.y + zRotation;
+  speeds.frontRight = input.x - input.y - zRotation;
+  speeds.rearLeft = input.x - input.y + zRotation;
   speeds.rearRight = input.x + input.y - zRotation;
 
   return speeds;

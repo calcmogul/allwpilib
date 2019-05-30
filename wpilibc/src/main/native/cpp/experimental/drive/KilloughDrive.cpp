@@ -35,8 +35,8 @@ KilloughDrive::WheelSpeeds KilloughDrive::DriveCartesian(double xSpeed,
   }
 
   // Compensate for gyro angle
-  Vector2d input{ySpeed, xSpeed};
-  input.Rotate(-gyroAngle);
+  Vector2d input{xSpeed, ySpeed};
+  input.Rotate(gyroAngle);
 
   WheelSpeeds speeds;
   speeds.left = input.ScalarProject(m_leftVec) + zRotation;

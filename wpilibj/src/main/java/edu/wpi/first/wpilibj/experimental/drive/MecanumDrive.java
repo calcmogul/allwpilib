@@ -136,13 +136,13 @@ public class MecanumDrive {
     }
 
     // Compensate for gyro angle
-    Vector2d input = new Vector2d(ySpeed, xSpeed);
-    input.rotate(-gyroAngle);
+    Vector2d input = new Vector2d(xSpeed, ySpeed);
+    input.rotate(gyroAngle);
 
     WheelSpeeds speeds = new WheelSpeeds();
     speeds.frontLeft = input.x + input.y + zRotation;
-    speeds.frontRight = -input.x + input.y - zRotation;
-    speeds.rearLeft = -input.x + input.y + zRotation;
+    speeds.frontRight = input.x - input.y - zRotation;
+    speeds.rearLeft = input.x - input.y + zRotation;
     speeds.rearRight = input.x + input.y - zRotation;
 
     return speeds;
@@ -167,14 +167,14 @@ public class MecanumDrive {
     }
 
     // Convert from polar to rectangular coordinates
-    double xSpeed = magnitude * Math.sin(angle * (Math.PI / 180.0));
-    double ySpeed = magnitude * Math.cos(angle * (Math.PI / 180.0));
-    Vector2d input = new Vector2d(ySpeed, xSpeed);
+    double xSpeed = magnitude * Math.cos(angle * (Math.PI / 180.0));
+    double ySpeed = magnitude * Math.sin(angle * (Math.PI / 180.0));
+    Vector2d input = new Vector2d(xSpeed, ySpeed);
 
     WheelSpeeds speeds = new WheelSpeeds();
     speeds.frontLeft = input.x + input.y + zRotation;
-    speeds.frontRight = -input.x + input.y - zRotation;
-    speeds.rearLeft = -input.x + input.y + zRotation;
+    speeds.frontRight = input.x - input.y - zRotation;
+    speeds.rearLeft = input.x - input.y + zRotation;
     speeds.rearRight = input.x + input.y - zRotation;
 
     return speeds;
