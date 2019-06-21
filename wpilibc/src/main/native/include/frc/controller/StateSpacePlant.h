@@ -215,6 +215,7 @@ class StateSpacePlant {
    * @param u The control input.
    */
   Eigen::Matrix<double, Outputs, 1> UpdateY(
+      const Eigen::Matrix<double, States, 1> x,
       const Eigen::Matrix<double, Inputs, 1>& u);
 
  protected:

@@ -145,11 +145,8 @@ void StateSpacePlant<States, Inputs, Outputs>::Reset() {
 template <int States, int Inputs, int Outputs>
 void StateSpacePlant<States, Inputs, Outputs>::Update(
     const Eigen::Matrix<double, Inputs, 1>& u) {
-  // Powers outside of the range are more likely controller bugs than things
-  // that the plant should deal with.
-  CheckU(u);
   m_X = UpdateX(X(), u);
-  m_Y = UpdateY(u);
+  m_Y = UpdateY(X(), u);
 }
 
 template <int States, int Inputs, int Outputs>
@@ -163,8 +160,9 @@ StateSpacePlant<States, Inputs, Outputs>::UpdateX(
 template <int States, int Inputs, int Outputs>
 Eigen::Matrix<double, Outputs, 1>
 StateSpacePlant<States, Inputs, Outputs>::UpdateY(
+    const Eigen::Matrix<double, States, 1> x,
     const Eigen::Matrix<double, Inputs, 1>& u) {
-  return C() * X() + D() * u;
+  return C() * x + D() * u;
 }
 
 }  // namespace frc

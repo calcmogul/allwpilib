@@ -5,19 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.math.numbers;
+package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.math.Nat;
+import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 
-public class N10 extends Num implements Nat<N10> {
-    private N10() {
+@SuppressWarnings("unused")
+public class StateSpaceObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
+    private final Matrix<States, Outputs> K;
+
+    public StateSpaceObserverCoeffs(Matrix<States, Outputs> K) {
+        this.K = K;
     }
 
-    @Override
-    public int getNum() {
-        return 10;
+    public Matrix<States, Outputs> getK() {
+        return K;
     }
-
-    public static final N10 N10 = new N10();
 }
