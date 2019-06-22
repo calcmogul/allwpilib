@@ -10,15 +10,15 @@ package edu.wpi.first.wpilibj.controller;
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassTypeParameterName", "MemberName", "ParameterName"})
 public class StateSpaceObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
-    private final Matrix<States, Outputs> K;
+  private final Matrix<States, Outputs> K;
 
-    public StateSpaceObserverCoeffs(Matrix<States, Outputs> K) {
-        this.K = K;
-    }
+  public StateSpaceObserverCoeffs(Matrix<States, Outputs> K) {
+    this.K = K;
+  }
 
-    public Matrix<States, Outputs> getK() {
-        return K;
-    }
+  public Matrix<States, Outputs> getK() {
+    return K;
+  }
 }

@@ -54,10 +54,6 @@ compileJava {
     dependsOn generateJavaVersion
 }
 
-repositories {
-    jcenter()
-}
-
 dependencies {
     compile "org.ejml:ejml-all:0.37"
     compile project(':hal')
