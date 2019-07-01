@@ -53,8 +53,8 @@ TEST(KilloughDriveTest, DrivePolar) {
     for (size_t j = 0; j < gyroVals.size(); ++j) {
       for (size_t k = 0; k < joystickVals.size(); ++k) {
         double magnitudeJoystick = joystickVals[i];
-        double rotateJoystick = joystickVals[j];
-        double directionJoystick = gyroVals[k];
+        double rotateJoystick = joystickVals[k];
+        double directionJoystick = gyroVals[j];
         auto speeds = drive.DrivePolar(magnitudeJoystick, directionJoystick,
                                        rotateJoystick);
         static_cast<void>(speeds);
