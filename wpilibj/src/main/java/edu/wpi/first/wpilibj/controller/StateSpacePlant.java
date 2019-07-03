@@ -21,54 +21,52 @@ public class StateSpacePlant<States extends Num, Inputs extends Num, Outputs ext
   private List<StateSpacePlantCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
 
-  private Nat<States> m_states;
-  private Nat<Inputs> m_inputs;
-  private Nat<Outputs> m_outputs;
+  private final Nat<States> kStates;
+  private final Nat<Inputs> kInputs;
+  private final Nat<Outputs> kOutputs;
 
   private Matrix<States, N1> m_x;
   private Matrix<Outputs, N1> m_y;
 
   public StateSpacePlant(StateSpacePlantCoeffs<States, Inputs, Outputs> plantCoeffs) {
     addCoefficients(plantCoeffs);
-    m_states = getCoefficients().getStates();
-    m_inputs = getCoefficients().getInputs();
-    m_outputs = getCoefficients().getOutputs();
+    kStates = getCoefficients().getStates();
+    kInputs = getCoefficients().getInputs();
+    kOutputs = getCoefficients().getOutputs();
     reset();
   }
 
-  public void update(Matrix<Inputs, N1> u) {
-    m_x = updateX(m_x, u);
-    m_y = updateY(m_x, u);
+  public Matrix<States, States> getA() {
+    return getCoefficients().getA();
   }
 
-  Matrix<States, N1> updateX(Matrix<States, N1> x, Matrix<Inputs, N1> u) {
-    // x = Ax + Bu
-    return (A().times(x)).plus(B().times(u));
+  public double getA(int i, int j) {
+    return getA().get(i, j);
+
   }
 
-  Matrix<Outputs, N1> updateY(Matrix<States, N1> x, Matrix<Inputs, N1> u) {
-    // y = Cx + Du
-    return (C().times(x)).plus(D().times(u));
+  public Matrix<States, Inputs> getB() {
+    return getCoefficients().getB();
   }
 
-  @SuppressWarnings("MethodName")
-  public Matrix<States, States> A() {
-    return m_coefficients.get(m_index).getA();
+  public double getB(int i, int j) {
+    return getB().get(i, j);
   }
 
-  @SuppressWarnings("MethodName")
-  public Matrix<States, Inputs> B() {
-    return m_coefficients.get(m_index).getB();
+  public Matrix<Outputs, States> getC() {
+    return getCoefficients().getC();
   }
 
-  @SuppressWarnings("MethodName")
-  public Matrix<Outputs, States> C() {
-    return m_coefficients.get(m_index).getC();
+  public double getC(int i, int j) {
+    return getC().get(i, j);
   }
 
-  @SuppressWarnings("MethodName")
-  public Matrix<Outputs, Inputs> D() {
-    return m_coefficients.get(m_index).getD();
+  public Matrix<Outputs, Inputs> getD() {
+    return getCoefficients().getD();
+  }
+
+  public double getD(int i, int j) {
+    return getD().get(i, j);
   }
 
   public Matrix<States, N1> getX() {
@@ -76,15 +74,7 @@ public class StateSpacePlant<States extends Num, Inputs extends Num, Outputs ext
   }
 
   public double getX(int i) {
-    return m_x.get(i, 0);
-  }
-
-  public void setX(Matrix<States, N1> x) {
-    m_x = x;
-  }
-
-  public void setY(Matrix<Outputs, N1> y) {
-    m_y = y;
+    return getX().get(i, 0);
   }
 
   public Matrix<Outputs, N1> getY() {
@@ -92,46 +82,77 @@ public class StateSpacePlant<States extends Num, Inputs extends Num, Outputs ext
   }
 
   public double getY(int i) {
-    return m_y.get(i, 0);
+    return getY().get(i, 0);
   }
 
-  public void reset() {
-    m_x = MatrixUtils.zeros(m_states);
-    m_y = MatrixUtils.zeros(m_outputs);
+  public void setX(Matrix<States, N1> x) {
+    m_x = x;
+  }
+
+  public void setX(int i, double value) {
+    m_x.set(i, 0, value);
+  }
+
+  public void setY(Matrix<Outputs, N1> y) {
+    m_y = y;
+  }
+
+  public void setY(int i, double value) {
+    m_y.set(i, 0, value);
+  }
+
+  public void addCoefficients(StateSpacePlantCoeffs<States, Inputs, Outputs> coefficients) {
+    m_coefficients.add(coefficients);
+  }
+
+  public StateSpacePlantCoeffs<States, Inputs, Outputs> getCoefficients(int index) {
+    return m_coefficients.get(index);
+  }
+
+  public StateSpacePlantCoeffs<States, Inputs, Outputs> getCoefficients() {
+    return getCoefficients(getIndex());
   }
 
   public void setIndex(int index) {
-    if (index < 0 || index > m_coefficients.size()) {
-      throw new IllegalArgumentException("Invalid index for state space coefficients list of size " + m_coefficients.size());
+    if(index < 0) {
+      m_index = 0;
+    } else if(index >= m_coefficients.size()) {
+      m_index = m_coefficients.size() - 1;
+    } else {
+      m_index = index;
     }
-    m_index = index;
   }
 
   public int getIndex() {
     return m_index;
   }
 
-  private void addCoefficients(StateSpacePlantCoeffs<States, Inputs, Outputs> plantCoeffs) {
-    m_coefficients.add(plantCoeffs);
+  public void reset() {
+    m_x = MatrixUtils.zeros(kStates);
+  }
+
+  public void update(Matrix<Inputs, N1> u) {
+    m_x = updateX(getX(), u);
+    m_y = updateY(getX(), u);
+  }
+
+  public Matrix<States, N1> updateX(Matrix<States, N1> x, Matrix<Inputs, N1> u) {
+    return getA().times(x).plus(getB().times(u));
+  }
+
+  public Matrix<Outputs, N1> updateY(Matrix<States, N1> x, Matrix<Inputs, N1> u) {
+    return getC().times(x).plus(getD().times(u));
   }
 
   public Nat<States> getStates() {
-    return m_states;
+    return kStates;
   }
 
   public Nat<Inputs> getInputs() {
-    return m_inputs;
+    return kInputs;
   }
 
   public Nat<Outputs> getOutputs() {
-    return m_outputs;
-  }
-
-  public StateSpacePlantCoeffs<States, Inputs, Outputs> getCoefficients() {
-    return m_coefficients.get(m_index);
-  }
-
-  public StateSpacePlantCoeffs<States, Inputs, Outputs> getCoefficients(int index) {
-    return m_coefficients.get(index);
+    return kOutputs;
   }
 }

@@ -37,7 +37,38 @@ public class StateSpaceController<States extends Num, Inputs extends Num, Output
 
   public void disable() {
     m_enabled = false;
-    m_u = MatrixUtils.zeros(m_plant.getInputs());
+  }
+
+  public Matrix<Inputs, States> getK() {
+    return getCoefficients().getK();
+  }
+
+  public double getK(int i, int j) {
+    return getK().get(i, j);
+  }
+
+  public Matrix<Inputs, States> getKff() {
+    return getCoefficients().getKff();
+  }
+
+  public double getKff(int i, int j) {
+    return getKff().get(i, j);
+  }
+
+  public Matrix<States, N1> getR() {
+    return m_r;
+  }
+
+  public double getR(int i) {
+    return getR().get(i, 0);
+  }
+
+  public Matrix<Inputs, N1> getU() {
+    return m_u;
+  }
+
+  public double getU(int i) {
+    return getU().get(i, 0);
   }
 
   public void reset() {
@@ -47,69 +78,52 @@ public class StateSpaceController<States extends Num, Inputs extends Num, Output
 
   public void update(Matrix<States, N1> x) {
     if (m_enabled) {
-      m_u = (K().times(m_r.minus(x))).plus(Kff().times(m_r.minus(m_plant.A().times(m_r))));
+      m_u = getK().times(m_r.minus(x)).plus(getKff().times(m_r.minus(m_plant.getA().times(m_r))));
+      capU();
     }
   }
 
   public void update(Matrix<States, N1> nextR, Matrix<States, N1> x) {
     if (m_enabled) {
-      // u = K * (r - x) + Kff * (nextR - Ar)
-      m_u = (K().times(m_r.minus(x))).plus(Kff().times(nextR.minus(m_plant.A().times(m_r))));
-
+      m_u = getK().times(m_r.minus(x)).plus(getKff().times(nextR.minus(m_plant.getA().times(m_r))));
+      capU();
       m_r = nextR;
     }
   }
 
   private void capU() {
-    for (int i = 0; i < m_plant.getInputs().getNum(); i++) {
-      if (U(i) > getCoefficients().getUmax().get(i, 0)) {
-        m_u.set(i, 0, getCoefficients().getUmax().get(i, 0));
-      } else if (U(i) < getCoefficients().getUmin().get(i, 0)) {
-        m_u.set(i, 0, getCoefficients().getUmin().get(i, 0));
+    for(int i = 0; i < m_plant.getInputs().getNum(); ++i) {
+      if(getU(i) > getCoefficients().getUmax(i)) {
+        m_u.set(i, 0, getCoefficients().getUmax(i));
+      } else if(getU(i) < getCoefficients().getUmin(i)) {
+        m_u.set(i, 0, getCoefficients().getUmin(i));
       }
     }
   }
 
-  public void addCoefficients(StateSpaceControllerCoeffs<States, Inputs, Outputs> coeffs) {
-    m_coefficients.add(coeffs);
-  }
-
-  public StateSpaceControllerCoeffs<States, Inputs, Outputs> getCoefficients() {
-    return m_coefficients.get(m_index);
-  }
-
-  public StateSpaceControllerCoeffs<States, Inputs, Outputs> getCoefficients(int index) {
-    return m_coefficients.get(index);
+  public void setIndex(int index) {
+    if(index < 0) {
+      m_index = 0;
+    }else if(index >= m_coefficients.size()) {
+      m_index = m_coefficients.size() - 1;
+    }else {
+      m_index = index;
+    }
   }
 
   public int getIndex() {
     return m_index;
   }
 
-  public void setIndex(int index) {
-    if (index < 0 || index > m_coefficients.size()) {
-      throw new IllegalArgumentException("Invalid index given for state space controller with " + m_coefficients.size() + "  coefficients");
-    }
-    m_index = index;
+  public void addCoefficients(StateSpaceControllerCoeffs<States, Inputs, Outputs> coefficients) {
+    m_coefficients.add(coefficients);
   }
 
-  @SuppressWarnings("MethodName")
-  public Matrix<Inputs, States> K() {
-    return m_coefficients.get(m_index).getK();
+  public StateSpaceControllerCoeffs<States, Inputs, Outputs> getCoefficients(int index) {
+    return m_coefficients.get(index);
   }
 
-  @SuppressWarnings("MethodName")
-  public Matrix<Inputs, States> Kff() {
-    return m_coefficients.get(m_index).getKff();
-  }
-
-  @SuppressWarnings("MethodName")
-  public Matrix<Inputs, N1> U() {
-    return m_u;
-  }
-
-  @SuppressWarnings({"MethodName", "ParameterName"})
-  public double U(int i) {
-    return m_u.get(i, 0);
+  public StateSpaceControllerCoeffs<States, Inputs, Outputs> getCoefficients() {
+    return getCoefficients(getIndex());
   }
 }

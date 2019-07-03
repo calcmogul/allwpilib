@@ -41,4 +41,12 @@ public class StateSpaceControllerCoeffs<States extends Num, Inputs extends Num, 
   public Matrix<Inputs, N1> getUmax() {
     return Umax;
   }
+
+  public double getUmax(int i) {
+    return getUmax().get(i, 0);
+  }
+
+  public double getUmin(int i) {
+    return getUmin().get(i, 0);
+  }
 }

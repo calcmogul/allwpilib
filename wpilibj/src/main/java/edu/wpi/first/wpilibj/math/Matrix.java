@@ -13,26 +13,58 @@ import org.ejml.simple.SimpleMatrix;
 
 import java.util.Objects;
 
+/**
+ * A shape-safe wrapper over Efficient Java Matrix Library (EJML) matrices
+ * <p>
+ * This class is intended to be used alongside the state space library
+ *
+ * @param <R> The number of rows in this matrix
+ * @param <C> The number of columns in this matrix
+ */
 public class Matrix<R extends Num, C extends Num> {
 
   private final SimpleMatrix m_storage;
 
+  /**
+   * Gets the number of columns in this matrix
+   *
+   * @return The number of columns, according to the internal storage
+   */
   public final int getNumCols() {
     return this.m_storage.numCols();
   }
 
+  /**
+   * Gets the number of rows in this matrix
+   *
+   * @return The number of rows, according to the internal storage
+   */
   public final int getNumRows() {
     return this.m_storage.numRows();
   }
 
+  /**
+   * Get an element of this matrix
+   *
+   * @param i The row of the element
+   * @param j The column of the element
+   * @return The element in this matrix at ij
+   */
   @SuppressWarnings("ParameterName")
   public final double get(int i, int j) {
     return this.m_storage.get(i, j);
   }
 
+  /**
+   * Sets the value at the given indices
+   *
+   * @param i     The row of the element
+   * @param j     The column of the element
+   * @param value The value to insert at the given location
+   */
   @SuppressWarnings("ParameterName")
-  public final void set(int i, int j, double k) {
-    this.m_storage.set(i, j, k);
+  public final void set(int i, int j, double value) {
+    this.m_storage.set(i, j, value);
   }
 
 
@@ -40,24 +72,52 @@ public class Matrix<R extends Num, C extends Num> {
     return new Matrix<>(this.m_storage.diag());
   }
 
+  /**
+   * Returns the largest element of this matrix
+   *
+   * @return The largest element of this matrix
+   */
   public final double maxInternal() {
     return CommonOps_DDRM.elementMax(this.m_storage.getDDRM());
   }
 
+  /**
+   * Returns the smallest element of this matrix
+   *
+   * @return The smallest element of this matrix
+   */
   public final double minInternal() {
     return CommonOps_DDRM.elementMin(this.m_storage.getDDRM());
   }
 
+  /**
+   * Calculates the mean of the elements in this matrix
+   *
+   * @return The mean value of this matrix
+   */
   public final double mean() {
     return this.elementSum() / (double) this.m_storage.getNumElements();
   }
 
-
+  /**
+   * Multiplies this matrix with another that has <C> rows.
+   * As matrix multiplication is only defined if the number of columns in the first matrix matches the number of rows in the second,
+   * this operation will fail to compile under any other circumstances
+   *
+   * @param other The other matrix to multiply by
+   * @param <C2> The number of columns in the second matrix
+   * @return The result of the matrix multiplication between this and the given matrix
+   */
   public final <C2 extends Num> Matrix<R, C2> times(Matrix<C, C2> other) {
     return new Matrix<>(this.m_storage.mult(other.m_storage));
   }
 
-
+  /**
+   * Multiplies all the elements of this matrix by the given scalar
+   *
+   * @param value The scalar value to multiply by
+   * @return A new matrix with all the elements multiplied by the given value
+   */
   public final Matrix<R, C> times(double value) {
     return new Matrix<>(this.m_storage.scale(value));
   }
@@ -67,12 +127,12 @@ public class Matrix<R extends Num, C extends Num> {
     return new Matrix<>(this.m_storage.elementMult(Objects.requireNonNull(other).m_storage));
   }
 
-
-  public final Matrix<R, C> unaryMinus() {
-    return new Matrix<>(this.m_storage.scale(-1.0D));
-  }
-
-
+  /**
+   * Subtracts the given value from all the elements of this matrix
+   *
+   * @param value The value to subtract
+   * @return The resultant matrix
+   */
   public final Matrix<R, C> minus(double value) {
     return new Matrix<>(this.m_storage.minus(value));
   }

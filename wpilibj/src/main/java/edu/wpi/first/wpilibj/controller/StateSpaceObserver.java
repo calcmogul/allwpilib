@@ -21,7 +21,7 @@ public class StateSpaceObserver<States extends Num, Inputs extends Num, Outputs 
   private List<StateSpaceObserverCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
 
-  private Matrix<States, N1> m_xHat;
+  private Matrix<States, N1> m_Xhat;
 
   public StateSpaceObserver(StateSpacePlant<States, Inputs, Outputs> plant, StateSpaceObserverCoeffs<States, Inputs, Outputs> coeffs) {
     m_plant = plant;
@@ -29,48 +29,65 @@ public class StateSpaceObserver<States extends Num, Inputs extends Num, Outputs 
     reset();
   }
 
-  public void setIndex(int index) {
-    if (index < 0 || index > m_coefficients.size()) {
-      throw new IllegalArgumentException("Invalid coefficients index for observer with coefficients size " + m_coefficients.size());
-    }
-    m_index = index;
+  public Matrix<States, Outputs> getK() {
+    return getCoefficients().getK();
   }
 
-  @SuppressWarnings("MethodName")
-  public Matrix<States, Outputs> K() {
-    return m_coefficients.get(m_index).getK();
+  public double getK(int i, int j) {
+    return getK().get(i, j);
   }
 
   public Matrix<States, N1> getXhat() {
-    return m_xHat;
+    return m_Xhat;
+  }
+
+  public double getXhat(int i) {
+    return getXhat().get(i, 0);
   }
 
   public void setXhat(Matrix<States, N1> xHat) {
-    m_xHat = xHat;
+    m_Xhat = xHat;
   }
 
-  public void predict(Matrix<Inputs, N1> newU) {
-    m_xHat = m_plant.updateX(m_xHat, newU);
-  }
-
-  public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
-    // Xhat += K * (y - Cx - Du)
-    m_xHat = m_xHat.plus(K().times(y.minus(m_plant.updateY(m_xHat, u))));
+  public void setXhat(int i, double value) {
+    m_Xhat.set(i, 0, value);
   }
 
   public void reset() {
-    m_xHat = MatrixUtils.zeros(m_plant.getStates());
+    m_Xhat = MatrixUtils.zeros(m_plant.getStates());
   }
 
-  public StateSpaceObserverCoeffs<States, Inputs, Outputs> getCoefficients() {
-    return m_coefficients.get(m_index);
+  public void predict(Matrix<Inputs, N1> newU) {
+    m_Xhat = m_plant.updateX(getXhat(), newU);
+  }
+
+  public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
+    m_Xhat = m_Xhat.plus(getK().times(y.minus(m_plant.updateY(getXhat(), u))));
+  }
+
+  public void addCoefficients(StateSpaceObserverCoeffs<States, Inputs, Outputs> coefficients) {
+    m_coefficients.add(coefficients);
   }
 
   public StateSpaceObserverCoeffs<States, Inputs, Outputs> getCoefficients(int index) {
     return m_coefficients.get(index);
   }
 
-  public void addCoefficients(StateSpaceObserverCoeffs<States, Inputs, Outputs> coeffs) {
-    m_coefficients.add(coeffs);
+  public StateSpaceObserverCoeffs<States, Inputs, Outputs> getCoefficients() {
+    return getCoefficients(getIndex());
+  }
+
+  public void setIndex(int index) {
+    if(index < 0) {
+      m_index = 0;
+    } else if(index >= m_coefficients.size()) {
+      m_index = m_coefficients.size() - 1;
+    } else {
+      m_index = index;
+    }
+  }
+
+  public int getIndex() {
+    return m_index;
   }
 }
