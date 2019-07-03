@@ -14,7 +14,7 @@
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 
-#include "Subsystems/DifferentialDriveController.h"
+#include "subsystems/DifferentialDriveController.h"
 
 class Drivetrain {
  public:

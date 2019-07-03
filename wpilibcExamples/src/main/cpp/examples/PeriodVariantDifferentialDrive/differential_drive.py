@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Avoid needing display if plots aren't being shown
+import os
 import sys
 
 if "--noninteractive" in sys.argv:
@@ -61,8 +62,8 @@ class DifferentialDrive(frccnt.System):
             Gl = Ghigh
             Gr = Ghigh
 
-        return frccnt.models.diff_drive(frccnt.models.MOTOR_CIM, num_motors, m,
-                                        r, rb, J, Gl, Gr)
+        return frccnt.models.differential_drive(frccnt.models.MOTOR_CIM,
+                                                num_motors, m, r, rb, J, Gl, Gr)
 
     def design_controller_observer(self):
         if self.in_low_gear:
@@ -93,7 +94,11 @@ class DifferentialDrive(frccnt.System):
 def main():
     dt = 0.00505
     diff_drive = DifferentialDrive(dt)
-    diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/", True)
+    diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/", "h", True)
+    os.rename("DifferentialDriveCoeffs.cpp",
+              "cpp/subsystems/DifferentialDriveCoeffs.cpp")
+    os.rename("DifferentialDriveCoeffs.h",
+              "include/subsystems/DifferentialDriveCoeffs.h")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         try:
@@ -104,7 +109,7 @@ def main():
         except ImportError:  # Slycot unavailable. Can't show pzmaps.
             pass
     if "--save-plots" in sys.argv:
-        plt.savefig("diff_drive_pzmaps.svg")
+        plt.savefig("differential_drive_pzmaps.svg")
 
     t, xprof, vprof, aprof = frccnt.generate_s_curve_profile(max_v=4.0,
                                                              max_a=3.5,
@@ -123,7 +128,7 @@ def main():
         x_rec, ref_rec, u_rec = diff_drive.generate_time_responses(t, refs)
         diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
-        plt.savefig("diff_drive_response.svg")
+        plt.savefig("differential_drive_response.svg")
     if "--noninteractive" not in sys.argv:
         plt.show()
 

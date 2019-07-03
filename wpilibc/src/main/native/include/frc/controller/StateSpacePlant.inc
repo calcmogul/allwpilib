@@ -144,15 +144,16 @@ void StateSpacePlant<States, Inputs, Outputs>::Reset() {
 
 template <int States, int Inputs, int Outputs>
 void StateSpacePlant<States, Inputs, Outputs>::Update(
+    const Eigen::Matrix<double, States, 1>& x,
     const Eigen::Matrix<double, Inputs, 1>& u) {
-  m_X = UpdateX(X(), u);
-  m_Y = UpdateY(X(), u);
+  m_X = UpdateX(x, u);
+  m_Y = UpdateY(x, u);
 }
 
 template <int States, int Inputs, int Outputs>
 Eigen::Matrix<double, States, 1>
 StateSpacePlant<States, Inputs, Outputs>::UpdateX(
-    const Eigen::Matrix<double, States, 1> x,
+    const Eigen::Matrix<double, States, 1>& x,
     const Eigen::Matrix<double, Inputs, 1>& u) const {
   return A() * x + B() * u;
 }
@@ -160,7 +161,7 @@ StateSpacePlant<States, Inputs, Outputs>::UpdateX(
 template <int States, int Inputs, int Outputs>
 Eigen::Matrix<double, Outputs, 1>
 StateSpacePlant<States, Inputs, Outputs>::UpdateY(
-    const Eigen::Matrix<double, States, 1> x,
+    const Eigen::Matrix<double, States, 1>& x,
     const Eigen::Matrix<double, Inputs, 1>& u) {
   return C() * x + D() * u;
 }

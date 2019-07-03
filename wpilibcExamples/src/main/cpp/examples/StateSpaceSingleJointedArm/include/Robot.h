@@ -9,7 +9,7 @@
 
 #include <frc/TimedRobot.h>
 
-#include "Subsystems/SingleJointedArm.h"
+#include "subsystems/SingleJointedArm.h"
 
 class Robot : public frc::TimedRobot {
  public:

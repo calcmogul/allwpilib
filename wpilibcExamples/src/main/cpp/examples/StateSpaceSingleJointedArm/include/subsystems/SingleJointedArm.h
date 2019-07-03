@@ -12,7 +12,7 @@
 #include <frc/Notifier.h>
 #include <frc/Spark.h>
 
-#include "Subsystems/SingleJointedArmController.h"
+#include "subsystems/SingleJointedArmController.h"
 
 class SingleJointedArm {
  public:

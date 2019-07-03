@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 
+# Avoid needing display if plots aren't being shown
+import os
+import sys
+
+if "--noninteractive" in sys.argv:
+    import matplotlib as mpl
+
+    mpl.use("svg")
+
 import frccontrol as frccnt
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 
 
 class Flywheel(frccnt.System):
@@ -19,20 +27,24 @@ class Flywheel(frccnt.System):
         u_labels = [("Voltage", "V")]
         self.set_plot_labels(state_labels, u_labels)
 
+        frccnt.System.__init__(self, np.array([[0.0]]), np.array([[-12.0]]),
+                               np.array([[12.0]]), dt)
+
+    def create_model(self, states):
         # Number of motors
-        self.num_motors = 1.0
+        num_motors = 1.0
         # Flywheel moment of inertia in kg-m^2
-        self.J = 0.00032
+        J = 0.00032
         # Gear ratio
-        self.G = 12.0 / 18.0
+        G = 12.0 / 18.0
 
-        self.model = frccnt.models.flywheel(frccnt.models.MOTOR_775PRO,
-                                            self.num_motors, self.J, self.G)
-        frccnt.System.__init__(self, self.model, -12.0, 12.0, dt)
+        return frccnt.models.flywheel(frccnt.models.MOTOR_775PRO, num_motors, J,
+                                      G)
 
+    def design_controller_observer(self):
         q = [9.42]
         r = [12.0]
-        self.design_dlqr_controller(q, r)
+        self.design_lqr(q, r)
         # self.place_controller_poles([0.87])
         self.design_two_state_feedforward(q, r)
 
@@ -45,7 +57,9 @@ class Flywheel(frccnt.System):
 def main():
     dt = 0.00505
     flywheel = Flywheel(dt)
-    flywheel.export_cpp_coeffs("Flywheel", "Subsystems/")
+    flywheel.export_cpp_coeffs("Flywheel", "subsystems/", "h")
+    os.rename("FlywheelCoeffs.cpp", "cpp/subsystems/FlywheelCoeffs.cpp")
+    os.rename("FlywheelCoeffs.h", "include/subsystems/FlywheelCoeffs.h")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(1)
@@ -57,23 +71,24 @@ def main():
     l0 = 0.1
     l1 = l0 + 5.0
     l2 = l1 + 0.1
-    t = np.linspace(0, l2 + 5.0, (l2 + 5.0) / dt)
+    t = np.arange(0, l2 + 5.0, dt)
 
     refs = []
 
     # Generate references for simulation
     for i in range(len(t)):
         if t[i] < l0:
-            r = np.matrix([[0]])
+            r = np.array([[0]])
         elif t[i] < l1:
-            r = np.matrix([[9000 / 60 * 2 * math.pi]])
+            r = np.array([[9000 / 60 * 2 * math.pi]])
         else:
-            r = np.matrix([[0]])
+            r = np.array([[0]])
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(2)
-        flywheel.plot_time_responses(t, refs)
+        x_rec, ref_rec, u_rec = flywheel.generate_time_responses(t, refs)
+        flywheel.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
         plt.savefig("flywheel_response.svg")
     if "--noninteractive" not in sys.argv:

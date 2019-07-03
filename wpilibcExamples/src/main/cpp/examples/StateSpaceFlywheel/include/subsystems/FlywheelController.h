@@ -10,7 +10,7 @@
 #include <Eigen/Core>
 #include <frc/controller/StateSpaceLoop.h>
 
-#include "Subsystems/FlywheelCoeffs.h"
+#include "subsystems/FlywheelCoeffs.h"
 
 class FlywheelController {
  public:

@@ -9,7 +9,7 @@
 
 #include <frc/TimedRobot.h>
 
-#include "Subsystems/Flywheel.h"
+#include "subsystems/Flywheel.h"
 
 class Robot : public frc::TimedRobot {
  public:

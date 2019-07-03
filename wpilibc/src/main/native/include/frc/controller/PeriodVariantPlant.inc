@@ -9,7 +9,7 @@
 
 #include <cassert>
 
-#include <Eigen/MatrixFunctions>
+#include <unsupported/Eigen/MatrixFunctions>
 
 namespace frc {
 

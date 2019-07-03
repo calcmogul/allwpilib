@@ -20,7 +20,6 @@
 #include "wpi/SmallVector.h"
 #include "wpi/iterator.h"
 #include "wpi/iterator_range.h"
-#include "wpi/optional.h"
 #include "wpi/ErrorHandling.h"
 #include <algorithm>
 #include <cassert>
@@ -32,6 +31,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -595,16 +595,16 @@ static Iter next_or_end(const Iter &I, const Iter &End) {
 
 template <typename Iter>
 static auto deref_or_none(const Iter &I, const Iter &End)
-    -> wpi::optional<typename std::remove_const<
+    -> std::optional<typename std::remove_const<
         typename std::remove_reference<decltype(*I)>::type>::type> {
   if (I == End)
-    return nullopt;
+    return std::nullopt;
   return *I;
 }
 
 template <typename Iter> struct ZipLongestItemType {
   using type =
-      wpi::optional<typename std::remove_const<typename std::remove_reference<
+      std::optional<typename std::remove_const<typename std::remove_reference<
           decltype(*std::declval<Iter>())>::type>::type>;
 };
 
@@ -702,7 +702,7 @@ public:
 } // namespace detail
 
 /// Iterate over two or more iterators at the same time. Iteration continues
-/// until all iterators reach the end. The wpi::optional only contains a value
+/// until all iterators reach the end. The std::optional only contains a value
 /// if the iterator has not reached the end.
 template <typename T, typename U, typename... Args>
 detail::zip_longest_range<T, U, Args...> zip_longest(T &&t, U &&u,
@@ -1310,7 +1310,7 @@ template <typename R> struct result_pair {
   ValueOfRange<R> &value() { return *Iter; }
 
 private:
-  std::size_t Index = std::numeric_limits<std::size_t>::max();
+  std::size_t Index = (std::numeric_limits<std::size_t>::max)();
   IterOfRange<R> Iter;
 };
 
@@ -1325,7 +1325,7 @@ class enumerator_iter
 
 public:
   explicit enumerator_iter(IterOfRange<R> EndIter)
-      : Result(std::numeric_limits<size_t>::max(), EndIter) {}
+      : Result((std::numeric_limits<size_t>::max)(), EndIter) {}
 
   enumerator_iter(std::size_t Index, IterOfRange<R> Iter)
       : Result(Index, Iter) {}
@@ -1334,7 +1334,7 @@ public:
   const result_type &operator*() const { return Result; }
 
   enumerator_iter<R> &operator++() {
-    assert(Result.Index != std::numeric_limits<size_t>::max());
+    assert(Result.Index != (std::numeric_limits<size_t>::max)());
     ++Result.Iter;
     ++Result.Index;
     return *this;

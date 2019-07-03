@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <Eigen/MatrixFunctions>
+#include <unsupported/Eigen/MatrixFunctions>
 
 namespace frc {
 

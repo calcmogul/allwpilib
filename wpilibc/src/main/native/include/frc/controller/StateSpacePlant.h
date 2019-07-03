@@ -190,9 +190,12 @@ class StateSpacePlant {
   /**
    * Computes the new x and y given the control input.
    *
+   * @param x The current state.
    * @param u The control input.
    */
-  void Update(const Eigen::Matrix<double, Inputs, 1>& u);
+  void Update(
+      const Eigen::Matrix<double, States, 1>& x,
+      const Eigen::Matrix<double, Inputs, 1>& u);
 
   /**
    * Computes the new x given the old x and the control input.
@@ -204,7 +207,7 @@ class StateSpacePlant {
    * @param u The control input.
    */
   Eigen::Matrix<double, States, 1> UpdateX(
-      const Eigen::Matrix<double, States, 1> x,
+      const Eigen::Matrix<double, States, 1>& x,
       const Eigen::Matrix<double, Inputs, 1>& u) const;
 
   /**
@@ -212,10 +215,11 @@ class StateSpacePlant {
    *
    * This should be used when setting x manually to update y separately.
    *
+   * @param x The current state.
    * @param u The control input.
    */
   Eigen::Matrix<double, Outputs, 1> UpdateY(
-      const Eigen::Matrix<double, States, 1> x,
+      const Eigen::Matrix<double, States, 1>& x,
       const Eigen::Matrix<double, Inputs, 1>& u);
 
  protected:

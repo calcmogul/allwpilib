@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <cmath>
+#include "subsystems/DifferentialDriveController.h"
 
-#include "subsystems/DifferentialDrive.h"
+#include <cmath>
 
 DifferentialDriveController::DifferentialDriveController() { m_Y.setZero(); }
 

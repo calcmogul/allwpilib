@@ -12,7 +12,7 @@
 #include <frc/Notifier.h>
 #include <frc/Spark.h>
 
-#include "Subsystems/FlywheelController.h"
+#include "subsystems/FlywheelController.h"
 
 class Flywheel {
  public:

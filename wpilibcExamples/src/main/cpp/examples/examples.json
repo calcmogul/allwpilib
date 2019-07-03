@@ -245,13 +245,13 @@
     "gradlebase": "cpp"
   },
   {
-    "name": "StateSpaceDrivetrain",
-    "description": "An example that demonstates a state-space controller for a drivetrain.",
+    "name": "StateSpaceDifferentialDrive",
+    "description": "An example that demonstates a state-space controller for a differential drive.",
     "tags": [
       "State-space",
       "Complete List"
     ],
-    "foldername": "StateSpaceDrivetrain",
+    "foldername": "StateSpaceDifferentialDrive",
     "gradlebase": "cpp"
   },
   {
@@ -285,13 +285,13 @@
     "gradlebase": "cpp"
   },
   {
-    "name": "PeriodVariantDrivetrain",
-    "description": "An example that demonstates a period-variant state-space controller for a drivetrain.",
+    "name": "PeriodVariantDifferentialDrive",
+    "description": "An example that demonstates a period-variant state-space controller for a differential drive.",
     "tags": [
       "State-space",
       "Complete List"
     ],
-    "foldername": "PeriodVariantDrivetrain",
+    "foldername": "PeriodVariantDifferentialDrive",
     "gradlebase": "cpp"
   },
   {

@@ -12,7 +12,7 @@
 #include <Eigen/Core>
 #include <frc/controller/PeriodVariantLoop.h>
 
-#include "Subsystems/SingleJointedArmCoeffs.h"
+#include "subsystems/SingleJointedArmCoeffs.h"
 
 class SingleJointedArmController {
  public:

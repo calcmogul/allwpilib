@@ -12,7 +12,7 @@
 #include <Eigen/Core>
 #include <frc/controller/PeriodVariantLoop.h>
 
-#include "Subsystems/DifferentialDriveCoeffs.h"
+#include "subsystems/DifferentialDriveCoeffs.h"
 
 class DifferentialDriveController {
  public:

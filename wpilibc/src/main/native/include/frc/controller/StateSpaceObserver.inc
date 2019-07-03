@@ -66,7 +66,6 @@ void StateSpaceObserver<States, Inputs, Outputs>::Correct(
     const Eigen::Matrix<double, Inputs, 1>& u,
     const Eigen::Matrix<double, Outputs, 1>& y) {
   m_Xhat += K() * (y - m_plant->UpdateY(Xhat(), u));
-  //m_Xhat += K() * (y - m_plant->C() * Xhat() - m_plant->D() * u);
 }
 
 template <int States, int Inputs, int Outputs>

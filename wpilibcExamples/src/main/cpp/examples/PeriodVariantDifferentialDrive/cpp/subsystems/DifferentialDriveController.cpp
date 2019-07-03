@@ -5,73 +5,75 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "subsystems/DifferentialDriveController.h"
+
 #include <cmath>
 
-#include "subsystems/Drivetrain.h"
+DifferentialDriveController::DifferentialDriveController() { m_Y.setZero(); }
 
-DrivetrainController::DrivetrainController() { m_Y.setZero(); }
+void DifferentialDriveController::Enable() { m_loop.Enable(); }
 
-void DrivetrainController::Enable() { m_loop.Enable(); }
+void DifferentialDriveController::Disable() { m_loop.Disable(); }
 
-void DrivetrainController::Disable() { m_loop.Disable(); }
-
-void DrivetrainController::SetReferences(double leftPosition,
-                                         double leftVelocity,
-                                         double rightPosition,
-                                         double rightVelocity) {
+void DifferentialDriveController::SetReferences(double leftPosition,
+                                                double leftVelocity,
+                                                double rightPosition,
+                                                double rightVelocity) {
   Eigen::Matrix<double, 4, 1> nextR;
   nextR << leftPosition, leftVelocity, rightPosition, rightVelocity;
   m_loop.SetNextR(nextR);
 }
 
-bool DrivetrainController::AtReferences() const { return m_atReferences; }
+bool DifferentialDriveController::AtReferences() const {
+  return m_atReferences;
+}
 
-void DrivetrainController::SetMeasuredStates(double leftPosition,
-                                             double rightPosition) {
+void DifferentialDriveController::SetMeasuredStates(double leftPosition,
+                                                    double rightPosition) {
   m_Y << leftPosition, rightPosition;
 }
 
-double DrivetrainController::ControllerLeftVoltage() const {
+double DifferentialDriveController::ControllerLeftVoltage() const {
   return m_loop.U(0);
 }
 
-double DrivetrainController::ControllerRightVoltage() const {
+double DifferentialDriveController::ControllerRightVoltage() const {
   return m_loop.U(1);
 }
 
-double DrivetrainController::EstimatedLeftPosition() const {
+double DifferentialDriveController::EstimatedLeftPosition() const {
   return m_loop.Xhat(0);
 }
 
-double DrivetrainController::EstimatedLeftVelocity() const {
+double DifferentialDriveController::EstimatedLeftVelocity() const {
   return m_loop.Xhat(1);
 }
 
-double DrivetrainController::EstimatedRightPosition() const {
+double DifferentialDriveController::EstimatedRightPosition() const {
   return m_loop.Xhat(2);
 }
 
-double DrivetrainController::EstimatedRightVelocity() const {
+double DifferentialDriveController::EstimatedRightVelocity() const {
   return m_loop.Xhat(3);
 }
 
-double DrivetrainController::LeftPositionError() const {
+double DifferentialDriveController::LeftPositionError() const {
   return m_loop.Error()(0, 0);
 }
 
-double DrivetrainController::LeftVelocityError() const {
+double DifferentialDriveController::LeftVelocityError() const {
   return m_loop.Error()(1, 0);
 }
 
-double DrivetrainController::RightPositionError() const {
+double DifferentialDriveController::RightPositionError() const {
   return m_loop.Error()(2, 0);
 }
 
-double DrivetrainController::RightVelocityError() const {
+double DifferentialDriveController::RightVelocityError() const {
   return m_loop.Error()(3, 0);
 }
 
-void DrivetrainController::Update(std::chrono::nanoseconds dt) {
+void DifferentialDriveController::Update(std::chrono::nanoseconds dt) {
   m_loop.Correct(m_Y);
 
   auto error = m_loop.Error();
@@ -83,4 +85,4 @@ void DrivetrainController::Update(std::chrono::nanoseconds dt) {
   m_loop.Predict(dt);
 }
 
-void DrivetrainController::Reset() { m_loop.Reset(); }
+void DifferentialDriveController::Reset() { m_loop.Reset(); }

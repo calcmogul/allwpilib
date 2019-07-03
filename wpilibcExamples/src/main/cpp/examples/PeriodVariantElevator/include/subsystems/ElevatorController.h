@@ -12,7 +12,7 @@
 #include <Eigen/Core>
 #include <frc/controller/PeriodVariantLoop.h>
 
-#include "Subsystems/ElevatorCoeffs.h"
+#include "subsystems/ElevatorCoeffs.h"
 
 class ElevatorController {
  public:
