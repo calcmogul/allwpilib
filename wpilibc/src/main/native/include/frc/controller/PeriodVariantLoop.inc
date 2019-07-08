@@ -15,8 +15,7 @@ template <int States, int Inputs, int Outputs>
 PeriodVariantLoop<States, Inputs, Outputs>::PeriodVariantLoop(
     const PeriodVariantPlantCoeffs<States, Inputs, Outputs>& plantCoeffs,
     const StateSpaceControllerCoeffs<States, Inputs, Outputs>& controllerCoeffs,
-    const PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs>&
-        observerCoeffs)
+    const PeriodVariantObserverCoeffs<States, Inputs, Outputs>& observerCoeffs)
     : m_plant(plantCoeffs),
       m_controller(controllerCoeffs, m_plant),
       m_observer(observerCoeffs, m_plant) {
@@ -27,7 +26,7 @@ template <int States, int Inputs, int Outputs>
 PeriodVariantLoop<States, Inputs, Outputs>::PeriodVariantLoop(
     PeriodVariantPlant<States, Inputs, Outputs>&& plant,
     PeriodVariantController<States, Inputs, Outputs>&& controller,
-    PeriodVariantKalmanFilter<States, Inputs, Outputs>&& observer)
+    PeriodVariantObserver<States, Inputs, Outputs>&& observer)
     : m_plant(std::move(plant)),
       m_controller(std::move(controller)),
       m_observer(std::move(observer)) {
@@ -107,7 +106,7 @@ PeriodVariantLoop<States, Inputs, Outputs>::GetController() const {
 }
 
 template <int States, int Inputs, int Outputs>
-const PeriodVariantKalmanFilter<States, Inputs, Outputs>&
+const PeriodVariantObserver<States, Inputs, Outputs>&
 PeriodVariantLoop<States, Inputs, Outputs>::GetObserver() const {
   return m_observer;
 }
@@ -135,7 +134,7 @@ void PeriodVariantLoop<States, Inputs, Outputs>::Correct(
 template <int States, int Inputs, int Outputs>
 void PeriodVariantLoop<States, Inputs, Outputs>::Predict(
     std::chrono::nanoseconds dt) {
-  m_controller.Update(m_nextR, m_observer.Xhat());
+  m_controller.Update(m_observer.Xhat(), m_nextR);
   m_observer.Predict(m_controller.U(), dt);
 }
 

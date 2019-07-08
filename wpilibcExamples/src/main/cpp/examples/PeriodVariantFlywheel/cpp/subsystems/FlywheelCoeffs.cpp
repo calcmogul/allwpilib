@@ -33,15 +33,15 @@ frc::StateSpaceControllerCoeffs<1, 1, 1> MakeFlywheelControllerCoeffs() {
   return frc::StateSpaceControllerCoeffs<1, 1, 1>(K, Kff, Umin, Umax);
 }
 
-frc::PeriodVariantKalmanFilterCoeffs<1, 1, 1> MakeFlywheelObserverCoeffs() {
+frc::PeriodVariantObserverCoeffs<1, 1, 1> MakeFlywheelObserverCoeffs() {
   Eigen::Matrix<double, 1, 1> Qcontinuous;
   Qcontinuous(0, 0) = 1.0;
   Eigen::Matrix<double, 1, 1> Rcontinuous;
   Rcontinuous(0, 0) = 0.0001;
   Eigen::Matrix<double, 1, 1> PsteadyState;
   PsteadyState(0, 0) = 9.999000199441811e-05;
-  return frc::PeriodVariantKalmanFilterCoeffs<1, 1, 1>(Qcontinuous, Rcontinuous,
-                                                       PsteadyState);
+  return frc::PeriodVariantObserverCoeffs<1, 1, 1>(Qcontinuous, Rcontinuous,
+                                                   PsteadyState);
 }
 
 frc::PeriodVariantLoop<1, 1, 1> MakeFlywheelLoop() {

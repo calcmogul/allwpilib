@@ -133,7 +133,7 @@ void StateSpaceLoop<States, Inputs, Outputs>::Correct(
 
 template <int States, int Inputs, int Outputs>
 void StateSpaceLoop<States, Inputs, Outputs>::Predict() {
-  m_controller.Update(m_nextR, m_observer.Xhat());
+  m_controller.Update(m_observer.Xhat(), m_nextR);
   m_observer.Predict(m_controller.U());
 }
 

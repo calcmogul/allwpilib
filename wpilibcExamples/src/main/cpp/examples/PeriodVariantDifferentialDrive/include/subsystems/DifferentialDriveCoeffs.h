@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include <frc/controller/PeriodVariantKalmanFilterCoeffs.h>
 #include <frc/controller/PeriodVariantLoop.h>
+#include <frc/controller/PeriodVariantObserverCoeffs.h>
 #include <frc/controller/PeriodVariantPlantCoeffs.h>
 #include <frc/controller/StateSpaceControllerCoeffs.h>
 
 frc::PeriodVariantPlantCoeffs<4, 2, 2> MakeDifferentialDrivePlantCoeffs();
 frc::StateSpaceControllerCoeffs<4, 2, 2>
 MakeDifferentialDriveControllerCoeffs();
-frc::PeriodVariantKalmanFilterCoeffs<4, 2, 2>
-MakeDifferentialDriveObserverCoeffs();
+frc::PeriodVariantObserverCoeffs<4, 2, 2> MakeDifferentialDriveObserverCoeffs();
 frc::PeriodVariantLoop<4, 2, 2> MakeDifferentialDriveLoop();

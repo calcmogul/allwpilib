@@ -154,7 +154,11 @@ template <int States, int Inputs, int Outputs>
 void PeriodVariantPlant<States, Inputs, Outputs>::Update(
     const Eigen::Matrix<double, Inputs, 1>& u, std::chrono::nanoseconds dt) {
   m_X = UpdateX(X(), m_delayedU);
+<<<<<<< HEAD
   m_Y = UpdateY(m_delayedU);
+=======
+  m_Y = UpdateY(X(), m_delayedU);
+>>>>>>> d3aadea91f1c78767af2d78f027193fd5a2adccb
   m_delayedU = u;
 }
 
@@ -170,8 +174,9 @@ PeriodVariantPlant<States, Inputs, Outputs>::UpdateX(
 template <int States, int Inputs, int Outputs>
 Eigen::Matrix<double, Outputs, 1>
 PeriodVariantPlant<States, Inputs, Outputs>::UpdateY(
+    const Eigen::Matrix<double, States, 1>& x,
     const Eigen::Matrix<double, Inputs, 1>& u) {
-  return C() * X() + D() * u;
+  return C() * x + D() * u;
 }
 
 template <int States, int Inputs, int Outputs>

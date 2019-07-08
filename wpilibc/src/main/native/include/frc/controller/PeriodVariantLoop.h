@@ -12,7 +12,11 @@
 #include <Eigen/Core>
 
 #include "frc/controller/PeriodVariantController.h"
+<<<<<<< HEAD
 #include "frc/controller/PeriodVariantKalmanFilter.h"
+=======
+#include "frc/controller/PeriodVariantObserver.h"
+>>>>>>> d3aadea91f1c78767af2d78f027193fd5a2adccb
 #include "frc/controller/PeriodVariantPlant.h"
 
 namespace frc {
@@ -48,7 +52,7 @@ class PeriodVariantLoop {
       const PeriodVariantPlantCoeffs<States, Inputs, Outputs>& plantCoeffs,
       const StateSpaceControllerCoeffs<States, Inputs, Outputs>&
           controllerCoeffs,
-      const PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs>&
+      const PeriodVariantObserverCoeffs<States, Inputs, Outputs>&
           observerCoeffs);
   /**
    * Constructs a period-variant loop with the given plant, controller, and
@@ -61,7 +65,11 @@ class PeriodVariantLoop {
   PeriodVariantLoop(
       PeriodVariantPlant<States, Inputs, Outputs>&& plant,
       PeriodVariantController<States, Inputs, Outputs>&& controller,
+<<<<<<< HEAD
       PeriodVariantKalmanFilter<States, Inputs, Outputs>&& observer);
+=======
+      PeriodVariantObserver<States, Inputs, Outputs>&& observer);
+>>>>>>> d3aadea91f1c78767af2d78f027193fd5a2adccb
 
   virtual ~PeriodVariantLoop() = default;
 
@@ -149,7 +157,7 @@ class PeriodVariantLoop {
   /**
    * Return the observer used internally.
    */
-  const PeriodVariantKalmanFilter<States, Inputs, Outputs>& GetObserver() const;
+  const PeriodVariantObserver<States, Inputs, Outputs>& GetObserver() const;
 
   /**
    * Zeroes reference r, controller output u, plant output y, and state estimate
@@ -196,7 +204,7 @@ class PeriodVariantLoop {
  protected:
   PeriodVariantPlant<States, Inputs, Outputs> m_plant;
   PeriodVariantController<States, Inputs, Outputs> m_controller;
-  PeriodVariantKalmanFilter<States, Inputs, Outputs> m_observer;
+  PeriodVariantObserver<States, Inputs, Outputs> m_observer;
 
   // Reference to go to in the next cycle (used by feedforward controller).
   Eigen::Matrix<double, States, 1> m_nextR;

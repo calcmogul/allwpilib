@@ -82,7 +82,7 @@ MakeDifferentialDriveControllerCoeffs() {
   return frc::StateSpaceControllerCoeffs<4, 2, 2>(K, Kff, Umin, Umax);
 }
 
-frc::PeriodVariantKalmanFilterCoeffs<4, 2, 2>
+frc::PeriodVariantObserverCoeffs<4, 2, 2>
 MakeDifferentialDriveObserverCoeffs() {
   Eigen::Matrix<double, 4, 4> Qcontinuous;
   Qcontinuous(0, 0) = 0.0025000000000000005;
@@ -123,8 +123,8 @@ MakeDifferentialDriveObserverCoeffs() {
   PsteadyState(3, 1) = -0.26183323515195367;
   PsteadyState(3, 2) = 1.4808967508522786e-07;
   PsteadyState(3, 3) = 8.238974828958877;
-  return frc::PeriodVariantKalmanFilterCoeffs<4, 2, 2>(Qcontinuous, Rcontinuous,
-                                                       PsteadyState);
+  return frc::PeriodVariantObserverCoeffs<4, 2, 2>(Qcontinuous, Rcontinuous,
+                                                   PsteadyState);
 }
 
 frc::PeriodVariantLoop<4, 2, 2> MakeDifferentialDriveLoop() {

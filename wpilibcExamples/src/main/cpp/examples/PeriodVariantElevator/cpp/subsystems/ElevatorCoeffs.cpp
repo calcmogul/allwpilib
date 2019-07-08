@@ -40,7 +40,7 @@ frc::StateSpaceControllerCoeffs<2, 1, 1> MakeElevatorControllerCoeffs() {
   return frc::StateSpaceControllerCoeffs<2, 1, 1>(K, Kff, Umin, Umax);
 }
 
-frc::PeriodVariantKalmanFilterCoeffs<2, 1, 1> MakeElevatorObserverCoeffs() {
+frc::PeriodVariantObserverCoeffs<2, 1, 1> MakeElevatorObserverCoeffs() {
   Eigen::Matrix<double, 2, 2> Qcontinuous;
   Qcontinuous(0, 0) = 0.0025000000000000005;
   Qcontinuous(0, 1) = 0.0;
@@ -53,8 +53,8 @@ frc::PeriodVariantKalmanFilterCoeffs<2, 1, 1> MakeElevatorObserverCoeffs() {
   PsteadyState(0, 1) = 7.34757941922686e-09;
   PsteadyState(1, 0) = 7.347579419241315e-09;
   PsteadyState(1, 1) = 1.2335349474145199;
-  return frc::PeriodVariantKalmanFilterCoeffs<2, 1, 1>(Qcontinuous, Rcontinuous,
-                                                       PsteadyState);
+  return frc::PeriodVariantObserverCoeffs<2, 1, 1>(Qcontinuous, Rcontinuous,
+                                                   PsteadyState);
 }
 
 frc::PeriodVariantLoop<2, 1, 1> MakeElevatorLoop() {

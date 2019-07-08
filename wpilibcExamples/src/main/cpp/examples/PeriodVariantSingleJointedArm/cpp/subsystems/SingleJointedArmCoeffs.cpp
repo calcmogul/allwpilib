@@ -41,8 +41,7 @@ MakeSingleJointedArmControllerCoeffs() {
   return frc::StateSpaceControllerCoeffs<2, 1, 1>(K, Kff, Umin, Umax);
 }
 
-frc::PeriodVariantKalmanFilterCoeffs<2, 1, 1>
-MakeSingleJointedArmObserverCoeffs() {
+frc::PeriodVariantObserverCoeffs<2, 1, 1> MakeSingleJointedArmObserverCoeffs() {
   Eigen::Matrix<double, 2, 2> Qcontinuous;
   Qcontinuous(0, 0) = 0.0003045025;
   Qcontinuous(0, 1) = 0.0;
@@ -55,8 +54,8 @@ MakeSingleJointedArmObserverCoeffs() {
   PsteadyState(0, 1) = 0.0007738121910642457;
   PsteadyState(1, 0) = 0.000773812191064246;
   PsteadyState(1, 1) = 0.62614228094563;
-  return frc::PeriodVariantKalmanFilterCoeffs<2, 1, 1>(Qcontinuous, Rcontinuous,
-                                                       PsteadyState);
+  return frc::PeriodVariantObserverCoeffs<2, 1, 1>(Qcontinuous, Rcontinuous,
+                                                   PsteadyState);
 }
 
 frc::PeriodVariantLoop<2, 1, 1> MakeSingleJointedArmLoop() {

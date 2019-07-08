@@ -89,8 +89,8 @@ void StateSpaceController<States, Inputs, Outputs>::Update(
 
 template <int States, int Inputs, int Outputs>
 void StateSpaceController<States, Inputs, Outputs>::Update(
-    const Eigen::Matrix<double, States, 1>& nextR,
-    const Eigen::Matrix<double, States, 1>& x) {
+    const Eigen::Matrix<double, States, 1>& x,
+    const Eigen::Matrix<double, States, 1>& nextR) {
   if (m_enabled) {
     m_u = K() * (m_r - x) + Kff() * (nextR - m_plant->A() * m_r);
     CapU();

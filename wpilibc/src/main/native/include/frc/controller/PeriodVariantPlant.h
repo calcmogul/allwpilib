@@ -223,11 +223,14 @@ class PeriodVariantPlant {
   /**
    * Computes the new y given the control input.
    *
-   * This should be used when setting x manually to update y separately.
+   * This is used by state observers directly to run updates based on state
+   * estimate.
    *
+   * @param x The current state.
    * @param u The control input.
    */
   Eigen::Matrix<double, Outputs, 1> UpdateY(
+      const Eigen::Matrix<double, States, 1>& x,
       const Eigen::Matrix<double, Inputs, 1>& u);
 
  protected:

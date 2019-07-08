@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <frc/controller/PeriodVariantKalmanFilterCoeffs.h>
 #include <frc/controller/PeriodVariantLoop.h>
+#include <frc/controller/PeriodVariantObserverCoeffs.h>
 #include <frc/controller/PeriodVariantPlantCoeffs.h>
 #include <frc/controller/StateSpaceControllerCoeffs.h>
 
 frc::PeriodVariantPlantCoeffs<1, 1, 1> MakeFlywheelPlantCoeffs();
 frc::StateSpaceControllerCoeffs<1, 1, 1> MakeFlywheelControllerCoeffs();
-frc::PeriodVariantKalmanFilterCoeffs<1, 1, 1> MakeFlywheelObserverCoeffs();
+frc::PeriodVariantObserverCoeffs<1, 1, 1> MakeFlywheelObserverCoeffs();
 frc::PeriodVariantLoop<1, 1, 1> MakeFlywheelLoop();
