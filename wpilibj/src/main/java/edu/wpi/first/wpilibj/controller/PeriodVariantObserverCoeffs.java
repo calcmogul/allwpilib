@@ -10,14 +10,14 @@ package edu.wpi.first.wpilibj.controller;
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 
-public final class PeriodVariantKalmanFilterCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
+public final class PeriodVariantObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
   private Matrix<States, States> Qcontinuous;
   private Matrix<Outputs, Outputs> Rcontinuous;
   private Matrix<States, States> PsteadyState;
 
-  public PeriodVariantKalmanFilterCoeffs(Matrix<States, States> Qcontinuous,
-                                  Matrix<Outputs, Outputs> Rcontinuous,
-                                  Matrix<States, States> PsteadyState) {
+  public PeriodVariantObserverCoeffs(Matrix<States, States> Qcontinuous,
+                                     Matrix<Outputs, Outputs> Rcontinuous,
+                                     Matrix<States, States> PsteadyState) {
     this.Qcontinuous = Qcontinuous;
     this.Rcontinuous = Rcontinuous;
     this.PsteadyState = PsteadyState;

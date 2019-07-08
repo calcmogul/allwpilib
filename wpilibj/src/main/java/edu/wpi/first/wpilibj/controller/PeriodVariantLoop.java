@@ -19,13 +19,13 @@ public class PeriodVariantLoop<States extends Num, Inputs extends Num, Outputs e
   protected final Nat<Outputs> kOutputs;
   protected PeriodVariantPlant<States, Inputs, Outputs> m_plant;
   protected PeriodVariantController<States, Inputs, Outputs> m_controller;
-  protected PeriodVariantKalmanFilter<States, Inputs, Outputs> m_observer;
+  protected PeriodVariantObserver<States, Inputs, Outputs> m_observer;
 
   protected Matrix<States, N1> m_nextR;
 
   public PeriodVariantLoop(PeriodVariantPlant<States, Inputs, Outputs> plant,
                            PeriodVariantController<States, Inputs, Outputs> controller,
-                           PeriodVariantKalmanFilter<States, Inputs, Outputs> observer) {
+                           PeriodVariantObserver<States, Inputs, Outputs> observer) {
     m_plant = plant;
     m_controller = controller;
     m_observer = observer;
@@ -36,10 +36,10 @@ public class PeriodVariantLoop<States extends Num, Inputs extends Num, Outputs e
 
   public PeriodVariantLoop(PeriodVariantPlantCoeffs<States, Inputs, Outputs> plantCoeffs,
                            StateSpaceControllerCoeffs<States, Inputs, Outputs> controllerCoeffs,
-                           PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs> observerCoeffs) {
+                           PeriodVariantObserverCoeffs<States, Inputs, Outputs> observerCoeffs) {
     m_plant = new PeriodVariantPlant<>(plantCoeffs);
     m_controller = new PeriodVariantController<>(controllerCoeffs, m_plant);
-    m_observer = new PeriodVariantKalmanFilter<>(observerCoeffs, m_plant);
+    m_observer = new PeriodVariantObserver<>(observerCoeffs, m_plant);
     kStates = m_plant.getStates();
     kInputs = m_plant.getInputs();
     kOutputs = m_plant.getOutputs();
@@ -97,7 +97,7 @@ public class PeriodVariantLoop<States extends Num, Inputs extends Num, Outputs e
     return m_controller;
   }
 
-  public PeriodVariantKalmanFilter<States, Inputs, Outputs> getObserver() {
+  public PeriodVariantObserver<States, Inputs, Outputs> getObserver() {
     return m_observer;
   }
 

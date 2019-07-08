@@ -18,14 +18,14 @@ import org.ejml.simple.SimpleMatrix;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PeriodVariantKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
+public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outputs extends Num> {
   private PeriodVariantPlant<States, Inputs, Outputs> m_plant;
   private double m_nominalSamplePeriod;
   private Matrix<States, N1> m_Xhat;
   private Matrix<States, States> m_P;
   private Matrix<States, States> m_Q;
   private Matrix<Outputs, Outputs> m_R;
-  private List<PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
+  private List<PeriodVariantObserverCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
 
   private void updateQR(double dt) {
@@ -51,16 +51,16 @@ public class PeriodVariantKalmanFilter<States extends Num, Inputs extends Num, O
     m_R = new Matrix<>(Rtemp.divide(dt));
   }
 
-  public PeriodVariantKalmanFilter(PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs> coeffs,
-                                   PeriodVariantPlant<States, Inputs, Outputs> plant,
-                                   double nominalSamplePeriod) {
+  public PeriodVariantObserver(PeriodVariantObserverCoeffs<States, Inputs, Outputs> coeffs,
+                               PeriodVariantPlant<States, Inputs, Outputs> plant,
+                               double nominalSamplePeriod) {
     addCoefficients(coeffs);
     m_plant = plant;
     m_nominalSamplePeriod = nominalSamplePeriod;
   }
 
-  public PeriodVariantKalmanFilter(PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs> coeffs,
-                                   PeriodVariantPlant<States, Inputs, Outputs> plant) {
+  public PeriodVariantObserver(PeriodVariantObserverCoeffs<States, Inputs, Outputs> coeffs,
+                               PeriodVariantPlant<States, Inputs, Outputs> plant) {
     this(coeffs, plant, 0.005);
   }
 
@@ -127,15 +127,15 @@ public class PeriodVariantKalmanFilter<States extends Num, Inputs extends Num, O
     m_P = (MatrixUtils.eye(m_plant.getStates()).minus(kalmanGain.times(m_plant.getC()))).times(getP());
   }
 
-  public void addCoefficients(PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs> coefficients) {
+  public void addCoefficients(PeriodVariantObserverCoeffs<States, Inputs, Outputs> coefficients) {
     m_coefficients.add(coefficients);
   }
 
-  public PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs> getCoefficients(int index) {
+  public PeriodVariantObserverCoeffs<States, Inputs, Outputs> getCoefficients(int index) {
     return m_coefficients.get(index);
   }
 
-  public PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs> getCoefficients() {
+  public PeriodVariantObserverCoeffs<States, Inputs, Outputs> getCoefficients() {
     return getCoefficients(m_index);
   }
 
