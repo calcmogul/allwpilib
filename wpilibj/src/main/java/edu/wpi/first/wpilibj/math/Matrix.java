@@ -208,11 +208,11 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
 
-  final SimpleMatrix getStorage() {
+  public final SimpleMatrix getStorage() {
     return this.m_storage;
   }
 
-  Matrix(SimpleMatrix storage) {
+  public Matrix(SimpleMatrix storage) {
     this.m_storage = Objects.requireNonNull(storage);
   }
 }

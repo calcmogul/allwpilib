@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.math.numbers;
 import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 
-public class N18 extends Num implements Nat<N18> {
+public final class N18 extends Num implements Nat<N18> {
   private N18() {
   }
 

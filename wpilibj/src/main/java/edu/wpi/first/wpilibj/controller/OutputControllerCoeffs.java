@@ -11,27 +11,21 @@ import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
-@SuppressWarnings({"unused", "ParameterName", "ClassTypeParameterName", "MemberName"})
-public final class StateSpaceControllerCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
-  private final Matrix<Inputs, States> K;
-  private final Matrix<Inputs, States> Kff;
-  private final Matrix<Inputs, N1> Umin;
-  private final Matrix<Inputs, N1> Umax;
+public final class OutputControllerCoeffs<Inputs extends Num, Outputs extends Num> {
+  private Matrix<Inputs, Outputs> K;
+  private Matrix<Inputs, N1> Umin;
+  private Matrix<Inputs, N1> Umax;
 
-  public StateSpaceControllerCoeffs(Matrix<Inputs, States> K, Matrix<Inputs, States> Kff,
-                                    Matrix<Inputs, N1> Umin, Matrix<Inputs, N1> Umax) {
+  public OutputControllerCoeffs(Matrix<Inputs, Outputs> K,
+                                Matrix<Inputs, N1> Umin,
+                                Matrix<Inputs, N1> Umax) {
     this.K = K;
-    this.Kff = Kff;
     this.Umin = Umin;
     this.Umax = Umax;
   }
 
-  public Matrix<Inputs, States> getK() {
+  public Matrix<Inputs, Outputs> getK() {
     return K;
-  }
-
-  public Matrix<Inputs, States> getKff() {
-    return Kff;
   }
 
   public Matrix<Inputs, N1> getUmin() {

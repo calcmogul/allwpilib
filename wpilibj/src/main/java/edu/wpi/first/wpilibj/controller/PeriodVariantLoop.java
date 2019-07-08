@@ -13,29 +13,36 @@ import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
-public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
+public class PeriodVariantLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
   protected final Nat<States> kStates;
   protected final Nat<Inputs> kInputs;
   protected final Nat<Outputs> kOutputs;
-
-  protected StateSpacePlant<States, Inputs, Outputs> m_plant;
-  protected StateSpaceController<States, Inputs, Outputs> m_controller;
-  protected StateSpaceObserver<States, Inputs, Outputs> m_observer;
+  protected PeriodVariantPlant<States, Inputs, Outputs> m_plant;
+  protected PeriodVariantController<States, Inputs, Outputs> m_controller;
+  protected PeriodVariantKalmanFilter<States, Inputs, Outputs> m_observer;
 
   protected Matrix<States, N1> m_nextR;
 
-  public StateSpaceLoop(StateSpacePlantCoeffs<States, Inputs, Outputs> plantCoeffs,
-                        StateSpaceControllerCoeffs<States, Inputs, Outputs> controllerCoeffs,
-                        StateSpaceObserverCoeffs<States, Inputs, Outputs> observerCoeffs) {
-    kStates = plantCoeffs.getStates();
-    kInputs = plantCoeffs.getInputs();
-    kOutputs = plantCoeffs.getOutputs();
+  public PeriodVariantLoop(PeriodVariantPlant<States, Inputs, Outputs> plant,
+                           PeriodVariantController<States, Inputs, Outputs> controller,
+                           PeriodVariantKalmanFilter<States, Inputs, Outputs> observer) {
+    m_plant = plant;
+    m_controller = controller;
+    m_observer = observer;
+    kStates = m_plant.getStates();
+    kInputs = m_plant.getInputs();
+    kOutputs = m_plant.getOutputs();
+  }
 
-    m_nextR = MatrixUtils.zeros(kStates);
-
-    m_plant = new StateSpacePlant<>(plantCoeffs);
-    m_controller = new StateSpaceController<>(m_plant, controllerCoeffs);
-    m_observer = new StateSpaceObserver<>(m_plant, observerCoeffs);
+  public PeriodVariantLoop(PeriodVariantPlantCoeffs<States, Inputs, Outputs> plantCoeffs,
+                           StateSpaceControllerCoeffs<States, Inputs, Outputs> controllerCoeffs,
+                           PeriodVariantKalmanFilterCoeffs<States, Inputs, Outputs> observerCoeffs) {
+    m_plant = new PeriodVariantPlant<>(plantCoeffs);
+    m_controller = new PeriodVariantController<>(controllerCoeffs, m_plant);
+    m_observer = new PeriodVariantKalmanFilter<>(observerCoeffs, m_plant);
+    kStates = m_plant.getStates();
+    kInputs = m_plant.getInputs();
+    kOutputs = m_plant.getOutputs();
   }
 
   public void enable() {
@@ -59,7 +66,7 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
   }
 
   public double getNextR(int i) {
-    return m_nextR.get(i, 0);
+    return getNextR().get(i, 0);
   }
 
   public Matrix<Inputs, N1> getU() {
@@ -82,15 +89,15 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
     m_nextR = nextR;
   }
 
-  public StateSpacePlant<States, Inputs, Outputs> getPlant() {
+  public PeriodVariantPlant<States, Inputs, Outputs> getPlant() {
     return m_plant;
   }
 
-  public StateSpaceController<States, Inputs, Outputs> getController() {
+  public PeriodVariantController<States, Inputs, Outputs> getController() {
     return m_controller;
   }
 
-  public StateSpaceObserver<States, Inputs, Outputs> getObserver() {
+  public PeriodVariantKalmanFilter<States, Inputs, Outputs> getObserver() {
     return m_observer;
   }
 
@@ -109,8 +116,9 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
     m_observer.correct(m_controller.getU(), y);
   }
 
-  public void predict() {
-    m_observer.predict(m_controller.getU());
+  public void predict(double dt) {
+    m_controller.update(m_nextR, m_observer.getXhat());
+    m_observer.predict(m_controller.getU(), dt);
   }
 
   public void setIndex(int index) {

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 
 @SuppressWarnings({"unused", "ClassTypeParameterName", "MemberName", "ParameterName"})
-public class StateSpaceObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
+public final class StateSpaceObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final Matrix<States, Outputs> K;
 
   public StateSpaceObserverCoeffs(Matrix<States, Outputs> K) {

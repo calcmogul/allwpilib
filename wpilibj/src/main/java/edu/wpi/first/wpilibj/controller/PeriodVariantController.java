@@ -15,20 +15,29 @@ import edu.wpi.first.wpilibj.math.numbers.N1;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"ClassTypeParameterName", "MemberName", "ParameterName"})
-public class StateSpaceController<States extends Num, Inputs extends Num, Outputs extends Num> {
-  private StateSpacePlant<States, Inputs, Outputs> m_plant;
-  private List<StateSpaceControllerCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
-  private int m_index = 0;
+public class PeriodVariantController<States extends Num, Inputs extends Num, Outputs extends Num> {
+  private PeriodVariantPlant<States, Inputs, Outputs> m_plant;
   private boolean m_enabled = false;
-
   private Matrix<States, N1> m_r;
   private Matrix<Inputs, N1> m_u;
+  private List<StateSpaceControllerCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
+  private int m_index = 0;
 
-  public StateSpaceController(StateSpacePlant<States, Inputs, Outputs> plant, StateSpaceControllerCoeffs<States, Inputs, Outputs> coeffs) {
-    m_plant = plant;
+  public PeriodVariantController(StateSpaceControllerCoeffs<States, Inputs, Outputs> coeffs,
+                                 PeriodVariantPlant<States, Inputs, Outputs> plant) {
     addCoefficients(coeffs);
+    m_plant = plant;
     reset();
+  }
+
+  private void capU() {
+    for (int i = 0; i < m_plant.getInputs().getNum(); ++i) {
+      if (getU(i) > getCoefficients().getUmax(i)) {
+        m_u.set(i, 0, getCoefficients().getUmax(i));
+      } else if (getU(i) < getCoefficients().getUmin(i)) {
+        m_u.set(i, 0, getCoefficients().getUmin(i));
+      }
+    }
   }
 
   public void enable() {
@@ -77,42 +86,18 @@ public class StateSpaceController<States extends Num, Inputs extends Num, Output
   }
 
   public void update(Matrix<States, N1> x) {
-    if (m_enabled) {
+    if(m_enabled) {
       m_u = getK().times(m_r.minus(x)).plus(getKff().times(m_r.minus(m_plant.getA().times(m_r))));
       capU();
     }
   }
 
   public void update(Matrix<States, N1> x, Matrix<States, N1> nextR) {
-    if (m_enabled) {
+    if(m_enabled) {
       m_u = getK().times(m_r.minus(x)).plus(getKff().times(nextR.minus(m_plant.getA().times(m_r))));
       capU();
       m_r = nextR;
     }
-  }
-
-  private void capU() {
-    for(int i = 0; i < m_plant.getInputs().getNum(); ++i) {
-      if(getU(i) > getCoefficients().getUmax(i)) {
-        m_u.set(i, 0, getCoefficients().getUmax(i));
-      } else if(getU(i) < getCoefficients().getUmin(i)) {
-        m_u.set(i, 0, getCoefficients().getUmin(i));
-      }
-    }
-  }
-
-  public void setIndex(int index) {
-    if(index < 0) {
-      m_index = 0;
-    }else if(index >= m_coefficients.size()) {
-      m_index = m_coefficients.size() - 1;
-    }else {
-      m_index = index;
-    }
-  }
-
-  public int getIndex() {
-    return m_index;
   }
 
   public void addCoefficients(StateSpaceControllerCoeffs<States, Inputs, Outputs> coefficients) {
@@ -124,6 +109,20 @@ public class StateSpaceController<States extends Num, Inputs extends Num, Output
   }
 
   public StateSpaceControllerCoeffs<States, Inputs, Outputs> getCoefficients() {
-    return getCoefficients(getIndex());
+    return getCoefficients(m_index);
+  }
+
+  public void setIndex(int index) {
+    if(index < 0) {
+      m_index = 0;
+    } else if(index >= m_coefficients.size()) {
+      m_index = m_coefficients.size() - 1;
+    }else {
+      m_index = index;
+    }
+  }
+
+  public int getIndex() {
+    return m_index;
   }
 }

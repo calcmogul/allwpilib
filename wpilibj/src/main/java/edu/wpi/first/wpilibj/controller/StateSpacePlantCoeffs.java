@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 
 @SuppressWarnings({"MemberName", "ClassTypeParameterName", "ParameterName"})
-public class StateSpacePlantCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
+public final class StateSpacePlantCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final Nat<States> states;
   private final Nat<Inputs> inputs;
   private final Nat<Outputs> outputs;

@@ -10,14 +10,14 @@ package edu.wpi.first.wpilibj.math.numbers;
 import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 
-public final class N14 extends Num implements Nat<N14> {
-  private N14() {
-  }
+public final class N{0} extends Num implements Nat<N{0}> {{
+  private N{0}() {{
+  }}
 
   @Override
-  public int getNum() {
-    return 14;
-  }
+  public int getNum() {{
+    return {0};
+  }}
 
-  public static final N14 N14 = new N14();
-}
+  public static final N{0} N{0} = new N{0}();
+}}
