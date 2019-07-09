@@ -105,7 +105,7 @@ public class Matrix<R extends Num, C extends Num> {
    * this operation will fail to compile under any other circumstances
    *
    * @param other The other matrix to multiply by
-   * @param <C2> The number of columns in the second matrix
+   * @param <C2>  The number of columns in the second matrix
    * @return The result of the matrix multiplication between this and the given matrix
    */
   public final <C2 extends Num> Matrix<R, C2> times(Matrix<C, C2> other) {
@@ -138,80 +138,183 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
 
+  /**
+   * Subtracts the given matrix from this matrix.
+   *
+   * @param value The matrix to subtract.
+   * @return The resultant matrix.
+   */
   public final Matrix<R, C> minus(Matrix<R, C> value) {
     return new Matrix<>(this.m_storage.minus(Objects.requireNonNull(value).m_storage));
   }
 
 
+  /**
+   * Adds the given value to all the elements of this matrix.
+   *
+   * @param value The value to add.
+   * @return The resultant matrix.
+   */
   public final Matrix<R, C> plus(double value) {
     return new Matrix<>(this.m_storage.plus(value));
   }
 
-
+  /**
+   * Adds the given matrix to this matrix.
+   *
+   * @param value The matrix to add.
+   * @return The resultant matrix.
+   */
   public final Matrix<R, C> plus(Matrix<R, C> value) {
     return new Matrix<>(this.m_storage.plus(value.m_storage));
   }
 
-
+  /**
+   * Divides all elements of this matrix by the given value.
+   *
+   * @param value The value to divide by.
+   * @return The resultant matrix.
+   */
   public final Matrix<R, C> div(int value) {
     return new Matrix<>(this.m_storage.divide((double) value));
   }
 
-
+  /**
+   * Divides all elements of this matrix by the given value.
+   *
+   * @param value The value to divide by.
+   * @return The resultant matrix.
+   */
   public final Matrix<R, C> div(double value) {
     return new Matrix<>(this.m_storage.divide(value));
   }
 
-
+  /**
+   * Calculates the transpose, M^T of this matrix.
+   *
+   * @return The tranpose matrix.
+   */
   public final Matrix<C, R> transpose() {
     return new Matrix<>(this.m_storage.transpose());
   }
 
 
+  /**
+   * Returns a copy of this matrix.
+   *
+   * @return A copy of this matrix.
+   */
   public final Matrix<R, C> copy() {
     return new Matrix<>(this.m_storage.copy());
   }
 
 
+  /**
+   * Returns the inverse matrix of this matrix
+   *
+   * @return The inverse of this matrix
+   * @throws org.ejml.data.SingularMatrixException If this matrix is non-invertable.
+   */
   public final Matrix<R, C> inv() {
     return new Matrix<>(this.m_storage.invert());
   }
 
+  /**
+   * Returns the determinant of this matrix.
+   *
+   * @return The determinant of this matrix.
+   */
   public final double det() {
     return this.m_storage.determinant();
   }
 
+  /**
+   * <p>
+   * Computes the Frobenius normal of the matrix:<br>
+   * <br>
+   * normF = Sqrt{  &sum;<sub>i=1:m</sub> &sum;<sub>j=1:n</sub> { a<sub>ij</sub><sup>2</sup>}   }
+   * </p>
+   *
+   * @return The matrix's Frobenius normal.
+   */
   public final double normF() {
     return this.m_storage.normF();
   }
 
+  /**
+   * <p>
+   * Computes the induced p = 1 matrix norm.<br>
+   * <br>
+   * ||A||<sub>1</sub>= max(j=1 to n; sum(i=1 to m; |a<sub>ij</sub>|))
+   * </p>
+   *
+   * @return The norm.
+   */
   public final double normIndP1() {
     return NormOps_DDRM.inducedP1(this.m_storage.getDDRM());
   }
 
+  /**
+   * Computes the sum of all the elements in the matrix.
+   *
+   * @return Sum of all the elements.
+   */
   public final double elementSum() {
     return this.m_storage.elementSum();
   }
 
+  /**
+   * <p>
+   * Computes the trace of the matrix.
+   * </p>
+   *
+   * @return The trace of the matrix.
+   */
   public final double trace() {
     return this.m_storage.trace();
   }
 
-
+  /**
+   * <p>
+   * Returns a matrix which is the result of an element by element power of 'this' and 'b':
+   * c<sub>i,j</sub> = a<sub>i,j</sub> ^ b
+   * </p>
+   *
+   * @param b Scalar
+   * @return The element by element power of 'this' and 'b'.
+   */
   public final Matrix<R, C> epow(double other) {
     return new Matrix<>(this.m_storage.elementPower(other));
   }
 
-
+  /**
+   * <p>
+   * Returns a matrix which is the result of an element by element power of 'this' and 'b':
+   * c<sub>i,j</sub> = a<sub>i,j</sub> ^ b
+   * </p>
+   *
+   * @param b Scalar
+   * @return The element by element power of 'this' and 'b'.
+   */
   public final Matrix<R, C> epow(int other) {
     return new Matrix<>(this.m_storage.elementPower((double) other));
   }
 
-
+  /**
+   * Returns the EJML {@link SimpleMatrix} backing this wrapper
+   *
+   * @return The untyped EJML {@link SimpleMatrix}
+   */
   public final SimpleMatrix getStorage() {
     return this.m_storage;
   }
 
+  /**
+   * Constructs a new matrix with the given storage.
+   * Caller should make sure that the provided generic bounds match the shape of the provided matrix
+   *
+   * @param storage The {@link SimpleMatrix} to back this value
+   */
   public Matrix(SimpleMatrix storage) {
     this.m_storage = Objects.requireNonNull(storage);
   }

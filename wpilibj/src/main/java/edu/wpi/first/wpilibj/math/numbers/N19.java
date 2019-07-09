@@ -10,6 +10,9 @@ package edu.wpi.first.wpilibj.math.numbers;
 import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 
+/**
+ * A class representing the number 19.
+*/
 public final class N19 extends Num implements Nat<N19> {
   private N19() {
   }
@@ -19,5 +22,8 @@ public final class N19 extends Num implements Nat<N19> {
     return 19;
   }
 
+  /**
+   * The singleton instance of this class
+  */
   public static final N19 N19 = new N19();
 }

@@ -10,6 +10,9 @@ package edu.wpi.first.wpilibj.math.numbers;
 import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 
+/**
+ * A class representing the number 15.
+*/
 public final class N15 extends Num implements Nat<N15> {
   private N15() {
   }
@@ -19,5 +22,8 @@ public final class N15 extends Num implements Nat<N15> {
     return 15;
   }
 
+  /**
+   * The singleton instance of this class
+  */
   public static final N15 N15 = new N15();
 }

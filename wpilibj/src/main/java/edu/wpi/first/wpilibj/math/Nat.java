@@ -29,8 +29,18 @@ import edu.wpi.first.wpilibj.math.numbers.N18;
 import edu.wpi.first.wpilibj.math.numbers.N19;
 import edu.wpi.first.wpilibj.math.numbers.N20;
 
+/**
+ * A natural number expressed as a java class. The counterpart to {@link Num} that should be used as a concrete value.
+ *
+ * @param <T> The {@link Num} this represents
+ */
 @SuppressWarnings({"MethodName", "unused"})
 public interface Nat<T extends Num> {
+  /**
+   * The number this interface represents.
+   *
+   * @return The number backing this value.
+   */
   int getNum();
 
   static Nat<N0> N0() {
