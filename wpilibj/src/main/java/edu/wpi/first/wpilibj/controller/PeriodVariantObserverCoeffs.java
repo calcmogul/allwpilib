@@ -10,11 +10,32 @@ package edu.wpi.first.wpilibj.controller;
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 
+/**
+ * A container for all the observer coefficients.
+ */
 public final class PeriodVariantObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
+  /**
+   * The continuous process noise covariance matrix.
+   */
   private Matrix<States, States> Qcontinuous;
+
+  /**
+   * The continuous measurement noise covariance matrix.
+   */
   private Matrix<Outputs, Outputs> Rcontinuous;
+
+  /**
+   * The steady-state error covariance matrix.
+   */
   private Matrix<States, States> PsteadyState;
 
+  /**
+   * Construct the container for the observer coefficients.
+   *
+   * @param Qcontinuous  The continuous process noise covariance matrix.
+   * @param Rcontinuous  The continuous measurement noise covariance matrix.
+   * @param PsteadyState The steady-state error covariance matrix.
+   */
   public PeriodVariantObserverCoeffs(Matrix<States, States> Qcontinuous,
                                      Matrix<Outputs, Outputs> Rcontinuous,
                                      Matrix<States, States> PsteadyState) {

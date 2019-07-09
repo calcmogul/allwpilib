@@ -11,13 +11,39 @@ import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
+/**
+ * A container for all the state-space controller coefficients.
+ */
 @SuppressWarnings({"unused", "ParameterName", "ClassTypeParameterName", "MemberName"})
 public final class StateSpaceControllerCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
+  /**
+   * Controller gain matrix.
+   */
   private final Matrix<Inputs, States> K;
+
+  /**
+   * Controller feedforward gain matrix.
+   */
   private final Matrix<Inputs, States> Kff;
+
+  /**
+   * Minimum control input.
+   */
   private final Matrix<Inputs, N1> Umin;
+
+  /**
+   * Maximum control input.
+   */
   private final Matrix<Inputs, N1> Umax;
 
+  /**
+   * Construct the container for the controller coefficients.
+   *
+   * @param K    Controller gain matrix.
+   * @param Kff  Controller feedforward gain matrix.
+   * @param Umin Minimum control input.
+   * @param Umax Maximum control input.
+   */
   public StateSpaceControllerCoeffs(Matrix<Inputs, States> K, Matrix<Inputs, States> Kff,
                                     Matrix<Inputs, N1> Umin, Matrix<Inputs, N1> Umax) {
     this.K = K;

@@ -12,11 +12,7 @@
 #include <Eigen/Core>
 
 #include "frc/controller/PeriodVariantController.h"
-<<<<<<< HEAD
-#include "frc/controller/PeriodVariantKalmanFilter.h"
-=======
 #include "frc/controller/PeriodVariantObserver.h"
->>>>>>> d3aadea91f1c78767af2d78f027193fd5a2adccb
 #include "frc/controller/PeriodVariantPlant.h"
 
 namespace frc {
@@ -65,11 +61,7 @@ class PeriodVariantLoop {
   PeriodVariantLoop(
       PeriodVariantPlant<States, Inputs, Outputs>&& plant,
       PeriodVariantController<States, Inputs, Outputs>&& controller,
-<<<<<<< HEAD
-      PeriodVariantKalmanFilter<States, Inputs, Outputs>&& observer);
-=======
       PeriodVariantObserver<States, Inputs, Outputs>&& observer);
->>>>>>> d3aadea91f1c78767af2d78f027193fd5a2adccb
 
   virtual ~PeriodVariantLoop() = default;
 

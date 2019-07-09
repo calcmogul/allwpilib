@@ -10,10 +10,21 @@ package edu.wpi.first.wpilibj.controller;
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.Num;
 
+/**
+ * A container for all the observer coefficients.
+ */
 @SuppressWarnings({"unused", "ClassTypeParameterName", "MemberName", "ParameterName"})
 public final class StateSpaceObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
+  /**
+   * Estimator gain matrix.
+   */
   private final Matrix<States, Outputs> K;
 
+  /**
+   * Construct the container for the observer coefficients.
+   *
+   * @param K The Kalman gain matrix.
+   */
   public StateSpaceObserverCoeffs(Matrix<States, Outputs> K) {
     this.K = K;
   }
