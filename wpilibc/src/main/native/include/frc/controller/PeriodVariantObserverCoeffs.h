@@ -40,7 +40,7 @@ struct PeriodVariantObserverCoeffs final {
    * @param Rcontinuous The continuous measurement noise covariance matrix.
    * @param PsteadyState The steady-state error covariance matrix.
    */
-  explicit PeriodVariantObserverCoeffs(
+  PeriodVariantObserverCoeffs(
       const Eigen::Matrix<double, States, States>& Qcontinuous,
       const Eigen::Matrix<double, Outputs, Outputs>& Rcontinuous,
       const Eigen::Matrix<double, States, States>& PsteadyState);
