@@ -7,11 +7,11 @@
 
 package edu.wpi.first.wpilibj.math;
 
-import edu.wpi.first.wpilibj.math.numbers.N1;
-import org.ejml.dense.row.CommonOps_DDRM;
+import java.util.Objects;
+
 import org.ejml.simple.SimpleMatrix;
 
-import java.util.Objects;
+import edu.wpi.first.wpilibj.math.numbers.N1;
 
 public final class MatrixUtils {
   private MatrixUtils() {
@@ -27,8 +27,10 @@ public final class MatrixUtils {
    * @param <C> The number of columns in the matrix as a generic.
    * @return An RxC matrix filled with zeros.
    */
+  @SuppressWarnings("LineLength")
   public static <R extends Num, C extends Num> Matrix<R, C> zeros(Nat<R> rows, Nat<C> cols) {
-    return new Matrix<>(new SimpleMatrix(Objects.requireNonNull(rows).getNum(), Objects.requireNonNull(cols).getNum()));
+    return new Matrix<>(
+        new SimpleMatrix(Objects.requireNonNull(rows).getNum(), Objects.requireNonNull(cols).getNum()));
   }
 
   /**
@@ -54,7 +56,8 @@ public final class MatrixUtils {
   }
 
   /**
-   * Entrypoint to the MatBuilder class for creation of custom matrices with the given dimensions and contents.
+   * Entrypoint to the MatBuilder class for creation
+   * of custom matrices with the given dimensions and contents.
    *
    * @param rows The number of rows of the desired matrix.
    * @param cols The number of columns of the desired matrix.
@@ -67,7 +70,8 @@ public final class MatrixUtils {
   }
 
   /**
-   * Entrypoint to the VecBuilder class for creation of custom vectors with the given size and contents.
+   * Entrypoint to the VecBuilder class for creation
+   * of custom vectors with the given size and contents.
    *
    * @param dim The dimension of the vector.
    * @param <D> The dimension of the vector as a generic.

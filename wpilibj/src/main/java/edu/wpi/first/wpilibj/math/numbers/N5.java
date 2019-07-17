@@ -17,13 +17,18 @@ public final class N5 extends Num implements Nat<N5> {
   private N5() {
   }
 
+  /**
+   * The integer this class represents.
+   *
+   * @return The literal number 5.
+  */
   @Override
   public int getNum() {
     return 5;
   }
 
   /**
-   * The singleton instance of this class
+   * The singleton instance of this class.
   */
   public static final N5 N5 = new N5();
 }

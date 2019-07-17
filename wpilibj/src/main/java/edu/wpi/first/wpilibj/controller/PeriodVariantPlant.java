@@ -7,14 +7,20 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.math.*;
-import edu.wpi.first.wpilibj.math.numbers.N1;
-import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.simple.SimpleMatrix;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.simple.SimpleMatrix;
+
+import edu.wpi.first.wpilibj.math.Matrix;
+import edu.wpi.first.wpilibj.math.MatrixUtils;
+import edu.wpi.first.wpilibj.math.Nat;
+import edu.wpi.first.wpilibj.math.Num;
+import edu.wpi.first.wpilibj.math.SimpleMatrixUtils;
+import edu.wpi.first.wpilibj.math.numbers.N1;
+
+@SuppressWarnings({"ClassTypeParameterName", "MemberName"})
 public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final double m_nominalSamplePeriod;
 
@@ -48,6 +54,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    */
   private Matrix<Inputs, N1> m_delayedU;
 
+  @SuppressWarnings("LineLength")
   private List<PeriodVariantPlantCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
 
@@ -91,6 +98,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    * @param i Row of A.
    * @param j Column of A.
    */
+  @SuppressWarnings("ParameterName")
   public double getA(int i, int j) {
     return getA().get(i, j);
   }
@@ -108,6 +116,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    * @param i Row of B.
    * @param j Column of B.
    */
+  @SuppressWarnings("ParameterName")
   public double getB(int i, int j) {
     return getB().get(i, j);
   }
@@ -125,6 +134,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    * @param i Row of C.
    * @param j Column of C.
    */
+  @SuppressWarnings("ParameterName")
   public double getC(int i, int j) {
     return getC().get(i, j);
   }
@@ -142,6 +152,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    * @param i Row of D.
    * @param j Column of D.
    */
+  @SuppressWarnings("ParameterName")
   public double getD(int i, int j) {
     return getD().get(i, j);
   }
@@ -158,6 +169,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    *
    * @param i Row of x.
    */
+  @SuppressWarnings("ParameterName")
   public double getX(int i) {
     return getX().get(i, 0);
   }
@@ -174,6 +186,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    *
    * @param i Row of y.
    */
+  @SuppressWarnings("ParameterName")
   public double getY(int i) {
     return getY().get(i, 0);
   }
@@ -183,6 +196,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    *
    * @param x The initial state.
    */
+  @SuppressWarnings("ParameterName")
   public void setX(Matrix<States, N1> x) {
     m_x = x;
   }
@@ -193,6 +207,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    * @param i     Row of x.
    * @param value Value of element of x.
    */
+  @SuppressWarnings("ParameterName")
   public void setX(int i, double value) {
     m_x.set(i, 0, value);
   }
@@ -202,6 +217,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    *
    * @param y The current measurement.
    */
+  @SuppressWarnings("ParameterName")
   public void setY(Matrix<Outputs, N1> y) {
     m_y = y;
   }
@@ -212,6 +228,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    * @param i     Row of y.
    * @param value Value of element of y.
    */
+  @SuppressWarnings("ParameterName")
   public void setY(int i, double value) {
     m_y.set(i, 0, value);
   }
@@ -283,6 +300,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    * @param u  The control input.
    * @param dt The timestep.
    */
+  @SuppressWarnings("ParameterName")
   public void update(Matrix<Inputs, N1> u, double dt) {
     m_x = updateX(getX(), m_delayedU, dt);
     m_y = updateY(getX(), m_delayedU);
@@ -291,14 +309,15 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
 
   /**
    * Computes the new x given the old x and the control input.
-   * <p>
-   * This is used by state observers directly to run updates based on state
+   *
+   * <p>This is used by state observers directly to run updates based on state
    * estimate.
    *
    * @param x  The current state.
    * @param u  The control input.
    * @param dt The timestep.
    */
+  @SuppressWarnings("ParameterName")
   public Matrix<States, N1> updateX(Matrix<States, N1> x, Matrix<Inputs, N1> u, double dt) {
     updateAB(dt);
     return getA().times(x).plus(getB().times(u));
@@ -306,13 +325,14 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
 
   /**
    * Computes the new y given the control input.
-   * <p>
-   * This is used by state observers directly to run updates based on state
+   *
+   * <p>This is used by state observers directly to run updates based on state
    * estimate.
    *
    * @param x The current state.
    * @param u The control input.
    */
+  @SuppressWarnings("ParameterName")
   public Matrix<Outputs, N1> updateY(Matrix<States, N1> x, Matrix<Inputs, N1> u) {
     return getC().times(x).plus(getD().times(u));
   }
@@ -322,6 +342,7 @@ public class PeriodVariantPlant<States extends Num, Inputs extends Num, Outputs 
    *
    * @param dt Timestep.
    */
+  @SuppressWarnings({"LineLength", "LocalVariableName"})
   private void updateAB(double dt) {
     SimpleMatrix MstateContinuous = new SimpleMatrix(kStates.getNum() + kInputs.getNum(), kStates.getNum() + kInputs.getNum());
 

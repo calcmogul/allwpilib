@@ -10,9 +10,9 @@ package edu.wpi.first.wpilibj.math;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
 /**
- * A specialization of {@link MatBuilder} for constructing vectors (Nx1 matrices)
+ * A specialization of {@link MatBuilder} for constructing vectors (Nx1 matrices).
  *
- * @param <N> The dimension of the vector to be constructed
+ * @param <N> The dimension of the vector to be constructed.
  */
 public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
   public VecBuilder(Nat<N> rows) {

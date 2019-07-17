@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.math.Num;
 /**
  * A container for all the period-variant plant coefficients.
  */
+@SuppressWarnings({"ClassTypeParameterName", "MemberName", "LineLength"})
 public final class PeriodVariantPlantCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
 
   // The states, inputs, and outputs for this system
@@ -49,9 +50,12 @@ public final class PeriodVariantPlantCoeffs<States extends Num, Inputs extends N
    * @param C           Output matrix.
    * @param D           Feedthrough matrix.
    */
+  @SuppressWarnings("ParameterName")
   public PeriodVariantPlantCoeffs(Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs,
-                                  Matrix<States, States> Acontinuous, Matrix<States, Inputs> Bcontinuous,
-                                  Matrix<Outputs, States> C, Matrix<Outputs, Inputs> D) {
+                                  Matrix<States, States> Acontinuous,
+                                  Matrix<States, Inputs> Bcontinuous,
+                                  Matrix<Outputs, States> C,
+                                  Matrix<Outputs, Inputs> D) {
     this.states = states;
     this.inputs = inputs;
     this.outputs = outputs;

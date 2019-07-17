@@ -9,14 +9,6 @@ package edu.wpi.first.wpilibj.math;
 
 import edu.wpi.first.wpilibj.math.numbers.N0;
 import edu.wpi.first.wpilibj.math.numbers.N1;
-import edu.wpi.first.wpilibj.math.numbers.N2;
-import edu.wpi.first.wpilibj.math.numbers.N3;
-import edu.wpi.first.wpilibj.math.numbers.N4;
-import edu.wpi.first.wpilibj.math.numbers.N5;
-import edu.wpi.first.wpilibj.math.numbers.N6;
-import edu.wpi.first.wpilibj.math.numbers.N7;
-import edu.wpi.first.wpilibj.math.numbers.N8;
-import edu.wpi.first.wpilibj.math.numbers.N9;
 import edu.wpi.first.wpilibj.math.numbers.N10;
 import edu.wpi.first.wpilibj.math.numbers.N11;
 import edu.wpi.first.wpilibj.math.numbers.N12;
@@ -27,12 +19,21 @@ import edu.wpi.first.wpilibj.math.numbers.N16;
 import edu.wpi.first.wpilibj.math.numbers.N17;
 import edu.wpi.first.wpilibj.math.numbers.N18;
 import edu.wpi.first.wpilibj.math.numbers.N19;
+import edu.wpi.first.wpilibj.math.numbers.N2;
 import edu.wpi.first.wpilibj.math.numbers.N20;
+import edu.wpi.first.wpilibj.math.numbers.N3;
+import edu.wpi.first.wpilibj.math.numbers.N4;
+import edu.wpi.first.wpilibj.math.numbers.N5;
+import edu.wpi.first.wpilibj.math.numbers.N6;
+import edu.wpi.first.wpilibj.math.numbers.N7;
+import edu.wpi.first.wpilibj.math.numbers.N8;
+import edu.wpi.first.wpilibj.math.numbers.N9;
 
 /**
- * A natural number expressed as a java class. The counterpart to {@link Num} that should be used as a concrete value.
+ * A natural number expressed as a java class.
+ * The counterpart to {@link Num} that should be used as a concrete value.
  *
- * @param <T> The {@link Num} this represents
+ * @param <T> The {@link Num} this represents.
  */
 @SuppressWarnings({"MethodName", "unused"})
 public interface Nat<T extends Num> {

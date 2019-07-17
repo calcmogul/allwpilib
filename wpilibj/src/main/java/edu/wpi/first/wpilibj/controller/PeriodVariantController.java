@@ -7,24 +7,24 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.MatrixUtils;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 /**
  * Contains the controller coefficients and logic for a state-space controller.
- * <p>
- * State-space controllers generally use the control law u = -Kx. The
+ *
+ * <p>State-space controllers generally use the control law u = -Kx. The
  * feedforward used is u_ff = K_ff * (r_k+1 - A * r_k).
- * <p>
- * For more on the underlying math, read
+ *
+ * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/state-space-guide.pdf.
  */
+@SuppressWarnings({"ClassTypeParameterName", "MemberName"})
 public class PeriodVariantController<States extends Num, Inputs extends Num, Outputs extends Num> {
   private PeriodVariantPlant<States, Inputs, Outputs> m_plant;
   private boolean m_enabled = false;
@@ -39,6 +39,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    */
   private Matrix<Inputs, N1> m_u;
 
+  @SuppressWarnings("LineLength")
   private List<StateSpaceControllerCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
 
@@ -48,6 +49,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    * @param controllerCoeffs Controller coefficients.
    * @param plant            The plant used for the feedforward calculation.
    */
+  @SuppressWarnings("LineLength")
   public PeriodVariantController(StateSpaceControllerCoeffs<States, Inputs, Outputs> controllerCoeffs,
                                  PeriodVariantPlant<States, Inputs, Outputs> plant) {
     addCoefficients(controllerCoeffs);
@@ -93,6 +95,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    * @param i Row of K.
    * @param j Column of K.
    */
+  @SuppressWarnings("ParameterName")
   public double getK(int i, int j) {
     return getK().get(i, j);
   }
@@ -110,6 +113,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    * @param i Row of Kff.
    * @param j Column of Kff.
    */
+  @SuppressWarnings("ParameterName")
   public double getKff(int i, int j) {
     return getKff().get(i, j);
   }
@@ -126,6 +130,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    *
    * @param i Row of r.
    */
+  @SuppressWarnings("ParameterName")
   public double getR(int i) {
     return getR().get(i, 0);
   }
@@ -142,6 +147,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    *
    * @param i Row of u.
    */
+  @SuppressWarnings("ParameterName")
   public double getU(int i) {
     return getU().get(i, 0);
   }
@@ -159,6 +165,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    *
    * @param x The current state x.
    */
+  @SuppressWarnings("ParameterName")
   public void update(Matrix<States, N1> x) {
     if (m_enabled) {
       m_u = getK().times(m_r.minus(x)).plus(getKff().times(m_r.minus(m_plant.getA().times(m_r))));
@@ -172,6 +179,7 @@ public class PeriodVariantController<States extends Num, Inputs extends Num, Out
    * @param x     The current state x.
    * @param nextR The next reference vector r.
    */
+  @SuppressWarnings("ParameterName")
   public void update(Matrix<States, N1> x, Matrix<States, N1> nextR) {
     if (m_enabled) {
       m_u = getK().times(m_r.minus(x)).plus(getKff().times(nextR.minus(m_plant.getA().times(m_r))));

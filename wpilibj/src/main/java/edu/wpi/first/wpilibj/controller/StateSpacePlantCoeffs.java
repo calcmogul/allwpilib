@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.math.Num;
 /**
  * A container for all the state-space plant coefficients.
  */
-@SuppressWarnings({"MemberName", "ClassTypeParameterName", "ParameterName"})
+@SuppressWarnings({"MemberName", "ClassTypeParameterName", "ParameterName", "LineLength"})
 public final class StateSpacePlantCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final Nat<States> states;
   private final Nat<Inputs> inputs;
@@ -51,7 +51,11 @@ public final class StateSpacePlantCoeffs<States extends Num, Inputs extends Num,
    * @param C       Output matrix.
    * @param D       Feedthrough matrix.
    */
-  public StateSpacePlantCoeffs(Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs, Matrix<States, States> A, Matrix<States, Inputs> B, Matrix<Outputs, States> C, Matrix<Outputs, Inputs> D) {
+  public StateSpacePlantCoeffs(Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs,
+                               Matrix<States, States> A,
+                               Matrix<States, Inputs> B,
+                               Matrix<Outputs, States> C,
+                               Matrix<Outputs, Inputs> D) {
     this.states = states;
     this.inputs = inputs;
     this.outputs = outputs;

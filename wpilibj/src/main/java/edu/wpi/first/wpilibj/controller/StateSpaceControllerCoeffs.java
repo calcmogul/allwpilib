@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.math.numbers.N1;
 /**
  * A container for all the state-space controller coefficients.
  */
-@SuppressWarnings({"unused", "ParameterName", "ClassTypeParameterName", "MemberName"})
+@SuppressWarnings({"unused", "ParameterName", "ClassTypeParameterName", "MemberName", "LineLength"})
 public final class StateSpaceControllerCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
   /**
    * Controller gain matrix.
@@ -64,15 +64,15 @@ public final class StateSpaceControllerCoeffs<States extends Num, Inputs extends
     return Umin;
   }
 
+  public double getUmin(int i) {
+    return getUmin().get(i, 0);
+  }
+
   public Matrix<Inputs, N1> getUmax() {
     return Umax;
   }
 
   public double getUmax(int i) {
     return getUmax().get(i, 0);
-  }
-
-  public double getUmin(int i) {
-    return getUmin().get(i, 0);
   }
 }

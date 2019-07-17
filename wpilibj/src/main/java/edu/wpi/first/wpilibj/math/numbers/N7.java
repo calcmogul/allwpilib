@@ -17,13 +17,18 @@ public final class N7 extends Num implements Nat<N7> {
   private N7() {
   }
 
+  /**
+   * The integer this class represents.
+   *
+   * @return The literal number 7.
+  */
   @Override
   public int getNum() {
     return 7;
   }
 
   /**
-   * The singleton instance of this class
+   * The singleton instance of this class.
   */
   public static final N7 N7 = new N7();
 }

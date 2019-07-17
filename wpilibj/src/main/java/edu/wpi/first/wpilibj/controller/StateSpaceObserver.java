@@ -7,35 +7,36 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.MatrixUtils;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Luenberger observers combine predictions from a model and measurements to
  * give an estimate of the true system state.
- * <p>
- * Luenberger observers use an L gain matrix to determine whether to trust the
+ *
+ * <p>Luenberger observers use an L gain matrix to determine whether to trust the
  * model or measurements more. Kalman filter theory uses statistics to compute
  * an optimal L gain (alternatively called the Kalman gain, K) which minimizes
  * the sum of squares error in the state estimate.
- * <p>
- * Luenberger observers run the prediction and correction steps simultaneously
+ *
+ * <p>Luenberger observers run the prediction and correction steps simultaneously
  * while Kalman filters run them sequentially. To implement a discrete-time
  * Kalman filter as a Luenberger observer, use the following mapping:
  * <pre>C = H, L = A * K</pre>
  * (H is the measurement matrix).
- * <p>
- * For more on the underlying math, read
+ *
+ * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/state-space-guide.pdf.
  */
 @SuppressWarnings({"ClassTypeParameterName", "MemberName", "ParameterName"})
 public class StateSpaceObserver<States extends Num, Inputs extends Num, Outputs extends Num> {
   private StateSpacePlant<States, Inputs, Outputs> m_plant;
+  @SuppressWarnings("LineLength")
   private List<StateSpaceObserverCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
 
@@ -120,7 +121,6 @@ public class StateSpaceObserver<States extends Num, Inputs extends Num, Outputs 
    * Project the model into the future with a new control input u.
    *
    * @param newU New control input from controller.
-   * @param dt   Timestep for prediction.
    */
   public void predict(Matrix<Inputs, N1> newU) {
     m_Xhat = m_plant.updateX(getXhat(), newU);

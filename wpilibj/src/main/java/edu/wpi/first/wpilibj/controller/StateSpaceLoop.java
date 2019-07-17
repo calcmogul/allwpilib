@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
+@SuppressWarnings({"ClassTypeParameterName", "MemberName"})
 public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
   // The number of states, inputs, and outputs of this system
   protected final Nat<States> kStates;
@@ -96,6 +97,7 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
    *
    * @param i Row of x-hat.
    */
+  @SuppressWarnings("ParameterName")
   public double getXhat(int i) {
     return m_observer.getXhat(i);
   }
@@ -112,6 +114,7 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
    *
    * @param i Row of r.
    */
+  @SuppressWarnings("ParameterName")
   public double getNextR(int i) {
     return m_nextR.get(i, 0);
   }
@@ -128,6 +131,7 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
    *
    * @param i Row of u.
    */
+  @SuppressWarnings("ParameterName")
   public double getU(int i) {
     return m_controller.getU(i);
   }
@@ -137,6 +141,7 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
    *
    * @param xHat The initial state estimate x-hat.
    */
+  @SuppressWarnings("ParameterName")
   public void setXhat(Matrix<States, N1> xHat) {
     m_observer.setXhat(xHat);
   }
@@ -147,6 +152,7 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
+  @SuppressWarnings("ParameterName")
   public void setXhat(int i, double value) {
     m_observer.setXhat(i, value);
   }
@@ -204,6 +210,7 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
    *
    * @param y Measurement vector.
    */
+  @SuppressWarnings("ParameterName")
   public void correct(Matrix<Outputs, N1> y) {
     m_observer.correct(m_controller.getU(), y);
   }
@@ -211,8 +218,8 @@ public class StateSpaceLoop<States extends Num, Inputs extends Num, Outputs exte
   /**
    * Sets new controller output, projects model forward, and runs observer
    * prediction.
-   * <p>
-   * After calling this, the user should send the elements of u to the
+   *
+   * <p>After calling this, the user should send the elements of u to the
    * actuators.
    */
   public void predict() {

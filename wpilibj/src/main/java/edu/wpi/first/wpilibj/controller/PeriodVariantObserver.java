@@ -7,35 +7,37 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.simple.SimpleMatrix;
+
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.MatrixUtils;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.SimpleMatrixUtils;
 import edu.wpi.first.wpilibj.math.numbers.N1;
-import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.simple.SimpleMatrix;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A Kalman filter that discretizes its model and covariance matrices after
  * every sample period.
- * <p>
- * Typical discrete state feedback implementations discretize with a nominal
+ *
+ * <p>Typical discrete state feedback implementations discretize with a nominal
  * sample period offline. If the real system doesn't maintain this period, this
  * nonlinearity can negatively affect the state estimate. This class discretizes
  * the continuous model after each measurement based on the measured sample
  * period.
- * <p>
- * Since the sample period changes during runtime, the process and measurement
+ *
+ * <p>Since the sample period changes during runtime, the process and measurement
  * noise covariance matrices as well as the true steady state error covariance
  * change as well. During runtime, the error covariance matrix is initialized
  * with the discrete steady state value, but is updated during runtime as well.
- * <p>
- * For more on the underlying math, read
+ *
+ * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/state-space-guide.pdf.
  */
+@SuppressWarnings({"ClassTypeParameterName", "MemberName"})
 public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outputs extends Num> {
   private PeriodVariantPlant<States, Inputs, Outputs> m_plant;
 
@@ -60,6 +62,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    */
   private Matrix<Outputs, Outputs> m_R;
 
+  @SuppressWarnings("LineLength")
   private List<PeriodVariantObserverCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
 
@@ -68,11 +71,12 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    *
    * @param dt Discretization timestep.
    */
+  @SuppressWarnings({"LineLength", "LocalVariableName"})
   private void updateQR(double dt) {
     int states = m_plant.getStates().getNum();
     SimpleMatrix Qtemp = (getCoefficients().getQcontinuous().plus(getCoefficients().getQcontinuous().transpose()))
         .div(2.0).getStorage();
-    SimpleMatrix Rtemp = (getCoefficients().getRcontinuous().plus(getCoefficients().getRcontinuous().transpose()))
+    final SimpleMatrix Rtemp = (getCoefficients().getRcontinuous().plus(getCoefficients().getRcontinuous().transpose()))
         .div(2.0).getStorage();
 
     Qtemp.concatRows(m_plant.getCoefficients().getAcontinuous().getStorage().transpose());
@@ -108,7 +112,8 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
   }
 
   /**
-   * Constructs a Kalman filter with the given coefficients and plant, with a nominal sample period of 0.005s.
+   * Constructs a Kalman filter with the given coefficients and plant,
+   * with a nominal sample period of 0.005s.
    *
    * @param coeffs Observer coefficients.
    * @param plant  The plant used for the prediction step
@@ -131,6 +136,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    * @param i Row in Q.
    * @param j Column in Q.
    */
+  @SuppressWarnings("ParameterName")
   public double getQ(int i, int j) {
     return getQ().get(i, j);
   }
@@ -148,6 +154,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    * @param i Row of R.
    * @param j Column of R.
    */
+  @SuppressWarnings("ParameterName")
   public double getR(int i, int j) {
     return getR().get(i, j);
   }
@@ -165,6 +172,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    * @param i Row of P.
    * @param j Column of P.
    */
+  @SuppressWarnings("ParameterName")
   public double getP(int i, int j) {
     return getP().get(i, j);
   }
@@ -181,6 +189,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    *
    * @param i Row of x-hat.
    */
+  @SuppressWarnings("ParameterName")
   public double getXhat(int i) {
     return getXhat().get(i, 0);
   }
@@ -190,6 +199,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    *
    * @param xHat The state estimate x-hat.
    */
+  @SuppressWarnings("ParameterName")
   public void setXhat(Matrix<States, N1> xHat) {
     m_Xhat = xHat;
   }
@@ -200,6 +210,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
+  @SuppressWarnings("ParameterName")
   public void setXhat(int i, double value) {
     m_Xhat.set(i, 0, value);
   }
@@ -233,6 +244,7 @@ public class PeriodVariantObserver<States extends Num, Inputs extends Num, Outpu
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
+  @SuppressWarnings({"ParameterName", "LocalVariableName", "LineLength"})
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     Matrix<Outputs, N1> yBar = y.minus(m_plant.updateY(getXhat(), u));
     Matrix<Outputs, Outputs> S = m_plant.getC().times(getP()).times(m_plant.getC().transpose()).plus(getR());

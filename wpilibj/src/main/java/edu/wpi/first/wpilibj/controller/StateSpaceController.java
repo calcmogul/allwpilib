@@ -7,26 +7,27 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.MatrixUtils;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Contains the controller coefficients and logic for a state-space controller.
- * <p>
- * State-space controllers generally use the control law u = -Kx. The
+ *
+ * <p>State-space controllers generally use the control law u = -Kx. The
  * feedforward used is u_ff = K_ff * (r_k+1 - A * r_k).
- * <p>
- * For more on the underlying math, read
+ *
+ * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/state-space-guide.pdf.
  */
 @SuppressWarnings({"ClassTypeParameterName", "MemberName", "ParameterName"})
 public class StateSpaceController<States extends Num, Inputs extends Num, Outputs extends Num> {
   private StateSpacePlant<States, Inputs, Outputs> m_plant;
+  @SuppressWarnings("LineLength")
   private List<StateSpaceControllerCoeffs<States, Inputs, Outputs>> m_coefficients = new ArrayList<>();
   private int m_index = 0;
   private boolean m_enabled = false;

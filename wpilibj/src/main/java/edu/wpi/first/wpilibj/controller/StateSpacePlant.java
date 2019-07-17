@@ -7,14 +7,14 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.math.Matrix;
 import edu.wpi.first.wpilibj.math.MatrixUtils;
 import edu.wpi.first.wpilibj.math.Nat;
 import edu.wpi.first.wpilibj.math.Num;
 import edu.wpi.first.wpilibj.math.numbers.N1;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings({"ClassTypeParameterName", "MemberName", "ParameterName"})
 public class StateSpacePlant<States extends Num, Inputs extends Num, Outputs extends Num> {
@@ -250,8 +250,8 @@ public class StateSpacePlant<States extends Num, Inputs extends Num, Outputs ext
 
   /**
    * Computes the new x given the old x and the control input.
-   * <p>
-   * This is used by state observers directly to run updates based on state
+   *
+   * <p>This is used by state observers directly to run updates based on state
    * estimate.
    *
    * @param x The current state.
@@ -263,8 +263,8 @@ public class StateSpacePlant<States extends Num, Inputs extends Num, Outputs ext
 
   /**
    * Computes the new y given the control input.
-   * <p>
-   * This is used by state observers directly to run updates based on state
+   *
+   * <p>This is used by state observers directly to run updates based on state
    * estimate.
    *
    * @param x The current state.
@@ -275,27 +275,27 @@ public class StateSpacePlant<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
-   * Returns the number of states of this plant
+   * Returns the number of states of this plant.
    *
-   * @return The number of states
+   * @return The number of states.
    */
   public Nat<States> getStates() {
     return kStates;
   }
 
   /**
-   * Returns the number of inputs of this plant
+   * Returns the number of inputs of this plant.
    *
-   * @return The number of inputs
+   * @return The number of inputs.
    */
   public Nat<Inputs> getInputs() {
     return kInputs;
   }
 
   /**
-   * Returns the number of outputs of this plant
+   * Returns the number of outputs of this plant.
    *
-   * @return The number of outputs
+   * @return The number of outputs.
    */
   public Nat<Outputs> getOutputs() {
     return kOutputs;

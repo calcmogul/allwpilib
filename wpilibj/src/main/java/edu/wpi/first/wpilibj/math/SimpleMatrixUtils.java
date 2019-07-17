@@ -7,19 +7,20 @@
 
 package edu.wpi.first.wpilibj.math;
 
+import java.util.function.BiFunction;
+
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.simple.SimpleBase;
 import org.ejml.simple.SimpleMatrix;
 
-import java.util.function.BiFunction;
-
 public class SimpleMatrixUtils {
   /**
-   * Compute the matrix exponential, e^M of the given matrix
+   * Compute the matrix exponential, e^M of the given matrix.
    *
-   * @param matrix The matrix to compute the exponential of
-   * @return The resultant matrix
+   * @param matrix The matrix to compute the exponential of.
+   * @return The resultant matrix.
    */
+  @SuppressWarnings({"LocalVariableName", "LineLength"})
   public static SimpleMatrix expm(SimpleMatrix matrix) {
     BiFunction<SimpleMatrix, SimpleMatrix, SimpleMatrix> solveProvider = SimpleBase::solve;
     SimpleMatrix A = matrix;
@@ -48,19 +49,22 @@ public class SimpleMatrixUtils {
     }
   }
 
-  private static SimpleMatrix dispatchPade(SimpleMatrix U, SimpleMatrix V, int n_squarings, BiFunction<SimpleMatrix, SimpleMatrix, SimpleMatrix> solveProvider) {
+  @SuppressWarnings({"LocalVariableName", "ParameterName", "LineLength"})
+  private static SimpleMatrix dispatchPade(SimpleMatrix U, SimpleMatrix V,
+                                           int nSquarings, BiFunction<SimpleMatrix, SimpleMatrix, SimpleMatrix> solveProvider) {
     SimpleMatrix P = U.plus(V);
     SimpleMatrix Q = U.negative().plus(V);
 
     SimpleMatrix R = solveProvider.apply(Q, P);
 
-    for(int i = 0; i < n_squarings; i++) {
+    for (int i = 0; i < nSquarings; i++) {
       R = R.mult(R);
     }
 
     return R;
   }
 
+  @SuppressWarnings({"MethodName", "LocalVariableName", "ParameterName"})
   private static Pair<SimpleMatrix, SimpleMatrix> _pade3(SimpleMatrix A) {
     double[] b = new double[]{120, 60, 12, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
@@ -71,6 +75,7 @@ public class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
+  @SuppressWarnings({"MethodName", "LocalVariableName", "ParameterName"})
   private static Pair<SimpleMatrix, SimpleMatrix> _pade5(SimpleMatrix A) {
     double[] b = new double[]{30240, 15120, 3360, 420, 30, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
@@ -83,6 +88,7 @@ public class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
+  @SuppressWarnings({"MethodName", "LocalVariableName", "LineLength", "ParameterName"})
   private static Pair<SimpleMatrix, SimpleMatrix> _pade7(SimpleMatrix A) {
     double[] b = new double[]{17297280, 8648640, 1995840, 277200, 25200, 1512, 56, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
@@ -96,8 +102,9 @@ public class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
+  @SuppressWarnings({"MethodName", "LocalVariableName", "ParameterName", "LineLength"})
   private static Pair<SimpleMatrix, SimpleMatrix> _pade9(SimpleMatrix A) {
-    double[] b = new double[] {17643225600.0, 8821612800.0, 2075673600, 302702400, 30270240,
+    double[] b = new double[]{17643225600.0, 8821612800.0, 2075673600, 302702400, 30270240,
         2162160, 110880, 3960, 90, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
     SimpleMatrix A2 = A.mult(A);
@@ -111,8 +118,9 @@ public class SimpleMatrixUtils {
     return new Pair<>(U, V);
   }
 
+  @SuppressWarnings({"MethodName", "LocalVariableName", "LineLength", "ParameterName"})
   private static Pair<SimpleMatrix, SimpleMatrix> _pade13(SimpleMatrix A) {
-    double[] b = new double[] {64764752532480000.0, 32382376266240000.0, 7771770303897600.0,
+    double[] b = new double[]{64764752532480000.0, 32382376266240000.0, 7771770303897600.0,
         1187353796428800.0, 129060195264000.0, 10559470521600.0, 670442572800.0,
         33522128640.0, 1323241920, 40840800, 960960, 16380, 182, 1};
     SimpleMatrix ident = eye(A.numRows(), A.numCols());
@@ -135,7 +143,7 @@ public class SimpleMatrixUtils {
     private A m_first;
     private B m_second;
 
-    public Pair(A first, B second) {
+    Pair(A first, B second) {
       m_first = first;
       m_second = second;
     }

@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.math.Num;
 /**
  * A container for all the observer coefficients.
  */
-@SuppressWarnings({"unused", "ClassTypeParameterName", "MemberName", "ParameterName"})
+@SuppressWarnings({"unused", "ClassTypeParameterName", "MemberName", "ParameterName", "LineLength"})
 public final class StateSpaceObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
   /**
    * Estimator gain matrix.

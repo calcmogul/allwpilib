@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.math.Num;
 /**
  * A container for all the observer coefficients.
  */
+@SuppressWarnings({"ClassTypeParameterName", "MemberName", "ParameterName", "LineLength"})
 public final class PeriodVariantObserverCoeffs<States extends Num, Inputs extends Num, Outputs extends Num> {
   /**
    * The continuous process noise covariance matrix.
