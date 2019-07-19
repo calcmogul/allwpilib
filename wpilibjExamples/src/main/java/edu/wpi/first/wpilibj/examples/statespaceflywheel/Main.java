@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.examples.statespaceelevator;
+package edu.wpi.first.wpilibj.examples.statespaceflywheel;
 
 import edu.wpi.first.wpilibj.RobotBase;
 

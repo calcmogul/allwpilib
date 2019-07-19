@@ -50,8 +50,8 @@ public class DriveTrain extends Subsystem {
     addChild("Back Left CIM", (Victor) m_rearLeftCIM);
     addChild("Back Right CIM", (Victor) m_rearRightCIM);
 
-    // Configure the DifferentialDrive to reflect the fact that all motors
-    // are wired backwards (right is inverted in DifferentialDrive).
+    // Configure the Drivetrain to reflect the fact that all motors
+    // are wired backwards (right is inverted in Drivetrain).
     m_leftCIMs.setInverted(true);
     m_drive = new DifferentialDrive(m_leftCIMs, m_rightCIMs);
     m_drive.setSafetyEnabled(true);
