@@ -4,9 +4,11 @@
 
 package edu.wpi.first.util;
 
+import java.util.NoSuchElementException;
+
 /** This is a simple circular buffer so we don't need to "bucket brigade" copy old values. */
-public class CircularBuffer {
-  private double[] m_data;
+public class CircularBuffer<T extends Comparable> {
+  private T[] m_data;
 
   // Index of element at front of buffer
   private int m_front;
@@ -19,11 +21,9 @@ public class CircularBuffer {
    *
    * @param size The size of the circular buffer.
    */
+  @SuppressWarnings("unchecked")
   public CircularBuffer(int size) {
-    m_data = new double[size];
-    for (int i = 0; i < m_data.length; i++) {
-      m_data[i] = 0.0;
-    }
+    m_data = (T[]) new Object[size];
   }
 
   /**
@@ -31,7 +31,7 @@ public class CircularBuffer {
    *
    * @return number of elements in buffer
    */
-  double size() {
+  public int size() {
     return m_length;
   }
 
@@ -40,7 +40,7 @@ public class CircularBuffer {
    *
    * @return value at front of buffer
    */
-  double getFirst() {
+  public T getFirst() {
     return m_data[m_front];
   }
 
@@ -48,11 +48,12 @@ public class CircularBuffer {
    * Get value at back of buffer.
    *
    * @return value at back of buffer
+   * @throws NoSuchElementException if the buffer is empty
    */
-  double getLast() {
+  public T getLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
-      return 0.0;
+      throw new NoSuchElementException();
     }
 
     return m_data[(m_front + m_length - 1) % m_data.length];
@@ -64,7 +65,7 @@ public class CircularBuffer {
    *
    * @param value The value to push.
    */
-  public void addFirst(double value) {
+  public void addFirst(T value) {
     if (m_data.length == 0) {
       return;
     }
@@ -84,7 +85,7 @@ public class CircularBuffer {
    *
    * @param value The value to push.
    */
-  public void addLast(double value) {
+  public void addLast(T value) {
     if (m_data.length == 0) {
       return;
     }
@@ -103,14 +104,15 @@ public class CircularBuffer {
    * Pop value at front of buffer.
    *
    * @return value at front of buffer
+   * @throws NoSuchElementException if the buffer is empty
    */
-  public double removeFirst() {
+  public T removeFirst() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
-      return 0.0;
+      throw new NoSuchElementException();
     }
 
-    double temp = m_data[m_front];
+    T temp = m_data[m_front];
     m_front = moduloInc(m_front);
     m_length--;
     return temp;
@@ -120,11 +122,12 @@ public class CircularBuffer {
    * Pop value at back of buffer.
    *
    * @return value at back of buffer
+   * @throws NoSuchElementException if the buffer is empty
    */
-  public double removeLast() {
+  public T removeLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
-      return 0.0;
+      throw new NoSuchElementException();
     }
 
     m_length--;
@@ -138,8 +141,9 @@ public class CircularBuffer {
    *
    * @param size New buffer size.
    */
-  void resize(int size) {
-    double[] newBuffer = new double[size];
+  @SuppressWarnings("unchecked")
+  public void resize(int size) {
+    T[] newBuffer = (T[]) new Object[size];
     m_length = Math.min(m_length, size);
     for (int i = 0; i < m_length; i++) {
       newBuffer[i] = m_data[(m_front + i) % m_data.length];
@@ -150,9 +154,6 @@ public class CircularBuffer {
 
   /** Sets internal buffer contents to zero. */
   public void clear() {
-    for (int i = 0; i < m_data.length; i++) {
-      m_data[i] = 0.0;
-    }
     m_front = 0;
     m_length = 0;
   }
@@ -163,7 +164,7 @@ public class CircularBuffer {
    * @param index Index into the buffer.
    * @return Element at index starting from front of buffer.
    */
-  public double get(int index) {
+  public T get(int index) {
     return m_data[(m_front + index) % m_data.length];
   }
 

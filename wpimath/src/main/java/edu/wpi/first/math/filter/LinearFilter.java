@@ -47,8 +47,8 @@ import java.util.Arrays;
  * to make sure calculate() gets called at the desired, constant frequency!
  */
 public class LinearFilter {
-  private final CircularBuffer m_inputs;
-  private final CircularBuffer m_outputs;
+  private final CircularBuffer<Double> m_inputs;
+  private final CircularBuffer<Double> m_outputs;
   private final double[] m_inputGains;
   private final double[] m_outputGains;
 
@@ -61,8 +61,8 @@ public class LinearFilter {
    * @param fbGains The "feed back" or IIR gains.
    */
   public LinearFilter(double[] ffGains, double[] fbGains) {
-    m_inputs = new CircularBuffer(ffGains.length);
-    m_outputs = new CircularBuffer(fbGains.length);
+    m_inputs = new CircularBuffer<Double>(ffGains.length);
+    m_outputs = new CircularBuffer<Double>(fbGains.length);
     m_inputGains = Arrays.copyOf(ffGains, ffGains.length);
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 

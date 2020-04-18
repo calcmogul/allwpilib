@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class MedianFilterTest {
   @Test
   void medianFilterNotFullTestEven() {
-    MedianFilter filter = new MedianFilter(10);
+    var filter = new MedianFilter<Integer>(10);
 
     filter.calculate(3);
     filter.calculate(0);
@@ -22,7 +22,7 @@ public class MedianFilterTest {
 
   @Test
   void medianFilterNotFullTestOdd() {
-    MedianFilter filter = new MedianFilter(10);
+    var filter = new MedianFilter<Integer>(10);
 
     filter.calculate(3);
     filter.calculate(0);
@@ -34,7 +34,7 @@ public class MedianFilterTest {
 
   @Test
   void medianFilterFullTestEven() {
-    MedianFilter filter = new MedianFilter(6);
+    var filter = new MedianFilter<Integer>(6);
 
     filter.calculate(3);
     filter.calculate(0);
@@ -48,7 +48,7 @@ public class MedianFilterTest {
 
   @Test
   void medianFilterFullTestOdd() {
-    MedianFilter filter = new MedianFilter(5);
+    var filter = new MedianFilter<Integer>(5);
 
     filter.calculate(3);
     filter.calculate(0);
@@ -57,5 +57,16 @@ public class MedianFilterTest {
     filter.calculate(1000);
 
     assertEquals(5, filter.calculate(99));
+  }
+
+  @Test
+  void medianFilterBool() {
+    var filter = new MedianFilter<Boolean>(5);
+
+    filter.calculate(true);
+    filter.calculate(false);
+    filter.calculate(true);
+
+    assertEquals(true, filter.calculate(true));
   }
 }
