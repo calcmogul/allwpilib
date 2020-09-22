@@ -52,10 +52,10 @@ UnscentedTransform(const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
     y.template block<CovDim, 1>(0, i) =
         residualFunc(sigmas.template block<CovDim, 1>(0, i), x);
   }
-  Eigen::Matrix<double, CovDim, CovDim> P =
-      y * Eigen::DiagonalMatrix<double, 2 * States + 1>(Wc) * y.transpose();
+  Eigen::Matrix<double, CovDim, CovDim> S =
+      y * Eigen::DiagonalMatrix<double, 2 * States + 1>(Wc.sqrt());
 
-  return std::make_tuple(x, P);
+  return std::make_tuple(x, S);
 }
 
 }  // namespace frc

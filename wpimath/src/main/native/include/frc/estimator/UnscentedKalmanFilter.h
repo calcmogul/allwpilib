@@ -20,6 +20,72 @@
 
 namespace frc {
 
+namespace detail {
+template <int Rows>
+int CholeskyRankUpdate(Eigen::Matrix<double, Rows, Rows>& mat,
+                       const Eigen::Matrix<double, Rows, 1>& vec,
+                       double sigma) {
+  typedef typename MatrixType::ColXpr ColXpr;
+  typedef typename internal::remove_all<ColXpr>::type ColXprCleaned;
+  typedef typename ColXprCleaned::SegmentReturnType ColXprSegment;
+  using TempVectorType = Eigen::Matrix<double, Rows, 1>;
+  typedef typename TempVectorType::SegmentReturnType TempVecSegment;
+
+  TempVectorType temp;
+
+  if (sigma > 0) {
+    // This version is based on Givens rotations.
+    // It is faster than the other one below, but only works for updates,
+    // i.e., for sigma > 0
+    temp = std::sqrt(sigma) * vec;
+
+    for (int i = 0; i < Rows; ++i) {
+      Eigen::JacobiRotation<double> g;
+      g.makeGivens(mat(i, i), -temp(i), &mat(i, i));
+
+      Index rs = n - i - 1;
+      if (rs > 0) {
+        ColXprSegment x(mat.col(i).tail(rs));
+        TempVecSegment y(temp.tail(rs));
+        apply_rotation_in_the_plane(x, y, g);
+      }
+    }
+  } else {
+    temp = vec;
+    RealScalar beta = 1;
+    for (Index j = 0; j < n; ++j) {
+      RealScalar Ljj = numext::real(mat.coeff(j, j));
+      RealScalar dj = numext::abs2(Ljj);
+      Scalar wj = temp.coeff(j);
+      RealScalar swj2 = sigma * numext::abs2(wj);
+      RealScalar gamma = dj * beta + swj2;
+
+      RealScalar x = dj + swj2 / beta;
+      if (x <= RealScalar(0)) return j;
+      RealScalar nLjj = std::sqrt(x);
+      mat.coeffRef(j, j) = nLjj;
+      beta += swj2 / dj;
+
+      // Update the terms of L
+      Index rs = n - j - 1;
+      if (rs) {
+        temp.tail(rs) -= (wj / Ljj) * mat.col(j).tail(rs);
+        if (gamma != 0)
+          mat.col(j).tail(rs) =
+              (nLjj / Ljj) * mat.col(j).tail(rs) +
+              (nLjj * sigma * numext::conj(wj) / gamma) * temp.tail(rs);
+      }
+    }
+  }
+  return -1;
+}
+}  // namespace detail
+
+/**
+ * This implements the algorithm for the square-root Unscented Kalman Filter
+ * described here:
+ * https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.80.1421&rep=rep1&type=pdf.
+ */
 template <int States, int Inputs, int Outputs>
 class UnscentedKalmanFilter {
  public:
@@ -142,7 +208,9 @@ class UnscentedKalmanFilter {
   /**
    * Returns the error covariance matrix P.
    */
-  const Eigen::Matrix<double, States, States>& P() const { return m_P; }
+  const Eigen::Matrix<double, States, States>& P() const {
+    return m_S * m_S.transpose();
+  }
 
   /**
    * Returns an element of the error covariance matrix P.
@@ -150,14 +218,16 @@ class UnscentedKalmanFilter {
    * @param i Row of P.
    * @param j Column of P.
    */
-  double P(int i, int j) const { return m_P(i, j); }
+  double P(int i, int j) const { return P()(i, j); }
 
   /**
    * Set the current error covariance matrix P.
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
+  void SetP(const Eigen::Matrix<double, States, States>& P) {
+    m_S = P.llt().matrixL();
+  }
 
   /**
    * Returns the state estimate x-hat.
@@ -191,7 +261,7 @@ class UnscentedKalmanFilter {
    */
   void Reset() {
     m_xHat.setZero();
-    m_P.setZero();
+    m_S.setZero();
     m_sigmasF.setZero();
   }
 
@@ -212,7 +282,7 @@ class UnscentedKalmanFilter {
     DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
 
     Eigen::Matrix<double, States, 2 * States + 1> sigmas =
-        m_pts.SigmaPoints(m_xHat, m_P);
+        m_pts.SigmaPoints(m_xHat, m_S);
 
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
       Eigen::Matrix<double, States, 1> x =
@@ -223,9 +293,9 @@ class UnscentedKalmanFilter {
     auto ret = UnscentedTransform<States, States>(
         m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX);
     m_xHat = std::get<0>(ret);
-    m_P = std::get<1>(ret);
+    m_S = std::get<1>(ret);
 
-    m_P += discQ;
+    m_S += discQ;
   }
 
   /**
@@ -328,7 +398,7 @@ class UnscentedKalmanFilter {
     // Transform sigma points into measurement space
     Eigen::Matrix<double, Rows, 2 * States + 1> sigmasH;
     Eigen::Matrix<double, States, 2 * States + 1> sigmas =
-        m_pts.SigmaPoints(m_xHat, m_P);
+        m_pts.SigmaPoints(m_xHat, m_S);
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
       sigmasH.template block<Rows, 1>(0, i) =
           h(sigmas.template block<States, 1>(0, i), u);
@@ -359,7 +429,7 @@ class UnscentedKalmanFilter {
         Py.transpose().ldlt().solve(Pxy.transpose()).transpose();
 
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
-    m_P -= K * Py * K.transpose();
+    m_S -= K * Py * K.transpose();
   }
 
  private:
@@ -392,7 +462,7 @@ class UnscentedKalmanFilter {
       const Eigen::Matrix<double, States, 1>)>
       m_addFuncX;
   Eigen::Matrix<double, States, 1> m_xHat;
-  Eigen::Matrix<double, States, States> m_P;
+  Eigen::Matrix<double, States, States> m_S;
   Eigen::Matrix<double, States, States> m_contQ;
   Eigen::Matrix<double, Outputs, Outputs> m_contR;
   Eigen::Matrix<double, States, 2 * States + 1> m_sigmasF;
