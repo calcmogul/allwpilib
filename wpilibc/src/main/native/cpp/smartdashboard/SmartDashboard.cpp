@@ -104,6 +104,30 @@ void SmartDashboard::PutData(wpi::Sendable* value) {
   }
 }
 
+void SmartDashboard::PutData(std::string_view key, wpi::Sendable& data) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.tablesToDataMutex);
+  auto& uid = inst.tablesToData[key];
+  wpi::Sendable* sddata = wpi::SendableRegistry::GetSendable(uid);
+  if (sddata != &data) {
+    uid = wpi::SendableRegistry::GetUniqueId(&data);
+    auto dataTable = inst.table->GetSubTable(key);
+    auto builder = std::make_unique<SendableBuilderImpl>();
+    auto builderPtr = builder.get();
+    builderPtr->SetTable(dataTable);
+    wpi::SendableRegistry::Publish(uid, std::move(builder));
+    builderPtr->StartListeners();
+    dataTable->GetEntry(".name").SetString(key);
+  }
+}
+
+void SmartDashboard::PutData(wpi::Sendable& value) {
+  auto name = wpi::SendableRegistry::GetName(&value);
+  if (!name.empty()) {
+    PutData(name, &value);
+  }
+}
+
 wpi::Sendable* SmartDashboard::GetData(std::string_view key) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
