@@ -13,6 +13,8 @@
 #include <vector>
 
 #include <networktables/NTSendableBuilder.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "frc/smartdashboard/SendableChooser.h"
 
@@ -54,6 +56,17 @@ template <class T>
 void SendableChooser<T>::OnChange(std::function<void(T)> listener) {
   std::scoped_lock lock(m_mutex);
   m_listener = listener;
+}
+
+template <class T>
+  requires std::copy_constructible<T> && std::default_initializable<T>
+void SendableChooser<T>::SetSelected(std::string_view name) {
+  m_haveSelected = true;
+  m_selected = name;
+  nt::NetworkTableInstance inst = nt::NetworkTableInstance::GetDefault();
+  // TODO: These NetworkTables keys are wrong
+  inst.GetEntry("/SmartDashboard/Autonomous modes/selected").SetString(name);
+  inst.GetEntry("/SmartDashboard/Autonomous modes/active").SetString(name);
 }
 
 template <class T>

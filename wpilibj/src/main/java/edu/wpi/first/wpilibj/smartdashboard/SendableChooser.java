@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -133,6 +134,21 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
     m_mutex.lock();
     m_listener = listener;
     m_mutex.unlock();
+  }
+
+  /**
+   * Sets the currently selected option.
+   *
+   * <p>This is useful for selecting options for unit testing.
+   *
+   * @param name The name of the option.
+   */
+  public void setSelected(String name) {
+    m_selected = name;
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    // TODO: These NetworkTables keys are wrong
+    inst.getEntry("/SmartDashboard/Autonomous modes/selected").setString(name);
+    inst.getEntry("/SmartDashboard/Autonomous modes/active").setString(name);
   }
 
   private String m_selected;

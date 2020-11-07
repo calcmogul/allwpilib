@@ -91,6 +91,15 @@ class SendableChooser : public SendableChooserBase {
    */
   void OnChange(std::function<void(T)>);
 
+  /**
+   * Sets the currently selected option.
+   *
+   * This is useful for selecting options for unit testing.
+   *
+   * @param name The name of the option.
+   */
+  void SetSelected(std::string_view name);
+
   void InitSendable(nt::NTSendableBuilder& builder) override;
 };
 
