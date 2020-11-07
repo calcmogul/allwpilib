@@ -111,6 +111,15 @@ class SendableChooser : public SendableChooserBase {
    */
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 
+  /**
+   * Sets the currently selected option.
+   *
+   * This is useful for selecting options for unit testing.
+   *
+   * @param name The name of the option.
+   */
+  void SetSelected(std::string_view name);
+
   void InitSendable(nt::NTSendableBuilder& builder) override;
 };
 

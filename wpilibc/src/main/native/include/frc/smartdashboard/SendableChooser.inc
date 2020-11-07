@@ -12,6 +12,8 @@
 #include <vector>
 
 #include <networktables/NTSendableBuilder.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "frc/smartdashboard/SendableChooser.h"
 
@@ -43,6 +45,16 @@ auto SendableChooser<T>::GetSelected()
   } else {
     return _unwrap_smart_ptr(m_choices[selected]);
   }
+}
+
+template <class T>
+void SendableChooser<T>::SetSelected(std::string_view name) {
+  m_haveSelected = true;
+  m_selected = name;
+  nt::NetworkTableInstance inst = nt::NetworkTableInstance::GetDefault();
+  // TODO: These NetworkTables keys are wrong
+  inst.GetEntry("/SmartDashboard/Autonomous modes/selected").SetString(name);
+  inst.GetEntry("/SmartDashboard/Autonomous modes/active").SetString(name);
 }
 
 template <class T>
