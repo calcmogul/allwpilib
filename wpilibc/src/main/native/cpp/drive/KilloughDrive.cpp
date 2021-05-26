@@ -8,7 +8,6 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/numbers>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -24,6 +23,10 @@ using namespace frc;
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
+const Rotation2d KilloughDrive::kDefaultLeftMotorAngle{60_deg};
+const Rotation2d KilloughDrive::kDefaultRightMotorAngle{120_deg};
+const Rotation2d KilloughDrive::kDefaultBackMotorAngle{270_deg};
+
 KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                              SpeedController& rightMotor,
                              SpeedController& backMotor)
@@ -32,17 +35,16 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
 
 KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                              SpeedController& rightMotor,
-                             SpeedController& backMotor, double leftMotorAngle,
-                             double rightMotorAngle, double backMotorAngle)
+                             SpeedController& backMotor,
+                             Rotation2d leftMotorAngle,
+                             Rotation2d rightMotorAngle,
+                             Rotation2d backMotorAngle)
     : m_leftMotor(&leftMotor),
       m_rightMotor(&rightMotor),
       m_backMotor(&backMotor) {
-  m_leftVec = {std::cos(leftMotorAngle * (wpi::numbers::pi / 180.0)),
-               std::sin(leftMotorAngle * (wpi::numbers::pi / 180.0))};
-  m_rightVec = {std::cos(rightMotorAngle * (wpi::numbers::pi / 180.0)),
-                std::sin(rightMotorAngle * (wpi::numbers::pi / 180.0))};
-  m_backVec = {std::cos(backMotorAngle * (wpi::numbers::pi / 180.0)),
-               std::sin(backMotorAngle * (wpi::numbers::pi / 180.0))};
+  m_leftVec << leftMotorAngle.Cos(), leftMotorAngle.Sin();
+  m_rightVec << rightMotorAngle.Cos(), rightMotorAngle.Sin();
+  m_backVec << backMotorAngle.Cos(), backMotorAngle.Sin();
   wpi::SendableRegistry::AddChild(this, m_leftMotor);
   wpi::SendableRegistry::AddChild(this, m_rightMotor);
   wpi::SendableRegistry::AddChild(this, m_backMotor);
@@ -51,19 +53,19 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
   wpi::SendableRegistry::AddLW(this, "KilloughDrive", instances);
 }
 
-void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
-                                   double zRotation, double gyroAngle) {
+void KilloughDrive::DriveCartesian(double xSpeed, double ySpeed,
+                                   double zRotation, Rotation2d gyroAngle) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
                HALUsageReporting::kRobotDrive2_KilloughCartesian, 3);
     reported = true;
   }
 
-  ySpeed = ApplyDeadband(ySpeed, m_deadband);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
+  ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
   auto [left, right, back] =
-      DriveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
+      DriveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
 
   m_leftMotor->Set(left * m_maxOutput);
   m_rightMotor->Set(right * m_maxOutput);
@@ -72,7 +74,7 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
   Feed();
 }
 
-void KilloughDrive::DrivePolar(double magnitude, double angle,
+void KilloughDrive::DrivePolar(double magnitude, Rotation2d angle,
                                double zRotation) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
@@ -80,30 +82,45 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::sin(angle * (wpi::numbers::pi / 180.0)),
-                 magnitude * std::cos(angle * (wpi::numbers::pi / 180.0)),
-                 zRotation, 0.0);
+  DriveCartesian(magnitude * angle.Cos(), magnitude * angle.Sin(), zRotation,
+                 0_rad);
 }
 
-KilloughDrive::WheelSpeeds KilloughDrive::DriveCartesianIK(double ySpeed,
-                                                           double xSpeed,
-                                                           double zRotation,
-                                                           double gyroAngle) {
-  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
+KilloughDrive::WheelSpeeds KilloughDrive::DriveCartesianIK(
+    double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
 
-  // Compensate for gyro angle.
-  Vector2d input{ySpeed, xSpeed};
-  input.Rotate(-gyroAngle);
+  Eigen::Vector2d input;
+  input << xSpeed, ySpeed;
 
-  double wheelSpeeds[3];
-  wheelSpeeds[kLeft] = input.ScalarProject(m_leftVec) + zRotation;
-  wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + zRotation;
-  wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + zRotation;
+  // CCW rotation matrix
+  Eigen::Matrix<double, 2, 2> R;
+  double c = gyroAngle.Cos();
+  double s = gyroAngle.Sin();
+  // clang-format off
+  R << c,  -s,
+       s,   c;
+  // clang-format on
 
-  Normalize(wheelSpeeds);
+  // Compensate for gyro angle by undoing CCW rotation. Since the rotation
+  // matrix is a unitary matrix, it's inverse is equal to its transpose.
+  input = R.transpose() * input;
 
-  return {wheelSpeeds[kLeft], wheelSpeeds[kRight], wheelSpeeds[kBack]};
+  // Project input onto wheel vectors. Wheel vectors are already normalized, so
+  // only dot product is needed.
+  Eigen::Matrix<double, 3, 1> output;
+  output(0) = input.dot(m_leftVec) + zRotation;
+  output(1) = input.dot(m_rightVec) + zRotation;
+  output(2) = input.dot(m_backVec) + zRotation;
+
+  // Normalize wheel speeds
+  double maxValue = output.lpNorm<Eigen::Infinity>();
+  if (maxValue > 1.0) {
+    output /= maxValue;
+  }
+
+  return {output(0), output(1), output(2)};
 }
 
 void KilloughDrive::StopMotor() {

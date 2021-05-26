@@ -7,11 +7,12 @@
 #include <memory>
 #include <string>
 
+#include <Eigen/Core>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
-#include "frc/drive/Vector2d.h"
+#include "frc/geometry/Rotation2d.h"
 
 namespace frc {
 
@@ -46,21 +47,24 @@ class SpeedController;
  * opposite sides, but can be overridden. See the constructor for more
  * information.
  *
- * This library uses the NED axes convention (North-East-Down as external
- * reference in the world frame):
- * http://www.nuclearprojects.com/ins/images/axis_big.png.
+ * This library uses the NWU axes convention (North-West-Up as external
+ * reference in the world frame).
  *
- * The positive X axis points ahead, the positive Y axis points right, and the
- * and the positive Z axis points down. Rotations follow the right-hand rule, so
- * clockwise rotation around the Z axis is positive.
+ * The positive X axis points ahead, the positive Y axis points to the left,
+ * and the positive Z axis points up. Rotations follow the right-hand rule, so
+ * counterclockwise rotation around the Z axis is positive.
+ *
+ * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
+ * so that the full range is still used. This deadband value can be changed
+ * with SetDeadband().
  */
 class KilloughDrive : public RobotDriveBase,
                       public wpi::Sendable,
                       public wpi::SendableHelper<KilloughDrive> {
  public:
-  static constexpr double kDefaultLeftMotorAngle = 60.0;
-  static constexpr double kDefaultRightMotorAngle = 120.0;
-  static constexpr double kDefaultBackMotorAngle = 270.0;
+  static const Rotation2d kDefaultLeftMotorAngle;
+  static const Rotation2d kDefaultRightMotorAngle;
+  static const Rotation2d kDefaultBackMotorAngle;
 
   struct WheelSpeeds {
     double left = 0.0;
@@ -99,8 +103,8 @@ class KilloughDrive : public RobotDriveBase,
    *                        travel.
    */
   KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
-                SpeedController& backMotor, double leftMotorAngle,
-                double rightMotorAngle, double backMotorAngle);
+                SpeedController& backMotor, Rotation2d leftMotorAngle,
+                Rotation2d rightMotorAngle, Rotation2d backMotorAngle);
 
   ~KilloughDrive() override = default;
 
@@ -113,17 +117,17 @@ class KilloughDrive : public RobotDriveBase,
    * Angles are measured clockwise from the positive X axis. The robot's speed
    * is independent from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
-   *                  positive.
    * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+   *                  positive.
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around
-   *                  the Z axis. Use this to implement field-oriented controls.
+   * @param gyroAngle The current angle reading from the gyro around the Z axis.
+   *                  Use this to implement field-oriented controls.
    */
-  void DriveCartesian(double ySpeed, double xSpeed, double zRotation,
-                      double gyroAngle = 0.0);
+  void DriveCartesian(double xSpeed, double ySpeed, double zRotation,
+                      Rotation2d gyroAngle = 0_rad);
 
   /**
    * Drive method for Killough platform.
@@ -133,12 +137,11 @@ class KilloughDrive : public RobotDriveBase,
    *
    * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
    *                  positive.
-   * @param angle     The angle around the Z axis at which the robot drives in
-   *                  degrees [-180..180].
+   * @param angle     The angle around the Z axis at which the robot drives.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
    */
-  void DrivePolar(double magnitude, double angle, double zRotation);
+  void DrivePolar(double magnitude, Rotation2d angle, double zRotation);
 
   /**
    * Cartesian inverse kinematics for Killough platform.
@@ -146,17 +149,17 @@ class KilloughDrive : public RobotDriveBase,
    * Angles are measured clockwise from the positive X axis. The robot's speed
    * is independent from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
-   *                  positive.
    * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+   *                  positive.
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around
    *                  the Z axis. Use this to implement field-oriented controls.
    */
-  WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed, double zRotation,
-                               double gyroAngle = 0.0);
+  WheelSpeeds DriveCartesianIK(double xSpeed, double ySpeed, double zRotation,
+                               Rotation2d gyroAngle = 0_rad);
 
   void StopMotor() override;
   std::string GetDescription() const override;
@@ -168,9 +171,9 @@ class KilloughDrive : public RobotDriveBase,
   SpeedController* m_rightMotor;
   SpeedController* m_backMotor;
 
-  Vector2d m_leftVec;
-  Vector2d m_rightVec;
-  Vector2d m_backVec;
+  Eigen::Vector2d m_leftVec;
+  Eigen::Vector2d m_rightVec;
+  Eigen::Vector2d m_backVec;
 
   bool reported = false;
 };

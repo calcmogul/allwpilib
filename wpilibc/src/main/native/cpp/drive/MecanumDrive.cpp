@@ -7,13 +7,12 @@
 #include <algorithm>
 #include <cmath>
 
+#include <Eigen/Core>
 #include <hal/FRCUsageReporting.h>
-#include <wpi/numbers>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/SpeedController.h"
-#include "frc/drive/Vector2d.h"
 
 using namespace frc;
 
@@ -42,19 +41,19 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
   wpi::SendableRegistry::AddLW(this, "MecanumDrive", instances);
 }
 
-void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
-                                  double zRotation, double gyroAngle) {
+void MecanumDrive::DriveCartesian(double xSpeed, double ySpeed,
+                                  double zRotation, Rotation2d gyroAngle) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
                HALUsageReporting::kRobotDrive2_MecanumCartesian, 4);
     reported = true;
   }
 
-  ySpeed = ApplyDeadband(ySpeed, m_deadband);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
+  ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
   auto [frontLeft, frontRight, rearLeft, rearRight] =
-      DriveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
+      DriveCartesianIK(xSpeed, ySpeed, zRotation, gyroAngle);
 
   m_frontLeftMotor->Set(frontLeft * m_maxOutput);
   m_frontRightMotor->Set(frontRight * m_maxOutput);
@@ -64,7 +63,7 @@ void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
   Feed();
 }
 
-void MecanumDrive::DrivePolar(double magnitude, double angle,
+void MecanumDrive::DrivePolar(double magnitude, Rotation2d angle,
                               double zRotation) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
@@ -72,9 +71,8 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::cos(angle * (wpi::numbers::pi / 180.0)),
-                 magnitude * std::sin(angle * (wpi::numbers::pi / 180.0)),
-                 zRotation, 0.0);
+  DriveCartesian(magnitude * angle.Cos(), magnitude * angle.Sin(), zRotation,
+                 0_rad);
 }
 
 void MecanumDrive::StopMotor() {
@@ -85,27 +83,49 @@ void MecanumDrive::StopMotor() {
   Feed();
 }
 
-MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double ySpeed,
-                                                         double xSpeed,
+MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
+                                                         double ySpeed,
                                                          double zRotation,
-                                                         double gyroAngle) {
-  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
+                                                         Rotation2d gyroAngle) {
   xSpeed = std::clamp(xSpeed, -1.0, 1.0);
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
 
-  // Compensate for gyro angle.
-  Vector2d input{ySpeed, xSpeed};
-  input.Rotate(-gyroAngle);
+  Eigen::Vector3d input;
+  input << xSpeed, ySpeed, zRotation;
 
-  double wheelSpeeds[4];
-  wheelSpeeds[kFrontLeft] = input.x + input.y + zRotation;
-  wheelSpeeds[kFrontRight] = input.x - input.y - zRotation;
-  wheelSpeeds[kRearLeft] = input.x - input.y + zRotation;
-  wheelSpeeds[kRearRight] = input.x + input.y - zRotation;
+  // CCW rotation matrix
+  Eigen::Matrix<double, 3, 3> R;
+  double c = gyroAngle.Cos();
+  double s = gyroAngle.Sin();
+  // clang-format off
+  R <<   c,  -s, 0.0,
+         s,   c, 0.0,
+       0.0, 0.0, 1.0;
+  // clang-format on
 
-  Normalize(wheelSpeeds);
+  // Compensate for gyro angle by undoing CCW rotation. Since the rotation
+  // matrix is a unitary matrix, it's inverse is equal to its transpose.
+  input = R.transpose() * input;
 
-  return {wheelSpeeds[kFrontLeft], wheelSpeeds[kFrontRight],
-          wheelSpeeds[kRearLeft], wheelSpeeds[kRearRight]};
+  // Rows are front-left, front-right, rear-left, and rear-right wheel speeds
+  // https://file.tavsys.net/control/controls-engineering-in-frc.pdf,
+  // section 12.6.1
+  Eigen::Matrix<double, 4, 3> M;
+  // clang-format off
+  M << 1.0, -1.0, -1.0,
+       1.0, 1.0, 1.0,
+       1.0, 1.0, -1.0,
+       1.0, -1.0, 1.0;
+  // clang-format on
+  Eigen::Matrix<double, 4, 1> output = M * input;
+
+  // Normalize wheel speeds
+  double maxValue = output.lpNorm<Eigen::Infinity>();
+  if (maxValue > 1.0) {
+    output /= maxValue;
+  }
+
+  return {output(0), output(1), output(2), output(3)};
 }
 
 std::string MecanumDrive::GetDescription() const {

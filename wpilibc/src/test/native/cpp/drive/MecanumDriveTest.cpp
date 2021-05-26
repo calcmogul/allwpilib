@@ -59,35 +59,35 @@ TEST(MecanumDriveTest, CartesianGyro90CW) {
   drive.SetDeadband(0.0);
 
   // Forward in global frame; left in robot frame
-  drive.DriveCartesian(1.0, 0.0, 0.0, 90.0);
+  drive.DriveCartesian(1.0, 0.0, 0.0, -90_deg);
   EXPECT_DOUBLE_EQ(-1.0, fl.Get());
   EXPECT_DOUBLE_EQ(1.0, fr.Get());
   EXPECT_DOUBLE_EQ(1.0, rl.Get());
   EXPECT_DOUBLE_EQ(-1.0, rr.Get());
 
   // Left in global frame; backward in robot frame
-  drive.DriveCartesian(0.0, -1.0, 0.0, 90.0);
+  drive.DriveCartesian(0.0, -1.0, 0.0, -90_deg);
   EXPECT_DOUBLE_EQ(-1.0, fl.Get());
   EXPECT_DOUBLE_EQ(-1.0, fr.Get());
   EXPECT_DOUBLE_EQ(-1.0, rl.Get());
   EXPECT_DOUBLE_EQ(-1.0, rr.Get());
 
   // Right in global frame; forward in robot frame
-  drive.DriveCartesian(0.0, 1.0, 0.0, 90.0);
+  drive.DriveCartesian(0.0, 1.0, 0.0, -90_deg);
   EXPECT_DOUBLE_EQ(1.0, fl.Get());
   EXPECT_DOUBLE_EQ(1.0, fr.Get());
   EXPECT_DOUBLE_EQ(1.0, rl.Get());
   EXPECT_DOUBLE_EQ(1.0, rr.Get());
 
   // Rotate CCW
-  drive.DriveCartesian(0.0, 0.0, -1.0, 90.0);
+  drive.DriveCartesian(0.0, 0.0, -1.0, -90_deg);
   EXPECT_DOUBLE_EQ(-1.0, fl.Get());
   EXPECT_DOUBLE_EQ(-1.0, fr.Get());
   EXPECT_DOUBLE_EQ(1.0, rl.Get());
   EXPECT_DOUBLE_EQ(1.0, rr.Get());
 
   // Rotate CW
-  drive.DriveCartesian(0.0, 0.0, 1.0, 90.0);
+  drive.DriveCartesian(0.0, 0.0, 1.0, -90_deg);
   EXPECT_DOUBLE_EQ(1.0, fl.Get());
   EXPECT_DOUBLE_EQ(1.0, fr.Get());
   EXPECT_DOUBLE_EQ(-1.0, rl.Get());
@@ -103,35 +103,35 @@ TEST(MecanumDriveTest, Polar) {
   drive.SetDeadband(0.0);
 
   // Forward
-  drive.DrivePolar(1.0, 0.0, 0.0);
+  drive.DrivePolar(1.0, 0_deg, 0.0);
   EXPECT_DOUBLE_EQ(1.0, fl.Get());
   EXPECT_DOUBLE_EQ(1.0, fr.Get());
   EXPECT_DOUBLE_EQ(1.0, rl.Get());
   EXPECT_DOUBLE_EQ(1.0, rr.Get());
 
   // Left
-  drive.DrivePolar(1.0, -90.0, 0.0);
+  drive.DrivePolar(1.0, 90_deg, 0.0);
   EXPECT_DOUBLE_EQ(-1.0, fl.Get());
   EXPECT_DOUBLE_EQ(1.0, fr.Get());
   EXPECT_DOUBLE_EQ(1.0, rl.Get());
   EXPECT_DOUBLE_EQ(-1.0, rr.Get());
 
   // Right
-  drive.DrivePolar(1.0, 90.0, 0.0);
+  drive.DrivePolar(1.0, -90_deg, 0.0);
   EXPECT_DOUBLE_EQ(1.0, fl.Get());
   EXPECT_DOUBLE_EQ(-1.0, fr.Get());
   EXPECT_DOUBLE_EQ(-1.0, rl.Get());
   EXPECT_DOUBLE_EQ(1.0, rr.Get());
 
   // Rotate CCW
-  drive.DrivePolar(0.0, 0.0, -1.0);
+  drive.DrivePolar(0.0, 0_deg, -1.0);
   EXPECT_DOUBLE_EQ(-1.0, fl.Get());
   EXPECT_DOUBLE_EQ(-1.0, fr.Get());
   EXPECT_DOUBLE_EQ(1.0, rl.Get());
   EXPECT_DOUBLE_EQ(1.0, rr.Get());
 
   // Rotate CW
-  drive.DrivePolar(0.0, 0.0, 1.0);
+  drive.DrivePolar(0.0, 0_deg, 1.0);
   EXPECT_DOUBLE_EQ(1.0, fl.Get());
   EXPECT_DOUBLE_EQ(1.0, fr.Get());
   EXPECT_DOUBLE_EQ(-1.0, rl.Get());

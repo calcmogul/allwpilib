@@ -11,6 +11,7 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
+#include "frc/geometry/Rotation2d.h"
 
 namespace frc {
 
@@ -47,30 +48,16 @@ class SpeedController;
  * Mecanum drive robot. Motor outputs for the right side are negated, so motor
  * direction inversion by the user is usually unnecessary.
  *
- * This library uses the NED axes convention (North-East-Down as external
- * reference in the world frame):
- * http://www.nuclearprojects.com/ins/images/axis_big.png.
+ * This library uses the NWU axes convention (North-West-Up as external
+ * reference in the world frame).
  *
- * The positive X axis points ahead, the positive Y axis points to the right,
- * and the positive Z axis points down. Rotations follow the right-hand rule, so
- * clockwise rotation around the Z axis is positive.
+ * The positive X axis points ahead, the positive Y axis points to the left,
+ * and the positive Z axis points up. Rotations follow the right-hand rule, so
+ * counterclockwise rotation around the Z axis is positive.
  *
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
- *
- * RobotDrive porting guide:
- * <br>In MecanumDrive, the right side speed controllers are automatically
- * inverted, while in RobotDrive, no speed controllers are automatically
- * inverted.
- * <br>DriveCartesian(double, double, double, double) is equivalent to
- * RobotDrive's MecanumDrive_Cartesian(double, double, double, double)
- * if a deadband of 0 is used, and the ySpeed and gyroAngle values are inverted
- * compared to RobotDrive (eg DriveCartesian(xSpeed, -ySpeed, zRotation,
- * -gyroAngle).
- * <br>DrivePolar(double, double, double) is equivalent to
- * RobotDrive's MecanumDrive_Polar(double, double, double) if a
- * deadband of 0 is used.
  */
 class MecanumDrive : public RobotDriveBase,
                      public wpi::Sendable,
@@ -109,11 +96,11 @@ class MecanumDrive : public RobotDriveBase,
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around
-   *                  the Z axis. Use this to implement field-oriented controls.
+   * @param gyroAngle The current angle reading from the gyro around the Z axis.
+   *                  Use this to implement field-oriented controls.
    */
   void DriveCartesian(double ySpeed, double xSpeed, double zRotation,
-                      double gyroAngle = 0.0);
+                      Rotation2d gyroAngle = 0_rad);
 
   /**
    * Drive method for Mecanum platform.
@@ -123,12 +110,11 @@ class MecanumDrive : public RobotDriveBase,
    *
    * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
    *                  positive.
-   * @param angle     The angle around the Z axis at which the robot drives in
-   *                  degrees [-180..180].
+   * @param angle     The angle around the Z axis at which the robot drives.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
    */
-  void DrivePolar(double magnitude, double angle, double zRotation);
+  void DrivePolar(double magnitude, Rotation2d angle, double zRotation);
 
   /**
    * Cartesian inverse kinematics for Mecanum platform.
@@ -142,11 +128,12 @@ class MecanumDrive : public RobotDriveBase,
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around
-   *                  the Z axis. Use this to implement field-oriented controls.
+   * @param gyroAngle The current angle reading from the gyro around the Z axis.
+   *                  Use this to implement field-oriented controls.
    */
   static WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed,
-                                      double zRotation, double gyroAngle = 0.0);
+                                      double zRotation,
+                                      Rotation2d gyroAngle = 0_rad);
 
   void StopMotor() override;
   std::string GetDescription() const override;
