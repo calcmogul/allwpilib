@@ -4,6 +4,12 @@
 
 #include "frc/commands/TimedCommand.h"
 
+#include <units/time.h>
+
+namespace frc {
+class Subsystem;
+}  // namespace frc
+
 using namespace frc;
 
 TimedCommand::TimedCommand(std::string_view name, units::second_t timeout)

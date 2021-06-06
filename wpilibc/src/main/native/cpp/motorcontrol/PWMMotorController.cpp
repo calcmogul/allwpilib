@@ -8,6 +8,8 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/Timer.h"
+
 using namespace frc;
 
 void PWMMotorController::Set(double speed) {

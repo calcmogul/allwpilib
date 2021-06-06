@@ -4,6 +4,10 @@
 
 #include "glass/View.h"
 
+#include <utility>
+
+#include <wpi/FunctionExtras.h>
+
 using namespace glass;
 
 namespace {

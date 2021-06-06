@@ -5,7 +5,10 @@
 #ifndef CSCORE_FRAME_H_
 #define CSCORE_FRAME_H_
 
+#include <stdint.h>
+
 #include <atomic>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -17,6 +20,10 @@
 
 #include "Image.h"
 #include "cscore_cpp.h"
+
+namespace cv {
+class Mat;
+}  // namespace cv
 
 namespace cs {
 

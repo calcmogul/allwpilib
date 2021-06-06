@@ -4,6 +4,10 @@
 
 #include "glass/hardware/AnalogOutput.h"
 
+#include <cstdio>
+#include <string>
+#include <type_traits>
+
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 #include "glass/other/DeviceTree.h"

@@ -5,6 +5,8 @@
 #ifndef NTCORE_LOGGERIMPL_H_
 #define NTCORE_LOGGERIMPL_H_
 
+#include <functional>
+
 #include <wpi/CallbackManager.h>
 
 #include "Handle.h"

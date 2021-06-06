@@ -4,6 +4,15 @@
 
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
+
+namespace nt {
+class Value;
+}  // namespace nt
+
 using namespace frc;
 
 ShuffleboardComponentBase::ShuffleboardComponentBase(

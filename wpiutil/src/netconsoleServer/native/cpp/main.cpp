@@ -2,6 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <signal.h>
+#include <stdint.h>
+
 #ifdef __APPLE__
 #include <util.h>
 #elif !defined(_WIN32)
@@ -9,17 +12,29 @@
 #endif
 
 #include <cstdio>
+#include <cstdlib>
+#include <initializer_list>
+#include <memory>
+#include <string>
+#include <string_view>
 
 #include "fmt/format.h"
+#include "uv.h"
 #include "wpi/MathExtras.h"
+#include "wpi/Signal.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
+#include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
+#include "wpi/span.h"
 #include "wpi/timestamp.h"
+#include "wpi/uv/Buffer.h"
+#include "wpi/uv/Error.h"
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Pipe.h"
 #include "wpi/uv/Process.h"
 #include "wpi/uv/Signal.h"
+#include "wpi/uv/Stream.h"
 #include "wpi/uv/Tcp.h"
 #include "wpi/uv/Tty.h"
 #include "wpi/uv/Udp.h"

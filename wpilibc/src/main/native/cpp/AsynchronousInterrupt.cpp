@@ -4,7 +4,13 @@
 
 #include "frc/AsynchronousInterrupt.h"
 
-#include <frc/DigitalSource.h>
+#include <units/time.h>
+
+#include "frc/SynchronousInterrupt.h"
+
+namespace frc {
+class DigitalSource;
+}  // namespace frc
 
 using namespace frc;
 

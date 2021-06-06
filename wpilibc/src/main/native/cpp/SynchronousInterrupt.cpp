@@ -4,9 +4,15 @@
 
 #include "frc/SynchronousInterrupt.h"
 
-#include <type_traits>
+#include <stdint.h>
 
+#include <type_traits>
+#include <utility>
+
+#include <hal/AnalogTrigger.h>
 #include <hal/Interrupts.h>
+#include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/NullDeleter.h>
 
 #include "frc/DigitalSource.h"

@@ -5,8 +5,10 @@
 #include "wpi/Demangle.h"
 
 #include <cxxabi.h>
+#include <stdint.h>
 
 #include <cstdio>
+#include <cstdlib>
 
 #include "wpi/SmallString.h"
 

@@ -5,6 +5,8 @@
 #ifndef WPIUTIL_WPI_RAW_SOCKET_ISTREAM_H_
 #define WPIUTIL_WPI_RAW_SOCKET_ISTREAM_H_
 
+#include <cstddef>
+
 #include "wpi/raw_istream.h"
 
 namespace wpi {

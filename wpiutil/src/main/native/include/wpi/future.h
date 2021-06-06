@@ -10,7 +10,11 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <functional>
+#include <iterator>
+#include <mutex>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -22,10 +26,8 @@ namespace wpi {
 
 template <typename T>
 class PromiseFactory;
-
 template <typename T>
 class future;
-
 template <typename T>
 class promise;
 template <>

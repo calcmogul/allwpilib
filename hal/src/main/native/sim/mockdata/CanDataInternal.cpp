@@ -4,6 +4,8 @@
 
 #include "CanDataInternal.h"
 
+#include "hal/Types.h"
+
 using namespace hal;
 
 namespace hal::init {

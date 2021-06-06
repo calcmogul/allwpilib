@@ -4,7 +4,11 @@
 
 #include "wpi/raw_uv_ostream.h"
 
+#include <algorithm>
+#include <cassert>
 #include <cstring>
+
+#include "wpi/iterator_range.h"
 
 using namespace wpi;
 

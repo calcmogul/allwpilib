@@ -5,6 +5,8 @@
 #ifndef WPIUTIL_WPI_LEB128_H_
 #define WPIUTIL_WPI_LEB128_H_
 
+#include <stdint.h>
+
 #include <cstddef>
 
 #include "wpi/SmallVector.h"
@@ -12,6 +14,8 @@
 namespace wpi {
 
 class raw_istream;
+template <typename T>
+class SmallVectorImpl;
 
 /**
  * Get size of unsigned LEB128 data

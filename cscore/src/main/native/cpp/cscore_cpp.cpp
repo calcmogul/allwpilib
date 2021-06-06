@@ -4,19 +4,25 @@
 
 #include "cscore_cpp.h"
 
+#include <atomic>
+#include <memory>
+
+#include <wpi/Logger.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/hostname.h>
 #include <wpi/json.h>
+#include <wpi/span.h>
 
 #include "Handle.h"
 #include "Instance.h"
-#include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
 #include "PropertyContainer.h"
 #include "SinkImpl.h"
 #include "SourceImpl.h"
 #include "Telemetry.h"
+#include "UsbCameraListener.h"
 
 using namespace cs;
 

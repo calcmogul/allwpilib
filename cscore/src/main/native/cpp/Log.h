@@ -7,6 +7,7 @@
 
 #include <string_view>
 
+#include <fmt/format.h>
 #include <wpi/Logger.h>
 
 namespace cs {

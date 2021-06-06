@@ -4,6 +4,8 @@
 
 #include "hal/cpp/fpga_clock.h"
 
+#include <stdint.h>
+
 #include <cstdio>
 #include <limits>
 

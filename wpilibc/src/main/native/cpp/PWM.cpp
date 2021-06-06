@@ -4,12 +4,12 @@
 
 #include "frc/PWM.h"
 
-#include <utility>
+#include <string>
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
-#include <hal/Ports.h>
+#include <hal/Types.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>

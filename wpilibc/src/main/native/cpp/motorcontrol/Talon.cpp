@@ -4,7 +4,12 @@
 
 #include "frc/motorcontrol/Talon.h"
 
+#include <string_view>
+
 #include <hal/FRCUsageReporting.h>
+
+#include "frc/PWM.h"
+#include "frc/Timer.h"
 
 using namespace frc;
 

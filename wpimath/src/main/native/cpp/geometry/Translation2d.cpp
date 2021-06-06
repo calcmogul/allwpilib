@@ -6,6 +6,7 @@
 
 #include <wpi/json.h>
 
+#include "frc/geometry/Rotation2d.h"
 #include "units/math.h"
 
 using namespace frc;

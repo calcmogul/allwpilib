@@ -4,14 +4,20 @@
 
 #include "hal/PDP.h"
 
+#include <string>
+
 #include <fmt/format.h>
+#include <wpi/UidVector.h>
 
 #include "CANAPIInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/CANAPI.h"
+#include "hal/CANAPITypes.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/PDPDataInternal.h"
 
 using namespace hal;

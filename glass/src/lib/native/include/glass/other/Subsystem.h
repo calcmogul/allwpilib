@@ -8,6 +8,7 @@
 
 namespace glass {
 class DataSource;
+
 class SubsystemModel : public Model {
  public:
   virtual const char* GetName() const = 0;

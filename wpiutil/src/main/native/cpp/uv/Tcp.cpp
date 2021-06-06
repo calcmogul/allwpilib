@@ -5,7 +5,11 @@
 #include "wpi/uv/Tcp.h"
 
 #include <cstring>
+#include <utility>
 
+#include "uv.h"
+#include "wpi/Signal.h"
+#include "wpi/uv/Loop.h"
 #include "wpi/uv/util.h"
 
 namespace wpi::uv {

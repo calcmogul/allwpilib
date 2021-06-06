@@ -2,11 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "hal/simulation/AddressableLEDData.h"
+
+#include <stdint.h>
+
 #include <algorithm>
 #include <cstring>
 
+#include <wpi/UidVector.h>
+
 #include "../PortsInternal.h"
 #include "AddressableLEDDataInternal.h"
+#include "hal/AddressableLEDTypes.h"
+#include "hal/Types.h"
+#include "hal/Value.h"
+#include "hal/simulation/NotifyListener.h"
+#include "hal/simulation/SimCallbackRegistry.h"
+#include "hal/simulation/SimDataValue.h"
 
 using namespace hal;
 

@@ -35,6 +35,7 @@
 namespace wpi {
 
 class Logger;
+class NetworkStream;
 
 class TCPAcceptor : public NetworkAcceptor {
   int m_lsd;

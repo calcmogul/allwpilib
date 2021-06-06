@@ -4,6 +4,8 @@
 
 #include "frc/simulation/SimDeviceSim.h"
 
+#include <stdint.h>
+
 #include <string>
 #include <vector>
 

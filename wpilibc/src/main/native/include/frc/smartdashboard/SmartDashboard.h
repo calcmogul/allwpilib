@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -17,7 +18,14 @@ namespace wpi {
 class Sendable;
 }  // namespace wpi
 
+namespace nt {
+class Value;
+}  // namespace nt
+
 namespace frc {
+namespace detail {
+class ListenerExecutor;
+}  // namespace detail
 
 class SmartDashboard {
  public:

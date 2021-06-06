@@ -4,11 +4,16 @@
 
 #include "hal/Notifier.h"
 
+#include <stdint.h>
+
 #include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <utility>
 
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
@@ -18,7 +23,7 @@
 #include "NotifierInternal.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
-#include "hal/cpp/fpga_clock.h"
+#include "hal/handles/HandlesInternal.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/NotifierData.h"
 

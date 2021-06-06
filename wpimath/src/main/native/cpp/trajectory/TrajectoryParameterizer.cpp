@@ -28,9 +28,14 @@
 
 #include "frc/trajectory/TrajectoryParameterizer.h"
 
+#include <stdexcept>
+
 #include <fmt/format.h>
 
-#include "units/math.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "units/time.h"
 
 using namespace frc;
 

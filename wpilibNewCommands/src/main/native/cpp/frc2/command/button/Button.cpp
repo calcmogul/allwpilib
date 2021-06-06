@@ -4,6 +4,15 @@
 
 #include "frc2/command/button/Button.h"
 
+#include <wpi/span.h>
+
+#include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/Trigger.h"
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
+
 using namespace frc2;
 
 Button::Button(std::function<bool()> isPressed) : Trigger(isPressed) {}

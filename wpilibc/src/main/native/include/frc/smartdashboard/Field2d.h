@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <string_view>
 #include <vector>
@@ -18,6 +19,14 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/smartdashboard/FieldObject2d.h"
+
+namespace nt {
+class NetworkTable;
+}  // namespace nt
+
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
 
 namespace frc {
 

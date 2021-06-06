@@ -4,16 +4,23 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <array>
 
 #include <DSCommJoystickPacket.h>
+#include <hal/DriverStationTypes.h>
 #include <hal/simulation/DriverStationData.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/span.h>
 
 class DSCommPacketTest;
+namespace wpi {
+class raw_uv_ostream;
+}  // namespace wpi
 
 namespace halsim {
+struct DSCommJoystickPacket;
 
 class DSCommPacket {
   friend class ::DSCommPacketTest;

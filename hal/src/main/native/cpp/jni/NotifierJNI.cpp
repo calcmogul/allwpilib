@@ -3,15 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
-
-#include <cassert>
-#include <cstdio>
+#include <stdint.h>
 
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_NotifierJNI.h"
 #include "hal/Notifier.h"
+#include "hal/Types.h"
+#include "jni_md.h"
 
 using namespace hal;
 

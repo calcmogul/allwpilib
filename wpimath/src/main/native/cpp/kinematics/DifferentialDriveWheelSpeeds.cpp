@@ -4,6 +4,7 @@
 
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 
+#include "units/dimensionless.h"
 #include "units/math.h"
 
 using namespace frc;

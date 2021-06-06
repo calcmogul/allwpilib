@@ -5,6 +5,8 @@
 #ifndef CSCORE_SOURCEIMPL_H_
 #define CSCORE_SOURCEIMPL_H_
 
+#include <stdint.h>
+
 #include <atomic>
 #include <cstddef>
 #include <memory>
@@ -20,16 +22,22 @@
 #include "Handle.h"
 #include "Image.h"
 #include "PropertyContainer.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
 
 namespace wpi {
 class json;
+class Logger;
+template <typename T>
+class SmallVectorImpl;
 }  // namespace wpi
 
 namespace cs {
 
 class Notifier;
 class Telemetry;
+class Image;
+class PropertyImpl;
 
 class SourceImpl : public PropertyContainer {
   friend class Frame;

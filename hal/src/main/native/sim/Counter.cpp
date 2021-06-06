@@ -4,13 +4,13 @@
 
 #include "hal/Counter.h"
 
-#include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 
 namespace hal {
+struct Counter;
 
 LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                       HAL_HandleEnum::Counter>* counterHandles;

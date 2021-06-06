@@ -13,6 +13,10 @@
 #include "frc/smartdashboard/MechanismObject2d.h"
 #include "frc/util/Color8Bit.h"
 
+namespace nt {
+class NetworkTable;
+}  // namespace nt
+
 namespace frc {
 
 /**

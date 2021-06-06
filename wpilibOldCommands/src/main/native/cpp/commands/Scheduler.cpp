@@ -5,6 +5,7 @@
 #include "frc/commands/Scheduler.h"
 
 #include <algorithm>
+#include <functional>
 #include <set>
 #include <string>
 #include <vector>
@@ -12,8 +13,11 @@
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NTSendableBuilder.h>
 #include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableValue.h>
+#include <wpi/SmallPtrSet.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableRegistry.h>
+#include <wpi/span.h>
 
 #include "frc/Errors.h"
 #include "frc/buttons/ButtonScheduler.h"

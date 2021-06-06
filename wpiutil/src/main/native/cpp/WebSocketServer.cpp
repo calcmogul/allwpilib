@@ -4,12 +4,16 @@
 
 #include "wpi/WebSocketServer.h"
 
+#include <cstddef>
 #include <utility>
 
 #include "wpi/StringExtras.h"
 #include "wpi/fmt/raw_ostream.h"
+#include "wpi/priority_mutex.h"
+#include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/uv/Buffer.h"
+#include "wpi/uv/Error.h"
 #include "wpi/uv/Stream.h"
 
 using namespace wpi;

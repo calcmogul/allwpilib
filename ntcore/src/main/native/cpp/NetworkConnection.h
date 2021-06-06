@@ -9,6 +9,8 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>

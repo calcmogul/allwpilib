@@ -4,7 +4,12 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <memory>
+#include <string_view>
+
+#include <wpi/json.h>
 
 #include "WSHalProviders.h"
 

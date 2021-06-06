@@ -10,7 +10,12 @@
 #include <string_view>
 #include <vector>
 
+#include <ntcore_c.h>
 #include <wpi/deprecated.h>
+
+namespace nt {
+class NetworkTable;
+}  // namespace nt
 
 namespace frc {
 

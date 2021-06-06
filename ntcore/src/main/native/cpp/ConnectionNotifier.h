@@ -5,6 +5,9 @@
 #ifndef NTCORE_CONNECTIONNOTIFIER_H_
 #define NTCORE_CONNECTIONNOTIFIER_H_
 
+#include <climits>
+#include <functional>
+
 #include <wpi/CallbackManager.h>
 
 #include "Handle.h"

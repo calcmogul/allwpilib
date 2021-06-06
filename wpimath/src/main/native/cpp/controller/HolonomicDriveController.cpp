@@ -6,7 +6,11 @@
 
 #include <utility>
 
+#include "frc/geometry/Translation2d.h"
+#include "units/angle.h"
 #include "units/angular_velocity.h"
+#include "units/length.h"
+#include "units/velocity.h"
 
 using namespace frc;
 

@@ -4,18 +4,42 @@
 
 #include "HttpCameraImpl.h"
 
+#include <chrono>
+#include <cstdlib>
+#include <optional>
+#include <thread>
+#include <tuple>
+#include <utility>
+
+#include <fmt/format.h>
+#include <wpi/HttpUtil.h>
 #include <wpi/MemAlloc.h>
+#include <wpi/NetworkStream.h>
+#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/StringMap.h>
 #include <wpi/TCPConnector.h>
+#include <wpi/condition_variable.h>
+#include <wpi/raw_istream.h>
+#include <wpi/raw_socket_istream.h>
+#include <wpi/span.h>
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
+#include "Image.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
-#include "Telemetry.h"
 #include "c_util.h"
+#include "cscore_cpp.h"
+
+namespace cs {
+class Telemetry;
+}  // namespace cs
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

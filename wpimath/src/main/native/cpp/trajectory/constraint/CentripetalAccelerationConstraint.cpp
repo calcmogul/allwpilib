@@ -4,7 +4,12 @@
 
 #include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
 
-#include "units/math.h"
+#include "frc/geometry/Rotation2d.h"
+#include "units/angle.h"
+
+namespace frc {
+class Pose2d;
+}  // namespace frc
 
 using namespace frc;
 

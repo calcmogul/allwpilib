@@ -4,11 +4,23 @@
 
 #include "frc/smartdashboard/FieldObject2d.h"
 
+#include <stdint.h>
+
+#include <cstddef>
+#include <memory>
+#include <utility>
 #include <vector>
 
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableValue.h>
+#include <units/angle.h>
+#include <units/length.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
+#include <wpi/SmallVector.h>
+#include <wpi/span.h>
 
+#include "frc/geometry/Translation2d.h"
 #include "frc/trajectory/Trajectory.h"
 
 using namespace frc;

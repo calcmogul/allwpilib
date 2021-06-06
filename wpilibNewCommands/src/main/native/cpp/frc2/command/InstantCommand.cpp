@@ -4,6 +4,16 @@
 
 #include "frc2/command/InstantCommand.h"
 
+#include <utility>
+
+#include <wpi/span.h>
+
+#include "frc2/command/CommandScheduler.h"
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
+
 using namespace frc2;
 
 InstantCommand::InstantCommand(std::function<void()> toRun,

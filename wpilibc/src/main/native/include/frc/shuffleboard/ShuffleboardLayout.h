@@ -12,12 +12,17 @@
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
+namespace nt {
+class NetworkTable;
+}  // namespace nt
+
 #ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 namespace frc {
+class ShuffleboardContainer;
 
 /**
  * A layout in a Shuffleboard tab. Layouts can contain widgets and other

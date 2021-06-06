@@ -9,7 +9,9 @@
 #include "ConstBufferCallbackStore.h"
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_simulation_SPIDataJNI.h"
+#include "hal/Types.h"
 #include "hal/simulation/SPIData.h"
+#include "jni_md.h"
 
 using namespace hal;
 

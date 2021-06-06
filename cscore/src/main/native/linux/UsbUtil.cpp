@@ -5,18 +5,20 @@
 #include "UsbUtil.h"
 
 #include <fcntl.h>
-#include <libgen.h>
 #include <sys/ioctl.h>
 
+#include <cerrno>
+#include <cstring>
+#include <string_view>
+
 #include <fmt/format.h>
+#include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 
 #include "Instance.h"
-#include "Log.h"
 
 namespace cs {
 

@@ -4,6 +4,10 @@
 
 #include "frc/simulation/ADXRS450_GyroSim.h"
 
+#include <hal/SimDevice.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+
 #include "frc/ADXRS450_Gyro.h"
 #include "frc/simulation/SimDeviceSim.h"
 

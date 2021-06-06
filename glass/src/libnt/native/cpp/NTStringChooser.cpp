@@ -4,7 +4,12 @@
 
 #include "glass/networktables/NTStringChooser.h"
 
+#include <memory>
+
 #include <fmt/format.h>
+#include <ntcore_cpp.h>
+
+#include "networktables/NetworkTableValue.h"
 
 using namespace glass;
 

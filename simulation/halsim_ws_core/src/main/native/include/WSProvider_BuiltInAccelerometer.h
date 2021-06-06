@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <wpi/json.h>
+
 #include "WSHalProviders.h"
 
 namespace wpilibws {

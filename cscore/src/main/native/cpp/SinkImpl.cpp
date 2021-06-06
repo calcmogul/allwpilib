@@ -4,11 +4,22 @@
 
 #include "SinkImpl.h"
 
-#include <wpi/json.h>
+#include <atomic>
 
-#include "Instance.h"
+#include <wpi/SmallVector.h>
+#include <wpi/json.h>
+#include <wpi/raw_ostream.h>
+
+#include "Frame.h"
+#include "Log.h"
 #include "Notifier.h"
+#include "PropertyImpl.h"
 #include "SourceImpl.h"
+#include "cscore_cpp.h"
+
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

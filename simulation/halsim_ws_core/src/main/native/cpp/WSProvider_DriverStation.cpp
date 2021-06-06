@@ -4,15 +4,16 @@
 
 #include "WSProvider_DriverStation.h"
 
-#include <algorithm>
 #include <atomic>
+#include <string>
 #include <string_view>
 
-#include <hal/DriverStation.h>
+#include <hal/DriverStationTypes.h>
 #include <hal/Extensions.h>
-#include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/DriverStationData.h>
-#include <wpi/raw_ostream.h>
+
+#include "WSHalProviders.inc"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterDriverStation##halsim##Callback(                         \

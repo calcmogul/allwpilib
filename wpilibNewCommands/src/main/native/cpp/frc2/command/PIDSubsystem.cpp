@@ -4,7 +4,10 @@
 
 #include "frc2/command/PIDSubsystem.h"
 
+#include <memory>
 #include <utility>
+
+#include <frc/controller/PIDController.h>
 
 using namespace frc2;
 

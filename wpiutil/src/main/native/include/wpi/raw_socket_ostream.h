@@ -5,6 +5,10 @@
 #ifndef WPIUTIL_WPI_RAW_SOCKET_OSTREAM_H_
 #define WPIUTIL_WPI_RAW_SOCKET_OSTREAM_H_
 
+#include <stdint.h>
+
+#include <cstddef>
+
 #include "wpi/raw_ostream.h"
 
 namespace wpi {

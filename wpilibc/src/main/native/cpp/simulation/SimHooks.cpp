@@ -4,7 +4,11 @@
 
 #include "frc/simulation/SimHooks.h"
 
+#include <stdint.h>
+
+#include <hal/HALBase.h>
 #include <hal/simulation/MockHooks.h>
+#include <units/time.h>
 
 namespace frc::sim {
 

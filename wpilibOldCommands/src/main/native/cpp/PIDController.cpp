@@ -4,10 +4,15 @@
 
 #include "frc/PIDController.h"
 
+#include <units/time.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/Notifier.h"
 #include "frc/PIDOutput.h"
+
+namespace frc {
+class PIDSource;
+}  // namespace frc
 
 using namespace frc;
 

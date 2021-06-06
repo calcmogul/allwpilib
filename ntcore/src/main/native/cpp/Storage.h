@@ -8,9 +8,11 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <climits>
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -26,6 +28,7 @@
 #include "IStorage.h"
 #include "Message.h"
 #include "SequenceNumber.h"
+#include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
 namespace wpi {
@@ -40,6 +43,9 @@ class IEntryNotifier;
 class INetworkConnection;
 class IRpcServer;
 class IStorageTest;
+class IDispatcher;
+class Message;
+class Value;
 
 class Storage : public IStorage {
   friend class StorageTest;

@@ -14,6 +14,8 @@
 
 namespace frc {
 
+class PneumaticsBase;
+
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
  * (PCM).

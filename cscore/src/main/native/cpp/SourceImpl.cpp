@@ -5,16 +5,28 @@
 #include "SourceImpl.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cstring>
 #include <memory>
+#include <utility>
 
+#include <fmt/format.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/condition_variable.h>
 #include <wpi/json.h>
+#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
+#include "Image.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "PropertyImpl.h"
 #include "Telemetry.h"
+
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

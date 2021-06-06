@@ -4,13 +4,15 @@
 
 #include "hal/Interrupts.h"
 
+#include <chrono>
+#include <condition_variable>
 #include <memory>
 
 #include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"
-#include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
 #include "PortsInternal.h"
@@ -20,6 +22,7 @@
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 #include "hal/handles/UnlimitedHandleResource.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/AnalogInDataInternal.h"
 #include "mockdata/DIODataInternal.h"
 

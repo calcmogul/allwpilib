@@ -12,10 +12,15 @@
 #include <wpi/Logger.h>
 #include <wpi/mutex.h>
 
+#include "PropertyContainer.h"
 #include "SourceImpl.h"
+#include "cscore_c.h"
 
 namespace wpi {
 class json;
+class Logger;
+template <typename T>
+class SmallVectorImpl;
 }  // namespace wpi
 
 namespace cs {
@@ -23,6 +28,8 @@ namespace cs {
 class Frame;
 class Notifier;
 class Telemetry;
+class PropertyImpl;
+class SourceImpl;
 
 class SinkImpl : public PropertyContainer {
  public:

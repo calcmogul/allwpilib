@@ -6,9 +6,11 @@
 
 #include <stdint.h>
 
-#include "Log.h"
+#include <wpi/Logger.h>
+
 #include "WireDecoder.h"
 #include "WireEncoder.h"
+#include "networktables/NetworkTableValue.h"
 
 #define kClearAllMagic 0xD06CB27Aul
 

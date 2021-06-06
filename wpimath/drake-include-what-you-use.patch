@@ -1,3 +1,34 @@
+diff --git b/wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp a/wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp
+index 88e7e6628..0d292578f 100644
+--- b/wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp
++++ a/wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp
+@@ -7,9 +7,8 @@
+ #include <atomic>
+ #include <cstdlib>
+ #include <iostream>
+-#include <sstream>
+-#include <stdexcept>
+ #include <string>
++#include <sstream>
+ 
+ #include "drake/common/drake_assertion_error.h"
+ #include "drake/common/never_destroyed.h"
+diff --git b/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp a/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
+index d53fbdddf..05e0b037f 100644
+--- b/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
++++ a/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
+@@ -1,5 +1,11 @@
+ #include "drake/math/discrete_algebraic_riccati_equation.h"
+ 
++#include <cmath>
++#include <stdexcept>
++
++#include <Eigen/Eigenvalues>
++#include <Eigen/QR>
++
+ #include "drake/common/drake_assert.h"
+ #include "drake/common/drake_throw.h"
+ #include "drake/common/is_approx_equal_abstol.h"
 diff --git b/wpimath/src/main/native/include/drake/common/is_approx_equal_abstol.h a/wpimath/src/main/native/include/drake/common/is_approx_equal_abstol.h
 index 9af0c4525..b3f369ca0 100644
 --- b/wpimath/src/main/native/include/drake/common/is_approx_equal_abstol.h
@@ -11,35 +42,23 @@ index 9af0c4525..b3f369ca0 100644
  
  namespace drake {
  
-diff --git a/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp b/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
-index 9585c4dae..49c2fefe7 100644
---- a/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
-+++ b/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
-@@ -1,5 +1,8 @@
- #include "drake/math/discrete_algebraic_riccati_equation.h"
- 
-+#include <Eigen/Eigenvalues>
-+#include <Eigen/QR>
-+
- #include "drake/common/drake_assert.h"
- #include "drake/common/drake_throw.h"
- #include "drake/common/is_approx_equal_abstol.h"
 diff --git b/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h a/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
-index b64bfe75e..fc5efb313 100644
+index 9b9fe97ec..72e838db0 100644
 --- b/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
 +++ a/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
-@@ -3,7 +3,7 @@
- #include <cmath>
- #include <cstdlib>
+@@ -1,9 +1,6 @@
+ #pragma once
  
+-#include <cmath>
+-#include <cstdlib>
+-
 -#include <Eigen/Dense>
 +#include <Eigen/Core>
  
  namespace drake {
  namespace math {
- 
 diff --git b/wpimath/src/test/native/cpp/drake/discrete_algebraic_riccati_equation_test.cpp a/wpimath/src/test/native/cpp/drake/discrete_algebraic_riccati_equation_test.cpp
-index 74aa4b23d..2deb039a0 100644
+index 0f56235bd..2ee42a19c 100644
 --- b/wpimath/src/test/native/cpp/drake/discrete_algebraic_riccati_equation_test.cpp
 +++ a/wpimath/src/test/native/cpp/drake/discrete_algebraic_riccati_equation_test.cpp
 @@ -1,5 +1,6 @@

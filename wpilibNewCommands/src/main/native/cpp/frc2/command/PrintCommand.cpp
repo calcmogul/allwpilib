@@ -4,7 +4,12 @@
 
 #include "frc2/command/PrintCommand.h"
 
+#include <functional>
+#include <string>
+
 #include <fmt/format.h>
+
+#include "frc2/command/CommandScheduler.h"
 
 using namespace frc2;
 

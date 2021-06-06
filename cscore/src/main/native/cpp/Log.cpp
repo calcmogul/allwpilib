@@ -4,6 +4,8 @@
 
 #include "Log.h"
 
+#include <wpi/Logger.h>
+
 void cs::NamedLogV(wpi::Logger& logger, unsigned int level, const char* file,
                    unsigned int line, std::string_view name,
                    fmt::string_view format, fmt::format_args args) {

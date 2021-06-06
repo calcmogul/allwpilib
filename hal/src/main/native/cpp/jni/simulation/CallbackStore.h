@@ -5,6 +5,7 @@
 #pragma once
 
 #include <jni.h>
+#include <stdint.h>
 
 #include <wpi/jni_util.h>
 
@@ -13,6 +14,9 @@
 #include "hal/Value.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/NotifyListener.h"
+#include "jni_md.h"
+
+struct HAL_Value;
 
 namespace hal::sim {
 class CallbackStore {

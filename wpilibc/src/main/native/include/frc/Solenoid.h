@@ -15,6 +15,8 @@
 
 namespace frc {
 
+class PneumaticsBase;
+
 /**
  * Solenoid class for running high voltage Digital Output (PCM).
  *

@@ -6,11 +6,15 @@
 
 #include <stdint.h>
 
+#include <memory>
 #include <utility>
 
 #include <hal/DriverStation.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
+#include <hal/Types.h>
+#include <units/time.h>
+#include <wpi/priority_queue.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"

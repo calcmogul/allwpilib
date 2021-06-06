@@ -4,10 +4,10 @@
 
 #include "wpi/EventLoopRunner.h"
 
-#include "wpi/SmallVector.h"
-#include "wpi/condition_variable.h"
-#include "wpi/mutex.h"
+#include "wpi/future.h"
+#include "wpi/priority_mutex.h"
 #include "wpi/uv/AsyncFunction.h"
+#include "wpi/uv/Handle.h"
 #include "wpi/uv/Loop.h"
 
 using namespace wpi;

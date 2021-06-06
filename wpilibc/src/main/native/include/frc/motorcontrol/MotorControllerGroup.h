@@ -12,6 +12,10 @@
 
 #include "frc/motorcontrol/MotorController.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 class MotorControllerGroup : public wpi::Sendable,

@@ -3,17 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
-
-#include <atomic>
-#include <cassert>
-#include <thread>
-
-#include <wpi/SafeThread.h>
-#include <wpi/mutex.h>
+#include <stdint.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_InterruptJNI.h"
+#include "hal/AnalogTrigger.h"
 #include "hal/Interrupts.h"
+#include "hal/Types.h"
+#include "jni_md.h"
 
 using namespace hal;
 

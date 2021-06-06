@@ -3,17 +3,26 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cctype>
+#include <cstdio>
+#include <memory>
 #include <string>
+#include <string_view>
+#include <system_error>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <wpi/Base64.h>
-#include <wpi/SmallString.h>
+#include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/span.h>
 
 #include "Log.h"
 #include "Storage.h"
+#include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
 
 using namespace nt;
 

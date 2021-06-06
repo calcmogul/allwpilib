@@ -4,12 +4,18 @@
 
 #include "frc/PneumaticsControlModule.h"
 
+#include <stdint.h>
+
+#include <string>
+
 #include <hal/CTREPCM.h>
+#include <hal/Types.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
+#include "frc/PneumaticsBase.h"
 #include "frc/SensorUtil.h"
 
 using namespace frc;

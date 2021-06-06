@@ -6,9 +6,7 @@
 
 #include <jni.h>
 
-#include <cassert>
 #include <cerrno>
-#include <cstdio>
 #include <cstring>
 #include <string>
 
@@ -18,8 +16,11 @@
 #include "edu_wpi_first_hal_HALUtil.h"
 #include "hal/CAN.h"
 #include "hal/DriverStation.h"
+#include "hal/DriverStationTypes.h"
 #include "hal/Errors.h"
-#include "hal/HAL.h"
+#include "hal/HALBase.h"
+#include "hal/Value.h"
+#include "jni_md.h"
 
 using namespace wpi::java;
 

@@ -4,6 +4,8 @@
 
 #include "wpi/SafeThread.h"
 
+#include "wpi/priority_mutex.h"
+
 using namespace wpi;
 
 detail::SafeThreadProxyBase::SafeThreadProxyBase(

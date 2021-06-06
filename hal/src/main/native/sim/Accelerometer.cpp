@@ -4,6 +4,10 @@
 
 #include "hal/Accelerometer.h"
 
+#include <wpi/UidVector.h>
+
+#include "hal/Value.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/AccelerometerDataInternal.h"
 
 using namespace hal;

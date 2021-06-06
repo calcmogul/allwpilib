@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "hal/AnalogTrigger.h"
 #include "hal/Types.h"
 

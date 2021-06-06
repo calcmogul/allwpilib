@@ -4,6 +4,9 @@
 
 #include "ReplaceMePIDSubsystem2.h"
 
+#include <frc/controller/PIDController.h>
+#include <frc2/command/PIDSubsystem.h>
+
 ReplaceMePIDSubsystem2::ReplaceMePIDSubsystem2()
     : PIDSubsystem(
           // The PIDController used by the subsystem

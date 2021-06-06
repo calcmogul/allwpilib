@@ -10,7 +10,9 @@
 #include <utility>
 #include <vector>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
+#include <wpi/function_ref.h>
 
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Field2D.h"
@@ -46,6 +48,7 @@ class NTField2DModel : public Field2DModel {
   std::string m_nameValue;
 
   class ObjectModel;
+
   using Objects = std::vector<std::unique_ptr<ObjectModel>>;
   Objects m_objects;
 

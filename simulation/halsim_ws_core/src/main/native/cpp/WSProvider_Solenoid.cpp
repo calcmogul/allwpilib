@@ -4,8 +4,13 @@
 
 #include "WSProvider_Solenoid.h"
 
+#include <functional>
+#include <memory>
+#include <utility>
+
 #include <fmt/format.h>
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/CTREPCMData.h>
 
 #define REGISTER_SOLENOID(halsim, jsonid, ctype, haltype)                  \

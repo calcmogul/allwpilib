@@ -4,7 +4,9 @@
 
 #include "ReplaceMeTrapezoidProfileSubsystem.h"
 
+#include <frc2/command/TrapezoidProfileSubsystem.h>
 #include <units/acceleration.h>
+#include <units/length.h>
 #include <units/velocity.h>
 
 ReplaceMeTrapezoidProfileSubsystem::ReplaceMeTrapezoidProfileSubsystem()

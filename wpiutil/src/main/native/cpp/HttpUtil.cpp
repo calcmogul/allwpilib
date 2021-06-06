@@ -4,12 +4,16 @@
 
 #include "wpi/HttpUtil.h"
 
+#include <algorithm>
 #include <cctype>
+#include <cstring>
+#include <tuple>
 
 #include "fmt/format.h"
 #include "wpi/Base64.h"
 #include "wpi/StringExtras.h"
-#include "wpi/TCPConnector.h"
+#include "wpi/iterator.h"
+#include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
 
 namespace wpi {

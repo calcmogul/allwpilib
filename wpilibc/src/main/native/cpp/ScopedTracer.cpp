@@ -4,8 +4,6 @@
 
 #include "frc/ScopedTracer.h"
 
-#include <wpi/raw_ostream.h>
-
 using namespace frc;
 
 ScopedTracer::ScopedTracer(std::string_view name, wpi::raw_ostream& os)

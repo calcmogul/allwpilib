@@ -4,12 +4,22 @@
 
 #pragma once
 
+#include <array>
+
+#include <Eigen/Core>
 #include <units/angular_velocity.h>
+#include <units/current.h>
 #include <units/moment_of_inertia.h>
+#include <units/voltage.h>
 
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
+
+namespace frc {
+template <int States, int Inputs, int Outputs>
+class LinearSystem;
+}  // namespace frc
 
 namespace frc::sim {
 /**

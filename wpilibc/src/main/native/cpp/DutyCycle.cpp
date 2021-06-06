@@ -4,10 +4,17 @@
 
 #include "frc/DutyCycle.h"
 
+#include <stdint.h>
+
+#include <utility>
+
+#include <hal/AnalogTrigger.h>
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
+#include <hal/Types.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/DigitalSource.h"
 #include "frc/Errors.h"

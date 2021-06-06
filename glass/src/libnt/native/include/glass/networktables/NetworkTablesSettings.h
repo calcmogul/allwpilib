@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 #include <wpi/SafeThread.h>
 

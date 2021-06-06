@@ -133,7 +133,7 @@ def main():
     subprocess.check_output(
         ["git", "apply", "drake-replace-noreturn-attributes.patch"])
     subprocess.check_output(
-        ["git", "apply", "drake-replace-dense-with-core.patch"])
+        ["git", "apply", "drake-include-what-you-use.patch"])
 
 
 if __name__ == "__main__":

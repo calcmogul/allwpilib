@@ -3,15 +3,21 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
-#include <cstring>
+#include <cstdio>
 
 #include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_DriverStationDataJNI.h"
+#include "hal/DriverStationTypes.h"
+#include "hal/Types.h"
 #include "hal/simulation/DriverStationData.h"
 #include "hal/simulation/MockHooks.h"
+#include "hal/simulation/NotifyListener.h"
+#include "jni_md.h"
 
 using namespace hal;
 using namespace wpi::java;

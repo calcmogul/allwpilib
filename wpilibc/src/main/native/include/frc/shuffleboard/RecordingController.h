@@ -9,10 +9,16 @@
 #include <string_view>
 
 #include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/SmallVector.h>
 
 #include "frc/shuffleboard/ShuffleboardEventImportance.h"
+
+namespace nt {
+class NetworkTable;
+class NetworkTableInstance;
+}  // namespace nt
 
 namespace frc::detail {
 

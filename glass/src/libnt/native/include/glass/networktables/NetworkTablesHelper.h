@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 
 namespace glass {

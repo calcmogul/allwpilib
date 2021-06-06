@@ -4,7 +4,11 @@
 
 #include "hal/SPI.h"
 
+#include <wpi/UidVector.h>
+
 #include "HALInitializer.h"
+#include "hal/Value.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/SPIDataInternal.h"
 
 using namespace hal;

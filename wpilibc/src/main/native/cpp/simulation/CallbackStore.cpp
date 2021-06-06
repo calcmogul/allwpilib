@@ -6,6 +6,8 @@
 
 #include <utility>
 
+struct HAL_Value;
+
 using namespace frc;
 using namespace frc::sim;
 

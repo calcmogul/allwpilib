@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "hal/Types.h"
 #include "hal/Value.h"
 

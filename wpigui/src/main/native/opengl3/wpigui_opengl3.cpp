@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <stdint.h>
+
 #include <cstdio>
 
 #include <GL/gl3w.h>
@@ -10,6 +12,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include "GL/glcorearb.h"
 #include "wpigui.h"
 #include "wpigui_internal.h"
 

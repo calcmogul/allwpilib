@@ -4,6 +4,9 @@
 
 #include "frc2/command/ConditionalCommand.h"
 
+#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandScheduler.h"
+
 using namespace frc2;
 
 ConditionalCommand::ConditionalCommand(std::unique_ptr<Command>&& onTrue,

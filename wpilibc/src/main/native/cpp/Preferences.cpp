@@ -4,11 +4,14 @@
 
 #include "frc/Preferences.h"
 
-#include <algorithm>
-
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
+
+namespace nt {
+class Value;
+}  // namespace nt
 
 using namespace frc;
 

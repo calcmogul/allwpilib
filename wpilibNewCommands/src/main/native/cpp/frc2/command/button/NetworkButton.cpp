@@ -4,6 +4,15 @@
 
 #include "frc2/command/button/NetworkButton.h"
 
+#include <functional>
+
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
+
+#include "frc2/command/CommandScheduler.h"
+#include "frc2/command/button/Button.h"
+
 using namespace frc2;
 
 NetworkButton::NetworkButton(nt::NetworkTableEntry entry)

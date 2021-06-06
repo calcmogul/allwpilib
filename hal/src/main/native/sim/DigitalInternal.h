@@ -10,9 +10,13 @@
 
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"
+#include "hal/Types.h"
 #include "hal/handles/DigitalHandleResource.h"
 
 namespace hal {
+template <typename THandle, typename TStruct, int16_t size>
+class DigitalHandleResource;
+
 /**
  * MXP channels when used as digital output PWM are offset from actual value
  */

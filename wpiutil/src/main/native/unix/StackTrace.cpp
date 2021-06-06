@@ -6,6 +6,11 @@
 
 #include <execinfo.h>
 
+#include <cstdlib>
+#include <string_view>
+#include <tuple>
+#include <utility>
+
 #include "wpi/Demangle.h"
 #include "wpi/SmallString.h"
 #include "wpi/StringExtras.h"

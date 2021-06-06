@@ -12,6 +12,10 @@
 
 #include "units/time.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc2 {
 
 /**

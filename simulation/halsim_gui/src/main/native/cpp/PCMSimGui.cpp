@@ -6,18 +6,30 @@
 
 #include <glass/hardware/PCM.h>
 #include <glass/other/DeviceTree.h>
+#include <stdint.h>
 
-#include <cstdio>
 #include <memory>
+#include <string_view>
+#include <type_traits>
 #include <vector>
 
 #include <hal/Ports.h>
 #include <hal/Value.h>
 #include <hal/simulation/CTREPCMData.h>
+#include <imgui.h>
+#include <wpi/function_ref.h>
 
 #include "HALDataSource.h"
+#include "HALProvider.h"
 #include "HALSimGui.h"
 #include "SimDeviceGui.h"
+#include "glass/DataSource.h"
+#include "glass/View.h"
+#include "glass/Window.h"
+
+namespace glass {
+class Model;
+}  // namespace glass
 
 using namespace halsimgui;
 

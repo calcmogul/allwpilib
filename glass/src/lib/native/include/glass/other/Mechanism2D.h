@@ -11,6 +11,7 @@
 
 #include "glass/Model.h"
 #include "glass/View.h"
+#include "units/length.h"
 
 namespace glass {
 

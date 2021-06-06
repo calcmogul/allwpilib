@@ -21,6 +21,14 @@
 #include <WSProvider_dPWM.h>
 #include <wpi/EventLoopRunner.h>
 
+#include "HALSimBaseWebSocketConnection.h"
+#include "HALSimWS.h"
+#include "WSHalProviders.h"
+
+namespace wpi::uv {
+class Loop;
+}  // namespace wpi::uv
+
 using namespace wpilibws;
 
 bool HALSimWSClient::Initialize() {

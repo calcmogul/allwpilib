@@ -6,15 +6,19 @@
 
 #include <glass/hardware/Accelerometer.h>
 #include <glass/other/DeviceTree.h>
+#include <stdint.h>
 
 #include <memory>
+#include <string_view>
 
+#include <hal/Accelerometer.h>
 #include <hal/Value.h>
 #include <hal/simulation/AccelerometerData.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
 #include "SimDeviceGui.h"
+#include "glass/DataSource.h"
+#include "glass/Model.h"
 
 using namespace glass;
 using namespace halsimgui;

@@ -4,10 +4,17 @@
 
 #include "Instance.h"
 
+#include <cstdio>
 #include <string_view>
 
 #include <fmt/format.h>
+#include <wpi/EventLoopRunner.h>
+#include <wpi/Logger.h>
 #include <wpi/fs.h>
+
+#include "Log.h"
+#include "SinkImpl.h"
+#include "SourceImpl.h"
 
 using namespace cs;
 

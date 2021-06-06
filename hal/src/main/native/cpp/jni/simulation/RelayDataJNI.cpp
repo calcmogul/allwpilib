@@ -6,7 +6,9 @@
 
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_RelayDataJNI.h"
+#include "hal/Types.h"
 #include "hal/simulation/RelayData.h"
+#include "jni_md.h"
 
 using namespace hal;
 

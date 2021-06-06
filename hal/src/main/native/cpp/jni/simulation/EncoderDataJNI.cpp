@@ -6,7 +6,9 @@
 
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_EncoderDataJNI.h"
+#include "hal/Types.h"
 #include "hal/simulation/EncoderData.h"
+#include "jni_md.h"
 
 using namespace hal;
 

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -11,6 +12,7 @@
 
 namespace glass {
 class DataSource;
+
 class CommandSchedulerModel : public Model {
  public:
   virtual const char* GetName() const = 0;

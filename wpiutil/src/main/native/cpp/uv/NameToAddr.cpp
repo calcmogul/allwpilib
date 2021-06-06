@@ -5,7 +5,9 @@
 #include "wpi/uv/util.h"  // NOLINT(build/include_order)
 
 #include <cstring>
+#include <string_view>
 
+#include "uv.h"
 #include "wpi/SmallString.h"
 
 namespace wpi::uv {

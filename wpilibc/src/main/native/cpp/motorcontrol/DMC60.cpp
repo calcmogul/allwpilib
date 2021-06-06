@@ -4,7 +4,12 @@
 
 #include "frc/motorcontrol/DMC60.h"
 
+#include <string_view>
+
 #include <hal/FRCUsageReporting.h>
+
+#include "frc/PWM.h"
+#include "frc/Timer.h"
 
 using namespace frc;
 

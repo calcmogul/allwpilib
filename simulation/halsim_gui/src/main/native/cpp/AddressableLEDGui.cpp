@@ -5,12 +5,31 @@
 #include "AddressableLEDGui.h"
 
 #include <glass/hardware/LEDDisplay.h>
+#include <stdint.h>
 
+#include <cstddef>
+#include <memory>
+#include <vector>
+
+#include <hal/AddressableLEDTypes.h>
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>
+#include <wpi/function_ref.h>
+#include <wpi/span.h>
 
+#include "HALProvider.h"
 #include "HALSimGui.h"
+#include "glass/View.h"
+#include "glass/Window.h"
+
+namespace glass {
+class Model;
+}  // namespace glass
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
 
 using namespace halsimgui;
 

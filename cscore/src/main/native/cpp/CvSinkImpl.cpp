@@ -4,17 +4,34 @@
 
 #include "CvSinkImpl.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <chrono>
+#include <memory>
+#include <string>
+#include <thread>
+
+#include <opencv2/core/version.hpp>
 #include <wpi/SmallString.h>
 
-#include "Handle.h"
+#include "Frame.h"
 #include "Instance.h"
 #include "Log.h"
-#include "Notifier.h"
+#include "SourceImpl.h"
 #include "c_util.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
+
+namespace cs {
+class Notifier;
+class Telemetry;
+}  // namespace cs
+namespace cv {
+class Mat;
+}  // namespace cv
+namespace wpi {
+class Logger;
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
 
 using namespace cs;
 

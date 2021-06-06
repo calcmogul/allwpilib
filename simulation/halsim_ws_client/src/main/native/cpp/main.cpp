@@ -7,6 +7,7 @@
 
 #include <hal/Extensions.h>
 
+#include "HALSimBaseWebSocketConnection.h"
 #include "HALSimWSClient.h"
 
 using namespace wpilibws;

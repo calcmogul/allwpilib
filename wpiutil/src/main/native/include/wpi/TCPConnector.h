@@ -33,6 +33,7 @@
 namespace wpi {
 
 class Logger;
+class NetworkStream;
 
 class TCPConnector {
  public:

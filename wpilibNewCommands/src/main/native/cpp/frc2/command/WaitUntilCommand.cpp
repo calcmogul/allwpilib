@@ -4,7 +4,12 @@
 
 #include "frc2/command/WaitUntilCommand.h"
 
+#include <utility>
+
 #include <frc/Timer.h>
+#include <units/time.h>
+
+#include "frc2/command/CommandScheduler.h"
 
 using namespace frc2;
 

@@ -2,10 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "hal/simulation/DriverStationData.h"
+
+#include <stdint.h>
+
 #include <cstring>
+#include <iterator>
+
+#include <wpi/UidVector.h>
 
 #include "DriverStationDataInternal.h"
 #include "hal/DriverStation.h"
+#include "hal/DriverStationTypes.h"
+#include "hal/Types.h"
+#include "hal/Value.h"
+#include "hal/simulation/NotifyListener.h"
+#include "hal/simulation/SimCallbackRegistry.h"
+#include "hal/simulation/SimDataValue.h"
 
 using namespace hal;
 

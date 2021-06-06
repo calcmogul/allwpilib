@@ -11,6 +11,10 @@
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 /**

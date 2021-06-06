@@ -4,8 +4,12 @@
 
 #include "hal/Extensions.h"
 
+#include <algorithm>
 #include <cstdio>
+#include <cstdlib>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>

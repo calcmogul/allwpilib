@@ -23,7 +23,6 @@
 
 #include "wpi/TCPAcceptor.h"
 
-#include <cstdio>
 #include <cstring>
 
 #ifdef _WIN32
@@ -35,12 +34,15 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #endif
 
 #include "wpi/Logger.h"
+#include "wpi/NetworkStream.h"
 #include "wpi/SmallString.h"
 #include "wpi/SocketError.h"
+#include "wpi/TCPStream.h"
 
 using namespace wpi;
 

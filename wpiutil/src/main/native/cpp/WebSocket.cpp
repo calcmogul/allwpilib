@@ -4,16 +4,22 @@
 
 #include "wpi/WebSocket.h"
 
+#include <algorithm>
+#include <chrono>
 #include <random>
 
 #include "fmt/format.h"
+#include "uv.h"
 #include "wpi/Base64.h"
 #include "wpi/HttpParser.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
+#include "wpi/priority_mutex.h"
+#include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/sha1.h"
+#include "wpi/uv/Buffer.h"
 #include "wpi/uv/Stream.h"
 
 using namespace wpi;

@@ -4,6 +4,8 @@
 
 #include "frc/buttons/JoystickButton.h"
 
+#include "frc/GenericHID.h"
+
 using namespace frc;
 
 JoystickButton::JoystickButton(GenericHID* joystick, int buttonNumber)

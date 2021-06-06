@@ -4,10 +4,16 @@
 
 #include "WSProvider_Joystick.h"
 
-#include <atomic>
+#include <stdint.h>
 
-#include <hal/Ports.h>
+#include <algorithm>
+#include <atomic>
+#include <vector>
+
+#include <hal/DriverStationTypes.h>
 #include <hal/simulation/DriverStationData.h>
+
+#include "WSHalProviders.inc"
 
 namespace wpilibws {
 

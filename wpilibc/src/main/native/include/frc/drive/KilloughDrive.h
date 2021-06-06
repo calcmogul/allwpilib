@@ -13,6 +13,10 @@
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/drive/Vector2d.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 #if defined(_MSC_VER)

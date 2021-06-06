@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <string>
@@ -24,6 +25,7 @@
 namespace nt {
 
 class NetworkTableInstance;
+class Value;
 
 /**
  * NetworkTables Entry

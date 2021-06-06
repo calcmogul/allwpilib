@@ -6,6 +6,8 @@
 #define NTCORE_ENTRYNOTIFIER_H_
 
 #include <atomic>
+#include <climits>
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -14,6 +16,7 @@
 
 #include "Handle.h"
 #include "IEntryNotifier.h"
+#include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
 namespace wpi {
@@ -21,6 +24,7 @@ class Logger;
 }  // namespace wpi
 
 namespace nt {
+class Value;
 
 namespace impl {
 

@@ -7,12 +7,13 @@
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
+#include <units/time.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "frc/PneumaticsBase.h"
 
 using namespace frc;
 

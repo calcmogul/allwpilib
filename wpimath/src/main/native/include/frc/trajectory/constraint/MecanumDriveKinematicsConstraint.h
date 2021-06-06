@@ -8,9 +8,13 @@
 
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "units/curvature.h"
 #include "units/velocity.h"
 
 namespace frc {
+class MecanumDriveKinematics;
+class Pose2d;
+
 /**
  * A class that enforces constraints on the mecanum drive kinematics.
  * This can be used to ensure that the trajectory is constructed so that the

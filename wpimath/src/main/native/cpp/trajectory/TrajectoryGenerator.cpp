@@ -4,13 +4,24 @@
 
 #include "frc/trajectory/TrajectoryGenerator.h"
 
+#include <array>
+#include <cstdio>
 #include <utility>
 
 #include <fmt/format.h>
+#include <wpi/array.h>
 
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/spline/CubicHermiteSpline.h"
+#include "frc/spline/QuinticHermiteSpline.h"
 #include "frc/spline/SplineHelper.h"
 #include "frc/spline/SplineParameterizer.h"
+#include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/TrajectoryParameterizer.h"
+#include "units/angle.h"
 
 using namespace frc;
 

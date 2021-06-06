@@ -4,8 +4,13 @@
 
 #include "frc/smartdashboard/SendableBuilderImpl.h"
 
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableValue.h>
 #include <ntcore_cpp.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/span.h>
 
 #include "frc/smartdashboard/SmartDashboard.h"
 

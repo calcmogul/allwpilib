@@ -7,14 +7,27 @@
 #include <glass/other/DeviceTree.h>
 #include <stdint.h>
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+
 #include <fmt/format.h>
 #include <hal/SimDevice.h>
+#include <hal/Value.h>
 #include <hal/simulation/SimDeviceData.h>
+#include <imgui.h>
 #include <wpi/DenseMap.h>
 #include <wpi/StringExtras.h>
 
-#include "HALDataSource.h"
+#include "HALProvider.h"
 #include "HALSimGui.h"
+#include "glass/DataSource.h"
+#include "glass/Model.h"
+#include "glass/View.h"
+#include "glass/Window.h"
 
 using namespace halsimgui;
 

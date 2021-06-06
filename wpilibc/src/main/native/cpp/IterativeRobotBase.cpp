@@ -4,9 +4,13 @@
 
 #include "frc/IterativeRobotBase.h"
 
+#include <functional>
+
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
+#include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <units/time.h>
 
 #include "frc/Errors.h"
 #include "frc/livewindow/LiveWindow.h"

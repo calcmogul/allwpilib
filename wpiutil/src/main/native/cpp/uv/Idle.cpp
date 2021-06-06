@@ -4,6 +4,7 @@
 
 #include "wpi/uv/Idle.h"
 
+#include "uv.h"
 #include "wpi/uv/Loop.h"
 
 namespace wpi::uv {

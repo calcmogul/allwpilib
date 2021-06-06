@@ -5,6 +5,7 @@
 #ifndef CSCORE_JPEGUTIL_H_
 #define CSCORE_JPEGUTIL_H_
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 

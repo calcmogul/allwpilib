@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 
 #include "glass/DataSource.h"

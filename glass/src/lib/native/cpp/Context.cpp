@@ -4,18 +4,26 @@
 
 #include "glass/Context.h"
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <cinttypes>
 #include <cstdio>
+#include <optional>
 
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
 #include <wpi/timestamp.h>
 #include <wpigui.h>
 
 #include "glass/ContextInternal.h"
+#include "glass/support/IniSaverString.h"
 
 using namespace glass;
 

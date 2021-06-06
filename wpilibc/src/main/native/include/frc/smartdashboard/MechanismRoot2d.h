@@ -11,6 +11,10 @@
 
 #include "MechanismObject2d.h"
 
+namespace nt {
+class NetworkTable;
+}  // namespace nt
+
 namespace frc {
 
 /**

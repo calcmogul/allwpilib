@@ -18,8 +18,15 @@
 #include "SinkImpl.h"
 #include "cscore_raw.h"
 
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace cs {
 class SourceImpl;
+class Frame;
+class Notifier;
+class Telemetry;
 
 class RawSinkImpl : public SinkImpl {
  public:

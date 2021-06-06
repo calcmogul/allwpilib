@@ -4,7 +4,10 @@
 
 #include "ntcore_test.h"
 
+#include <cstdlib>
 #include <cstring>
+#include <memory>
+#include <string_view>
 
 #include <wpi/MemAlloc.h>
 

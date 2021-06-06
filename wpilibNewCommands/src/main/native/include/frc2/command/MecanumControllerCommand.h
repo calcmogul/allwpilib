@@ -19,6 +19,7 @@
 #include <frc/trajectory/Trajectory.h>
 #include <units/angle.h>
 #include <units/length.h>
+#include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
 #include <wpi/span.h>
@@ -26,9 +27,18 @@
 #include "CommandBase.h"
 #include "CommandHelper.h"
 
+namespace frc {
+class Pose2d;
+class Rotation2d;
+template <class Distance>
+class ProfiledPIDController;
+}  // namespace frc
+
 #pragma once
 
 namespace frc2 {
+class Subsystem;
+
 /**
  * A command that uses two PID controllers (PIDController) and a profiled PID
  * controller (ProfiledPIDController) to follow a trajectory (Trajectory) with a

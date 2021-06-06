@@ -9,14 +9,17 @@
 #pragma warning(disable : 4521)
 #endif
 
+#include <cstddef>
 #include <limits>
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#include <wpi/SmallVector.h>
 #include <wpi/span.h>
 
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 

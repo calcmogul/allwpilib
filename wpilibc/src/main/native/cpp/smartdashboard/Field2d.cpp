@@ -4,7 +4,14 @@
 
 #include "frc/smartdashboard/Field2d.h"
 
+#include <string>
+#include <type_traits>
+#include <utility>
+
 #include <networktables/NTSendableBuilder.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <units/length.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;

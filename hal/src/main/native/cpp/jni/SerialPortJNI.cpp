@@ -3,14 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
-#include <cassert>
-
+#include <wpi/SmallVector.h>
 #include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_SerialPortJNI.h"
 #include "hal/SerialPort.h"
+#include "hal/Types.h"
+#include "jni_md.h"
 
 using namespace hal;
 using namespace wpi::java;

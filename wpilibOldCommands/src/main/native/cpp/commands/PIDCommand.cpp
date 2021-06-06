@@ -6,6 +6,13 @@
 
 #include <wpi/sendable/SendableBuilder.h>
 
+#include "frc/Controller.h"
+#include "frc/PIDController.h"
+
+namespace frc {
+class Subsystem;
+}  // namespace frc
+
 using namespace frc;
 
 PIDCommand::PIDCommand(std::string_view name, double p, double i, double d,

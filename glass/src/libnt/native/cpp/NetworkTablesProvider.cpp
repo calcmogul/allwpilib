@@ -5,12 +5,21 @@
 #include "glass/networktables/NetworkTablesProvider.h"
 
 #include <algorithm>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
+#include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
 #include <wpigui.h>
+
+#include "glass/Window.h"
+#include "networktables/NetworkTableValue.h"
 
 using namespace glass;
 

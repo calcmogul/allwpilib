@@ -6,10 +6,17 @@
 
 #include <glass/Model.h>
 
-#include <algorithm>
+#include <functional>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include <hal/simulation/DriverStationData.h>
+#include <imgui.h>
+
+#include "glass/Provider.h"
+#include "glass/View.h"
+#include "glass/Window.h"
 
 using namespace halsimgui;
 

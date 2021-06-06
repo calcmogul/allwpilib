@@ -6,7 +6,8 @@
 
 #include <networktables/NetworkTableInstance.h>
 
-#include "frc/shuffleboard/ShuffleboardTab.h"
+#include "frc/shuffleboard/RecordingController.h"
+#include "frc/shuffleboard/ShuffleboardInstance.h"
 
 using namespace frc;
 

@@ -4,6 +4,9 @@
 
 #include "RpcServer.h"
 
+#include <wpi/DenseMap.h>
+#include <wpi/SafeThread.h>
+
 using namespace nt;
 
 RpcServer::RpcServer(int inst, wpi::Logger& logger)

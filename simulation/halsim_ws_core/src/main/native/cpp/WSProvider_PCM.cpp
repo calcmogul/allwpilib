@@ -5,7 +5,10 @@
 #include "WSProvider_PCM.h"
 
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/CTREPCMData.h>
+
+#include "WSHalProviders.inc"
 
 #define REGISTER_CTREPCM(halsim, jsonid, ctype, haltype)                 \
   HALSIM_RegisterCTREPCM##halsim##Callback(                              \

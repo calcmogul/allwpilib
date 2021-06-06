@@ -7,8 +7,10 @@
 
 #include <linux/videodev2.h>
 
+#include <array>
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -24,11 +26,20 @@
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
 #include "UsbCameraProperty.h"
+#include "cscore_c.h"
+#include "cscore_cpp.h"
+
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 namespace cs {
 
 class Notifier;
 class Telemetry;
+class PropertyImpl;
+class UsbCameraBuffer;
+class UsbCameraProperty;
 
 class UsbCameraImpl : public SourceImpl {
  public:

@@ -15,8 +15,16 @@
 #include <wpi/span.h>
 
 #include "SourceImpl.h"
+#include "cscore_c.h"
+
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 namespace cs {
+class Notifier;
+class Telemetry;
+struct VideoMode;
 
 class ConfigurableSourceImpl : public SourceImpl {
  protected:

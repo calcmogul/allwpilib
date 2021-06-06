@@ -4,8 +4,13 @@
 
 #include "frc/motorcontrol/MotorControllerGroup.h"
 
+#include <memory>
+#include <utility>
+
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
+
+#include "frc/SpeedController.h"
 
 using namespace frc;
 

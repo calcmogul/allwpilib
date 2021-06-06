@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 
 #include "glass/DataSource.h"
@@ -14,6 +15,7 @@
 #include "glass/networktables/NetworkTablesHelper.h"
 
 namespace glass {
+class EncoderModel;
 
 class NTDigitalInputModel : public DIOModel {
  public:

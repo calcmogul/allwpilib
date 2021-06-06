@@ -6,11 +6,13 @@
 #define CSCORE_NOTIFIER_H_
 
 #include <functional>
+#include <string_view>
 #include <utility>
 
 #include <wpi/CallbackManager.h>
 
 #include "Handle.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
 
 namespace cs {

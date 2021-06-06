@@ -4,6 +4,9 @@
 
 #include "ReplaceMeTimedCommand.h"
 
+#include <frc/commands/TimedCommand.h>
+#include <units/time.h>
+
 ReplaceMeTimedCommand::ReplaceMeTimedCommand(units::second_t timeout)
     : TimedCommand(timeout) {
   // Use Requires() here to declare subsystem dependencies

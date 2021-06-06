@@ -15,6 +15,8 @@
 #include <units/time.h>
 
 namespace frc {
+class DigitalSource;
+
 /**
  * Class for handling asynchronous interrupts.
  *

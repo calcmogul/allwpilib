@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <frc2/command/CommandHelper.h>
 #include <frc2/command/TrapezoidProfileCommand.h>
 #include <units/length.h>

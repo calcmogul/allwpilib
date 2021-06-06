@@ -5,12 +5,17 @@
 #ifndef CSCORE_INSTANCE_H_
 #define CSCORE_INSTANCE_H_
 
+#include <atomic>
 #include <memory>
+#include <mutex>
 #include <utility>
 
 #include <wpi/EventLoopRunner.h>
 #include <wpi/Logger.h>
+#include <wpi/SmallVector.h>
+#include <wpi/span.h>
 
+#include "Handle.h"
 #include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
@@ -19,8 +24,11 @@
 #include "Telemetry.h"
 #include "UnlimitedHandleResource.h"
 #include "UsbCameraListener.h"
+#include "cscore_c.h"
 
 namespace cs {
+class SinkImpl;
+class SourceImpl;
 
 struct SourceData {
   SourceData(CS_SourceKind kind_, std::shared_ptr<SourceImpl> source_)

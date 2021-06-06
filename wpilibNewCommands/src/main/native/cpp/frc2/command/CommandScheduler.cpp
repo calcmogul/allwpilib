@@ -4,21 +4,30 @@
 
 #include "frc2/command/CommandScheduler.h"
 
-#include <cstdio>
+#include <stdint.h>
 
+#include <cstdio>
+#include <string>
+#include <vector>
+
+#include <frc/Errors.h>
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
+#include <frc/Watchdog.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <hal/FRCUsageReporting.h>
-#include <hal/HALBase.h>
 #include <networktables/NTSendableBuilder.h>
 #include <networktables/NetworkTableEntry.h>
+#include <units/time.h>
 #include <wpi/DenseMap.h>
+#include <wpi/FunctionExtras.h>
+#include <wpi/SmallPtrSet.h>
+#include <wpi/SmallSet.h>
 #include <wpi/SmallVector.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandState.h"
 #include "frc2/command/Subsystem.h"
 

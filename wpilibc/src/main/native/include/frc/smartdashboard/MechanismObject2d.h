@@ -13,6 +13,7 @@
 
 #include <networktables/NetworkTable.h>
 #include <wpi/StringMap.h>
+#include <wpi/mutex.h>
 
 #include "frc/Errors.h"
 

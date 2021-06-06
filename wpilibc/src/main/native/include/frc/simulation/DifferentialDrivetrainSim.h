@@ -8,11 +8,19 @@
 #include <frc/system/LinearSystem.h>
 #include <frc/system/plant/DCMotor.h>
 
+#include <array>
+
 #include <Eigen/Core>
+#include <units/current.h>
 #include <units/length.h>
+#include <units/mass.h>
 #include <units/moment_of_inertia.h>
 #include <units/time.h>
+#include <units/velocity.h>
 #include <units/voltage.h>
+
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
 
 namespace frc::sim {
 

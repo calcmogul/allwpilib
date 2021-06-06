@@ -4,7 +4,14 @@
 
 #include "ReplaceMeProfiledPIDCommand.h"
 
+#include <functional>
+
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/trajectory/TrapezoidProfile.h>
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/ProfiledPIDCommand.h>
 #include <units/acceleration.h>
+#include <units/length.h>
 #include <units/velocity.h>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.

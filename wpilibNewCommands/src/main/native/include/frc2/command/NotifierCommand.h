@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <memory>
 
 #include <frc/Notifier.h>
 #include <units/time.h>
@@ -15,6 +16,8 @@
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
+class Subsystem;
+
 /**
  * A command that starts a notifier to run the given runnable periodically in a
  * separate thread. Has no end condition as-is; either subclass it or use {@link

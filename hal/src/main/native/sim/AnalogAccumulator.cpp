@@ -4,7 +4,16 @@
 
 #include "hal/AnalogAccumulator.h"
 
+#include <memory>
+
+#include <wpi/UidVector.h>
+
 #include "AnalogInternal.h"
+#include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/Value.h"
+#include "hal/handles/IndexedHandleResource.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/AnalogInDataInternal.h"
 
 using namespace hal;

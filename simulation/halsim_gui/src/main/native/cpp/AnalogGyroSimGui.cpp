@@ -6,17 +6,21 @@
 
 #include <glass/hardware/AnalogGyro.h>
 #include <glass/other/DeviceTree.h>
+#include <stdint.h>
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <hal/Ports.h>
 #include <hal/Value.h>
 #include <hal/simulation/AnalogGyroData.h>
+#include <wpi/function_ref.h>
 
 #include "HALDataSource.h"
-#include "HALSimGui.h"
 #include "SimDeviceGui.h"
+#include "glass/DataSource.h"
+#include "glass/Model.h"
 
 using namespace halsimgui;
 

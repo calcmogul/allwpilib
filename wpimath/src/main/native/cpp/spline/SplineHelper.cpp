@@ -4,7 +4,15 @@
 
 #include "frc/spline/SplineHelper.h"
 
+#include <array>
 #include <cstddef>
+#include <memory>
+
+#include <wpi/array.h>
+
+#include "frc/geometry/Translation2d.h"
+#include "frc/spline/CubicHermiteSpline.h"
+#include "frc/spline/QuinticHermiteSpline.h"
 
 using namespace frc;
 

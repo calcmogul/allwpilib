@@ -6,8 +6,11 @@
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+#include <string>
+#include <vector>
 
 namespace cs {
 

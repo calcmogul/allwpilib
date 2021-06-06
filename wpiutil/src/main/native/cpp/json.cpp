@@ -35,7 +35,7 @@ SOFTWARE.
 #include "wpi/json.h"
 
 #include "fmt/format.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/iterator.h"
 
 namespace wpi {
 namespace detail {

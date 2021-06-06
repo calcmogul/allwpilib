@@ -29,10 +29,13 @@
 #pragma once
 
 #include <stack>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Twist2d.h"
 #include "frc/spline/Spline.h"
 #include "units/angle.h"
 #include "units/curvature.h"
@@ -40,6 +43,8 @@
 #include "units/math.h"
 
 namespace frc {
+template <int Degree>
+class Spline;
 
 /**
  * Class used to parameterize a spline by its arc length.

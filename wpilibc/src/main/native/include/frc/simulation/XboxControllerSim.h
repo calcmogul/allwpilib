@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "frc/GenericHID.h"
 #include "frc/simulation/GenericHIDSim.h"
 
 namespace frc {

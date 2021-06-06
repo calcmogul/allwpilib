@@ -12,6 +12,9 @@
 #include "wpi/uv/Loop.h"
 
 namespace wpi {
+namespace uv {
+class Loop;
+}  // namespace uv
 
 /**
  * Executes an event loop on a separate thread.
@@ -54,6 +57,7 @@ class EventLoopRunner {
 
  private:
   class Thread;
+
   SafeThreadOwner<Thread> m_owner;
 };
 

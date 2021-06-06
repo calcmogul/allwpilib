@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <typeinfo>
 
 #include <units/time.h>
 #include <wpi/Demangle.h>
@@ -17,6 +18,7 @@
 #include "frc2/command/Subsystem.h"
 
 namespace frc2 {
+class Subsystem;
 
 template <typename T>
 std::string GetTypeName(const T& type) {

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <jni.h>
+#include <stdint.h>
 
 #include <wpi/jni_util.h>
 
@@ -13,6 +14,7 @@
 #include "hal/Value.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/NotifyListener.h"
+#include "jni_md.h"
 
 namespace hal::sim {
 class BufferCallbackStore {

@@ -6,7 +6,9 @@
 
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_DIODataJNI.h"
+#include "hal/Types.h"
 #include "hal/simulation/DIOData.h"
+#include "jni_md.h"
 
 using namespace hal;
 

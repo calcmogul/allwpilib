@@ -8,6 +8,7 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/AnalogTriggerType.h"
 #include "frc/DigitalSource.h"
 
 namespace frc {

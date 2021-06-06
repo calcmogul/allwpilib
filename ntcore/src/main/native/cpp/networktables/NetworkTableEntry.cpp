@@ -5,6 +5,7 @@
 #include "networktables/NetworkTableEntry.h"
 
 #include "networktables/NetworkTableInstance.h"
+#include "networktables/NetworkTableInstance.inc"
 
 using namespace nt;
 

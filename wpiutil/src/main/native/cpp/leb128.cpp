@@ -4,6 +4,9 @@
 
 #include "wpi/leb128.h"
 
+#include <cstddef>
+
+#include "wpi/SmallVector.h"
 #include "wpi/raw_istream.h"
 
 namespace wpi {

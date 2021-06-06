@@ -4,10 +4,15 @@
 
 #include "frc/SerialPort.h"
 
-#include <utility>
+#include <stdint.h>
+
+#include <cstddef>
+#include <string>
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/SerialPort.h>
+#include <hal/Types.h>
+#include <units/time.h>
 
 #include "frc/Errors.h"
 

@@ -6,6 +6,25 @@
 
 #include <utility>
 
+#include <frc/Timer.h>
+#include <frc/controller/PIDController.h>
+#include <frc/controller/RamseteController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/trajectory/Trajectory.h>
+#include <units/curvature.h>
+#include <units/length.h>
+#include <units/voltage.h>
+#include <wpi/span.h>
+
+namespace frc {
+class Pose2d;
+}  // namespace frc
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
+
 using namespace frc2;
 using namespace units;
 

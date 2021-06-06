@@ -10,6 +10,10 @@
 #include "frc/shuffleboard/ShuffleboardRoot.h"
 #include "frc/shuffleboard/ShuffleboardTab.h"
 
+namespace nt {
+class NetworkTableInstance;
+}  // namespace nt
+
 namespace frc::detail {
 
 class ShuffleboardInstance final : public ShuffleboardRoot {
@@ -34,6 +38,7 @@ class ShuffleboardInstance final : public ShuffleboardRoot {
 
  private:
   struct Impl;
+
   std::unique_ptr<Impl> m_impl;
 };
 

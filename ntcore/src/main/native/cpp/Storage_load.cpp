@@ -2,18 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <algorithm>
+#include <cassert>
 #include <cctype>
+#include <climits>
+#include <cstdlib>
+#include <functional>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <string_view>
+#include <system_error>
+#include <tuple>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <wpi/Base64.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_istream.h>
 
 #include "IDispatcher.h"
 #include "IEntryNotifier.h"
+#include "Message.h"
+#include "SequenceNumber.h"
 #include "Storage.h"
+#include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
 
 using namespace nt;
 

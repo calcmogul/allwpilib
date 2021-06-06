@@ -5,10 +5,18 @@
 #include "hal/simulation/SimDeviceData.h"  // NOLINT(build/include_order)
 
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <wpi/StringExtras.h>
+#include <wpi/StringMap.h>
+#include <wpi/UidVector.h>
+#include <wpi/iterator.h>
 
 #include "SimDeviceDataInternal.h"
+#include "hal/Value.h"
 
 using namespace hal;
 

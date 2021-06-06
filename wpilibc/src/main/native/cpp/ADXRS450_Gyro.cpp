@@ -5,6 +5,8 @@
 #include "frc/ADXRS450_Gyro.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <hal/SimDevice.h>
+#include <units/time.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

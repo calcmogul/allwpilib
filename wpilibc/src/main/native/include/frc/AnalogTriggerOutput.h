@@ -4,10 +4,16 @@
 
 #pragma once
 
+#include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/AnalogTriggerType.h"
 #include "frc/DigitalSource.h"
+
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
 
 namespace frc {
 

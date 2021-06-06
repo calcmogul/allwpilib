@@ -4,13 +4,13 @@
 
 #include "frc/DigitalInput.h"
 
-#include <iostream>
-#include <limits>
+#include <stdint.h>
+
+#include <string>
 
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
-#include <hal/Ports.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>

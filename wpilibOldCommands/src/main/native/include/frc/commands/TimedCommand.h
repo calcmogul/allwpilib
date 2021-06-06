@@ -11,6 +11,7 @@
 #include "frc/commands/Command.h"
 
 namespace frc {
+class Subsystem;
 
 /**
  * A TimedCommand will wait for a timeout before finishing.

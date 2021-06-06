@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <memory>
 
 #include <frc/controller/PIDController.h>
 #include <wpi/span.h>
@@ -14,6 +15,8 @@
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
+class Subsystem;
+
 /**
  * A command that controls an output with a PIDController.  Runs forever by
  * default - to add exit conditions and/or other behavior, subclass this class.

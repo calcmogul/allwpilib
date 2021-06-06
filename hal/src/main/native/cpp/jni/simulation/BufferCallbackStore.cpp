@@ -7,14 +7,15 @@
 #include <jni.h>
 
 #include <cstdio>
+#include <memory>
+#include <string_view>
 
 #include <wpi/jni_util.h>
 
 #include "SimulatorJNI.h"
 #include "hal/Types.h"
-#include "hal/Value.h"
+#include "hal/handles/HandlesInternal.h"
 #include "hal/handles/UnlimitedHandleResource.h"
-#include "hal/simulation/NotifyListener.h"
 
 using namespace hal;
 using namespace hal::sim;

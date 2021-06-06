@@ -4,6 +4,9 @@
 
 #include "frc/commands/Subsystem.h"
 
+#include <algorithm>
+
+#include <wpi/SmallPtrSet.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

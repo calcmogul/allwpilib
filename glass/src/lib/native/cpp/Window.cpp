@@ -4,7 +4,10 @@
 
 #include "glass/Window.h"
 
-#include <imgui_internal.h>
+#include <cstdio>
+#include <optional>
+
+#include <imgui.h>
 #include <wpi/StringExtras.h>
 
 #include "glass/Context.h"

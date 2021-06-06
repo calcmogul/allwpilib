@@ -11,18 +11,28 @@
 **    by the protocol specification given by QDriverStation.
 **--------------------------------------------------------------------------*/
 
+#include <stdint.h>
 #include <sys/types.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cstdio>
 #include <cstring>
+#include <limits>
+#include <memory>
 #include <string_view>
 
 #include <DSCommPacket.h>
 #include <fmt/format.h>
 #include <hal/Extensions.h>
 #include <wpi/EventLoopRunner.h>
+#include <wpi/Signal.h>
+#include <wpi/SmallVector.h>
 #include <wpi/raw_uv_ostream.h>
+#include <wpi/span.h>
+#include <wpi/uv/Buffer.h>
+#include <wpi/uv/Error.h>
+#include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
 #include <wpi/uv/Timer.h>
 #include <wpi/uv/Udp.h>

@@ -6,13 +6,20 @@
 
 #include <stdint.h>
 
-#include <cassert>
 #include <cstdlib>
-#include <cstring>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <wpi/MathExtras.h>
 #include <wpi/MemAlloc.h>
-#include <wpi/leb128.h>
+
+#include "networktables/NetworkTableValue.h"
+
+namespace wpi {
+class Logger;
+class raw_istream;
+}  // namespace wpi
 
 using namespace nt;
 

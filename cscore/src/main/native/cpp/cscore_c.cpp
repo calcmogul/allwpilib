@@ -4,12 +4,20 @@
 
 #include "cscore_c.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <cstring>
+#include <memory>
+#include <new>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <opencv2/core/core.hpp>
 #include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/span.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"

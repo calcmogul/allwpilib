@@ -5,6 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
+#include <hal/Types.h>
 
 namespace glass {
 class DataSource;

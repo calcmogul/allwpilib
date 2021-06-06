@@ -4,10 +4,9 @@
 
 #include "glass/other/CommandScheduler.h"
 
-#include <imgui.h>
+#include <memory>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include <imgui.h>
 
 using namespace glass;
 

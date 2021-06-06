@@ -5,7 +5,8 @@
 #include "glass/hardware/PCM.h"
 
 #include <cstdio>
-#include <cstring>
+#include <string>
+#include <type_traits>
 
 #include <imgui.h>
 #include <wpi/SmallVector.h>

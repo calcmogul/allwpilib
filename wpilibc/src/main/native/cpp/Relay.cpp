@@ -4,19 +4,26 @@
 
 #include "frc/Relay.h"
 
-#include <utility>
+#include <stdint.h>
+
+#include <string_view>
 
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
-#include <hal/Ports.h>
 #include <hal/Relay.h>
+#include <hal/Types.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
+
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
 
 using namespace frc;
 

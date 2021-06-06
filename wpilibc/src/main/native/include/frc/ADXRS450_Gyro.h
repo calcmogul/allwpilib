@@ -13,6 +13,10 @@
 #include "frc/SPI.h"
 #include "frc/interfaces/Gyro.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 /**

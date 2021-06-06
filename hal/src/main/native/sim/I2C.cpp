@@ -4,7 +4,12 @@
 
 #include "hal/I2C.h"
 
+#include <wpi/UidVector.h>
+
 #include "HALInitializer.h"
+#include "hal/Types.h"
+#include "hal/Value.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/I2CDataInternal.h"
 
 using namespace hal;

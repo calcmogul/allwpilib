@@ -9,6 +9,8 @@
 #include "glass/WindowManager.h"
 #include "glass/support/IniSaverBase.h"
 
+struct ImGuiTextBuffer;
+
 namespace glass {
 
 class PlotProvider : private WindowManager {

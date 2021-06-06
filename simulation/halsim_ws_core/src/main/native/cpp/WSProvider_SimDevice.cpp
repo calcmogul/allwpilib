@@ -4,12 +4,26 @@
 
 #include "WSProvider_SimDevice.h"
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 #include <fmt/format.h>
-#include <hal/Ports.h>
+#include <hal/SimDevice.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <wpi/StringExtras.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
+#include <wpi/uv/AsyncFunction.h>
+
+#include "HALSimBaseWebSocketConnection.h"
+#include "WSProviderContainer.h"
+
+namespace wpi::uv {
+class Loop;
+}  // namespace wpi::uv
 
 namespace wpilibws {
 

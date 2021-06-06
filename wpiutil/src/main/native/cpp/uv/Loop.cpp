@@ -4,6 +4,10 @@
 
 #include "wpi/uv/Loop.h"
 
+#include <signal.h>
+
+#include "uv.h"
+
 using namespace wpi::uv;
 
 Loop::Loop(const private_init&) noexcept {

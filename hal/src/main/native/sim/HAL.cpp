@@ -4,9 +4,15 @@
 
 #include "hal/HAL.h"
 
+#include <stdint.h>
+
+#include <atomic>
 #include <cstdio>
+#include <memory>
+#include <utility>
 #include <vector>
 
+#include <wpi/UidVector.h>
 #include <wpi/mutex.h>
 #include <wpi/spinlock.h>
 
@@ -18,12 +24,19 @@
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
+#include "hal/CAN.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
+#include "hal/FRCUsageReporting.h"
+#include "hal/HALBase.h"
+#include "hal/Types.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/simulation/DriverStationData.h"
+#include "hal/simulation/MockHooks.h"
+#include "hal/simulation/NotifyListener.h"
 #include "hal/simulation/SimCallbackRegistry.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;

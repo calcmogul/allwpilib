@@ -12,6 +12,10 @@
 
 #include "frc/buttons/Button.h"
 
+namespace nt {
+class NetworkTable;
+}  // namespace nt
+
 namespace frc {
 
 class NetworkButton : public Button {

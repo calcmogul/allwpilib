@@ -4,6 +4,10 @@
 
 #include "frc/Resource.h"
 
+#include <limits>
+
+#include <wpi/mutex.h>
+
 #include "frc/Errors.h"
 
 using namespace frc;

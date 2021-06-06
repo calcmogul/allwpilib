@@ -4,7 +4,10 @@
 
 #include "wpi/sendable/SendableRegistry.h"
 
+#include <cassert>
 #include <memory>
+#include <type_traits>
+#include <utility>
 
 #include "fmt/format.h"
 #include "wpi/DenseMap.h"

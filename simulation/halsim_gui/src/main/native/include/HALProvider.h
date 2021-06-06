@@ -13,6 +13,11 @@
 #include <string_view>
 #include <vector>
 
+namespace glass {
+class Model;
+class Window;
+}  // namespace glass
+
 namespace halsimgui {
 
 class HALProvider : public glass::Provider<> {

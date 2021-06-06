@@ -16,8 +16,14 @@
 
 #include "Log.h"
 #include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
+
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 namespace nt {
+class Value;
 
 /* Decodes network data into native representation.
  * This class is designed to read from a raw_istream, which provides a blocking

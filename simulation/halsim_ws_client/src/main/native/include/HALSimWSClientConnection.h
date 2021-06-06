@@ -5,9 +5,11 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
+#include <wpi/SmallVector.h>
 #include <wpi/WebSocket.h>
 #include <wpi/mutex.h>
 #include <wpi/uv/Buffer.h>
@@ -17,6 +19,10 @@
 
 namespace wpi {
 class json;
+class WebSocket;
+namespace uv {
+class Stream;
+}  // namespace uv
 }  // namespace wpi
 
 namespace wpilibws {

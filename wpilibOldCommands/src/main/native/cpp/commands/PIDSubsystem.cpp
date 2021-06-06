@@ -4,6 +4,7 @@
 
 #include "frc/commands/PIDSubsystem.h"
 
+#include "frc/Controller.h"
 #include "frc/PIDController.h"
 
 using namespace frc;

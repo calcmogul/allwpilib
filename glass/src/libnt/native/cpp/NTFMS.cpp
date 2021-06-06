@@ -6,9 +6,16 @@
 
 #include <stdint.h>
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <fmt/format.h>
+#include <ntcore_cpp.h>
 #include <wpi/SmallVector.h>
 #include <wpi/timestamp.h>
+
+#include "networktables/NetworkTableValue.h"
 
 using namespace glass;
 

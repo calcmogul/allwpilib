@@ -16,9 +16,15 @@
 #include "frc/PIDSource.h"
 #include "frc/Timer.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 class PIDOutput;
+class Notifier;
+class PIDSource;
 
 /**
  * Class implements a PID Control Loop.

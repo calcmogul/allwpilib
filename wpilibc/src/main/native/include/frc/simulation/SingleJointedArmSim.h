@@ -6,13 +6,23 @@
 
 #include <array>
 
+#include <Eigen/Core>
 #include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/current.h>
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/moment_of_inertia.h>
+#include <units/time.h>
+#include <units/voltage.h>
 
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/plant/DCMotor.h"
+
+namespace frc {
+template <int States, int Inputs, int Outputs>
+class LinearSystem;
+}  // namespace frc
 
 namespace frc::sim {
 /**

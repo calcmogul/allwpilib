@@ -4,10 +4,22 @@
 
 #include "DsClient.h"
 
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+
+#include <fmt/format.h>
+#include <wpi/Logger.h>
+#include <wpi/NetworkStream.h>
+#include <wpi/SafeThread.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/TCPConnector.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/condition_variable.h>
 #include <wpi/raw_socket_istream.h>
 
 #include "Dispatcher.h"

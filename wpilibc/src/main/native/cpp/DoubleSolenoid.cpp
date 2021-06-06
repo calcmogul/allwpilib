@@ -4,17 +4,22 @@
 
 #include "frc/DoubleSolenoid.h"
 
+#include <string>
+#include <string_view>
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
-#include <hal/HALBase.h>
-#include <hal/Ports.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
+#include "frc/PneumaticsBase.h"
+
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
 
 using namespace frc;
 

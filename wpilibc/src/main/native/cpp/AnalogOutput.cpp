@@ -4,13 +4,14 @@
 
 #include "frc/AnalogOutput.h"
 
-#include <limits>
-#include <utility>
+#include <stdint.h>
+
+#include <string>
 
 #include <hal/AnalogOutput.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
-#include <hal/Ports.h>
+#include <hal/Types.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>

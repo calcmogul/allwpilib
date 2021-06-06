@@ -9,11 +9,18 @@
 #include <string_view>
 #include <vector>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 #include <wpi/DenseMap.h>
 
+#include "glass/DataSource.h"
 #include "glass/Model.h"
 #include "glass/View.h"
+
+namespace nt {
+class EntryNotification;
+class Value;
+}  // namespace nt
 
 namespace glass {
 

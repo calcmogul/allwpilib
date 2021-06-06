@@ -4,19 +4,36 @@
 
 #include "HALSimHttpConnection.h"
 
-#include <uv.h>
+#include <stdint.h>
 
+#include <algorithm>
+#include <cstdio>
+#include <functional>
+#include <string>
 #include <string_view>
+#include <system_error>
 
 #include <fmt/format.h>
+#include <wpi/HttpParser.h>
 #include <wpi/MimeTypes.h>
+#include <wpi/Signal.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/UrlParser.h>
+#include <wpi/WebSocket.h>
 #include <wpi/fs.h>
+#include <wpi/http_parser.h>
+#include <wpi/json.h>
 #include <wpi/raw_istream.h>
+#include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
-#include <wpi/uv/Request.h>
+#include <wpi/span.h>
+#include <wpi/uv/Buffer.h>
+#include <wpi/uv/Error.h>
+#include <wpi/uv/Stream.h>
+
+#include "HALSimBaseWebSocketConnection.h"
+#include "HALSimWeb.h"
 
 namespace uv = wpi::uv;
 

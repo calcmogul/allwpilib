@@ -4,11 +4,19 @@
 
 #include <jni.h>
 
+#include <cstddef>
+#include <string>
+#include <vector>
+
+#include <wpi/SmallVector.h>
 #include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_SimDeviceJNI.h"
 #include "hal/SimDevice.h"
+#include "hal/Value.h"
+#include "jni_md.h"
 
 using namespace wpi::java;
 

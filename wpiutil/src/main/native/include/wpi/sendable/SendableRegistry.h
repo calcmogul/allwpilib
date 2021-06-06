@@ -4,12 +4,17 @@
 
 #pragma once
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 
 #include "wpi/function_ref.h"
+
+namespace nt {
+class NetworkTable;
+}  // namespace nt
 
 namespace wpi {
 

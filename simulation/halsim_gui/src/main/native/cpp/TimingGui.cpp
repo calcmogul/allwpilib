@@ -6,9 +6,10 @@
 
 #include <glass/Model.h>
 #include <glass/View.h>
+#include <stdint.h>
 
-#include <cstdio>
-#include <cstring>
+#include <algorithm>
+#include <memory>
 #include <vector>
 
 #include <hal/HALBase.h>
@@ -16,7 +17,9 @@
 #include <hal/simulation/NotifierData.h>
 #include <imgui.h>
 
+#include "HALProvider.h"
 #include "HALSimGui.h"
+#include "glass/Window.h"
 
 using namespace halsimgui;
 

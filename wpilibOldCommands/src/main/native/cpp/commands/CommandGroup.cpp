@@ -4,6 +4,13 @@
 
 #include "frc/commands/CommandGroup.h"
 
+#include <algorithm>
+#include <cstddef>
+#include <memory>
+
+#include <units/time.h>
+#include <wpi/SmallPtrSet.h>
+
 #include "frc/Errors.h"
 
 using namespace frc;

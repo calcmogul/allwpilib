@@ -4,17 +4,34 @@
 
 #include "CvSourceImpl.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/version.hpp>
+#include <opencv2/imgproc.hpp>
+#include <wpi/SmallVector.h>
+#include <wpi/span.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
+#include "Image.h"
 #include "Instance.h"
 #include "Log.h"
-#include "Notifier.h"
-#include "c_util.h"
+#include "SourceImpl.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
+
+namespace cs {
+class Notifier;
+class Telemetry;
+}  // namespace cs
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

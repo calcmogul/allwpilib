@@ -13,6 +13,8 @@
 
 namespace frc {
 
+class AnalogInput;
+
 /**
  * Class for reading analog potentiometers. Analog potentiometers read in an
  * analog voltage that corresponds to a position. The position is in whichever

@@ -4,7 +4,19 @@
 
 #include "Storage.h"
 
+#include <algorithm>
+#include <chrono>
+#include <condition_variable>
+#include <type_traits>
+
+#include <wpi/DenseMap.h>
+#include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
+#include <wpi/StringMap.h>
+#include <wpi/condition_variable.h>
+#include <wpi/iterator.h>
+#include <wpi/mutex.h>
+#include <wpi/span.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -13,6 +25,8 @@
 #include "INetworkConnection.h"
 #include "IRpcServer.h"
 #include "Log.h"
+#include "Message.h"
+#include "networktables/NetworkTableValue.h"
 
 using namespace nt;
 

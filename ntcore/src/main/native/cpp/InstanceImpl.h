@@ -7,7 +7,9 @@
 
 #include <atomic>
 #include <memory>
+#include <vector>
 
+#include <wpi/Logger.h>
 #include <wpi/UidVector.h>
 #include <wpi/mutex.h>
 
@@ -19,6 +21,11 @@
 #include "LoggerImpl.h"
 #include "RpcServer.h"
 #include "Storage.h"
+
+namespace wpi {
+template <typename T, typename std::vector<T>::size_type reuse_threshold>
+class UidVector;
+}  // namespace wpi
 
 namespace nt {
 

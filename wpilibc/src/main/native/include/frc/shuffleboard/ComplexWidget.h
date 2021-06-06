@@ -16,6 +16,10 @@ class Sendable;
 class SendableBuilder;
 }  // namespace wpi
 
+namespace nt {
+class NetworkTable;
+}  // namespace nt
+
 namespace frc {
 
 class ShuffleboardContainer;

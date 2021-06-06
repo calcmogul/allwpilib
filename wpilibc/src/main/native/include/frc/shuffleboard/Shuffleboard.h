@@ -13,6 +13,10 @@
 namespace frc {
 
 class ShuffleboardTab;
+namespace detail {
+class RecordingController;
+class ShuffleboardInstance;
+}  // namespace detail
 
 /**
  * The Shuffleboard class provides a mechanism with which data can be added and

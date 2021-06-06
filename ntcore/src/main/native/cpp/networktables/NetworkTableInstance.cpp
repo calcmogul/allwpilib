@@ -3,9 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "networktables/NetworkTableInstance.h"
+#include "networktables/NetworkTableInstance.inc"
+
+#include <string>
 
 #include <fmt/format.h>
 #include <wpi/SmallVector.h>
+#include <wpi/span.h>
+
+#include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableType.h"
+#include "ntcore_cpp.h"
 
 using namespace nt;
 

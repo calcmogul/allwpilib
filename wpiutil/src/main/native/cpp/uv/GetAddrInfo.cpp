@@ -4,9 +4,12 @@
 
 #include "wpi/uv/GetAddrInfo.h"
 
+#include "uv.h"
 #include "wpi/SmallString.h"
+#include "wpi/uv/Error.h"
 #include "wpi/uv/Loop.h"
-#include "wpi/uv/util.h"
+
+struct addrinfo;
 
 namespace wpi::uv {
 

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/numbers>
@@ -13,6 +14,7 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/SpeedController.h"
+#include "frc/Timer.h"
 #include "frc/drive/Vector2d.h"
 
 using namespace frc;

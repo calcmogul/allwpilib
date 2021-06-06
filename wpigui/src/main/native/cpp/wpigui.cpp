@@ -5,8 +5,13 @@
 #include "wpigui.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>

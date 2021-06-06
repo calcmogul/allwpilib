@@ -6,12 +6,21 @@
 
 #include <atomic>
 #include <chrono>
+#include <functional>
+#include <memory>
+#include <string>
 #include <thread>
-#include <tuple>
+#include <utility>
 
+#include "wpi/NetworkStream.h"
 #include "wpi/SmallSet.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
+#include "wpi/span.h"
+
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace wpi;
 

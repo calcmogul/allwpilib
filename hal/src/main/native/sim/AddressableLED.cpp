@@ -4,15 +4,23 @@
 
 #include "hal/AddressableLED.h"
 
+#include <memory>
+#include <string>
+
 #include <fmt/format.h>
+#include <wpi/UidVector.h>
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "hal/AddressableLEDTypes.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
+#include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/AddressableLEDDataInternal.h"
 
 using namespace hal;

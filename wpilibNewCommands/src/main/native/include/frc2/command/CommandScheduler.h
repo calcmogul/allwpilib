@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <functional>
 #include <initializer_list>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 #include <frc/Errors.h>
@@ -15,6 +17,10 @@
 #include <wpi/FunctionExtras.h>
 #include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
+
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
 
 namespace frc2 {
 class Command;

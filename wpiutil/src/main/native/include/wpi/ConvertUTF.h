@@ -90,12 +90,12 @@
 #ifndef LLVM_SUPPORT_CONVERTUTF_H
 #define LLVM_SUPPORT_CONVERTUTF_H
 
-#include "wpi/span.h"
-
 #include <cstddef>
 #include <string>
 #include <string_view>
 #include <system_error>
+
+#include "wpi/span.h"
 
 // Wrap everything in namespace wpi so that programs can link with wpiutil and
 // their own version of the unicode libraries.

@@ -4,6 +4,8 @@
 
 #include "DigitalInternal.h"
 
+#include <memory>
+
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/Errors.h"

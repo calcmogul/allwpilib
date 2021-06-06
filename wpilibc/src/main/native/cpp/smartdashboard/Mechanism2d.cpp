@@ -7,6 +7,12 @@
 #include <cstdio>
 
 #include <networktables/NTSendableBuilder.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
+
+#include "frc/Errors.h"
 
 using namespace frc;
 

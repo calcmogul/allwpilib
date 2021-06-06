@@ -5,7 +5,6 @@
 #include "frc/simulation/PDPSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/PDPData.h>
 

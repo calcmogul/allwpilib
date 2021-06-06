@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <cstdarg>
 #include <string>
 #include <string_view>
 

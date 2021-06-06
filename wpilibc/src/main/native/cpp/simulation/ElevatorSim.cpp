@@ -4,9 +4,16 @@
 
 #include "frc/simulation/ElevatorSim.h"
 
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/mass.h>
+#include <units/velocity.h>
 #include <wpi/MathExtras.h>
 
+#include "frc/RobotController.h"
 #include "frc/StateSpaceUtil.h"
+#include "frc/system/LinearSystem.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 

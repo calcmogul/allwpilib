@@ -4,7 +4,11 @@
 
 #include "wpi/uv/Stream.h"
 
+#include "uv.h"
 #include "wpi/SmallVector.h"
+#include "wpi/priority_mutex.h"
+#include "wpi/uv/Buffer.h"
+#include "wpi/uv/Error.h"
 
 using namespace wpi;
 using namespace wpi::uv;

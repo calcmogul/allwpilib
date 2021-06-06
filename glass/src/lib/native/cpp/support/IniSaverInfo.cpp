@@ -4,9 +4,13 @@
 
 #include "glass/support/IniSaverInfo.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <optional>
+#include <string>
 
+#include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/StringExtras.h>
 

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/numbers>

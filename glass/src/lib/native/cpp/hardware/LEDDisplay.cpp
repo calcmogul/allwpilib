@@ -4,7 +4,14 @@
 
 #include "glass/hardware/LEDDisplay.h"
 
+#include <algorithm>
+#include <memory>
+#include <type_traits>
+#include <vector>
+
+#include <imgui.h>
 #include <wpi/SmallVector.h>
+#include <wpi/span.h>
 
 #include "glass/Context.h"
 #include "glass/support/ExtraGuiWidgets.h"

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/command/TrapezoidProfileSubsystem.h>
 #include <units/length.h>
 

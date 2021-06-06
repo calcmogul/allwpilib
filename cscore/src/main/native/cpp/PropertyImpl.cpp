@@ -4,6 +4,8 @@
 
 #include "PropertyImpl.h"
 
+#include <wpi/Signal.h>
+
 using namespace cs;
 
 PropertyImpl::PropertyImpl(std::string_view name_) : name{name_} {}

@@ -6,8 +6,8 @@
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 
+#include "units/dimensionless.h"
 #include "units/math.h"
 
 using namespace frc;

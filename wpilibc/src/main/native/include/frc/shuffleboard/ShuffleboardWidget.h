@@ -8,6 +8,7 @@
 
 #include "frc/shuffleboard/BuiltInWidgets.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
+#include "frc/shuffleboard/ShuffleboardValue.h"
 #include "frc/shuffleboard/WidgetType.h"
 
 namespace frc {

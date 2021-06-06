@@ -4,6 +4,9 @@
 
 #include "frc/simulation/DutyCycleEncoderSim.h"
 
+#include <hal/SimDevice.h>
+#include <units/angle.h>
+
 #include "frc/DutyCycleEncoder.h"
 #include "frc/simulation/SimDeviceSim.h"
 

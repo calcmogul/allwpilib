@@ -3,10 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PowerJNI.h"
 #include "hal/Power.h"
+#include "jni_md.h"
 
 using namespace hal;
 

@@ -4,12 +4,22 @@
 
 #include "hal/DIO.h"
 
+#include <atomic>
+#include <memory>
+#include <string>
+
+#include <wpi/UidVector.h>
+
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "hal/Errors.h"
+#include "hal/Value.h"
+#include "hal/handles/DigitalHandleResource.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/DIODataInternal.h"
 #include "mockdata/DigitalPWMDataInternal.h"
 

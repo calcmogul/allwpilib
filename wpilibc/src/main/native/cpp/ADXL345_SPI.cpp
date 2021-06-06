@@ -4,8 +4,12 @@
 
 #include "frc/ADXL345_SPI.h"
 
+#include <stdint.h>
+
 #include <hal/FRCUsageReporting.h>
+#include <hal/SimDevice.h>
 #include <networktables/NTSendableBuilder.h>
+#include <networktables/NetworkTableEntry.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;

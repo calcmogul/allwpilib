@@ -32,13 +32,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #define WPI_JSON_IMPLEMENTATION
-#include "wpi/json.h"
-
+#include <assert.h>
 #include <numeric> // accumulate
+#include <algorithm>
+#include <cstddef>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
+#include "wpi/json.h"
 #include "fmt/format.h"
 #include "wpi/SmallString.h"
 #include "wpi/StringExtras.h"
+#include "wpi/SmallVector.h"
+#include "wpi/StringMap.h"
+#include "wpi/iterator.h"
 
 namespace wpi {
 

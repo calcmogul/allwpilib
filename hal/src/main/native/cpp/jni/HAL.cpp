@@ -5,9 +5,10 @@
 #include "hal/HAL.h"
 
 #include <jni.h>
+#include <stdint.h>
 
-#include <cassert>
 #include <cstring>
+#include <string>
 
 #include <fmt/format.h>
 #include <wpi/jni_util.h>
@@ -15,7 +16,12 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_HAL.h"
 #include "hal/DriverStation.h"
+#include "hal/DriverStationTypes.h"
+#include "hal/FRCUsageReporting.h"
+#include "hal/HALBase.h"
 #include "hal/Main.h"
+#include "hal/Types.h"
+#include "jni_md.h"
 
 using namespace hal;
 using namespace wpi::java;

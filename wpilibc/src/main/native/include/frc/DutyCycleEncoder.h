@@ -15,6 +15,10 @@
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 class DutyCycle;
 class DigitalSource;

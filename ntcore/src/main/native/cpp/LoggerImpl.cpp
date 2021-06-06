@@ -4,8 +4,17 @@
 
 #include "LoggerImpl.h"
 
+#include <climits>
+#include <cstdio>
+#include <string>
+#include <string_view>
+
 #include <fmt/format.h>
+#include <wpi/SafeThread.h>
+#include <wpi/UidVector.h>
 #include <wpi/fs.h>
+
+#include "ntcore_c.h"
 
 using namespace nt;
 

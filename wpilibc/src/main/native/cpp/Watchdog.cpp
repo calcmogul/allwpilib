@@ -4,12 +4,17 @@
 
 #include "frc/Watchdog.h"
 
+#include <stdint.h>
+
 #include <atomic>
+#include <mutex>
 #include <thread>
 #include <utility>
+#include <vector>
 
-#include <fmt/format.h>
 #include <hal/Notifier.h>
+#include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/mutex.h>
 #include <wpi/priority_queue.h>
 

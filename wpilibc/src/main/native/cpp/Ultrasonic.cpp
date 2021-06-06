@@ -4,13 +4,18 @@
 
 #include "frc/Ultrasonic.h"
 
+#include <algorithm>
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
+#include <hal/SimDevice.h>
+#include <units/length.h>
+#include <units/time.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/AnalogTriggerType.h"
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"

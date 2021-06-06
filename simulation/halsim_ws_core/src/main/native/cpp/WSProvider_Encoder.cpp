@@ -4,8 +4,13 @@
 
 #include "WSProvider_Encoder.h"
 
+#include <stdint.h>
+
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/EncoderData.h>
+
+#include "WSHalProviders.inc"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterEncoder##halsim##Callback(                               \

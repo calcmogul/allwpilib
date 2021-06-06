@@ -4,6 +4,11 @@
 
 #include "frc/smartdashboard/SendableChooserBase.h"
 
+#include <type_traits>
+#include <utility>
+
+#include <networktables/NetworkTableEntry.h>
+#include <wpi/SmallVector.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;

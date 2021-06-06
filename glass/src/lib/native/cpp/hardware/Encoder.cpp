@@ -4,6 +4,10 @@
 
 #include "glass/hardware/Encoder.h"
 
+#include <cstdio>
+#include <string>
+#include <type_traits>
+
 #include <fmt/format.h>
 #include <imgui.h>
 

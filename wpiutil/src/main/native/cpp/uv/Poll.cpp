@@ -4,6 +4,9 @@
 
 #include "wpi/uv/Poll.h"
 
+#include <utility>
+
+#include "uv.h"
 #include "wpi/uv/Loop.h"
 
 namespace wpi::uv {

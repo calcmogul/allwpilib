@@ -4,7 +4,14 @@
 
 #include "frc2/command/button/Trigger.h"
 
+#include <wpi/span.h>
+
+#include "frc2/command/Command.h"
 #include "frc2/command/InstantCommand.h"
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
 
 using namespace frc2;
 

@@ -3,12 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
-
-#include <cassert>
+#include <stdint.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_ThreadsJNI.h"
 #include "hal/Threads.h"
+#include "hal/Types.h"
+#include "jni_md.h"
 
 using namespace hal;
 

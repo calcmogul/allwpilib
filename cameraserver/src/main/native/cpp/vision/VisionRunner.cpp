@@ -4,11 +4,16 @@
 
 #include "vision/VisionRunner.h"
 
+#include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
 
 #include <opencv2/core/mat.hpp>
 
 #include "cameraserver/CameraServerShared.h"
+#include "cscore_oo.h"
+#include "vision/VisionPipeline.h"
 
 using namespace frc;
 

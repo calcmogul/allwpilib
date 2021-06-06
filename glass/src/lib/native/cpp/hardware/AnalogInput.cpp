@@ -4,6 +4,10 @@
 
 #include "glass/hardware/AnalogInput.h"
 
+#include <cstdio>
+#include <string>
+#include <type_traits>
+
 #include <imgui.h>
 
 #include "glass/Context.h"

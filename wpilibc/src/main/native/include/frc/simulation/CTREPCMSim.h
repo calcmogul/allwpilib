@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <memory>
 
 #include "frc/PneumaticsBase.h"
@@ -12,6 +14,7 @@
 namespace frc {
 
 class Compressor;
+class PneumaticsBase;
 
 namespace sim {
 

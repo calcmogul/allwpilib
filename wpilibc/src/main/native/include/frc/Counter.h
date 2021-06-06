@@ -12,6 +12,7 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
+#include "frc/AnalogTriggerType.h"
 #include "frc/CounterBase.h"
 
 namespace frc {
@@ -19,6 +20,8 @@ namespace frc {
 class DigitalGlitchFilter;
 class DMA;
 class DMASample;
+class AnalogTrigger;
+class DigitalSource;
 
 /**
  * Class for counting the number of ticks on a digital input channel.

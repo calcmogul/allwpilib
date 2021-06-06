@@ -5,22 +5,22 @@
 #include "glass/other/Mechanism2D.h"
 
 #include <algorithm>
-#include <cmath>
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Transform2d.h>
 #include <frc/geometry/Translation2d.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>

@@ -5,7 +5,10 @@
 #include "WSProvider_PWM.h"
 
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/PWMData.h>
+
+#include "WSHalProviders.inc"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterPWM##halsim##Callback(                                  \

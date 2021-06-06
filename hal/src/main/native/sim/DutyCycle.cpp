@@ -4,11 +4,18 @@
 
 #include "hal/DutyCycle.h"
 
+#include <atomic>
+#include <memory>
+
+#include <wpi/UidVector.h>
+
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/DutyCycleDataInternal.h"
 
 using namespace hal;

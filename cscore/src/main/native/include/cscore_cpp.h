@@ -12,7 +12,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/span.h>
 
 #include "cscore_c.h"
@@ -25,6 +24,8 @@
 
 namespace wpi {
 class json;
+template <typename T>
+class SmallVectorImpl;
 }  // namespace wpi
 
 /** CameraServer (cscore) namespace */

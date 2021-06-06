@@ -5,9 +5,12 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
+#include <wpi/span.h>
 
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/StringChooser.h"

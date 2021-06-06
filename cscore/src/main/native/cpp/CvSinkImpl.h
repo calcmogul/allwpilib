@@ -18,9 +18,18 @@
 #include "Frame.h"
 #include "SinkImpl.h"
 
+namespace cv {
+class Mat;
+}  // namespace cv
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace cs {
 
 class SourceImpl;
+class Notifier;
+class Telemetry;
 
 class CvSinkImpl : public SinkImpl {
  public:

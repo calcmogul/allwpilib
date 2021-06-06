@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <hal/SimDevice.h>
+#include <hal/Types.h>
 #include <hal/simulation/SimDeviceData.h>
 
 namespace frc::sim {

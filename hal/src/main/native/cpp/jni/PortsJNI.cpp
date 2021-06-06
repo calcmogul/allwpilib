@@ -4,11 +4,10 @@
 
 #include <jni.h>
 
-#include <cassert>
-
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PortsJNI.h"
 #include "hal/Ports.h"
+#include "jni_md.h"
 
 using namespace hal;
 

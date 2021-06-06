@@ -10,8 +10,10 @@
 #endif
 
 #include <memory>
+#include <type_traits>
 #include <utility>
 
+#include "frc2/command/Command.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"

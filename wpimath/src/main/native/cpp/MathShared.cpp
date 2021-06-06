@@ -4,6 +4,8 @@
 
 #include "wpimath/MathShared.h"
 
+#include <utility>
+
 #include <wpi/mutex.h>
 
 using namespace wpi::math;

@@ -4,15 +4,21 @@
 
 #include "frc/Encoder.h"
 
+#include <stdint.h>
+
 #include <utility>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/Encoder.h>
 #include <hal/FRCUsageReporting.h>
+#include <hal/Types.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/AnalogTriggerType.h"
 #include "frc/DigitalInput.h"
+#include "frc/DigitalSource.h"
 #include "frc/Errors.h"
 
 using namespace frc;

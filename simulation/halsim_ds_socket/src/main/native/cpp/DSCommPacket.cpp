@@ -5,14 +5,15 @@
 #include "DSCommPacket.h"
 
 #include <algorithm>
-#include <chrono>
 #include <cstring>
-#include <thread>
-#include <vector>
 
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/raw_uv_ostream.h>
 #include <wpi/span.h>
+
+#include "DSCommJoystickPacket.h"
 
 using namespace halsim;
 

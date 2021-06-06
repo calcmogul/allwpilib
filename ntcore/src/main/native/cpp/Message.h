@@ -11,11 +11,13 @@
 #include <string_view>
 
 #include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
 
 namespace nt {
 
 class WireDecoder;
 class WireEncoder;
+class Value;
 
 class Message {
   struct private_init {};

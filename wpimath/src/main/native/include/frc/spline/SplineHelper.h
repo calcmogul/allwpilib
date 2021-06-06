@@ -9,10 +9,18 @@
 
 #include <wpi/array.h>
 
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc/spline/CubicHermiteSpline.h"
 #include "frc/spline/QuinticHermiteSpline.h"
+#include "frc/spline/Spline.h"
+#include "units/length.h"
 
 namespace frc {
+class CubicHermiteSpline;
+class QuinticHermiteSpline;
+class Translation2d;
+
 /**
  * Helper class that is used to generate cubic and quintic splines from user
  * provided waypoints.

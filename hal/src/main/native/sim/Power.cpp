@@ -4,6 +4,7 @@
 
 #include "hal/Power.h"
 
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;

@@ -6,6 +6,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/QR"
+#include "Eigen/src/QR/HouseholderQR.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"

@@ -7,6 +7,7 @@
 #include "frc/commands/InstantCommand.h"
 
 namespace frc {
+class Command;
 
 class StartCommand : public InstantCommand {
  public:

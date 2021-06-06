@@ -9,6 +9,10 @@
 
 #include <wpi/Logger.h>
 
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace cs {
 
 class Notifier;

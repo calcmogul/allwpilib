@@ -10,7 +10,14 @@
 
 #include "HALProvider.h"
 
+namespace glass {
+class MainMenuBar;
+class NetworkTablesProvider;
+class WindowManager;
+}  // namespace glass
+
 namespace halsimgui {
+class HALProvider;
 
 class HALSimGui {
  public:

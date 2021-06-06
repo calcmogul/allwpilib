@@ -4,10 +4,14 @@
 
 #include "frc/PowerDistributionPanel.h"
 
+#include <stdint.h>
+
+#include <string>
+
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/PDP.h>
-#include <hal/Ports.h>
+#include <hal/Types.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 

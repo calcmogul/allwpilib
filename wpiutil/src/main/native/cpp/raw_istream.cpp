@@ -18,6 +18,7 @@
 
 #include "wpi/SmallVector.h"
 #include "wpi/fs.h"
+#include "wpi/iterator_range.h"
 
 #if defined(_MSC_VER)
 #ifndef STDIN_FILENO

@@ -4,6 +4,9 @@
 
 #include "frc/livewindow/LiveWindow.h"
 
+#include <string_view>
+#include <type_traits>
+
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>

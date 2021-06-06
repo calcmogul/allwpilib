@@ -4,7 +4,7 @@
 
 #include "frc/buttons/ReleasedButtonScheduler.h"
 
-#include "frc/buttons/Button.h"
+#include "frc/buttons/Trigger.h"
 #include "frc/commands/Command.h"
 
 using namespace frc;

@@ -4,6 +4,8 @@
 
 #include "wpi/uv/Handle.h"
 
+#include "uv.h"
+
 using namespace wpi::uv;
 
 Handle::~Handle() noexcept {

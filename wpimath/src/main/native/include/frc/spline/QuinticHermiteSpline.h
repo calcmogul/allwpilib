@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <wpi/array.h>
 
 #include "Eigen/Core"

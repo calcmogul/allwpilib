@@ -6,9 +6,13 @@
 
 #include <glass/networktables/NetworkTables.h>
 
+#include <memory>
+
 #include <wpigui.h>
 
 #include "HALSimGui.h"
+#include "glass/Window.h"
+#include "glass/networktables/NetworkTablesProvider.h"
 
 using namespace halsimgui;
 

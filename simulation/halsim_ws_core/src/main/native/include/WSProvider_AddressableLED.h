@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <string_view>
+
 #include "WSHalProviders.h"
 
 namespace wpilibws {

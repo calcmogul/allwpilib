@@ -4,16 +4,27 @@
 
 #include "frc2/command/Command.h"
 
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+#include <units/time.h>
+#include <wpi/SmallPtrSet.h>
+#include <wpi/SmallSet.h>
+#include <wpi/span.h>
+
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/InstantCommand.h"
-#include "frc2/command/ParallelCommandGroup.h"
-#include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
 #include "frc2/command/ProxyScheduleCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
 
 using namespace frc2;
 

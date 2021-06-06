@@ -4,7 +4,17 @@
 
 #include "frc/estimator/KalmanFilter.h"
 
+#include <wpi/array.h>
+
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Core/ArrayBase.h"
+#include "Eigen/src/Core/BooleanRedux.h"
+#include "Eigen/src/Core/DenseBase.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+
 namespace frc {
+template <int States, int Inputs, int Outputs>
+class LinearSystem;
 
 KalmanFilter<1, 1, 1>::KalmanFilter(
     LinearSystem<1, 1, 1>& plant, const wpi::array<double, 1>& stateStdDevs,

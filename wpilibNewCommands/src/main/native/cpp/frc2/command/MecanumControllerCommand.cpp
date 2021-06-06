@@ -5,6 +5,31 @@
 #include "frc2/command/MecanumControllerCommand.h"
 
 #include <utility>
+#include <vector>
+
+#include <frc/Timer.h>
+#include <frc/controller/HolonomicDriveController.h>
+#include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Rotation2d.h>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/MecanumDriveKinematics.h>
+#include <frc/kinematics/MecanumDriveWheelSpeeds.h>
+#include <frc/trajectory/Trajectory.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
+#include <wpi/span.h>
+
+#include "frc2/command/CommandBase.h"
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
 
 using namespace frc2;
 using namespace units;

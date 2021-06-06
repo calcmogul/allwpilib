@@ -4,6 +4,7 @@
 
 #include "glass/support/IniSaverBase.h"
 
+#include <imgui.h>
 #include <imgui_internal.h>
 
 using namespace glass;

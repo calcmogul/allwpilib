@@ -5,8 +5,12 @@
 #include "glass/other/DeviceTree.h"
 
 #include <cinttypes>
+#include <cstdio>
+#include <string>
 
 #include <imgui.h>
+#include <wpi/FunctionExtras.h>
+#include <wpi/StringMap.h>
 
 #include "glass/Context.h"
 #include "glass/ContextInternal.h"

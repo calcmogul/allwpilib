@@ -5,11 +5,19 @@
 #include "UsbCameraListener.h"
 
 #include <wpi/EventLoopRunner.h>
+#include <wpi/Signal.h>
 #include <wpi/StringExtras.h>
 #include <wpi/uv/FsEvent.h>
 #include <wpi/uv/Timer.h>
 
 #include "Notifier.h"
+
+namespace wpi {
+class Logger;
+namespace uv {
+class Loop;
+}  // namespace uv
+}  // namespace wpi
 
 using namespace cs;
 

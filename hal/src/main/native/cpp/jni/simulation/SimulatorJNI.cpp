@@ -12,9 +12,10 @@
 #include "SimDeviceDataJNI.h"
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
 #include "edu_wpi_first_hal_simulation_SimulatorJNI.h"
-#include "hal/HAL.h"
+#include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/simulation/MockHooks.h"
+#include "jni_md.h"
 
 using namespace wpi::java;
 

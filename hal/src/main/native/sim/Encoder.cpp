@@ -4,13 +4,21 @@
 
 #include "hal/Encoder.h"
 
+#include <atomic>
+#include <limits>
+#include <memory>
+
+#include <wpi/UidVector.h>
+
 #include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/EncoderDataInternal.h"
 
 using namespace hal;

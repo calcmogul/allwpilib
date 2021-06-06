@@ -18,6 +18,10 @@
 
 #include "frc/Counter.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 class DigitalInput;

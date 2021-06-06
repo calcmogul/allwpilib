@@ -4,6 +4,15 @@
 
 #include "frc/controller/LinearQuadraticRegulator.h"
 
+#include <wpi/array.h>
+
+#include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Core/DenseBase.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Core/SolveTriangular.h"
+#include "Eigen/src/Core/products/SelfadjointProduct.h"
+
 namespace frc {
 
 LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(

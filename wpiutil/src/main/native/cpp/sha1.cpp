@@ -19,10 +19,11 @@
 
 #include "wpi/sha1.h"
 
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
+#include <system_error>
+
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/span.h"
 
 using namespace wpi;
 

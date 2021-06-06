@@ -5,6 +5,8 @@
 #pragma once
 
 #include <cmath>
+#include <stdexcept>
+#include <utility>
 
 #include <wpi/array.h>
 
@@ -18,6 +20,9 @@
 #include "wpimath/MathShared.h"
 
 namespace frc {
+template <int States, int Inputs, int Outputs>
+class LinearSystem;
+
 namespace detail {
 
 /**

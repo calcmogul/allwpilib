@@ -4,8 +4,10 @@
 
 #include "frc/Threads.h"
 
-#include <hal/FRCUsageReporting.h>
+#include <stdint.h>
+
 #include <hal/Threads.h>
+#include <hal/Types.h>
 
 #include "frc/Errors.h"
 

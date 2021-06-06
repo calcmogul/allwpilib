@@ -8,6 +8,8 @@
 #include <string_view>
 #include <vector>
 
+#include <imgui.h>
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 
 #include "glass/DataSource.h"

@@ -3,10 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <functional>
 #include <memory>
 
 #include <hal/Extensions.h>
 
+#include "HALSimBaseWebSocketConnection.h"
 #include "HALSimWSServer.h"
 
 using namespace std::placeholders;

@@ -14,15 +14,24 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 #include <frc/trajectory/Trajectory.h>
 #include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
 #include <units/voltage.h>
 #include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
+namespace frc {
+class Pose2d;
+}  // namespace frc
+
 namespace frc2 {
+class Subsystem;
+
 /**
  * A command that uses a RAMSETE controller  to follow a trajectory
  * with a differential drive.

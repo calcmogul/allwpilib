@@ -4,12 +4,24 @@
 
 #include "wpi/PortForwarder.h"
 
+#include <cstddef>
+#include <string>
+
 #include "fmt/format.h"
 #include "wpi/DenseMap.h"
 #include "wpi/EventLoopRunner.h"
+#include "wpi/Signal.h"
+#include "wpi/span.h"
+#include "wpi/uv/Buffer.h"
+#include "wpi/uv/Error.h"
 #include "wpi/uv/GetAddrInfo.h"
+#include "wpi/uv/Stream.h"
 #include "wpi/uv/Tcp.h"
 #include "wpi/uv/Timer.h"
+
+namespace wpi::uv {
+class Loop;
+}  // namespace wpi::uv
 
 using namespace wpi;
 

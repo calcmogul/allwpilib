@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <initializer_list>
 #include <string>
 #include <string_view>
 
@@ -14,6 +15,7 @@
 
 #include "cscore.h"
 #include "cscore_cv.h"
+#include "cscore_oo.h"
 
 namespace frc {
 

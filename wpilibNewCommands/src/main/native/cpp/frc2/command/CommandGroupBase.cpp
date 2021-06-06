@@ -4,6 +4,12 @@
 
 #include "frc2/command/CommandGroupBase.h"
 
+#include <frc/Errors.h>
+#include <wpi/span.h>
+
+#include "frc2/command/Command.h"
+#include "frc2/command/CommandScheduler.h"
+
 using namespace frc2;
 
 bool CommandGroupBase::RequireUngrouped(const Command& command) {

@@ -4,6 +4,10 @@
 
 #include "wpi/future.h"
 
+#include <stdint.h>
+
+#include <algorithm>
+
 namespace wpi {
 namespace detail {
 

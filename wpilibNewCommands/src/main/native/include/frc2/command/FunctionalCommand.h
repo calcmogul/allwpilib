@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <memory>
 
 #include <wpi/span.h>
 
@@ -13,6 +14,8 @@
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
+class Subsystem;
+
 /**
  * A command that allows the user to pass in functions for each of the basic
  * command methods through the constructor.  Useful for inline definitions of

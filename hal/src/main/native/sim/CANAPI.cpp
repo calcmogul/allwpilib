@@ -4,13 +4,22 @@
 
 #include "hal/CANAPI.h"
 
+#include <stdint.h>
+
+#include <algorithm>
+#include <cstring>
+#include <memory>
+#include <type_traits>
+
 #include <wpi/DenseMap.h>
+#include <wpi/mutex.h>
 
 #include "CANAPIInternal.h"
 #include "HALInitializer.h"
 #include "hal/CAN.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
+#include "hal/handles/HandlesInternal.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;

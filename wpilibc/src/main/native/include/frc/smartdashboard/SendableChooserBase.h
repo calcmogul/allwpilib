@@ -13,6 +13,10 @@
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
 
+namespace nt {
+class NetworkTableEntry;
+}  // namespace nt
+
 namespace frc {
 
 /**

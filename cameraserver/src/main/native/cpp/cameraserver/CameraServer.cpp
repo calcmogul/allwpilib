@@ -5,18 +5,26 @@
 #include "cameraserver/CameraServer.h"
 
 #include <atomic>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
 #include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
+#include <wpi/iterator.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "cameraserver/CameraServerShared.h"
+#include "cscore_c.h"
+#include "cscore_cpp.h"
+#include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
 using namespace frc;

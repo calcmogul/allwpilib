@@ -4,8 +4,11 @@
 
 #include "frc/AnalogTriggerOutput.h"
 
+#include <stdint.h>
+
 #include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/AnalogTriggerType.h"

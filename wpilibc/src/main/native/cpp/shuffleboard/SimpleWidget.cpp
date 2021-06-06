@@ -4,9 +4,17 @@
 
 #include "frc/shuffleboard/SimpleWidget.h"
 
-#include "frc/shuffleboard/Shuffleboard.h"
+#include <string>
+
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+
+#include "frc/shuffleboard/ShuffleboardContainer.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
+#include "frc/shuffleboard/ShuffleboardRoot.h"
 #include "frc/shuffleboard/ShuffleboardTab.h"
+#include "frc/shuffleboard/ShuffleboardValue.h"
+#include "frc/shuffleboard/WidgetType.h"
 
 using namespace frc;
 

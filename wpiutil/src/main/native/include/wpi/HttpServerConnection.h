@@ -5,16 +5,23 @@
 #ifndef WPIUTIL_WPI_HTTPSERVERCONNECTION_H_
 #define WPIUTIL_WPI_HTTPSERVERCONNECTION_H_
 
+#include <stdint.h>
+
 #include <memory>
 #include <string_view>
 
 #include "wpi/HttpParser.h"
+#include "wpi/Signal.h"
 #include "wpi/span.h"
 #include "wpi/uv/Stream.h"
 
 namespace wpi {
 
 class raw_ostream;
+namespace uv {
+class Buffer;
+class Stream;
+}  // namespace uv
 
 class HttpServerConnection {
  public:

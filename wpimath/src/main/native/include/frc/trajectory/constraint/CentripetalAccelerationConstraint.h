@@ -10,6 +10,7 @@
 #include "units/velocity.h"
 
 namespace frc {
+class Pose2d;
 
 /**
  * A constraint on the maximum absolute centripetal acceleration allowed when

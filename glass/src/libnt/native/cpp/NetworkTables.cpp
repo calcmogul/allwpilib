@@ -6,18 +6,24 @@
 
 #include <networktables/NetworkTableValue.h>
 
-#include <cinttypes>
+#include <algorithm>
+#include <cassert>
+#include <cctype>
 #include <cstdio>
 #include <cstring>
 #include <initializer_list>
 #include <memory>
+#include <optional>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
+#include <wpi/DenseMap.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>

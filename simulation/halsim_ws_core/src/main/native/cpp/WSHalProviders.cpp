@@ -4,7 +4,12 @@
 
 #include "WSHalProviders.h"
 
+#include <string>
+
 #include <fmt/format.h>
+#include <wpi/json.h>
+
+#include "HALSimBaseWebSocketConnection.h"
 
 namespace wpilibws {
 

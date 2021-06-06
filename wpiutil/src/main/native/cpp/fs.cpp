@@ -63,6 +63,9 @@
 #include "wpi/ghc/filesystem.hpp"
 #endif
 
+#include <errno.h>
+#include <system_error>
+
 #include "wpi/Errno.h"
 #include "wpi/ErrorHandling.h"
 #include "wpi/WindowsError.h"

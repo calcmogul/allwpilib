@@ -4,6 +4,8 @@
 
 #include "frc/commands/WaitForChildren.h"
 
+#include <units/time.h>
+
 #include "frc/commands/CommandGroup.h"
 
 using namespace frc;

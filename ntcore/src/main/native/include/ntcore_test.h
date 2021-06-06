@@ -7,9 +7,11 @@
 
 #include <stdint.h>
 
+#include <cstddef>
 #include <string>
 
 #include "ntcore.h"
+#include "ntcore_c.h"
 
 // Functions in this header are to be used only for testing
 

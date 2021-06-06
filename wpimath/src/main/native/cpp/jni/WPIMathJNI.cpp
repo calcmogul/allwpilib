@@ -4,16 +4,35 @@
 
 #include <jni.h>
 
+#include <algorithm>
+#include <cassert>
+#include <complex>
+#include <cstddef>
 #include <exception>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 #include "Eigen/QR"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryUtil.h"
+#include "jni_md.h"
+#include "units/acceleration.h"
+#include "units/angle.h"
+#include "units/curvature.h"
+#include "units/length.h"
+#include "units/time.h"
+#include "units/velocity.h"
 #include "unsupported/Eigen/MatrixFunctions"
 
 using namespace wpi::java;

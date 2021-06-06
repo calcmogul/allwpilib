@@ -4,6 +4,8 @@
 
 #include "edu_wpi_first_hal_simulation_NotifierDataJNI.h"
 #include "hal/simulation/NotifierData.h"
+#include "jni.h"
+#include "jni_md.h"
 
 extern "C" {
 

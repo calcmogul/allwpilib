@@ -6,8 +6,11 @@
 
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
+#include <units/time.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
+
+#include "frc/AnalogTriggerType.h"
 
 using namespace frc;
 

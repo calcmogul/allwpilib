@@ -4,7 +4,6 @@
 
 #include "frc/shuffleboard/SendableCameraWrapper.h"
 
-#include <functional>
 #include <memory>
 #include <string>
 

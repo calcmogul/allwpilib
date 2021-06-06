@@ -5,6 +5,8 @@
 #pragma once
 
 #include "Translation2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "units/length.h"
 
 namespace frc {
 

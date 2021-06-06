@@ -4,7 +4,7 @@
 
 #include "frc/commands/ConditionalCommand.h"
 
-#include "frc/commands/Scheduler.h"
+#include <wpi/SmallPtrSet.h>
 
 using namespace frc;
 

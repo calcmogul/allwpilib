@@ -4,6 +4,10 @@
 
 #include "glass/hardware/PWM.h"
 
+#include <cstdio>
+#include <string>
+#include <type_traits>
+
 #include <imgui.h>
 
 #include "glass/Context.h"

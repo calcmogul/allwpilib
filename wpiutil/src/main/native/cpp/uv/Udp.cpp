@@ -6,8 +6,13 @@
 
 #include <cstring>
 
+#include "uv.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
+#include "wpi/priority_mutex.h"
+#include "wpi/uv/Buffer.h"
+#include "wpi/uv/Error.h"
+#include "wpi/uv/Loop.h"
 #include "wpi/uv/util.h"
 
 namespace {

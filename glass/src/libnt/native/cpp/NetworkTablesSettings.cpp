@@ -4,6 +4,8 @@
 
 #include "glass/networktables/NetworkTablesSettings.h"
 
+#include <atomic>
+#include <mutex>
 #include <optional>
 #include <string_view>
 #include <utility>
@@ -11,8 +13,10 @@
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <ntcore_cpp.h>
+#include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/condition_variable.h>
 
 #include "glass/Context.h"
 

@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <type_traits>
 #include <utility>
 
 #include <wpi/span.h>
@@ -14,6 +15,8 @@
 
 namespace frc2 {
 class Command;
+class Subsystem;
+
 /**
  * A class used to bind command scheduling to button presses.  Can be composed
  * with other buttons with the operators in Trigger.

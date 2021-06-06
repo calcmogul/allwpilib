@@ -5,10 +5,17 @@
 #include "frc/trajectory/Trajectory.h"
 
 #include <algorithm>
+#include <memory>
 
 #include <wpi/json.h>
 
-#include "units/math.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "units/length.h"
+
+namespace frc {
+class Transform2d;
+}  // namespace frc
 
 using namespace frc;
 

@@ -7,6 +7,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 #include <wpi/span.h>
@@ -16,6 +17,8 @@
 
 namespace frc2 {
 class Command;
+class Subsystem;
+
 /**
  * A class used to bind command scheduling to events.  The
  * Trigger class is a base for all command-event-binding classes, and so the

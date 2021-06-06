@@ -7,9 +7,10 @@
 #include <utility>
 
 #include <fmt/format.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
 #include <hal/Threads.h>
+#include <hal/Types.h>
+#include <units/time.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"

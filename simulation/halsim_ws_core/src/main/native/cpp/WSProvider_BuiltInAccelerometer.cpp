@@ -4,7 +4,12 @@
 
 #include "WSProvider_BuiltInAccelerometer.h"
 
-#include <hal/Ports.h>
+#include <functional>
+#include <memory>
+#include <string>
+#include <string_view>
+
+#include <hal/Value.h>
 #include <hal/simulation/AccelerometerData.h>
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \

@@ -6,7 +6,10 @@
 
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_AccelerometerDataJNI.h"
+#include "hal/Accelerometer.h"
+#include "hal/Types.h"
 #include "hal/simulation/AccelerometerData.h"
+#include "jni_md.h"
 
 using namespace hal;
 

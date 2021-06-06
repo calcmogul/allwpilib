@@ -4,6 +4,8 @@
 
 #include "cameraserver/CameraServerShared.h"
 
+#include <memory>
+
 #include <wpi/mutex.h>
 
 namespace {

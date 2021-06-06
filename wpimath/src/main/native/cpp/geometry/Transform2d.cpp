@@ -5,6 +5,7 @@
 #include "frc/geometry/Transform2d.h"
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Translation2d.h"
 
 using namespace frc;
 

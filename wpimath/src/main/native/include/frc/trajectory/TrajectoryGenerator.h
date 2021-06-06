@@ -5,17 +5,24 @@
 #pragma once
 
 #include <functional>
+#include <iterator>
 #include <memory>
 #include <utility>
 #include <vector>
 
+#include "frc/geometry/Pose2d.h"
+#include "frc/spline/Spline.h"
 #include "frc/spline/SplineParameterizer.h"
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "units/curvature.h"
 
 namespace frc {
+class TrajectoryConfig;
+class Translation2d;
+
 /**
  * Helper class used to generate trajectories with various constraints.
  */

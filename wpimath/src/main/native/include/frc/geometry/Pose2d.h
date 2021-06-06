@@ -7,6 +7,8 @@
 #include "Transform2d.h"
 #include "Translation2d.h"
 #include "Twist2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "units/length.h"
 
 namespace wpi {
 class json;

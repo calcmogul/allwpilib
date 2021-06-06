@@ -4,6 +4,9 @@
 
 #include "wpi/uv/NetworkStream.h"
 
+#include "uv.h"
+#include "wpi/uv/Error.h"
+
 namespace wpi::uv {
 
 ConnectReq::ConnectReq() {

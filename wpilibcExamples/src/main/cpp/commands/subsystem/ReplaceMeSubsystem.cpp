@@ -4,6 +4,10 @@
 
 #include "ReplaceMeSubsystem.h"
 
+#include <string_view>
+
+#include <frc/commands/Subsystem.h>
+
 ReplaceMeSubsystem::ReplaceMeSubsystem() : Subsystem("ExampleSubsystem") {}
 
 void ReplaceMeSubsystem::InitDefaultCommand() {

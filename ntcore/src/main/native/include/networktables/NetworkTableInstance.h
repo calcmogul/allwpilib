@@ -5,6 +5,7 @@
 #ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_
 #define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
@@ -20,6 +21,12 @@
 #include "ntcore_cpp.h"
 
 namespace nt {
+class ConnectionNotification;
+class EntryNotification;
+class LogMessage;
+class NetworkTable;
+struct ConnectionInfo;
+struct EntryInfo;
 
 /**
  * NetworkTables Instance.

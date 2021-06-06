@@ -6,11 +6,17 @@
 
 #include <string_view>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 
 #include "glass/DataSource.h"
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/FMS.h"
+
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
 
 namespace glass {
 

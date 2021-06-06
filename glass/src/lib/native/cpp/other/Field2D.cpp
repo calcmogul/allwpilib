@@ -8,8 +8,12 @@
 #include <cmath>
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
+#include <system_error>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
@@ -32,6 +36,8 @@
 #include <wpigui.h>
 
 #include "glass/Context.h"
+#include "units/base.h"
+#include "wpi/span.h"
 
 using namespace glass;
 

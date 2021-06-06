@@ -4,6 +4,13 @@
 
 #include "frc/spline/CubicHermiteSpline.h"
 
+#include <wpi/array.h>
+
+#include "Eigen/src/Core/DenseBase.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "frc/geometry/Rotation2d.h"
+
 using namespace frc;
 
 CubicHermiteSpline::CubicHermiteSpline(

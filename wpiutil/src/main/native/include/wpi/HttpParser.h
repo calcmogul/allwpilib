@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 
+#include <cstddef>
 #include <string_view>
 
 #include "wpi/Signal.h"

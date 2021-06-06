@@ -4,6 +4,8 @@
 
 #include "frc/buttons/POVButton.h"
 
+#include "frc/GenericHID.h"
+
 using namespace frc;
 
 POVButton::POVButton(GenericHID& joystick, int angle, int povNumber)

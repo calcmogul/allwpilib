@@ -5,6 +5,8 @@
 #ifndef NTCORE_DISPATCHER_H_
 #define NTCORE_DISPATCHER_H_
 
+#include <stdint.h>
+
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -14,12 +16,14 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/NetworkStream.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/span.h>
 
 #include "IDispatcher.h"
 #include "INetworkConnection.h"
+#include "ntcore_c.h"
 
 namespace wpi {
 class Logger;
@@ -32,6 +36,10 @@ namespace nt {
 class IConnectionNotifier;
 class IStorage;
 class NetworkConnection;
+class ConnectionNotification;
+class INetworkConnection;
+class Message;
+struct ConnectionInfo;
 
 class DispatcherBase : public IDispatcher {
   friend class DispatcherTest;

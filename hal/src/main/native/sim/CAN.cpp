@@ -4,6 +4,10 @@
 
 #include "hal/CAN.h"
 
+#include <wpi/UidVector.h>
+
+#include "hal/Types.h"
+#include "hal/simulation/SimCallbackRegistry.h"
 #include "mockdata/CanDataInternal.h"
 
 using namespace hal;

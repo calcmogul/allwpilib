@@ -4,7 +4,11 @@
 
 #include "frc/smartdashboard/MechanismRoot2d.h"
 
-#include "frc/util/Color8Bit.h"
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+
+#include "frc/Errors.h"
+#include "frc/smartdashboard/MechanismObject2d.h"
 
 using namespace frc;
 

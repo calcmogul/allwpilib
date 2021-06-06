@@ -4,13 +4,21 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <cstring>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <wpi/MemAlloc.h>
+#include <wpi/span.h>
 #include <wpi/timestamp.h>
 
 #include "Value_internal.h"
 #include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
 
 using namespace nt;
 

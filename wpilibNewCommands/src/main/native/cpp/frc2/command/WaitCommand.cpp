@@ -4,8 +4,14 @@
 
 #include "frc2/command/WaitCommand.h"
 
+#include <string>
+
 #include <fmt/format.h>
+#include <frc/Timer.h>
 #include <frc/fmt/Units.h>
+#include <units/time.h>
+
+#include "frc2/command/CommandScheduler.h"
 
 using namespace frc2;
 

@@ -2,6 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+
+#include <imgui.h>
+#include <ntcore_c.h>
+
+#include "glass/DataSource.h"
+#include "glass/View.h"
+#include "glass/Window.h"
+#include "glass/hardware/DIO.h"
+#include "glass/hardware/Gyro.h"
+#include "glass/hardware/SpeedController.h"
 #include "glass/networktables/NTCommandScheduler.h"
 #include "glass/networktables/NTCommandSelector.h"
 #include "glass/networktables/NTDifferentialDrive.h"
@@ -17,6 +28,19 @@
 #include "glass/networktables/NTStringChooser.h"
 #include "glass/networktables/NTSubsystem.h"
 #include "glass/networktables/NetworkTablesProvider.h"
+#include "glass/other/CommandScheduler.h"
+#include "glass/other/CommandSelector.h"
+#include "glass/other/Drive.h"
+#include "glass/other/FMS.h"
+#include "glass/other/Field2D.h"
+#include "glass/other/Mechanism2D.h"
+#include "glass/other/PIDController.h"
+#include "glass/other/StringChooser.h"
+#include "glass/other/Subsystem.h"
+
+namespace glass {
+class Model;
+}  // namespace glass
 
 using namespace glass;
 

@@ -5,6 +5,7 @@
 #include "wpi/raw_socket_ostream.h"
 
 #include "wpi/NetworkStream.h"
+#include "wpi/iterator_range.h"
 
 using namespace wpi;
 

@@ -4,10 +4,16 @@
 
 #include "frc/AnalogEncoder.h"
 
+#include <utility>
+
+#include <hal/SimDevice.h>
+#include <units/angle.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/AnalogInput.h"
+#include "frc/AnalogTriggerType.h"
 #include "frc/Counter.h"
 #include "frc/Errors.h"
 

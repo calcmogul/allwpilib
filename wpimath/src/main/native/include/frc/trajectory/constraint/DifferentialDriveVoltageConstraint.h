@@ -7,10 +7,17 @@
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "units/curvature.h"
 #include "units/length.h"
+#include "units/velocity.h"
 #include "units/voltage.h"
 
 namespace frc {
+class DifferentialDriveKinematics;
+class Pose2d;
+template <class Distance>
+class SimpleMotorFeedforward;
+
 /**
  * A class that enforces constraints on differential drive voltage expenditure
  * based on the motor dynamics and the drive kinematics.  Ensures that the

@@ -16,6 +16,8 @@
 
 #include "portable-file-dialogs.h"
 
+#include <errno.h>
+
 #if _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #   define WIN32_LEAN_AND_MEAN 1
@@ -35,12 +37,12 @@
 #ifndef _POSIX_C_SOURCE
 #   define _POSIX_C_SOURCE 2 // for popen()
 #endif
-#include <cstdio>     // popen()
-#include <cstdlib>    // std::getenv()
 #include <fcntl.h>    // fcntl()
 #include <unistd.h>   // read(), pipe(), dup2()
-#include <csignal>    // ::kill, std::signal
 #include <sys/wait.h> // waitpid()
+#include <cstdio>     // popen()
+#include <cstdlib>    // std::getenv()
+#include <csignal>    // ::kill, std::signal
 #endif
 
 #ifdef _WIN32
@@ -50,6 +52,9 @@
 #include <regex>
 #include <thread>
 #include <chrono>
+#include <algorithm>
+#include <iterator>
+#include <sstream>
 
 //
 // Below this are all the method implementations.

@@ -5,15 +5,24 @@
 #include "networktables/NetworkTable.h"
 
 #include <algorithm>
+#include <utility>
 
-#include <fmt/core.h>
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
+#include <wpi/span.h>
 
+#include "networktables/NetworkTableEntry.inc"
 #include "networktables/NetworkTableInstance.h"
-#include "ntcore.h"
+#include "networktables/NetworkTableInstance.inc"
+#include "networktables/NetworkTableType.h"
+#include "ntcore_cpp.h"
+
+namespace nt {
+class Value;
+}  // namespace nt
 
 using namespace nt;
 

@@ -6,11 +6,13 @@
 
 #include <cinttypes>
 #include <memory>
+#include <mutex>
 #include <string_view>
 #include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
 #include <wpi/HttpWebSocketServerConnection.h>
+#include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
 #include <wpi/uv/AsyncFunction.h>
 #include <wpi/uv/Buffer.h>
@@ -19,9 +21,13 @@
 
 namespace wpi {
 class json;
+namespace uv {
+class Stream;
+}  // namespace uv
 }  // namespace wpi
 
 namespace wpilibws {
+class HALSimWeb;
 
 class HALSimHttpConnection
     : public wpi::HttpWebSocketServerConnection<HALSimHttpConnection>,

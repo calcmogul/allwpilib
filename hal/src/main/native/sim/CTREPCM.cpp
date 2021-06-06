@@ -4,12 +4,20 @@
 
 #include "hal/CTREPCM.h"
 
+#include <memory>
+#include <string>
+
+#include <wpi/UidVector.h>
+#include <wpi/mutex.h>
+
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
-#include "hal/CANAPI.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
+#include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/CTREPCMDataInternal.h"
 
 using namespace hal;

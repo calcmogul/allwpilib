@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <memory>
 
 #include <wpi/span.h>
 
@@ -13,6 +14,8 @@
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
+class Subsystem;
+
 /**
  * A command that runs a given runnable when it is initialized, and another
  * runnable when it ends. Useful for running and then stopping a motor, or

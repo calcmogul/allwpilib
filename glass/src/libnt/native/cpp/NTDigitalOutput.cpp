@@ -4,7 +4,13 @@
 
 #include "glass/networktables/NTDigitalOutput.h"
 
+#include <memory>
+#include <vector>
+
 #include <fmt/format.h>
+#include <ntcore_cpp.h>
+
+#include "networktables/NetworkTableValue.h"
 
 using namespace glass;
 

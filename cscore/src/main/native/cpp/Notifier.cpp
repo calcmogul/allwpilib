@@ -4,9 +4,8 @@
 
 #include "Notifier.h"
 
-#include <queue>
+#include <climits>
 #include <utility>
-#include <vector>
 
 #include "Handle.h"
 #include "Instance.h"

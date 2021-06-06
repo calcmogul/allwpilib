@@ -4,16 +4,11 @@
 
 #include "frc/DMA.h"
 
-#include <frc/AnalogInput.h>
-#include <frc/Counter.h>
-#include <frc/DigitalSource.h>
-#include <frc/DutyCycle.h>
-#include <frc/Encoder.h>
-#include <frc/PWM.h>
-#include <frc/motorcontrol/PWMMotorController.h>
+#include <stdint.h>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/DMA.h>
-#include <hal/HALBase.h>
+#include <hal/Types.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/Counter.h"
@@ -21,6 +16,8 @@
 #include "frc/DutyCycle.h"
 #include "frc/Encoder.h"
 #include "frc/Errors.h"
+#include "frc/PWM.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 using namespace frc;
 

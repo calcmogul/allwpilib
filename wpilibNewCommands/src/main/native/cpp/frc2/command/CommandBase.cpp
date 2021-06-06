@@ -4,8 +4,12 @@
 
 #include "frc2/command/CommandBase.h"
 
+#include <wpi/SmallSet.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
+
+#include "frc2/command/CommandScheduler.h"
+#include "frc2/command/Subsystem.h"
 
 using namespace frc2;
 

@@ -4,13 +4,27 @@
 
 #include "RawSourceImpl.h"
 
+#include <memory>
+#include <utility>
+
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/core/mat.hpp>
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
+#include "Image.h"
 #include "Instance.h"
-#include "Log.h"
-#include "Notifier.h"
+#include "SourceImpl.h"
+#include "cscore_c.h"
+#include "cscore_cpp.h"
 #include "cscore_raw.h"
+
+namespace cs {
+class Notifier;
+class Telemetry;
+}  // namespace cs
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

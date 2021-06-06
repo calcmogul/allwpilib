@@ -2,6 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "frc/buttons/Trigger.h"
+
+#include <atomic>
+#include <type_traits>
+#include <utility>
+
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/buttons/Button.h"
@@ -10,6 +16,10 @@
 #include "frc/buttons/PressedButtonScheduler.h"
 #include "frc/buttons/ReleasedButtonScheduler.h"
 #include "frc/buttons/ToggleButtonScheduler.h"
+
+namespace frc {
+class Command;
+}  // namespace frc
 
 using namespace frc;
 

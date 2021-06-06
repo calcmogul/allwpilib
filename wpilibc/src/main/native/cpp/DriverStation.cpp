@@ -9,10 +9,11 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <cstring>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <type_traits>
 
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
@@ -22,6 +23,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
+#include <units/time.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 

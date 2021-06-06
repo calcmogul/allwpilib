@@ -4,6 +4,8 @@
 
 #include "glass/hardware/DIO.h"
 
+#include <type_traits>
+
 #include <imgui.h>
 
 #include "glass/DataSource.h"

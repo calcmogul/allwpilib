@@ -4,16 +4,20 @@
 
 #include "frc/Counter.h"
 
-#include <utility>
+#include <stdint.h>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
+#include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/DigitalInput.h"
+#include "frc/DigitalSource.h"
 #include "frc/Errors.h"
 
 using namespace frc;

@@ -5,6 +5,9 @@
 #ifndef WPIUTIL_WPI_RAW_UV_OSTREAM_H_
 #define WPIUTIL_WPI_RAW_UV_OSTREAM_H_
 
+#include <stdint.h>
+
+#include <cstddef>
 #include <functional>
 #include <utility>
 

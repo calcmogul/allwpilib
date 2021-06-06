@@ -4,17 +4,24 @@
 
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cmath>
+#include <complex>
+#include <cstddef>
 #include <random>
 #include <type_traits>
+#include <utility>
 
 #include "Eigen/Core"
 #include "Eigen/QR"
 #include "Eigen/src/Eigenvalues/EigenSolver.h"
+#include "Eigen/src/QR/ColPivHouseholderQR.h"
 #include "frc/geometry/Pose2d.h"
 
 namespace frc {
+class Pose2d;
+
 namespace detail {
 
 template <int Rows, int Cols, typename Matrix, typename T, typename... Ts>

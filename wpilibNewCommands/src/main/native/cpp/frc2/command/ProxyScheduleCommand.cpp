@@ -4,6 +4,13 @@
 
 #include "frc2/command/ProxyScheduleCommand.h"
 
+#include <wpi/SmallVector.h>
+#include <wpi/span.h>
+
+#include "frc2/command/Command.h"
+#include "frc2/command/CommandScheduler.h"
+#include "frc2/command/SetUtilities.h"
+
 using namespace frc2;
 
 ProxyScheduleCommand::ProxyScheduleCommand(

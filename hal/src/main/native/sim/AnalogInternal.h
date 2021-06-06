@@ -9,10 +9,15 @@
 #include <string>
 
 #include "PortsInternal.h"
+#include "hal/Types.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 
 namespace hal {
+template <typename THandle, typename TStruct, int16_t size,
+          hal::HAL_HandleEnum enumValue>
+class IndexedHandleResource;
+
 constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock
 constexpr int32_t kDefaultOversampleBits = 0;
 constexpr int32_t kDefaultAverageBits = 7;

@@ -12,6 +12,10 @@
 
 #include "frc2/command/Subsystem.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc2 {
 /**
  * A base for subsystems that handles registration in the constructor, and

@@ -11,7 +11,10 @@
 #include <vector>
 
 #include <frc/geometry/Translation2d.h>
+#include <imgui.h>
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
+#include <wpi/function_ref.h>
 
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Mechanism2D.h"
@@ -54,6 +57,7 @@ class NTMechanism2DModel : public Mechanism2DModel {
   ImU32 m_bgColorValue = 0;
 
   class RootModel;
+
   std::vector<std::unique_ptr<RootModel>> m_roots;
 };
 

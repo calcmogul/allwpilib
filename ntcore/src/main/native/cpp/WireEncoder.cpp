@@ -6,12 +6,14 @@
 
 #include <stdint.h>
 
-#include <cassert>
-#include <cstdlib>
-#include <cstring>
+#include <string>
 
 #include <wpi/MathExtras.h>
+#include <wpi/SmallVector.h>
 #include <wpi/leb128.h>
+#include <wpi/span.h>
+
+#include "networktables/NetworkTableValue.h"
 
 using namespace nt;
 

@@ -6,13 +6,15 @@
 
 #include <typeinfo>
 
+#include <fmt/format.h>
+#include <units/time.h>
+#include <wpi/SmallPtrSet.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/RobotState.h"
 #include "frc/Timer.h"
-#include "frc/commands/CommandGroup.h"
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
 

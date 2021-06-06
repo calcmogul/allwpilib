@@ -13,6 +13,7 @@
 #include "frc2/command/CommandBase.h"
 
 namespace frc2 {
+class Command;
 
 /**
  * A base for CommandGroups.  Statically tracks commands that have been

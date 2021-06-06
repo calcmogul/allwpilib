@@ -4,6 +4,8 @@
 
 #include "ReplaceMeCommand2.h"
 
+#include <frc2/command/CommandBase.h>
+
 ReplaceMeCommand2::ReplaceMeCommand2() {
   // Use addRequirements() here to declare subsystem dependencies.
 }

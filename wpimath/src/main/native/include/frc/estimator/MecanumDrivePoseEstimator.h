@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <functional>
 
 #include <wpi/array.h>
@@ -17,6 +18,8 @@
 #include "units/time.h"
 
 namespace frc {
+struct MecanumDriveWheelSpeeds;
+
 /**
  * This class wraps an Unscented Kalman Filter to fuse latency-compensated
  * vision measurements with mecanum drive encoder velocity measurements. It will

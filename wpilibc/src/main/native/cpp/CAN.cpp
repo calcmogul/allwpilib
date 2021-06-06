@@ -4,10 +4,9 @@
 
 #include "frc/CAN.h"
 
-#include <utility>
-
 #include <hal/CAN.h>
 #include <hal/CANAPI.h>
+#include <hal/CANAPITypes.h>
 #include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
 

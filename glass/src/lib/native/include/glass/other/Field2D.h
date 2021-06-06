@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string_view>
 
 #include <frc/geometry/Pose2d.h>
@@ -15,6 +16,12 @@
 
 #include "glass/Model.h"
 #include "glass/View.h"
+
+namespace frc {
+class Pose2d;
+class Translation2d;
+}  // namespace frc
+struct ImVec2;
 
 namespace glass {
 

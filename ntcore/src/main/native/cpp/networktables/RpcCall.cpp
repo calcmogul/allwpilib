@@ -5,6 +5,7 @@
 #include "networktables/RpcCall.h"
 
 #include "networktables/NetworkTableEntry.h"
+#include "networktables/NetworkTableEntry.inc"
 
 using namespace nt;
 

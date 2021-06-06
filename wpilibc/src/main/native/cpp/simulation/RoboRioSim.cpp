@@ -5,9 +5,10 @@
 #include "frc/simulation/RoboRioSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/RoboRioData.h>
+#include <units/current.h>
+#include <units/voltage.h>
 
 using namespace frc;
 using namespace frc::sim;

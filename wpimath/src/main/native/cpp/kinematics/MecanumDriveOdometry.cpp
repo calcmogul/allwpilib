@@ -4,6 +4,8 @@
 
 #include "frc/kinematics/MecanumDriveOdometry.h"
 
+#include "frc/kinematics/ChassisSpeeds.h"
+#include "units/velocity.h"
 #include "wpimath/MathShared.h"
 
 using namespace frc;

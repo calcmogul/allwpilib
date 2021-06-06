@@ -4,8 +4,12 @@
 
 #include "wpi/uv/GetNameInfo.h"
 
+#include "uv.h"
+#include "wpi/uv/Error.h"
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/util.h"
+
+struct sockaddr;
 
 namespace wpi::uv {
 

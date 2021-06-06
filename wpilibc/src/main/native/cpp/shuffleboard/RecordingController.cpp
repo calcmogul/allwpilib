@@ -4,6 +4,11 @@
 
 #include "frc/shuffleboard/RecordingController.h"
 
+#include <string>
+
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
+
 #include "frc/Errors.h"
 
 using namespace frc;

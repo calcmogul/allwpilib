@@ -5,6 +5,9 @@
 #ifndef CSCORE_CSCORE_OO_H_
 #define CSCORE_CSCORE_OO_H_
 
+#include <stdint.h>
+
+#include <functional>
 #include <initializer_list>
 #include <string>
 #include <string_view>
@@ -13,7 +16,14 @@
 
 #include <wpi/span.h>
 
+#include "cscore_c.h"
 #include "cscore_cpp.h"
+
+namespace wpi {
+class json;
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
 
 namespace cs {
 

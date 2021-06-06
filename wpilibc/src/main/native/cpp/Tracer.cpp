@@ -5,7 +5,10 @@
 #include "frc/Tracer.h"
 
 #include <fmt/format.h>
+#include <hal/cpp/fpga_clock.h>
 #include <wpi/SmallString.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"

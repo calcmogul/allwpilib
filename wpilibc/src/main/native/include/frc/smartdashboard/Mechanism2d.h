@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <networktables/NTSendable.h>
 #include <networktables/NetworkTableEntry.h>
@@ -15,6 +16,14 @@
 
 #include "frc/smartdashboard/MechanismRoot2d.h"
 #include "frc/util/Color8Bit.h"
+
+namespace nt {
+class NetworkTable;
+}  // namespace nt
+
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
 
 namespace frc {
 

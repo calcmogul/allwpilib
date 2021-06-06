@@ -4,6 +4,19 @@
 
 #include "frc2/command/NotifierCommand.h"
 
+#include <type_traits>
+#include <utility>
+
+#include <frc/Notifier.h>
+#include <units/time.h>
+#include <wpi/span.h>
+
+#include "frc2/command/CommandScheduler.h"
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
+
 using namespace frc2;
 
 NotifierCommand::NotifierCommand(std::function<void()> toRun,

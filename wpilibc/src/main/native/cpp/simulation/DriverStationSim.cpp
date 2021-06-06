@@ -5,8 +5,9 @@
 #include "frc/simulation/DriverStationSim.h"
 
 #include <memory>
-#include <utility>
 
+#include <hal/DriverStationTypes.h>
+#include <hal/Types.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 

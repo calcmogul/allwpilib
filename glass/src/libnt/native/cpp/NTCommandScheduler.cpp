@@ -4,8 +4,16 @@
 
 #include "glass/networktables/NTCommandScheduler.h"
 
+#include <memory>
+#include <utility>
+
 #include <fmt/format.h>
+#include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
+#include <wpi/span.h>
+
+#include "glass/DataSource.h"
+#include "networktables/NetworkTableValue.h"
 
 using namespace glass;
 

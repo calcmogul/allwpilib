@@ -4,14 +4,17 @@
 
 #include "frc/SPI.h"
 
-#include <cstring>
+#include <functional>
 #include <memory>
-#include <utility>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/SPI.h>
+#include <hal/SPITypes.h>
+#include <units/time.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "frc/DigitalSource.h"
 #include "frc/Errors.h"

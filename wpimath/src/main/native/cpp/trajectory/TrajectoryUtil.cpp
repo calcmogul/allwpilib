@@ -4,13 +4,16 @@
 
 #include "frc/trajectory/TrajectoryUtil.h"
 
+#include <stdexcept>
 #include <system_error>
+#include <vector>
 
 #include <fmt/format.h>
-#include <wpi/SmallString.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+
+#include "frc/geometry/Rotation2d.h"
 
 using namespace frc;
 

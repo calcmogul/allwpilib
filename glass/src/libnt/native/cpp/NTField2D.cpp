@@ -4,15 +4,27 @@
 
 #include "glass/networktables/NTField2D.h"
 
+#include <stdint.h>
+
 #include <algorithm>
+#include <cstddef>
+#include <type_traits>
 #include <vector>
 
 #include <fmt/format.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Rotation2d.h>
+#include <frc/geometry/Translation2d.h>
 #include <ntcore_cpp.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/span.h>
+
+#include "networktables/NetworkTableValue.h"
+#include "units/angle.h"
+#include "units/length.h"
 
 using namespace glass;
 

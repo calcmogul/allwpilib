@@ -5,8 +5,12 @@
 #include "wpi/uv/Pipe.h"
 
 #include <cstdlib>
+#include <utility>
 
+#include "uv.h"
+#include "wpi/Signal.h"
 #include "wpi/SmallString.h"
+#include "wpi/uv/Loop.h"
 
 namespace wpi::uv {
 

@@ -4,6 +4,10 @@
 
 #include "frc/smartdashboard/MechanismObject2d.h"
 
+#include <networktables/NetworkTable.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
+
 using namespace frc;
 
 MechanismObject2d::MechanismObject2d(std::string_view name) : m_name{name} {}

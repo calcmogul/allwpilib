@@ -4,6 +4,7 @@
 
 #include "frc/simulation/JoystickSim.h"
 
+#include "frc/GenericHID.h"
 #include "frc/Joystick.h"
 #include "frc/simulation/GenericHIDSim.h"
 

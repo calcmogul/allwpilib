@@ -2,10 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <stdint.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PDPJNI.h"
 #include "hal/PDP.h"
 #include "hal/Ports.h"
+#include "jni.h"
+#include "jni_md.h"
 
 using namespace hal;
 

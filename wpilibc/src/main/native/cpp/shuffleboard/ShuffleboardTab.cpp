@@ -4,6 +4,16 @@
 
 #include "frc/shuffleboard/ShuffleboardTab.h"
 
+#include <string>
+#include <vector>
+
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+
+#include "frc/shuffleboard/LayoutType.h"
+#include "frc/shuffleboard/ShuffleboardComponentBase.h"
+#include "frc/shuffleboard/ShuffleboardValue.h"
+
 using namespace frc;
 
 ShuffleboardTab::ShuffleboardTab(ShuffleboardRoot& root, std::string_view title)

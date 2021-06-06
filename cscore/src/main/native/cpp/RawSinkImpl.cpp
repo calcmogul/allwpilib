@@ -4,9 +4,27 @@
 
 #include "RawSinkImpl.h"
 
+#include <algorithm>
+#include <chrono>
+#include <memory>
+#include <thread>
+
+#include "Frame.h"
+#include "Image.h"
 #include "Instance.h"
-#include "cscore.h"
+#include "Log.h"
+#include "SourceImpl.h"
+#include "cscore_c.h"
+#include "cscore_cpp.h"
 #include "cscore_raw.h"
+
+namespace cs {
+class Notifier;
+class Telemetry;
+}  // namespace cs
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

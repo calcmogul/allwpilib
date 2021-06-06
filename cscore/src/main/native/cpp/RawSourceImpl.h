@@ -16,7 +16,14 @@
 #include "SourceImpl.h"
 #include "cscore_raw.h"
 
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace cs {
+class Notifier;
+class Telemetry;
+struct VideoMode;
 
 class RawSourceImpl : public ConfigurableSourceImpl {
  public:

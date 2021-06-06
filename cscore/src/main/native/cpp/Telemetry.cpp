@@ -4,16 +4,21 @@
 
 #include "Telemetry.h"
 
+#include <stdint.h>
+
+#include <atomic>
 #include <chrono>
-#include <limits>
+#include <condition_variable>
+#include <type_traits>
+#include <utility>
 
 #include <wpi/DenseMap.h>
-#include <wpi/timestamp.h>
+#include <wpi/SafeThread.h>
+#include <wpi/condition_variable.h>
 
 #include "Handle.h"
 #include "Instance.h"
 #include "Notifier.h"
-#include "SourceImpl.h"
 #include "cscore_cpp.h"
 
 using namespace cs;

@@ -5,7 +5,9 @@
 #include "cscore_oo.h"
 
 #include <fmt/format.h>
+#include <wpi/SmallVector.h>
 #include <wpi/json.h>
+#include <wpi/span.h>
 
 using namespace cs;
 

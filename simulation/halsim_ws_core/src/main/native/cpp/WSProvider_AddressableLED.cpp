@@ -4,8 +4,16 @@
 
 #include "WSProvider_AddressableLED.h"
 
+#include <cstddef>
+#include <vector>
+
+#include <hal/AddressableLEDTypes.h>
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/AddressableLEDData.h>
+#include <wpi/json.h>
+
+#include "WSHalProviders.inc"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterAddressableLED##halsim##Callback(                        \

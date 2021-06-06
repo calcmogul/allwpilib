@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 #include "frc/geometry/Pose2d.h"
@@ -18,6 +19,8 @@ class json;
 }  // namespace wpi
 
 namespace frc {
+class Transform2d;
+
 /**
  * Represents a time-parameterized trajectory. The trajectory contains of
  * various States that represent the pose, curvature, time elapsed, velocity,

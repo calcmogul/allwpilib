@@ -5,6 +5,8 @@
 #ifndef WPIUTIL_WPI_UDPCLIENT_H_
 #define WPIUTIL_WPI_UDPCLIENT_H_
 
+#include <stdint.h>
+
 #include <string>
 #include <string_view>
 
@@ -15,6 +17,8 @@
 namespace wpi {
 
 class Logger;
+template <typename T>
+class SmallVectorImpl;
 
 class UDPClient {
   int m_lsd;

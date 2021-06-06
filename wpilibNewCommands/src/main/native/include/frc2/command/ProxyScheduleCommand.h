@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <wpi/SmallVector.h>
 #include <wpi/span.h>
 
@@ -12,6 +14,8 @@
 #include "frc2/command/SetUtilities.h"
 
 namespace frc2 {
+class Command;
+
 /**
  * Schedules the given commands when this command is initialized, and ends when
  * all the commands are no longer scheduled.  Useful for forking off from

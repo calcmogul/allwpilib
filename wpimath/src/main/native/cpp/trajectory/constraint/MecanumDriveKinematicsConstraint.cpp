@@ -4,7 +4,11 @@
 
 #include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
 
-#include "units/math.h"
+#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/MecanumDriveKinematics.h"
+#include "frc/kinematics/MecanumDriveWheelSpeeds.h"
 
 using namespace frc;
 

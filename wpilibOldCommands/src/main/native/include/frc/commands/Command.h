@@ -15,6 +15,10 @@
 
 #include "frc/commands/Subsystem.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 class CommandGroup;

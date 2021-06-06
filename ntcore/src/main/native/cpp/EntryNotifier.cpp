@@ -4,9 +4,14 @@
 
 #include "EntryNotifier.h"
 
+#include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
 
 #include "Log.h"
+
+namespace nt {
+class Value;
+}  // namespace nt
 
 using namespace nt;
 

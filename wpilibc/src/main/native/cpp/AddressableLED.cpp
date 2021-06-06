@@ -4,14 +4,22 @@
 
 #include "frc/AddressableLED.h"
 
+#include <stdint.h>
+
+#include <string>
+
 #include <hal/AddressableLED.h>
+#include <hal/AddressableLEDTypes.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
-#include <hal/Ports.h>
+#include <hal/Types.h>
+#include <units/time.h>
 #include <wpi/StackTrace.h>
+#include <wpi/span.h>
 
 #include "frc/Errors.h"
+#include "frc/util/Color.h"
 
 using namespace frc;
 

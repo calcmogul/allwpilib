@@ -4,6 +4,10 @@
 
 #include "frc2/command/ParallelCommandGroup.h"
 
+#include <frc/Errors.h>
+
+#include "frc2/command/CommandScheduler.h"
+
 using namespace frc2;
 
 ParallelCommandGroup::ParallelCommandGroup(

@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <hal/Types.h>
+#include <units/dimensionless.h>
 #include <units/math.h>
 #include <units/time.h>
 #include <wpi/deprecated.h>

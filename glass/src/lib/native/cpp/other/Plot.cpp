@@ -9,10 +9,12 @@
 #include <algorithm>
 #include <atomic>
 #include <cstdio>
-#include <cstring>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -24,14 +26,13 @@
 #include <implot.h>
 #include <wpigui.h>
 #include <wpi/Signal.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
-#include "glass/support/ExtraGuiWidgets.h"
+#include "glass/View.h"
+#include "glass/Window.h"
 
 using namespace glass;
 

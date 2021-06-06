@@ -13,6 +13,8 @@
 
 namespace frc {
 
+class AnalogInput;
+
 /**
  * Handle operation of an analog accelerometer.
  *

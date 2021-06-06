@@ -4,6 +4,10 @@
 
 #include "frc/buttons/Button.h"
 
+namespace frc {
+class Command;
+}  // namespace frc
+
 using namespace frc;
 
 void Button::WhenPressed(Command* command) {

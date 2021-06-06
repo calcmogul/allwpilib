@@ -6,7 +6,13 @@
 
 #include <cmath>
 
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "units/angle.h"
+#include "units/angular_velocity.h"
+#include "units/length.h"
 #include "units/math.h"
+#include "units/velocity.h"
 
 using namespace frc;
 

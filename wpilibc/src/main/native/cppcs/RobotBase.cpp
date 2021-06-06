@@ -9,18 +9,21 @@
 #endif
 
 #include <cstdio>
+#include <memory>
+#include <utility>
 
 #include <cameraserver/CameraServerShared.h>
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
-#include "frc/RobotState.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 

@@ -4,6 +4,15 @@
 
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 
+#include "frc/geometry/Rotation2d.h"
+#include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+
+namespace frc {
+class Pose2d;
+}  // namespace frc
+
 using namespace frc;
 
 DifferentialDriveKinematicsConstraint::DifferentialDriveKinematicsConstraint(

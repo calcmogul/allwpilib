@@ -59,18 +59,21 @@ SOFTWARE.
 #include <type_traits>
 #include <utility>
 #include <vector> // vector
+#include <iosfwd>
 
 #include "wpi/StringMap.h"
 #include "wpi/span.h"
+
+namespace wpi {
+template <typename T> class SmallVectorImpl;
+}  // namespace wpi
 
 namespace wpi
 {
 
 class raw_istream;
 class raw_ostream;
-
 class JsonTest;
-
 /*!
 @brief default JSONSerializer template argument
 
@@ -80,7 +83,6 @@ for serialization.
 */
 template<typename = void, typename = void>
 struct adl_serializer;
-
 /*!
 @brief JSON Pointer
 
@@ -93,7 +95,6 @@ within a JSON document. It can be used with functions `at` and
 @since version 2.0.0
 */
 class json_pointer;
-
 /*!
 @brief default JSON class
 

@@ -5,7 +5,10 @@
 #include "WSProvider_DIO.h"
 
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/DIOData.h>
+
+#include "WSHalProviders.inc"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterDIO##halsim##Callback(                                  \

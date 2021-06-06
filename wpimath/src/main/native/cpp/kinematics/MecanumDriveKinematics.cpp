@@ -4,6 +4,14 @@
 
 #include "frc/kinematics/MecanumDriveKinematics.h"
 
+#include "Eigen/src/Core/DenseBase.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Householder/BlockHouseholder.h"
+#include "frc/geometry/Rotation2d.h"
+#include "units/angular_velocity.h"
+#include "units/velocity.h"
+
 using namespace frc;
 
 MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(

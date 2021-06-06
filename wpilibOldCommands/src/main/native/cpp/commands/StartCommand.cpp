@@ -4,6 +4,10 @@
 
 #include "frc/commands/StartCommand.h"
 
+#include <string_view>
+
+#include "frc/commands/Command.h"
+
 using namespace frc;
 
 StartCommand::StartCommand(Command* commandToStart)

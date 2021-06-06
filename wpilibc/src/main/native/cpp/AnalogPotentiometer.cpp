@@ -10,6 +10,7 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/AnalogInput.h"
 #include "frc/RobotController.h"
 
 using namespace frc;

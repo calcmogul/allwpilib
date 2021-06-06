@@ -14,6 +14,11 @@
 
 #include "frc/shuffleboard/ShuffleboardValue.h"
 
+namespace nt {
+class NetworkTable;
+class Value;
+}  // namespace nt
+
 namespace frc {
 
 class ShuffleboardContainer;

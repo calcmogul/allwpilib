@@ -32,10 +32,17 @@
 #include <utility>
 #include <vector>
 
+#include "frc/geometry/Pose2d.h"
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "units/acceleration.h"
+#include "units/curvature.h"
+#include "units/length.h"
+#include "units/velocity.h"
 
 namespace frc {
+class TrajectoryConstraint;
+
 /**
  * Class used to parameterize a trajectory by time.
  */

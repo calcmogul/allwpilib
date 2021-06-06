@@ -2,8 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "hal/simulation/EncoderData.h"
+
+#include <stdint.h>
+
+#include <atomic>
+#include <limits>
+
+#include <wpi/UidVector.h>
+
 #include "../PortsInternal.h"
 #include "EncoderDataInternal.h"
+#include "hal/Types.h"
+#include "hal/Value.h"
+#include "hal/simulation/NotifyListener.h"
+#include "hal/simulation/SimDataValue.h"
 
 using namespace hal;
 

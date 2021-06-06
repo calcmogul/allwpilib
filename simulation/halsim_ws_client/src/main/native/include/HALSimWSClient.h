@@ -13,6 +13,7 @@
 #include "HALSimWS.h"
 
 namespace wpilibws {
+class HALSimWS;
 
 class HALSimWSClient {
  public:

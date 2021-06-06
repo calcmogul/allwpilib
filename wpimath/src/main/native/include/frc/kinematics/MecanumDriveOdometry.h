@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <wpi/timestamp.h>
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
 #include "units/time.h"

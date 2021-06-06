@@ -11,6 +11,7 @@
 #include "frc/commands/Subsystem.h"
 
 namespace frc {
+class Subsystem;
 
 /**
  * This command will execute once, then finish immediately afterward.

@@ -6,14 +6,17 @@
 
 #include <utility>
 
+#include <fmt/format.h>
+#include <wpi/Logger.h>
 #include <wpi/NetworkStream.h>
+#include <wpi/condition_variable.h>
 #include <wpi/raw_socket_istream.h>
-#include <wpi/timestamp.h>
 
 #include "IConnectionNotifier.h"
 #include "Log.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
+#include "networktables/NetworkTableValue.h"
 
 using namespace nt;
 

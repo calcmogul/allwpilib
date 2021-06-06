@@ -8,6 +8,7 @@
 #include "frc/commands/Command.h"
 
 namespace frc {
+class Command;
 
 /**
  * This class provides an easy way to link commands to OI inputs.

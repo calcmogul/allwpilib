@@ -22,9 +22,16 @@
 
 #include "SinkImpl.h"
 
+namespace wpi {
+class Logger;
+class NetworkAcceptor;
+}  // namespace wpi
+
 namespace cs {
 
 class SourceImpl;
+class Notifier;
+class Telemetry;
 
 class MjpegServerImpl : public SinkImpl {
  public:

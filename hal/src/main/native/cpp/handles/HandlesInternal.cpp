@@ -5,6 +5,7 @@
 #include "hal/handles/HandlesInternal.h"
 
 #include <algorithm>
+#include <mutex>
 
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>

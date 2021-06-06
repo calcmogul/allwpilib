@@ -6,6 +6,12 @@
 
 #include <cstdio>
 
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <units/angle.h>
+
+#include "frc/Errors.h"
+
 using namespace frc;
 
 MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,

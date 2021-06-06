@@ -4,13 +4,22 @@
 
 #include "hal/AnalogTrigger.h"
 
+#include <atomic>
+#include <memory>
+
+#include <wpi/UidVector.h>
+
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/handles/IndexedHandleResource.h"
 #include "hal/handles/LimitedHandleResource.h"
+#include "hal/simulation/AnalogTriggerData.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/AnalogInDataInternal.h"
 #include "mockdata/AnalogTriggerDataInternal.h"
 

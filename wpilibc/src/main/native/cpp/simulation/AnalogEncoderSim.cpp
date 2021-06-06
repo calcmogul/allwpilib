@@ -4,6 +4,9 @@
 
 #include "frc/simulation/AnalogEncoderSim.h"
 
+#include <hal/SimDevice.h>
+#include <units/angle.h>
+
 #include "frc/AnalogEncoder.h"
 #include "frc/simulation/SimDeviceSim.h"
 

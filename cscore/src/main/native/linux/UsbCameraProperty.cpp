@@ -4,8 +4,19 @@
 
 #include "UsbCameraProperty.h"
 
+#include <linux/v4l2-controls.h>
+#include <stdint.h>
+
+#include <cctype>
+#include <cstring>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 #include "UsbUtil.h"
 

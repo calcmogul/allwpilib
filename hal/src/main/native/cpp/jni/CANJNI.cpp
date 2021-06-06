@@ -3,14 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
-#include <cassert>
+#include <cstddef>
+#include <string_view>
 
 #include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_can_CANJNI.h"
 #include "hal/CAN.h"
+#include "jni_md.h"
 
 using namespace hal;
 using namespace wpi::java;

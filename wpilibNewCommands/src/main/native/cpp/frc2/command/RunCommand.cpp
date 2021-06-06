@@ -4,6 +4,16 @@
 
 #include "frc2/command/RunCommand.h"
 
+#include <utility>
+
+#include <wpi/span.h>
+
+#include "frc2/command/CommandScheduler.h"
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
+
 using namespace frc2;
 
 RunCommand::RunCommand(std::function<void()> toRun,

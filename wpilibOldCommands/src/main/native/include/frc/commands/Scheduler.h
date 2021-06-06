@@ -9,6 +9,10 @@
 #include <networktables/NTSendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 class ButtonScheduler;
@@ -88,6 +92,7 @@ class Scheduler : public nt::NTSendable, public wpi::SendableHelper<Scheduler> {
   Scheduler& operator=(Scheduler&&) = default;
 
   struct Impl;
+
   std::unique_ptr<Impl> m_impl;
 };
 

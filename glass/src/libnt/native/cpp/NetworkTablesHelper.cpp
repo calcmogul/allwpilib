@@ -4,6 +4,8 @@
 
 #include "glass/networktables/NetworkTablesHelper.h"
 
+#include <ntcore_cpp.h>
+
 using namespace glass;
 
 NetworkTablesHelper::NetworkTablesHelper(NT_Inst inst)

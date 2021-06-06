@@ -6,6 +6,13 @@
 
 #include <utility>
 
+#include <frc/controller/PIDController.h>
+#include <wpi/span.h>
+
+namespace frc2 {
+class Subsystem;
+}  // namespace frc2
+
 using namespace frc2;
 
 PIDCommand::PIDCommand(PIDController controller,

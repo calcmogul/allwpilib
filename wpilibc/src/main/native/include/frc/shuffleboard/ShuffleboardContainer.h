@@ -22,6 +22,10 @@
 #include "frc/shuffleboard/ShuffleboardValue.h"
 #include "frc/shuffleboard/SuppliedValueWidget.h"
 
+namespace nt {
+class Value;
+}  // namespace nt
+
 namespace cs {
 class VideoSource;
 }  // namespace cs
@@ -35,6 +39,9 @@ namespace frc {
 class ComplexWidget;
 class ShuffleboardLayout;
 class SimpleWidget;
+class LayoutType;
+template <typename T>
+class SuppliedValueWidget;
 
 /**
  * Common interface for objects that can contain shuffleboard components.

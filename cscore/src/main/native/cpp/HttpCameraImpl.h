@@ -6,6 +6,7 @@
 #define CSCORE_HTTPCAMERAIMPL_H_
 
 #include <atomic>
+#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -21,10 +22,22 @@
 #include <wpi/raw_istream.h>
 #include <wpi/span.h>
 
+#include "PropertyImpl.h"
 #include "SourceImpl.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
 
+namespace wpi {
+class Logger;
+class raw_istream;
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
+
 namespace cs {
+class Notifier;
+class Telemetry;
+struct VideoMode;
 
 class HttpCameraImpl : public SourceImpl {
  public:

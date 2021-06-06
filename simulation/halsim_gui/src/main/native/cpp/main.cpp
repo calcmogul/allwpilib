@@ -21,6 +21,7 @@
 #include "DIOSimGui.h"
 #include "DriverStationGui.h"
 #include "EncoderSimGui.h"
+#include "HALProvider.h"
 #include "HALSimGui.h"
 #include "NetworkTablesSimGui.h"
 #include "PCMSimGui.h"
@@ -30,6 +31,9 @@
 #include "RoboRioSimGui.h"
 #include "SimDeviceGui.h"
 #include "TimingGui.h"
+#include "glass/MainMenuBar.h"
+#include "glass/WindowManager.h"
+#include "glass/networktables/NetworkTablesProvider.h"
 
 using namespace halsimgui;
 

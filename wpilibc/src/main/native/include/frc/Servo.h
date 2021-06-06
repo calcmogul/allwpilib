@@ -6,6 +6,10 @@
 
 #include "frc/PWM.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 /**

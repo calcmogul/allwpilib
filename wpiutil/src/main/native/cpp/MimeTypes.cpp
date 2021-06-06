@@ -4,7 +4,10 @@
 
 #include "wpi/MimeTypes.h"
 
+#include <initializer_list>
+
 #include "wpi/StringMap.h"
+#include "wpi/iterator.h"
 
 namespace wpi {
 

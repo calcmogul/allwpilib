@@ -7,35 +7,41 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <libgen.h>
-#include <linux/kernel.h>
-#include <linux/types.h>
+#include <linux/v4l2-controls.h>
 #include <linux/videodev2.h>
 #include <sys/eventfd.h>
 #include <sys/inotify.h>
-#include <sys/ioctl.h>
 #include <sys/select.h>
-#include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <algorithm>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
+#include <initializer_list>
 #include <memory>
+#include <optional>
 
 #include <fmt/format.h>
-#include <wpi/MemAlloc.h>
+#include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
+#include <wpi/StringMap.h>
+#include <wpi/condition_variable.h>
 #include <wpi/fs.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_istream.h>
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
-#include "Telemetry.h"
+#include "PropertyImpl.h"
+#include "UsbCameraBuffer.h"
+#include "UsbCameraProperty.h"
 #include "UsbUtil.h"
 #include "cscore_cpp.h"
 

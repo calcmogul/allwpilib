@@ -4,25 +4,51 @@
 
 #include "MjpegServerImpl.h"
 
+#include <algorithm>
+#include <cctype>
 #include <chrono>
+#include <cstddef>
+#include <iterator>
+#include <mutex>
+#include <optional>
+#include <thread>
+#include <tuple>
+#include <utility>
 
 #include <fmt/format.h>
 #include <wpi/HttpUtil.h>
+#include <wpi/NetworkAcceptor.h>
+#include <wpi/NetworkStream.h>
+#include <wpi/SafeThread.h>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/TCPAcceptor.h>
+#include <wpi/condition_variable.h>
 #include <wpi/fmt/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_istream.h>
 #include <wpi/raw_socket_ostream.h>
+#include <wpi/span.h>
 
-#include "Handle.h"
+#include "Frame.h"
+#include "Image.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
+#include "PropertyImpl.h"
 #include "SourceImpl.h"
 #include "c_util.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
+
+namespace cs {
+class Notifier;
+class Telemetry;
+}  // namespace cs
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

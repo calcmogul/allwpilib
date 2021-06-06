@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -12,9 +14,12 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "units/length.h"
 #include "units/time.h"
 
 namespace frc {
+struct DifferentialDriveWheelSpeeds;
+
 /**
  * This class wraps an Unscented Kalman Filter to fuse latency-compensated
  * vision measurements with differential drive encoder measurements. It will

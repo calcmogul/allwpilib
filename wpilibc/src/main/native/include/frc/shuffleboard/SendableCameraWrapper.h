@@ -21,6 +21,10 @@ using CS_Source = CS_Handle;  // NOLINT
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 class SendableCameraWrapper;

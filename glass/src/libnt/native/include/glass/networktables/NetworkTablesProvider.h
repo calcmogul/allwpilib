@@ -9,11 +9,14 @@
 #include <string_view>
 #include <vector>
 
+#include <ntcore_c.h>
 #include <ntcore_cpp.h>
 #include <wpi/StringMap.h>
 
 #include "glass/Model.h"
 #include "glass/Provider.h"
+#include "glass/View.h"
+#include "glass/WindowManager.h"
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/support/IniSaverInfo.h"
 #include "glass/support/IniSaverString.h"

@@ -5,6 +5,7 @@
 #include "frc/buttons/NetworkButton.h"
 
 #include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 
 using namespace frc;

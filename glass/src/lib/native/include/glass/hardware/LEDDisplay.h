@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <cstddef>
+
 #include <wpi/function_ref.h>
 #include <wpi/span.h>
 

@@ -5,10 +5,10 @@
 #include "frc/simulation/CTREPCMSim.h"
 
 #include <memory>
-#include <utility>
 
 #include <hal/simulation/CTREPCMData.h>
 
+#include "frc/PneumaticsBase.h"
 #include "frc/SensorUtil.h"
 
 using namespace frc;

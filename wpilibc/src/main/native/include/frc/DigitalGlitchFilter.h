@@ -14,10 +14,15 @@
 
 #include "frc/DigitalSource.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
 
 class Encoder;
 class Counter;
+class DigitalSource;
 
 /**
  * Class to enable glitch filtering on a set of digital inputs.

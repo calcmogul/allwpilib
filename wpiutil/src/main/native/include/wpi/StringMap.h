@@ -14,13 +14,6 @@
 #ifndef WPIUTIL_WPI_STRINGMAP_H
 #define WPIUTIL_WPI_STRINGMAP_H
 
-#include "wpi/SmallVector.h"
-#include "wpi/iterator.h"
-#include "wpi/iterator_range.h"
-#include "wpi/MemAlloc.h"
-#include "wpi/PointerLikeTypeTraits.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/deprecated.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -30,6 +23,15 @@
 #include <iterator>
 #include <string_view>
 #include <utility>
+#include <new>
+
+#include "wpi/SmallVector.h"
+#include "wpi/iterator.h"
+#include "wpi/iterator_range.h"
+#include "wpi/MemAlloc.h"
+#include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/ErrorHandling.h"
+#include "wpi/deprecated.h"
 
 namespace wpi {
 

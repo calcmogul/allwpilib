@@ -19,6 +19,15 @@
 #include <WSProvider_SimDevice.h>
 #include <WSProvider_Solenoid.h>
 #include <WSProvider_dPWM.h>
+#include <wpi/EventLoopRunner.h>
+
+#include "HALSimBaseWebSocketConnection.h"
+#include "HALSimWeb.h"
+#include "WSHalProviders.h"
+
+namespace wpi::uv {
+class Loop;
+}  // namespace wpi::uv
 
 using namespace wpilibws;
 

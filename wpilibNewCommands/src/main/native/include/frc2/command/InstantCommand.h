@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <memory>
 
 #include <wpi/span.h>
 
@@ -13,6 +14,8 @@
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
+class Subsystem;
+
 /**
  * A Command that runs instantly; it will initialize, execute once, and end on
  * the same iteration of the scheduler.  Users can either pass in a Runnable and

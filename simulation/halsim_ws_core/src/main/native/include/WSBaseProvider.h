@@ -14,6 +14,7 @@
 #include "HALSimBaseWebSocketConnection.h"
 
 namespace wpilibws {
+class HALSimBaseWebSocketConnection;
 
 class HALSimWSBaseProvider {
  public:

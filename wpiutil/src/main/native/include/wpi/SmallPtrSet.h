@@ -15,9 +15,6 @@
 #ifndef WPIUTIL_WPI_SMALLPTRSET_H
 #define WPIUTIL_WPI_SMALLPTRSET_H
 
-#include "wpi/Compiler.h"
-#include "wpi/PointerLikeTypeTraits.h"
-#include "wpi/type_traits.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +23,11 @@
 #include <initializer_list>
 #include <iterator>
 #include <utility>
+#include <type_traits>
+
+#include "wpi/Compiler.h"
+#include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/type_traits.h"
 
 namespace wpi {
 

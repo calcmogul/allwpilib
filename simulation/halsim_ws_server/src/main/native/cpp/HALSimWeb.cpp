@@ -4,16 +4,27 @@
 
 #include "HALSimWeb.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <stdexcept>
+
 #include <fmt/format.h>
+#include <wpi/Signal.h>
 #include <wpi/SmallString.h>
-#include <wpi/UrlParser.h>
-#include <wpi/WebSocketServer.h>
+#include <wpi/SmallVector.h>
 #include <wpi/fs.h>
-#include <wpi/raw_uv_ostream.h>
+#include <wpi/json.h>
+#include <wpi/uv/Async.h>
+#include <wpi/uv/Buffer.h>
+#include <wpi/uv/Error.h>
 #include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
 
+#include "HALSimBaseWebSocketConnection.h"
 #include "HALSimHttpConnection.h"
+#include "WSBaseProvider.h"
+#include "WSProviderContainer.h"
+#include "WSProvider_SimDevice.h"
 
 namespace uv = wpi::uv;
 

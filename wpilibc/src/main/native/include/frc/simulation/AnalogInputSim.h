@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <memory>
 
 #include "frc/simulation/CallbackStore.h"

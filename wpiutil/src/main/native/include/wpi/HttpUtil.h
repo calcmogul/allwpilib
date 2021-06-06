@@ -5,6 +5,7 @@
 #ifndef WPIUTIL_WPI_HTTPUTIL_H_
 #define WPIUTIL_WPI_HTTPUTIL_H_
 
+#include <cstddef>
 #include <initializer_list>
 #include <memory>
 #include <optional>
@@ -23,6 +24,7 @@
 #include "wpi/span.h"
 
 namespace wpi {
+class raw_istream;
 
 // Unescape a %xx-encoded URI.
 // @param buf Buffer for output

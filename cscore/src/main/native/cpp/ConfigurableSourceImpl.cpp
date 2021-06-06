@@ -4,12 +4,22 @@
 
 #include "ConfigurableSourceImpl.h"
 
+#include <memory>
+#include <vector>
+
+#include <wpi/span.h>
 #include <wpi/timestamp.h>
 
-#include "Handle.h"
-#include "Instance.h"
-#include "Log.h"
 #include "Notifier.h"
+#include "PropertyImpl.h"
+#include "cscore_cpp.h"
+
+namespace cs {
+class Telemetry;
+}  // namespace cs
+namespace wpi {
+class Logger;
+}  // namespace wpi
 
 using namespace cs;
 

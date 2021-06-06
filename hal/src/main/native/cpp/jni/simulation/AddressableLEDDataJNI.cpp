@@ -3,11 +3,20 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
+
+#include <memory>
+
+#include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
 #include "edu_wpi_first_hal_simulation_AddressableLEDDataJNI.h"
+#include "hal/AddressableLEDTypes.h"
+#include "hal/Types.h"
 #include "hal/simulation/AddressableLEDData.h"
+#include "jni_md.h"
 
 static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
 

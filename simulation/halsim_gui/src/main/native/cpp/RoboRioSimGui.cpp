@@ -7,11 +7,22 @@
 #include <glass/hardware/RoboRio.h>
 
 #include <memory>
+#include <string_view>
 
+#include <hal/Value.h>
 #include <hal/simulation/RoboRioData.h>
+#include <imgui.h>
 
 #include "HALDataSource.h"
+#include "HALProvider.h"
 #include "HALSimGui.h"
+#include "glass/DataSource.h"
+#include "glass/View.h"
+#include "glass/Window.h"
+
+namespace glass {
+class Model;
+}  // namespace glass
 
 using namespace halsimgui;
 

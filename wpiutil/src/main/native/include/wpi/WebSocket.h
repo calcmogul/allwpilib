@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 
+#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -25,6 +26,7 @@ namespace wpi {
 
 namespace uv {
 class Stream;
+class Buffer;
 }  // namespace uv
 
 /**
@@ -453,6 +455,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
 
   // temporary data used only during client handshake
   class ClientHandshakeData;
+
   std::unique_ptr<ClientHandshakeData> m_clientHandshake;
 
   void StartClient(std::string_view uri, std::string_view host,

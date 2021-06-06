@@ -4,14 +4,22 @@
 
 #include <jni.h>
 
-#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <fmt/format.h>
-#include <wpi/ConvertUTF.h>
 #include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "edu_wpi_first_networktables_NetworkTablesJNI.h"
-#include "ntcore.h"
+#include "jni_md.h"
+#include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
+#include "ntcore_cpp.h"
 
 using namespace wpi::java;
 

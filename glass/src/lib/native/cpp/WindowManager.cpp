@@ -6,9 +6,14 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
+#include <wpi/FunctionExtras.h>
 #include <wpigui.h>
+
+#include "glass/View.h"
 
 using namespace glass;
 

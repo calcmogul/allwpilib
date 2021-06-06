@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <hal/CANAPITypes.h>
+#include <hal/Types.h>
 
 namespace frc {
 struct CANData {

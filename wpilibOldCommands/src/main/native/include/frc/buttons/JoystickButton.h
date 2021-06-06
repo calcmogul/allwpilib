@@ -8,6 +8,7 @@
 #include "frc/buttons/Button.h"
 
 namespace frc {
+class GenericHID;
 
 class JoystickButton : public Button {
  public:

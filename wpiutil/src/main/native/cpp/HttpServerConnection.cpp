@@ -4,13 +4,21 @@
 
 #include "wpi/HttpServerConnection.h"
 
+#include <cstddef>
+#include <string>
+
 #include "fmt/format.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/SpanExtras.h"
 #include "wpi/StringExtras.h"
 #include "wpi/fmt/raw_ostream.h"
+#include "wpi/priority_mutex.h"
+#include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
+#include "wpi/uv/Buffer.h"
+#include "wpi/uv/Error.h"
+#include "wpi/uv/Stream.h"
 
 using namespace wpi;
 

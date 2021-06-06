@@ -4,20 +4,26 @@
 
 #include "wpi/UDPClient.h"
 
+#include <cstring>
+#include <utility>
+
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
-#include <fcntl.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
 #include <unistd.h>
 #endif
 
 #include "wpi/Logger.h"
 #include "wpi/SmallString.h"
+#include "wpi/SmallVector.h"
 #include "wpi/SocketError.h"
+#include "wpi/iterator_range.h"
 
 using namespace wpi;
 

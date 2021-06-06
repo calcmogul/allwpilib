@@ -2,15 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <stdint.h>
+
 #include <cstdio>
+#include <cstdlib>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
 
 #include "fmt/format.h"
 #include "wpi/MathExtras.h"
+#include "wpi/Signal.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
+#include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
+#include "wpi/span.h"
 #include "wpi/timestamp.h"
+#include "wpi/uv/Buffer.h"
+#include "wpi/uv/Error.h"
 #include "wpi/uv/Loop.h"
+#include "wpi/uv/Stream.h"
 #include "wpi/uv/Tcp.h"
 #include "wpi/uv/Tty.h"
 #include "wpi/uv/Udp.h"

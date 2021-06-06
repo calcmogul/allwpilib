@@ -4,7 +4,13 @@
 
 #include "ReplaceMeTrapezoidProfileCommand.h"
 
+#include <functional>
+
+#include <frc/trajectory/TrapezoidProfile.h>
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/TrapezoidProfileCommand.h>
 #include <units/acceleration.h>
+#include <units/length.h>
 #include <units/velocity.h>
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.

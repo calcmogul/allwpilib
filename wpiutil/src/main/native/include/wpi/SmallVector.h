@@ -22,12 +22,7 @@
 #pragma GCC diagnostic warning "-Wclass-memaccess"
 #endif
 
-#include "wpi/iterator_range.h"
-#include "wpi/AlignOf.h"
-#include "wpi/Compiler.h"
-#include "wpi/MathExtras.h"
-#include "wpi/MemAlloc.h"
-#include "wpi/type_traits.h"
+#include <stdint.h>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -40,7 +35,16 @@
 #include <type_traits>
 #include <utility>
 
+#include "wpi/iterator_range.h"
+#include "wpi/AlignOf.h"
+#include "wpi/Compiler.h"
+#include "wpi/MathExtras.h"
+#include "wpi/MemAlloc.h"
+#include "wpi/type_traits.h"
+#include "wpi/ErrorHandling.h"
+
 namespace wpi {
+template <typename IteratorT> class iterator_range;
 
 /// This is all the non-templated stuff common to all SmallVectors.
 class SmallVectorBase {

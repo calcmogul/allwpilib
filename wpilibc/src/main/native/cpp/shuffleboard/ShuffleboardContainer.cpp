@@ -4,13 +4,21 @@
 
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
+#include <utility>
+
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableValue.h>
+#include <wpi/SmallSet.h>
+#include <wpi/StringMap.h>
 #include <wpi/sendable/SendableRegistry.h>
+#include <wpi/span.h>
 
 #include "frc/Errors.h"
 #include "frc/shuffleboard/ComplexWidget.h"
-#include "frc/shuffleboard/ShuffleboardComponent.h"
+#include "frc/shuffleboard/LayoutType.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
+#include "frc/shuffleboard/SuppliedValueWidget.h"
 
 using namespace frc;
 

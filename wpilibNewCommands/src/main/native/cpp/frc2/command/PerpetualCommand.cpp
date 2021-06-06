@@ -4,6 +4,9 @@
 
 #include "frc2/command/PerpetualCommand.h"
 
+#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandScheduler.h"
+
 using namespace frc2;
 
 PerpetualCommand::PerpetualCommand(std::unique_ptr<Command>&& command) {

@@ -14,8 +14,10 @@
 #include <wpi/SmallVector.h>
 
 #include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
 
 namespace nt {
+class Value;
 
 /* Encodes native data for network transmission.
  * This class maintains an internal memory buffer for written data so that

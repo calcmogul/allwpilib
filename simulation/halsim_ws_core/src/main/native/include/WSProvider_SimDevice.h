@@ -4,23 +4,36 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <functional>
 #include <memory>
+#include <shared_mutex>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <hal/SimDevice.h>
+#include <hal/Types.h>
+#include <hal/Value.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <wpi/StringMap.h>
+#include <wpi/json.h>
 #include <wpi/uv/AsyncFunction.h>
 
 #include "WSBaseProvider.h"
 #include "WSProviderContainer.h"
 
+namespace wpi::uv {
+class Loop;
+}  // namespace wpi::uv
+
 namespace wpilibws {
 
 class HALSimWSProviderSimDevice;
 class HALSimWSProviderSimDevices;
+class HALSimBaseWebSocketConnection;
+class ProviderContainer;
 
 struct SimDeviceValueData {
   HALSimWSProviderSimDevice* device;

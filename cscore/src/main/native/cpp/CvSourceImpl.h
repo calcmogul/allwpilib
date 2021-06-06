@@ -17,7 +17,17 @@
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"
 
+namespace cv {
+class Mat;
+}  // namespace cv
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace cs {
+class Notifier;
+class Telemetry;
+struct VideoMode;
 
 class CvSourceImpl : public ConfigurableSourceImpl {
  public:

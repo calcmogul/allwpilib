@@ -1,5 +1,8 @@
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 
+#include <cmath>
+#include <stdexcept>
+
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
 

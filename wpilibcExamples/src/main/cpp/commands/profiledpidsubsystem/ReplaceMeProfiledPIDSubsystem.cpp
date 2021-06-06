@@ -4,7 +4,10 @@
 
 #include "ReplaceMeProfiledPIDSubsystem.h"
 
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc2/command/ProfiledPIDSubsystem.h>
 #include <units/acceleration.h>
+#include <units/length.h>
 #include <units/velocity.h>
 
 ReplaceMeProfiledPIDSubsystem::ReplaceMeProfiledPIDSubsystem()

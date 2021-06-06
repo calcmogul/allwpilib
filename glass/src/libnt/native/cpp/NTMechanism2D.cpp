@@ -5,15 +5,24 @@
 #include "glass/networktables/NTMechanism2D.h"
 
 #include <algorithm>
+#include <optional>
 #include <string_view>
+#include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include <fmt/format.h>
+#include <frc/geometry/Rotation2d.h>
+#include <frc/geometry/Translation2d.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
+#include <wpi/span.h>
 
 #include "glass/other/Mechanism2D.h"
+#include "networktables/NetworkTableValue.h"
+#include "units/angle.h"
+#include "units/length.h"
 
 using namespace glass;
 

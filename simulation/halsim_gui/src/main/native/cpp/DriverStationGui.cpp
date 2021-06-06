@@ -7,18 +7,24 @@
 #include <glass/other/FMS.h>
 #include <glass/support/ExtraGuiWidgets.h>
 #include <glass/support/IniSaverInfo.h>
+#include <stdint.h>
 
 #include <algorithm>
 #include <atomic>
+#include <cstdio>
 #include <cstring>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <hal/DriverStationTypes.h>
+#include <hal/HALBase.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 #include <imgui.h>
@@ -27,8 +33,12 @@
 #include <wpi/StringExtras.h>
 #include <wpigui.h>
 
-#include "HALDataSource.h"
 #include "HALSimGui.h"
+#include "glass/DataSource.h"
+#include "glass/Window.h"
+#include "glass/WindowManager.h"
+
+struct HAL_Value;
 
 using namespace halsimgui;
 

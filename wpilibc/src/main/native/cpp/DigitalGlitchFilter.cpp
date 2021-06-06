@@ -6,17 +6,21 @@
 
 #include <algorithm>
 #include <array>
-#include <utility>
+#include <iterator>
+#include <memory>
 
 #include <hal/Constants.h>
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/mutex.h>
+#include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/AnalogTriggerType.h"
 #include "frc/Counter.h"
+#include "frc/DigitalSource.h"
 #include "frc/Encoder.h"
 #include "frc/Errors.h"
-#include "frc/SensorUtil.h"
 
 using namespace frc;
 

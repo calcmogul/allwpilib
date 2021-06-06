@@ -4,9 +4,19 @@
 
 #include "glass/DataSource.h"
 
+#include <memory>
+#include <utility>
+
 #include <fmt/format.h>
+#include <imgui.h>
+#include <wpi/Signal.h>
+#include <wpi/StringMap.h>
+#include <wpi/iterator.h>
+#include <wpi/spinlock.h>
 
 #include "glass/ContextInternal.h"
+#include "glass/support/IniSaverInfo.h"
+#include "glass/support/IniSaverString.h"
 
 using namespace glass;
 

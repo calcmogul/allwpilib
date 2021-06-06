@@ -4,8 +4,14 @@
 
 #include "HALSimGui.h"
 
-#include <imgui.h>
+#include <string_view>
+
 #include <wpigui.h>
+
+#include "HALProvider.h"
+#include "glass/MainMenuBar.h"
+#include "glass/WindowManager.h"
+#include "glass/networktables/NetworkTablesProvider.h"
 
 using namespace halsimgui;
 

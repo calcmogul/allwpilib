@@ -12,6 +12,13 @@
 #include "cscore_cv.h"
 #include "vision/VisionPipeline.h"
 
+namespace cs {
+class VideoSource;
+}  // namespace cs
+namespace cv {
+class Mat;
+}  // namespace cv
+
 namespace frc {
 
 /**

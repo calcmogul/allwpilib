@@ -7,6 +7,7 @@
 #include <hal/CAN.h>
 #include <hal/HALBase.h>
 #include <hal/Power.h>
+#include <units/voltage.h>
 
 #include "frc/Errors.h"
 

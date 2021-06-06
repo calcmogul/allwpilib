@@ -6,20 +6,33 @@
 
 #include <glass/hardware/DIO.h>
 #include <glass/hardware/Encoder.h>
+#include <stdint.h>
 
 #include <memory>
+#include <string_view>
+#include <type_traits>
 #include <vector>
 
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/DIOData.h>
 #include <hal/simulation/DigitalPWMData.h>
 #include <hal/simulation/DutyCycleData.h>
-#include <hal/simulation/EncoderData.h>
 #include <hal/simulation/SimDeviceData.h>
+#include <imgui.h>
+#include <wpi/function_ref.h>
 
 #include "EncoderSimGui.h"
 #include "HALDataSource.h"
+#include "HALProvider.h"
 #include "HALSimGui.h"
+#include "glass/DataSource.h"
+#include "glass/View.h"
+#include "glass/Window.h"
+
+namespace glass {
+class Model;
+}  // namespace glass
 
 using namespace halsimgui;
 

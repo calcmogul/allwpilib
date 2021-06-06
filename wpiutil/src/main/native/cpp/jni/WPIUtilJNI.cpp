@@ -3,8 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
 #include "edu_wpi_first_util_WPIUtilJNI.h"
+#include "jni_md.h"
 #include "wpi/PortForwarder.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"

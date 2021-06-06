@@ -15,7 +15,13 @@
 
 #include "frc2/command/Command.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc2 {
+class Subsystem;
+
 /**
  * A Sendable base class for Commands.
  */

@@ -5,16 +5,29 @@
 #include "PWMSimGui.h"
 
 #include <glass/hardware/PWM.h>
+#include <stdint.h>
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/PWMData.h>
+#include <imgui.h>
+#include <wpi/function_ref.h>
 
 #include "HALDataSource.h"
+#include "HALProvider.h"
 #include "HALSimGui.h"
+#include "glass/DataSource.h"
+#include "glass/View.h"
+#include "glass/Window.h"
+
+namespace glass {
+class Model;
+}  // namespace glass
 
 using namespace halsimgui;
 

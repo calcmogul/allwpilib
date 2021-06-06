@@ -6,14 +6,20 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
+#include <wpi/iterator.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/smartdashboard/ListenerExecutor.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
+
+namespace nt {
+class Value;
+}  // namespace nt
 
 using namespace frc;
 

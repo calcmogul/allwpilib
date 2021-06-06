@@ -4,6 +4,8 @@
 
 #include "frc/commands/CommandGroupEntry.h"
 
+#include <units/time.h>
+
 #include "frc/commands/Command.h"
 
 using namespace frc;

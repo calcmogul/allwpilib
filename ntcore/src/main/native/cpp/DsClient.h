@@ -9,6 +9,10 @@
 
 #include "Log.h"
 
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace nt {
 
 class Dispatcher;
@@ -23,6 +27,7 @@ class DsClient {
 
  private:
   class Thread;
+
   wpi::SafeThreadOwner<Thread> m_owner;
   Dispatcher& m_dispatcher;
   wpi::Logger& m_logger;

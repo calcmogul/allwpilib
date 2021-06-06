@@ -4,6 +4,7 @@
 
 #include "wpi/uv/Process.h"
 
+#include "uv.h"
 #include "wpi/SmallString.h"
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Pipe.h"

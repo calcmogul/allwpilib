@@ -4,7 +4,10 @@
 
 #include "frc/commands/WaitCommand.h"
 
+#include <string>
+
 #include <fmt/format.h>
+#include <units/time.h>
 
 using namespace frc;
 

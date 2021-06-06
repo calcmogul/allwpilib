@@ -6,6 +6,7 @@
 
 #include "edu_wpi_first_hal_AccelerometerJNI.h"
 #include "hal/Accelerometer.h"
+#include "jni_md.h"
 
 extern "C" {
 

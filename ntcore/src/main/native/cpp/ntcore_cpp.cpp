@@ -2,20 +2,37 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "ntcore_cpp.h"
+
 #include <stdint.h>
 
-#include <cassert>
+#include <climits>
 #include <cstdio>
-#include <cstdlib>
+#include <functional>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
+#include <wpi/Logger.h>
+#include <wpi/raw_istream.h>
+#include <wpi/span.h>
 #include <wpi/timestamp.h>
 
+#include "ConnectionNotifier.h"
+#include "Dispatcher.h"
+#include "DsClient.h"
+#include "EntryNotifier.h"
 #include "Handle.h"
 #include "InstanceImpl.h"
-#include "Log.h"
+#include "LoggerImpl.h"
+#include "RpcServer.h"
+#include "Storage.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
-#include "ntcore.h"
+#include "networktables/NetworkTableValue.h"
+#include "ntcore_c.h"
 
 namespace nt {
 

@@ -8,11 +8,13 @@
 #include <linux/videodev2.h>
 
 #include <memory>
+#include <mutex>
 #include <string_view>
 
 #include <wpi/mutex.h>
 
 #include "PropertyImpl.h"
+#include "cscore_c.h"
 
 namespace cs {
 

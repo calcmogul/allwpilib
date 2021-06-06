@@ -4,6 +4,17 @@
 
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 
+#include <string>
+#include <vector>
+
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+
+#include "frc/shuffleboard/ShuffleboardComponent.inc"
+#include "frc/shuffleboard/ShuffleboardComponentBase.h"
+#include "frc/shuffleboard/ShuffleboardContainer.h"
+#include "frc/shuffleboard/ShuffleboardValue.h"
+
 using namespace frc;
 
 ShuffleboardLayout::ShuffleboardLayout(ShuffleboardContainer& parent,

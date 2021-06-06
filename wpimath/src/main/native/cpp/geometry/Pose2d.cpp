@@ -8,6 +8,11 @@
 
 #include <wpi/json.h>
 
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Twist2d.h"
+#include "units/angle.h"
+
 using namespace frc;
 
 Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)

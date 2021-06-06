@@ -12,6 +12,11 @@
 
 #include "Button.h"
 
+namespace nt {
+class NetworkTable;
+class NetworkTableEntry;
+}  // namespace nt
+
 namespace frc2 {
 /**
  * A Button that uses a NetworkTable boolean field.

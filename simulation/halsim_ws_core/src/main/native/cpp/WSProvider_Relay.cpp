@@ -5,7 +5,10 @@
 #include "WSProvider_Relay.h"
 
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/RelayData.h>
+
+#include "WSHalProviders.inc"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterRelay##halsim##Callback(                                \

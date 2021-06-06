@@ -6,6 +6,10 @@
 
 #include <utility>
 
+namespace frc {
+class Subsystem;
+}  // namespace frc
+
 using namespace frc;
 
 InstantCommand::InstantCommand(std::string_view name) : Command(name) {}

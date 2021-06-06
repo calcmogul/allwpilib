@@ -45,16 +45,21 @@
 #ifndef WPIUTIL_WPI_HASHING_H
 #define WPIUTIL_WPI_HASHING_H
 
-#include "wpi/Endian.h"
-#include "wpi/SwapByteOrder.h"
-#include "wpi/type_traits.h"
 #include <stdint.h>
+#include <stdlib.h>
 #include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <cstdint>
+#include <iterator>
+#include <type_traits>
+
+#include "wpi/Endian.h"
+#include "wpi/SwapByteOrder.h"
+#include "wpi/type_traits.h"
 
 #ifdef _WIN32
 #pragma warning(push)

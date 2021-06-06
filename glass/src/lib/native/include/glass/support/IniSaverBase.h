@@ -9,6 +9,8 @@
 
 #include <imgui.h>
 
+struct ImGuiTextBuffer;
+
 namespace glass {
 
 class IniSaverBase;

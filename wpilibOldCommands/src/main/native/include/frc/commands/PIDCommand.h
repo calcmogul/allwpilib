@@ -12,7 +12,13 @@
 #include "frc/PIDSource.h"
 #include "frc/commands/Command.h"
 
+namespace wpi {
+class SendableBuilder;
+}  // namespace wpi
+
 namespace frc {
+class PIDController;
+class Subsystem;
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:

@@ -4,9 +4,19 @@
 
 #include "frc/simulation/FlywheelSim.h"
 
+#include <Eigen/Core>
+#include <units/angular_velocity.h>
+#include <units/moment_of_inertia.h>
 #include <wpi/MathExtras.h>
 
+#include "frc/RobotController.h"
+#include "frc/StateSpaceUtil.h"
 #include "frc/system/plant/LinearSystemId.h"
+
+namespace frc {
+template <int States, int Inputs, int Outputs>
+class LinearSystem;
+}  // namespace frc
 
 using namespace frc;
 using namespace frc::sim;

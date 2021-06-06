@@ -4,8 +4,13 @@
 
 #include "frc/shuffleboard/ComplexWidget.h"
 
+#include <string>
+
+#include <networktables/NetworkTable.h>
 #include <wpi/sendable/Sendable.h>
 
+#include "frc/shuffleboard/ShuffleboardValue.h"
+#include "frc/shuffleboard/WidgetType.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
 
 using namespace frc;

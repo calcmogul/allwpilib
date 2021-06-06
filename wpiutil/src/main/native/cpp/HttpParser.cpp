@@ -4,6 +4,8 @@
 
 #include "wpi/HttpParser.h"
 
+#include "wpi/priority_mutex.h"
+
 using namespace wpi;
 
 uint32_t HttpParser::GetParserVersion() {

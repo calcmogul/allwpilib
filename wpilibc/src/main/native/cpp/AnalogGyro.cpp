@@ -4,12 +4,13 @@
 
 #include "frc/AnalogGyro.h"
 
-#include <climits>
-#include <utility>
+#include <stdint.h>
+
+#include <string>
 
 #include <hal/AnalogGyro.h>
-#include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
+#include <hal/Types.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -17,7 +18,7 @@
 
 #include "frc/AnalogInput.h"
 #include "frc/Errors.h"
-#include "frc/Timer.h"
+#include "frc/geometry/Rotation2d.h"
 
 using namespace frc;
 

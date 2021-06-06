@@ -17,6 +17,7 @@
 #include <wpi/span.h>
 
 #include "PropertyImpl.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
 
 namespace wpi {

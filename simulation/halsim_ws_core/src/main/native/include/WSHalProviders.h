@@ -4,11 +4,14 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 
+#include <hal/Types.h>
 #include <hal/simulation/NotifyListener.h>
 #include <wpi/json.h>
 #include <wpi/mutex.h>
@@ -16,6 +19,7 @@
 #include "WSBaseProvider.h"
 
 namespace wpilibws {
+class HALSimBaseWebSocketConnection;
 
 using HALCbRegisterIndexedFunc = void (*)(int32_t index,
                                           HAL_NotifyCallback callback,

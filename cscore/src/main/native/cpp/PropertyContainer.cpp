@@ -4,10 +4,14 @@
 
 #include "PropertyContainer.h"
 
+#include <algorithm>
+
 #include <wpi/Logger.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
+#include <wpi/StringMap.h>
 #include <wpi/json.h>
+#include <wpi/span.h>
 
 using namespace cs;
 

@@ -11,10 +11,12 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTriggerOutput.h"
+#include "frc/AnalogTriggerType.h"
 
 namespace frc {
 
 class AnalogInput;
+class AnalogTriggerOutput;
 class DutyCycle;
 
 class AnalogTrigger : public wpi::Sendable,

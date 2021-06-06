@@ -13,6 +13,7 @@
 #include "frc/commands/Subsystem.h"
 
 namespace frc {
+class PIDController;
 
 /**
  * This class is designed to handle the case where there is a Subsystem which

@@ -4,8 +4,15 @@
 
 #include "glass/networktables/NTCommandSelector.h"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include <fmt/format.h>
+#include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
+
+#include "networktables/NetworkTableValue.h"
 
 using namespace glass;
 

@@ -4,10 +4,14 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <functional>
 #include <string_view>
 
 #include <hal/Value.h>
+
+struct HAL_Value;
 
 namespace frc::sim {
 

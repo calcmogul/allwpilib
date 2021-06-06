@@ -2,18 +2,30 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <stdint.h>
+
+#include <algorithm>
+#include <cstddef>
 #include <exception>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #include <fmt/format.h>
-#include <opencv2/core/core.hpp>
+#include <opencv2/core.hpp>
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/jni_util.h>
 #include <wpi/span.h>
 
+#include "cscore_c.h"
 #include "cscore_cpp.h"
 #include "cscore_cv.h"
 #include "cscore_raw.h"
 #include "edu_wpi_first_cscore_CameraServerJNI.h"
+#include "jni.h"
+#include "jni_md.h"
 
 namespace cv {
 class Mat;
@@ -1524,7 +1536,8 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSinkConfigJson
   (JNIEnv* env, jclass, jint source, jstring config)
 {
   CS_Status status = 0;
-  auto val = cs::SetSinkConfigJson(source, JStringRef{env, config}, &status);
+  auto val = cs::SetSinkConfigJson(
+      source, std::string_view{JStringRef{env, config}}, &status);
   CheckStatus(env, status);
   return val;
 }

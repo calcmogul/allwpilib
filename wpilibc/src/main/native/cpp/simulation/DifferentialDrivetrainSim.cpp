@@ -6,12 +6,23 @@
 
 #include <frc/system/plant/LinearSystemId.h>
 
+#include <cmath>
 #include <utility>
 
+#include <Eigen/Core>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/moment_of_inertia.h>
+#include <units/time.h>
+#include <units/voltage.h>
 #include <wpi/MathExtras.h>
 
 #include "frc/RobotController.h"
+#include "frc/StateSpaceUtil.h"
+#include "frc/system/LinearSystem.h"
 #include "frc/system/NumericalIntegration.h"
+#include "frc/system/plant/DCMotor.h"
 
 using namespace frc;
 using namespace frc::sim;

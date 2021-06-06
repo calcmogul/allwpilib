@@ -17,11 +17,19 @@
 
 namespace wpi {
 class json;
+namespace uv {
+class Loop;
+class Tcp;
+class Timer;
+}  // namespace uv
 }  // namespace wpi
 
 namespace wpilibws {
 
 class HALSimWSClientConnection;
+class HALSimBaseWebSocketConnection;
+class HALSimWSProviderSimDevices;
+class ProviderContainer;
 
 class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
  public:

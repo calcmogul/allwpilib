@@ -5,11 +5,9 @@
 #include "frc/simulation/BuiltInAccelerometerSim.h"
 
 #include <memory>
-#include <utility>
 
+#include <hal/Accelerometer.h>
 #include <hal/simulation/AccelerometerData.h>
-
-#include "frc/BuiltInAccelerometer.h"
 
 using namespace frc;
 using namespace frc::sim;

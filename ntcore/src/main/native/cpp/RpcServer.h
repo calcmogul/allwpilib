@@ -5,15 +5,22 @@
 #ifndef NTCORE_RPCSERVER_H_
 #define NTCORE_RPCSERVER_H_
 
+#include <functional>
+#include <string>
+#include <string_view>
+#include <type_traits>
 #include <utility>
 
 #include <wpi/CallbackManager.h>
 #include <wpi/DenseMap.h>
+#include <wpi/Logger.h>
 #include <wpi/mutex.h>
 
 #include "Handle.h"
 #include "IRpcServer.h"
 #include "Log.h"
+#include "ntcore_c.h"
+#include "ntcore_cpp.h"
 
 namespace nt {
 

@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 
+#include "uv.h"
 #include "wpi/SmallString.h"
 #include "wpi/uv/Loop.h"
 

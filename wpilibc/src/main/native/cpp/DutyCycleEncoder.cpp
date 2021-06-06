@@ -4,12 +4,17 @@
 
 #include "frc/DutyCycleEncoder.h"
 
+#include <utility>
+
+#include <hal/SimDevice.h>
+#include <units/angle.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/AnalogTriggerType.h"
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
-#include "frc/DigitalSource.h"
 #include "frc/DutyCycle.h"
 #include "frc/Errors.h"
 

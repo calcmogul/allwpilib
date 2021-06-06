@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <string>   // std::string
 #include <memory>   // std::shared_ptr
 #include <map>      // std::map

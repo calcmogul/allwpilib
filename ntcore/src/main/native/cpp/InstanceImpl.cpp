@@ -4,6 +4,13 @@
 
 #include "InstanceImpl.h"
 
+#include <functional>
+
+#include <wpi/UidVector.h>
+#include <wpi/mutex.h>
+
+#include "Handle.h"
+
 using namespace nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};

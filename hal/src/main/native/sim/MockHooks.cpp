@@ -2,10 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "hal/simulation/MockHooks.h"
+
+#include <stdint.h>
+
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <cstdio>
 #include <thread>
 
 #include <fmt/format.h>
@@ -13,6 +16,8 @@
 
 #include "MockHooksInternal.h"
 #include "NotifierInternal.h"
+#include "hal/HALBase.h"
+#include "hal/Types.h"
 #include "hal/simulation/NotifierData.h"
 
 static std::atomic<bool> programStarted{false};

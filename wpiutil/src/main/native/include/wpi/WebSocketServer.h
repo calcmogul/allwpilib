@@ -5,6 +5,8 @@
 #ifndef WPIUTIL_WPI_WEBSOCKETSERVER_H_
 #define WPIUTIL_WPI_WEBSOCKETSERVER_H_
 
+#include <stdint.h>
+
 #include <functional>
 #include <initializer_list>
 #include <memory>

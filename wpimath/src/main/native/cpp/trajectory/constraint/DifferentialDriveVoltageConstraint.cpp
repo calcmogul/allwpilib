@@ -9,7 +9,17 @@
 
 #include <wpi/MathExtras.h>
 
-#include "units/math.h"
+#include "frc/controller/SimpleMotorFeedforward.h"
+#include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "frc/system/Discretization.h"
+#include "units/acceleration.h"
+#include "units/angle.h"
+#include "units/dimensionless.h"
+
+namespace frc {
+class Pose2d;
+}  // namespace frc
 
 using namespace frc;
 

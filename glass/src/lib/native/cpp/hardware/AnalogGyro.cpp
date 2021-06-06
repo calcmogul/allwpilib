@@ -4,6 +4,9 @@
 
 #include "glass/hardware/AnalogGyro.h"
 
+#include <cstdio>
+#include <type_traits>
+
 #include "glass/DataSource.h"
 #include "glass/other/DeviceTree.h"
 

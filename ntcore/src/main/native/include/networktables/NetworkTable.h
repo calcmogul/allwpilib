@@ -5,6 +5,7 @@
 #ifndef NTCORE_NETWORKTABLES_NETWORKTABLE_H_
 #define NTCORE_NETWORKTABLES_NETWORKTABLE_H_
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
@@ -21,9 +22,15 @@
 #include "networktables/TableListener.h"
 #include "ntcore_c.h"
 
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
+
 namespace nt {
 
 class NetworkTableInstance;
+class Value;
 
 /**
  * @defgroup ntcore_cpp_api ntcore C++ object-oriented API

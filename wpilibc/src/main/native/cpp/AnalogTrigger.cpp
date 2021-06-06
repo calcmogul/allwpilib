@@ -4,14 +4,16 @@
 
 #include "frc/AnalogTrigger.h"
 
-#include <utility>
+#include <stdint.h>
 
 #include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
+#include <hal/Types.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/AnalogInput.h"
+#include "frc/AnalogTriggerOutput.h"
 #include "frc/DutyCycle.h"
 #include "frc/Errors.h"
 

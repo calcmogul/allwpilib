@@ -4,13 +4,20 @@
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
 
+#include <string>
+#include <vector>
+
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
+#include <wpi/iterator.h>
 
 #include "frc/shuffleboard/Shuffleboard.h"
+#include "frc/shuffleboard/ShuffleboardComponentBase.h"
+#include "frc/shuffleboard/ShuffleboardWidget.h"
 
 using namespace frc::detail;
 

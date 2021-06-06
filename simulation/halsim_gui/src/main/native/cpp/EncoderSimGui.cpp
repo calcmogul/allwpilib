@@ -7,18 +7,30 @@
 #include <glass/hardware/Encoder.h>
 #include <stdint.h>
 
+#include <cassert>
 #include <limits>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
 #include <fmt/format.h>
 #include <hal/Ports.h>
+#include <hal/Value.h>
 #include <hal/simulation/EncoderData.h>
 #include <hal/simulation/SimDeviceData.h>
+#include <imgui.h>
+#include <wpi/function_ref.h>
 
-#include "HALDataSource.h"
+#include "HALProvider.h"
 #include "HALSimGui.h"
+#include "glass/DataSource.h"
+#include "glass/View.h"
+#include "glass/Window.h"
+
+namespace glass {
+class Model;
+}  // namespace glass
 
 using namespace halsimgui;
 

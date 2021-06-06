@@ -4,7 +4,7 @@
 
 #include "frc/Errors.h"
 
-#include <exception>
+#include <utility>
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
@@ -41,11 +41,14 @@ const char* frc::GetErrorMessage(int32_t* code) {
   case err::label:                \
     return message;
 #include "frc/WPIErrors.mac"
+#include "fmt/format.h"
+
 #undef S
 #define S(label, offset, message) \
   case warn::label:               \
     return message;
 #include "frc/WPIWarnings.mac"
+
 #undef S
     default:
       return HAL_GetLastError(code);

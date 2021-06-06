@@ -4,10 +4,27 @@
 
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 
+#include <cmath>
+#include <cstddef>
+
+#include <wpi/array.h>
 #include <wpi/timestamp.h>
 
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Core/ArrayBase.h"
+#include "Eigen/src/Core/BooleanRedux.h"
+#include "Eigen/src/Core/DenseBase.h"
+#include "Eigen/src/Core/DiagonalProduct.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "Eigen/src/Core/SolveTriangular.h"
+#include "Eigen/src/Core/products/SelfadjointProduct.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
+#include "frc/system/Discretization.h"
+#include "units/angle.h"
 
 using namespace frc;
 

@@ -7,9 +7,8 @@
 #include <atomic>
 #include <cstdlib>
 #include <iostream>
-#include <sstream>
-#include <stdexcept>
 #include <string>
+#include <sstream>
 
 #include "drake/common/drake_assertion_error.h"
 #include "drake/common/never_destroyed.h"

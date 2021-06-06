@@ -5,8 +5,11 @@
 #ifndef CSCORE_TELEMETRY_H_
 #define CSCORE_TELEMETRY_H_
 
+#include <stdint.h>
+
 #include <wpi/SafeThread.h>
 
+#include "cscore_c.h"
 #include "cscore_cpp.h"
 
 namespace cs {

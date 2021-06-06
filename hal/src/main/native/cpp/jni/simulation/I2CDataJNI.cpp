@@ -8,7 +8,9 @@
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
 #include "edu_wpi_first_hal_simulation_I2CDataJNI.h"
+#include "hal/Types.h"
 #include "hal/simulation/I2CData.h"
+#include "jni_md.h"
 
 using namespace hal;
 

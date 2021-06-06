@@ -8,6 +8,9 @@
 #include <pthread.h>
 #endif
 
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -20,6 +23,7 @@
 #include "HALInitializer.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/simulation/MockHooks.h"
+#include "hal/simulation/SimDataValue.h"
 #include "mockdata/DriverStationDataInternal.h"
 
 static wpi::mutex msgMutex;

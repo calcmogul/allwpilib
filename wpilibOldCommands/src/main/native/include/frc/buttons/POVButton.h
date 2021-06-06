@@ -8,6 +8,8 @@
 #include "frc/buttons/Button.h"
 
 namespace frc {
+class GenericHID;
+
 class POVButton : public Button {
  public:
   /**
