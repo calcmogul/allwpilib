@@ -2,7 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
 #include "frc/PIDBase.h"
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #include <algorithm>
 #include <cmath>
@@ -19,6 +33,14 @@ template <class T>
 constexpr const T& clamp(const T& value, const T& low, const T& high) {
   return std::max(low, std::min(value, high));
 }
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 
 PIDBase::PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
                  PIDOutput& output)
@@ -43,6 +65,12 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
   wpi::SendableRegistry::Add(this, "PIDController", instances);
 }
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 double PIDBase::Get() const {
   std::scoped_lock lock(m_thisMutex);

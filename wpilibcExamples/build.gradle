@@ -34,11 +34,6 @@ templatesTree.list(new FilenameFilter() {
             templatesMap.put(it, [])
         }
 
-nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
-    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
-    cppCompiler.args.add('-Werror=deprecated-declarations')
-}
-
 ext {
     sharedCvConfigs = examplesMap + templatesMap + [commands: []]
     staticCvConfigs = [:]
@@ -143,13 +138,6 @@ model {
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    binary.tasks.withType(CppCompile) {
-                        if (!(binary.toolChain in VisualCpp)) {
-                            cppCompiler.args "-Wno-error=deprecated-declarations"
-                        } else {
-                            cppCompiler.args "/wd4996"
-                        }
-                    }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
                     }

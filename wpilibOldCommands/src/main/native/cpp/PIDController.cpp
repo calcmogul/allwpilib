@@ -2,7 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
 #include "frc/PIDController.h"
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #include <wpi/sendable/SendableBuilder.h>
 
@@ -10,6 +24,14 @@
 #include "frc/PIDOutput.h"
 
 using namespace frc;
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 
 PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
                              PIDOutput* output, double period)
@@ -31,6 +53,12 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
   m_controlLoop->StartPeriodic(units::second_t(period));
 }
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 PIDController::~PIDController() {
   // Forcefully stopping the notifier so the callback can successfully run.

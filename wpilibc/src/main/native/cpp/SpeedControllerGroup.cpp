@@ -2,7 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
 #include "frc/SpeedControllerGroup.h"
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -12,11 +26,25 @@ using namespace frc;
 // Can't use a delegated constructor here because of an MSVC bug.
 // https://developercommunity.visualstudio.com/content/problem/583/compiler-bug-with-delegating-a-constructor.html
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
 SpeedControllerGroup::SpeedControllerGroup(
     std::vector<std::reference_wrapper<SpeedController>>&& speedControllers)
     : m_speedControllers(std::move(speedControllers)) {
   Initialize();
 }
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 void SpeedControllerGroup::Initialize() {
   for (auto& speedController : m_speedControllers) {
