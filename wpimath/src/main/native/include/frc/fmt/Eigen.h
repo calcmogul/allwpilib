@@ -9,29 +9,17 @@
 #include "Eigen/Core"
 
 template <int Rows, int Cols, int... Args>
-struct fmt::formatter<Eigen::Matrix<double, Rows, Cols, Args...>> {
-  char presentation = 'f';
-
-  constexpr auto parse(fmt::format_parse_context& ctx) {
-    auto it = ctx.begin(), end = ctx.end();
-    if (it != end && (*it == 'f' || *it == 'e')) {
-      presentation = *it++;
-    }
-
-    if (it != end && *it != '}') {
-      throw fmt::format_error("invalid format");
-    }
-
-    return it;
-  }
-
+struct fmt::formatter<Eigen::Matrix<double, Rows, Cols, Args...>>
+    : fmt::formatter<double> {
   template <typename FormatContext>
   auto format(const Eigen::Matrix<double, Rows, Cols, Args...>& mat,
               FormatContext& ctx) {
     auto out = ctx.out();
+
     for (int i = 0; i < Rows; ++i) {
       for (int j = 0; j < Cols; ++j) {
-        out = fmt::format_to(out, "  {:f}", mat(i, j));
+        out = fmt::format_to(out, "  ");
+        out = fmt::formatter<double>::format(mat(i, j), ctx);
       }
 
       if (i < Rows - 1) {

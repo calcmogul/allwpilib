@@ -13,10 +13,17 @@ TEST(FormatterTest, Eigen) {
   Eigen::Matrix<double, 3, 2> A;
   A << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
   EXPECT_EQ(
-      "  1.000000  2.000000\n"
-      "  3.000000  4.000000\n"
-      "  5.000000  6.000000",
-      fmt::format("{}", A));
+      "  1  2\n"
+      "  3  4\n"
+      "  5  6",
+      fmt::format("{:.7}", A));
+
+  A << 1.2, 2.3, 3.4, 4.5, 5.67, 6.78;
+  EXPECT_EQ(
+      "  1.2  2.3\n"
+      "  3.4  4.5\n"
+      "  5.67  6.78",
+      fmt::format("{:.7}", A));
 }
 
 TEST(FormatterTest, Units) {
