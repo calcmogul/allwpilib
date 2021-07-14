@@ -13,6 +13,8 @@
 #include <wpi/circular_buffer.h>
 #include <wpi/span.h>
 
+#include "Eigen/Core"
+#include "Eigen/QR"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -165,6 +167,69 @@ class LinearFilter {
   }
 
   /**
+   * Creates a backward finite difference filter that computes the nth
+   * derivative of the input given the specified number of samples.
+   *
+   * For example, a first derivative filter that uses two samples and a sample
+   * period of 20 ms would be
+   *
+   * <pre><code>
+   * BackwardFiniteDifference(1, 2, 0.02);
+   * </code></pre>
+   *
+   * @param derivative The order of the derivative to compute.
+   * @param samples    The number of samples to use to compute the given
+   *                   derivative. This must be one more than the order of
+   *                   derivative or higher.
+   * @param period     The period in seconds between samples taken by the user.
+   */
+  static LinearFilter<double> BackwardFiniteDifference(int derivative,
+                                                       int samples,
+                                                       units::second_t period) {
+    // See
+    // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points.
+
+    if (derivative < 1) {
+      throw std::runtime_error(
+          "Order of derivative must be greater than or equal to one.");
+    }
+
+    if (samples <= 0) {
+      throw std::runtime_error("Number of samples must be greater than zero.");
+    }
+
+    if (derivative >= samples) {
+      throw std::runtime_error(
+          "Order of derivative must be less than number of samples.");
+    }
+
+    Eigen::MatrixXd S{samples, samples};
+    for (int row = 0; row < samples; ++row) {
+      for (int col = 0; col < samples; ++col) {
+        double s = 1 - samples + col;
+        S(row, col) = std::pow(s, row);
+      }
+    }
+
+    // Fill in Kronecker deltas
+    Eigen::VectorXd d{samples};
+    for (int i = 0; i < samples; ++i) {
+      d(i, 0) = (i == derivative) ? Factorial(derivative) : 0;
+    }
+
+    Eigen::VectorXd a =
+        S.householderQr().solve(d) / std::pow(period.to<double>(), derivative);
+
+    // Reverse gains list
+    std::vector<double> gains;
+    for (int i = samples - 1; i > 0; --i) {
+      gains.push_back(a(i, 0));
+    }
+
+    return LinearFilter(gains, {});
+  }
+
+  /**
    * Reset the filter state.
    */
   void Reset() {
@@ -208,6 +273,19 @@ class LinearFilter {
   wpi::circular_buffer<T> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
+
+  /**
+   * Factorial of n.
+   *
+   * @param n Argument of which to take factorial.
+   */
+  static int Factorial(int n) {
+    if (n < 2) {
+      return 1;
+    } else {
+      return n * Factorial(n - 1);
+    }
+  }
 };
 
 }  // namespace frc
