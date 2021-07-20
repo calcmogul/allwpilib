@@ -23,12 +23,13 @@ namespace frc {
  */
 template <typename F, typename T>
 T RK4(F&& f, T x, units::second_t dt) {
-  const auto halfDt = 0.5 * dt;
+  const auto h = dt.to<double>();
   T k1 = f(x);
-  T k2 = f(x + k1 * halfDt.to<double>());
-  T k3 = f(x + k2 * halfDt.to<double>());
-  T k4 = f(x + k3 * dt.to<double>());
-  return x + dt.to<double>() / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+  T k2 = f(x + h * k1 * 0.5);
+  T k3 = f(x + h * k2 * 0.5);
+  T k4 = f(x + h * k3);
+
+  return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
 }
 
 /**
@@ -41,12 +42,13 @@ T RK4(F&& f, T x, units::second_t dt) {
  */
 template <typename F, typename T, typename U>
 T RK4(F&& f, T x, U u, units::second_t dt) {
-  const auto halfDt = 0.5 * dt;
+  const auto h = dt.to<double>();
   T k1 = f(x, u);
-  T k2 = f(x + k1 * halfDt.to<double>(), u);
-  T k3 = f(x + k2 * halfDt.to<double>(), u);
-  T k4 = f(x + k3 * dt.to<double>(), u);
-  return x + dt.to<double>() / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+  T k2 = f(x + h * k1 * 0.5, u);
+  T k3 = f(x + h * k2 * 0.5, u);
+  T k4 = f(x + h * k3, u);
+
+  return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
 }
 
 /**
@@ -59,13 +61,18 @@ T RK4(F&& f, T x, U u, units::second_t dt) {
  */
 template <typename F, typename T>
 T RungeKuttaTimeVarying(F&& f, T x, units::second_t t, units::second_t dt) {
-  const auto halfDt = 0.5 * dt;
-  T k1 = f(t, x);
-  T k2 = f(t + halfDt, x + k1 / 2.0);
-  T k3 = f(t + halfDt, x + k2 / 2.0);
-  T k4 = f(t + dt, x + k3);
+  constexpr int kDim = 4;
 
-  return x + dt.to<double>() / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+  // This is used for time-varying integration
+  constexpr std::array<double, kDim - 1> A{1.0 / 2.0, 1.0 / 2.0, 1.0};
+
+  const auto h = dt.to<double>();
+  T k1 = f(t, x);
+  T k2 = f(t + dt * A[0], x + h * k1 * 0.5);
+  T k3 = f(t + dt * A[1], x + h * k2 * 0.5);
+  T k4 = f(t + dt * A[2], x + h * k3);
+
+  return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
 }
 
 /**
@@ -86,10 +93,6 @@ T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   // https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
   // for the Butcher tableau the following arrays came from.
   constexpr int kDim = 6;
-
-  // This is used for time-varying integration
-  // constexpr std::array<double, kDim - 1> A{
-  //     1.0 / 4.0, 3.0 / 8.0, 12.0 / 13.0, 1.0, 1.0 / 2.0};
 
   // clang-format off
   constexpr double B[kDim - 1][kDim - 1]{
@@ -121,20 +124,20 @@ T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
       // Notice how the derivative in the Wikipedia notation is dy/dx.
       // That means their y is our x and their x is our t
       // clang-format off
-      T k1 = f(x, u) * h;
-      T k2 = f(x + k1 * B[0][0], u) * h;
-      T k3 = f(x + k1 * B[1][0] + k2 * B[1][1], u) * h;
-      T k4 = f(x + k1 * B[2][0] + k2 * B[2][1] + k3 * B[2][2], u) * h;
-      T k5 = f(x + k1 * B[3][0] + k2 * B[3][1] + k3 * B[3][2] + k4 * B[3][3], u) * h;
-      T k6 = f(x + k1 * B[4][0] + k2 * B[4][1] + k3 * B[4][2] + k4 * B[4][3] + k5 * B[4][4], u) * h;
+      T k1 = f(x, u);
+      T k2 = f(x + h * (k1 * B[0][0]), u);
+      T k3 = f(x + h * (k1 * B[1][0] + k2 * B[1][1]), u);
+      T k4 = f(x + h * (k1 * B[2][0] + k2 * B[2][1] + k3 * B[2][2]), u);
+      T k5 = f(x + h * (k1 * B[3][0] + k2 * B[3][1] + k3 * B[3][2] + k4 * B[3][3]), u);
+      T k6 = f(x + h * (k1 * B[4][0] + k2 * B[4][1] + k3 * B[4][2] + k4 * B[4][3] + k5 * B[4][4]), u);
       // clang-format on
 
-      newX = x + k1 * C1[0] + k2 * C1[1] + k3 * C1[2] + k4 * C1[3] +
-             k5 * C1[4] + k6 * C1[5];
-      truncationError =
-          (k1 * (C1[0] - C2[0]) + k2 * (C1[1] - C2[1]) + k3 * (C1[2] - C2[2]) +
-           k4 * (C1[3] - C2[3]) + k5 * (C1[4] - C2[4]) + k6 * (C1[5] - C2[5]))
-              .norm();
+      newX = x + h * (k1 * C1[0] + k2 * C1[1] + k3 * C1[2] + k4 * C1[3] +
+                      k5 * C1[4] + k6 * C1[5]);
+      truncationError = (h * (k1 * (C1[0] - C2[0]) + k2 * (C1[1] - C2[1]) +
+                              k3 * (C1[2] - C2[2]) + k4 * (C1[3] - C2[3]) +
+                              k5 * (C1[4] - C2[4]) + k6 * (C1[5] - C2[5])))
+                            .norm();
 
       h = 0.9 * h * std::pow(maxError / truncationError, 1.0 / 5.0);
     } while (truncationError > maxError);
@@ -163,10 +166,6 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   // Butcher tableau the following arrays came from.
 
   constexpr int kDim = 7;
-
-  // This is used for time-varying integration
-  // constexpr std::array<double, kDim - 1> A{
-  //     1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0, 8.0 / 9.0, 1.0, 1.0};
 
   // clang-format off
   constexpr double B[kDim - 1][kDim - 1]{
@@ -199,25 +198,25 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
       h = std::min(h, dt.to<double>() - dtElapsed);
 
       // clang-format off
-      T k1 = f(x, u) * h;
-      T k2 = f(x + k1 * B[0][0], u) * h;
-      T k3 = f(x + k1 * B[1][0] + k2 * B[1][1], u) * h;
-      T k4 = f(x + k1 * B[2][0] + k2 * B[2][1] + k3 * B[2][2], u) * h;
-      T k5 = f(x + k1 * B[3][0] + k2 * B[3][1] + k3 * B[3][2] + k4 * B[3][3], u) * h;
-      T k6 = f(x + k1 * B[4][0] + k2 * B[4][1] + k3 * B[4][2] + k4 * B[4][3] + k5 * B[4][4], u) * h;
+      T k1 = f(x, u);
+      T k2 = f(x + h * (k1 * B[0][0]), u);
+      T k3 = f(x + h * (k1 * B[1][0] + k2 * B[1][1]), u);
+      T k4 = f(x + h * (k1 * B[2][0] + k2 * B[2][1] + k3 * B[2][2]), u);
+      T k5 = f(x + h * (k1 * B[3][0] + k2 * B[3][1] + k3 * B[3][2] + k4 * B[3][3]), u);
+      T k6 = f(x + h * (k1 * B[4][0] + k2 * B[4][1] + k3 * B[4][2] + k4 * B[4][3] + k5 * B[4][4]), u);
       // clang-format on
 
       // Since the final row of B and the array C1 have the same coefficients
       // and k7 has no effect on newX, we can reuse the calculation.
-      newX = x + k1 * B[5][0] + k2 * B[5][1] + k3 * B[5][2] + k4 * B[5][3] +
-             k5 * B[5][4] + k6 * B[5][5];
-      T k7 = f(newX, u) * h;
+      newX = x + h * (k1 * B[5][0] + k2 * B[5][1] + k3 * B[5][2] +
+                      k4 * B[5][3] + k5 * B[5][4] + k6 * B[5][5]);
+      T k7 = f(newX, u);
 
-      truncationError =
-          (k1 * (C1[0] - C2[0]) + k2 * (C1[1] - C2[1]) + k3 * (C1[2] - C2[2]) +
-           k4 * (C1[3] - C2[3]) + k5 * (C1[4] - C2[4]) + k6 * (C1[5] - C2[5]) +
-           k7 * (C1[6] - C2[6]))
-              .norm();
+      truncationError = (h * (k1 * (C1[0] - C2[0]) + k2 * (C1[1] - C2[1]) +
+                              k3 * (C1[2] - C2[2]) + k4 * (C1[3] - C2[3]) +
+                              k5 * (C1[4] - C2[4]) + k6 * (C1[5] - C2[5]) +
+                              k7 * (C1[6] - C2[6])))
+                            .norm();
 
       h = 0.9 * h * std::pow(maxError / truncationError, 1.0 / 5.0);
     } while (truncationError > maxError);
