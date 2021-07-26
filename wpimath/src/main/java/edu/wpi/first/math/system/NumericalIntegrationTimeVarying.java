@@ -8,8 +8,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import java.util.function.BiFunction;
 
-public final class RungeKuttaTimeVarying {
-  private RungeKuttaTimeVarying() {
+public final class NumericalIntegrationTimeVarying {
+  private NumericalIntegrationTimeVarying() {
     // Utility class
   }
 

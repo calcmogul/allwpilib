@@ -9,7 +9,7 @@
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalIntegration.h"
 
-// Tests that integrating dx/dt = e^x works.
+// Test that integrating dx/dt = eˣ works
 TEST(NumericalIntegrationTest, Exponential) {
   frc::Vectord<1> y0{0.0};
 
@@ -19,7 +19,7 @@ TEST(NumericalIntegrationTest, Exponential) {
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
-// Tests that integrating dx/dt = e^x works when we provide a U.
+// Test that integrating dx/dt = eˣ works when we provide a u
 TEST(NumericalIntegrationTest, ExponentialWithU) {
   frc::Vectord<1> y0{0.0};
 
@@ -41,7 +41,7 @@ TEST(NumericalIntegrationTest, ZeroRKDP) {
   EXPECT_NEAR(y1(0), 0.0, 1e-3);
 }
 
-// Tests that integrating dx/dt = e^x works with RKDP
+// Tests that integrating dx/dt = eˣ works with RKDP
 TEST(NumericalIntegrationTest, ExponentialRKDP) {
   frc::Vectord<1> y0{0.0};
 

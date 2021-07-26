@@ -10,7 +10,7 @@
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
-#include "frc/system/RungeKuttaTimeVarying.h"
+#include "frc/system/NumericalIntegrationTimeVarying.h"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
@@ -62,7 +62,7 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   //       T
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
+  frc::Matrixd<2, 2> discQIntegrated = frc::RKDPTimeVarying<
       std::function<frc::Matrixd<2, 2>(units::second_t,
                                        const frc::Matrixd<2, 2>&)>,
       frc::Matrixd<2, 2>>(
@@ -94,7 +94,7 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   //       T
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  frc::Matrixd<2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
+  frc::Matrixd<2, 2> discQIntegrated = frc::RKDPTimeVarying<
       std::function<frc::Matrixd<2, 2>(units::second_t,
                                        const frc::Matrixd<2, 2>&)>,
       frc::Matrixd<2, 2>>(

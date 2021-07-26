@@ -12,7 +12,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.N1;
 import org.junit.jupiter.api.Test;
 
-class RungeKuttaTimeVaryingTest {
+class NumericalIntegrationTimeVaryingTest {
   private static Matrix<N1, N1> rungeKuttaTimeVaryingSolution(double t) {
     return new MatBuilder<>(Nat.N1(), Nat.N1())
         .fill(12.0 * Math.exp(t) / Math.pow(Math.exp(t) + 1.0, 2.0));
