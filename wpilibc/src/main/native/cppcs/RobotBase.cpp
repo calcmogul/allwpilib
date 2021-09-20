@@ -268,3 +268,7 @@ RobotBase::RobotBase() {
   // First and one-time initialization
   LiveWindow::SetEnabled(false);
 }
+
+RobotBase::~RobotBase() {
+  nt::NetworkTableInstance::GetDefault().StopServer();
+}

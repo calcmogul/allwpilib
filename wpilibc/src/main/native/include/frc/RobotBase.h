@@ -248,7 +248,7 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase() = default;
+  virtual ~RobotBase();
 
  protected:
   RobotBase(RobotBase&&) = default;
