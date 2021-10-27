@@ -5,14 +5,12 @@
 #include <stdexcept>
 
 #include <Eigen/Core>
-#include <Eigen/Eigenvalues>
 #include <gtest/gtest.h>
 #include <wpi/expected>
-#include <wpi/print.h>
 
+#include "MatrixTestUtil.h"
 #include "frc/DARE.h"
 #include "frc/EigenCore.h"
-#include "frc/fmt/Eigen.h"
 
 // 2x1
 extern template wpi::expected<Eigen::Matrix<double, 2, 2>, frc::DAREError>
@@ -65,30 +63,6 @@ frc::DARE<2, 3>(const Eigen::Matrix<double, 2, 2>& A,
                 const Eigen::Matrix<double, 2, 2>& Q,
                 const Eigen::Matrix<double, 3, 3>& R,
                 const Eigen::Matrix<double, 2, 3>& N, bool checkPreconditions);
-
-void ExpectMatrixEqual(const Eigen::MatrixXd& lhs, const Eigen::MatrixXd& rhs,
-                       double tolerance) {
-  for (int row = 0; row < lhs.rows(); ++row) {
-    for (int col = 0; col < lhs.cols(); ++col) {
-      EXPECT_NEAR(lhs(row, col), rhs(row, col), tolerance)
-          << fmt::format("row = {}, col = {}", row, col);
-    }
-  }
-
-  if (::testing::Test::HasFailure()) {
-    wpi::print("lhs =\n{}\n", lhs);
-    wpi::print("rhs =\n{}\n", rhs);
-    wpi::print("delta =\n{}\n", Eigen::MatrixXd{lhs - rhs});
-  }
-}
-
-void ExpectPositiveSemidefinite(const Eigen::Ref<const Eigen::MatrixXd>& X) {
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigX{X,
-                                                      Eigen::EigenvaluesOnly};
-  for (int i = 0; i < X.rows(); ++i) {
-    EXPECT_GE(eigX.eigenvalues()[i], 0.0);
-  }
-}
 
 void ExpectDARESolution(const Eigen::Ref<const Eigen::MatrixXd>& A,
                         const Eigen::Ref<const Eigen::MatrixXd>& B,
