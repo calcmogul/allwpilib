@@ -1,0 +1,41 @@
+diff --git a/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h b/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h
+index 5d5e09a25..d2ba092da 100644
+--- a/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h
++++ b/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include <Eigen/Core>
++#include <wpi/SymbolExports.h>
+ 
+ #include "drake/common/eigen_types.h"
+ 
+@@ -50,7 +51,7 @@ namespace math {
+  * [2] http://slicot.org/objects/software/shared/doc/SB03MD.html
+  *
+  */
+-
++WPILIB_DLLEXPORT
+ Eigen::MatrixXd RealContinuousLyapunovEquation(
+     const Eigen::Ref<const Eigen::MatrixXd>& A,
+     const Eigen::Ref<const Eigen::MatrixXd>& Q);
+@@ -60,9 +61,11 @@ namespace internal {
+ // Subroutines which help special cases. These cases are also called within
+ // SolveReducedRealContinuousLyapunovFunction.
+ 
++WPILIB_DLLEXPORT
+ Vector1d Solve1By1RealContinuousLyapunovEquation(
+     const Eigen::Ref<const Vector1d>& A, const Eigen::Ref<const Vector1d>& Q);
+ 
++WPILIB_DLLEXPORT
+ Eigen::Matrix2d Solve2By2RealContinuousLyapunovEquation(
+     const Eigen::Ref<const Eigen::Matrix2d>& A,
+     const Eigen::Ref<const Eigen::Matrix2d>& Q);
+@@ -70,6 +73,7 @@ Eigen::Matrix2d Solve2By2RealContinuousLyapunovEquation(
+ // If the problem size is larger than 2-by-2, then it is reduced into a form
+ // which can be recursively solved by smaller problems.
+ 
++WPILIB_DLLEXPORT
+ Eigen::MatrixXd SolveReducedRealContinuousLyapunovEquation(
+     const Eigen::Ref<const Eigen::MatrixXd>& A,
+     const Eigen::Ref<const Eigen::MatrixXd>& Q);

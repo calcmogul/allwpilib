@@ -1,0 +1,27 @@
+diff --git a/wpimath/src/main/native/cpp/drake/math/continuous_lyapunov_equation.cpp b/wpimath/src/main/native/cpp/drake/math/continuous_lyapunov_equation.cpp
+index 988e00bb8..130fd6ad2 100644
+--- a/wpimath/src/main/native/cpp/drake/math/continuous_lyapunov_equation.cpp
++++ b/wpimath/src/main/native/cpp/drake/math/continuous_lyapunov_equation.cpp
+@@ -5,6 +5,9 @@
+ #include <limits>
+ #include <stdexcept>
+ 
++#include <Eigen/Eigenvalues>
++#include <Eigen/QR>
++
+ #include "drake/common/drake_assert.h"
+ #include "drake/common/is_approx_equal_abstol.h"
+ 
+diff --git a/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h b/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h
+index 6900550b2..5d5e09a25 100644
+--- a/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h
++++ b/wpimath/src/main/native/include/drake/math/continuous_lyapunov_equation.h
+@@ -1,7 +1,6 @@
+ #pragma once
+ 
+-#include <Eigen/Dense>
+-#include <Eigen/QR>
++#include <Eigen/Core>
+ 
+ #include "drake/common/eigen_types.h"
+ 

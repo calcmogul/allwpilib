@@ -20,14 +20,16 @@ def main():
 
     # Copy drake source files into allwpilib
     src_files = walk_cwd_and_copy_if(
-        lambda dp, f: f in
-        ["drake_assert_and_throw.cc", "discrete_algebraic_riccati_equation.cc"],
-        os.path.join(wpimath, "src/main/native/cpp/drake"))
+        lambda dp, f: f in [
+            "continuous_lyapunov_equation.cc", "drake_assert_and_throw.cc",
+            "discrete_algebraic_riccati_equation.cc"
+        ], os.path.join(wpimath, "src/main/native/cpp/drake"))
 
     # Copy drake header files into allwpilib
     include_files = walk_cwd_and_copy_if(
         lambda dp, f: f in [
-            "drake_assert.h", "drake_assertion_error.h",
+            "constants.h", "continuous_lyapunov_equation.h", "drake_assert.h",
+            "drake_assertion_error.h", "eigen_types.h",
             "is_approx_equal_abstol.h", "never_destroyed.h", "drake_copyable.h",
             "drake_throw.h", "discrete_algebraic_riccati_equation.h"
         ], os.path.join(wpimath, "src/main/native/include/drake"))
@@ -35,8 +37,10 @@ def main():
     # Copy drake test source files into allwpilib
     os.chdir(os.path.join(repo, "math/test"))
     test_src_files = walk_cwd_and_copy_if(
-        lambda dp, f: f == "discrete_algebraic_riccati_equation_test.cc",
-        os.path.join(wpimath, "src/test/native/cpp/drake"))
+        lambda dp, f: f in [
+            "continuous_lyapunov_equation_test.cc",
+            "discrete_algebraic_riccati_equation_test.cc"
+        ], os.path.join(wpimath, "src/test/native/cpp/drake"))
     os.chdir(repo)
 
     # Copy drake test header files into allwpilib
@@ -61,9 +65,17 @@ def main():
             os.path.join(wpimath, "src/test/native/include")
         ])
 
+    # Replace <Eigen/Dense> with <Eigen/Core> in eigen_types.h
+    eigen_types = os.path.join(
+        wpimath, "src/main/native/include/drake/common/eigen_types.h")
+    content = open(eigen_types).read()
+    open(eigen_types, "w").write(content.replace("Eigen/Dense", "Eigen/Core"))
+
     apply_patches(root, [
-        "upstream_utils/drake-replace-dense-with-core.patch",
-        "upstream_utils/drake-dllexport-dare.patch"
+        "upstream_utils/drake-dare-replace-dense-with-core.patch",
+        "upstream_utils/drake-dare-dllexport.patch",
+        "upstream_utils/drake-continuous-lyapunov-replace-dense-with-core.patch",
+        "upstream_utils/drake-continuous-lyapunov-dllexport.patch"
     ])
 
 
