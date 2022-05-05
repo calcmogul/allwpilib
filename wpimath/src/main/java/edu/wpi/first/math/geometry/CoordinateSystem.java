@@ -6,35 +6,15 @@ package edu.wpi.first.math.geometry;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.numbers.N3;
 
 /** A helper class that converts Pose3d objects between different standard coordinate frames. */
 public class CoordinateSystem {
-  /** A class representing a coordinate system axis within the NWU coordinate system. */
-  public static class Axis {
-    /**
-     * Constructs a coordinate system axis within the NWU coordinate system and normalizes it.
-     *
-     * @param x The x component.
-     * @param y The y component.
-     * @param z The z component.
-     */
-    public Axis(double x, double y, double z) {
-      double norm = Math.sqrt(x * x + y * y + z * z);
-      m_axis = VecBuilder.fill(x / norm, y / norm, z / norm);
-    }
-
-    private final Vector<N3> m_axis;
-  }
-
-  public static final Axis N = new Axis(1.0, 0.0, 0.0); // +X in NWU
-  public static final Axis S = new Axis(-1.0, 0.0, 0.0); // -X in NWU
-  public static final Axis E = new Axis(0.0, -1.0, 0.0); // -Y in NWU
-  public static final Axis W = new Axis(0.0, 1.0, 0.0); // +Y in NWU
-  public static final Axis U = new Axis(0.0, 0.0, 1.0); // +Z in NWU
-  public static final Axis D = new Axis(0.0, 0.0, -1.0); // -Z in NWU
+  public static final CoordinateAxis N = new Axis(1.0, 0.0, 0.0); // +X in NWU
+  public static final CoordinateAxis S = new Axis(-1.0, 0.0, 0.0); // -X in NWU
+  public static final CoordinateAxis E = new Axis(0.0, -1.0, 0.0); // -Y in NWU
+  public static final CoordinateAxis W = new Axis(0.0, 1.0, 0.0); // +Y in NWU
+  public static final CoordinateAxis U = new Axis(0.0, 0.0, 1.0); // +Z in NWU
+  public static final CoordinateAxis D = new Axis(0.0, 0.0, -1.0); // -Z in NWU
 
   // Common coordinate systems
   public static final CoordinateSystem NWU = new CoordinateSystem(N, W, U);
@@ -52,7 +32,7 @@ public class CoordinateSystem {
    * @param positiveZ The cardinal direction of the positive z-axis.
    * @throws IllegalArgumentException if the coordinate system isn't special orthogonal
    */
-  public CoordinateSystem(Axis positiveX, Axis positiveY, Axis positiveZ) {
+  public CoordinateSystem(CoordinateAxis positiveX, CoordinateAxis positiveY, CoordinateAxis positiveZ) {
     // Construct a change of basis matrix from the source coordinate system to the
     // NWU coordinate system. Each column vector in the change of basis matrix is
     // one of the old basis vectors mapped to its representation in the new basis.
@@ -63,8 +43,8 @@ public class CoordinateSystem {
     R.assignBlock(0, 2, positiveZ.m_axis);
 
     // Require that the change of basis matrix is special orthogonal. This is true
-    // if the axes used are orthogonal and normalized. The Axis class already
-    // normalizes itself, so we just need to check for orthogonality.
+    // if the axes used are orthogonal and normalized. The CoordinateAxis class
+    // already normalizes itself, so we just need to check for orthogonality.
     if (!R.times(R.transpose()).equals(Matrix.eye(Nat.N3()))) {
       throw new IllegalArgumentException("Coordinate system isn't special orthogonal");
     }
