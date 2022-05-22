@@ -103,7 +103,7 @@ tasks.withType(JavaCompile).configureEach {
         '-encoding',
         'UTF8',
         "-Werror",
-        "-Xlint:deprecation, removal",
+        "-Xlint:deprecation,removal",
     ]
 }
 
