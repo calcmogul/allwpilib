@@ -102,6 +102,16 @@ Run with `--build-cache` on the command-line to use the shared [build cache](htt
 ./gradlew build --build-cache
 ```
 
+### C++ sanitizers
+
+The C++ compiler's address, thread, and undefined behavior sanitizers can be enabled with the `-Pasan`, `-Ptsan`, and `-Pubsan` flags respectively.
+
+```bash
+./gradlew build -Pasan
+./gradlew build -Ptsan
+./gradlew build -Pubsan
+```
+
 ### Using Development Builds
 
 Please read the documentation available [here](DevelopmentBuilds.md)
