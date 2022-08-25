@@ -39,6 +39,51 @@ nativeUtils.platformConfigs.each {
   }
 }
 
+// Add address sanitizer flag
+if (project.hasProperty('asan')) {
+    nativeUtils.platformConfigs.each {
+        if (it.name.contains('windows') || it.name == nativeUtils.wpi.platforms.roborio) {
+            return
+        }
+        it.cppCompiler.args.add('-g3')
+        it.cppCompiler.args.add('-fsanitize=address')
+        it.linker.args.add('-fsanitize=address')
+        if (it.name == nativeUtils.wpi.platforms.linuxx64) {
+            it.linker.args.add('-static-libasan')
+        }
+    }
+}
+
+// Add thread sanitizer flag
+if (project.hasProperty('tsan')) {
+    nativeUtils.platformConfigs.each {
+        if (it.name.contains('windows') || it.name == nativeUtils.wpi.platforms.roborio) {
+            return
+        }
+        it.cppCompiler.args.add('-g3')
+        it.cppCompiler.args.add('-fsanitize=thread')
+        it.linker.args.add('-fsanitize=thread')
+        if (it.name == nativeUtils.wpi.platforms.linuxx64) {
+            it.linker.args.add('-static-libtsan')
+        }
+    }
+}
+
+// Add undefined behavior sanitizer flag
+if (project.hasProperty('ubsan')) {
+    nativeUtils.platformConfigs.each {
+        if (it.name.contains('windows') || it.name == nativeUtils.wpi.platforms.roborio) {
+            return
+        }
+        it.cppCompiler.args.add('-g3')
+        it.cppCompiler.args.add('-fsanitize=undefined')
+        it.linker.args.add('-fsanitize=undefined')
+        if (it.name == nativeUtils.wpi.platforms.linuxx64) {
+            it.linker.args.add('-static-libubsan')
+        }
+    }
+}
+
 nativeUtils.platformConfigs.linuxathena.linker.args.add("-Wl,--fatal-warnings")
 
 if (project.hasProperty('ntcoreffibuild')) {
