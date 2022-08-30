@@ -346,7 +346,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       Eigen::SparseMatrix<double> inverseSigma = S * inverseZ;
 
       // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
-      Eigen::SparseMatrix<double> H = Hessian(L, m_leaves);
+      Eigen::SparseMatrix<double> H = autodiff::Hessian(L, m_leaves);
 
       // TODO: Regularize H
 
@@ -354,35 +354,15 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
       //         [    ⋮    ]
       //         [∇ᵀcₑₘ(x)ₖ]
-      triplets.clear();
-      for (int row = 0; row < m_equalityConstraints.rows(); ++row) {
-        Eigen::RowVectorXd g =
-            Gradient(m_equalityConstraints(row), m_leaves).transpose();
-        for (int col = 0; col < g.cols(); ++col) {
-          if (g(col) != 0.0) {
-            triplets.emplace_back(row, col, g(col));
-          }
-        }
-      }
-      Eigen::SparseMatrix<double> A_e{m_equalityConstraints.rows(), x.rows()};
-      A_e.setFromTriplets(triplets.begin(), triplets.end());
+      Eigen::SparseMatrix<double> A_e =
+          autodiff::Jacobian(m_equalityConstraints, m_leaves);
 
       //         [∇ᵀcᵢ₁(x)ₖ]
       // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
       //         [    ⋮    ]
       //         [∇ᵀcᵢₘ(x)ₖ]
-      triplets.clear();
-      for (int row = 0; row < m_inequalityConstraints.rows(); ++row) {
-        Eigen::RowVectorXd g =
-            Gradient(m_inequalityConstraints(row), m_leaves).transpose();
-        for (int col = 0; col < g.cols(); ++col) {
-          if (g(col) != 0.0) {
-            triplets.emplace_back(row, col, g(col));
-          }
-        }
-      }
-      Eigen::SparseMatrix<double> A_i{m_inequalityConstraints.rows(), x.rows()};
-      A_i.setFromTriplets(triplets.begin(), triplets.end());
+      Eigen::SparseMatrix<double> A_i =
+          autodiff::Jacobian(m_inequalityConstraints, m_leaves);
 
       // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
       //       [    Aₑ       0 ]

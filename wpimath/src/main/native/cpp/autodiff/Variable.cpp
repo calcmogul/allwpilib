@@ -413,6 +413,23 @@ Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
   return grad;
 }
 
+Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
+  Eigen::SparseMatrix<double> J{variables.rows(), wrt.rows()};
+
+  std::vector<Eigen::Triplet<double>> triplets;
+  for (int row = 0; row < variables.rows(); ++row) {
+    Eigen::RowVectorXd g = Gradient(variables(row), wrt).transpose();
+    for (int col = 0; col < g.cols(); ++col) {
+      if (g(col) != 0.0) {
+        triplets.emplace_back(row, col, g(col));
+      }
+    }
+  }
+  J.setFromTriplets(triplets.begin(), triplets.end());
+
+  return J;
+}
+
 Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
   // Based on algorithm 4 of "A new framework for the computation of Hessians"
   // https://arxiv.org/pdf/2007.15040.pdf

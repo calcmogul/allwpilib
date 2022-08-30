@@ -155,16 +155,34 @@ using VectorXvar = Eigen::Vector<frc::autodiff::Variable, Eigen::Dynamic>;
 
 /**
  * Returns gradient of a variable with respect to the given variable.
+ *
+ * @param variable Variable of which to compute gradient.
+ * @param wrt Variable with respect to which to compute the gradient.
  */
 WPILIB_DLLEXPORT double Gradient(Variable variable, Variable& wrt);
 
 /**
  * Returns gradient of a variable with respect to the given vector.
+ *
+ * @param variable Variable of which to compute the gradient.
+ * @param wrt Vector with respect to which to compute the gradient.
  */
 WPILIB_DLLEXPORT Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt);
 
 /**
- * Returns gradient of a variable with respect to the given vector.
+ * Returns the Jacobian of an autodiff vector with respect to the given vector.
+ *
+ * @param variables Vector of which to compute the Jacobian.
+ * @param wrt Vector with respect to which to compute the Jacobian.
+ */
+WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables,
+                                                      VectorXvar& wrt);
+
+/**
+ * Returns the Hessian of an autodiff variable with respect to the given vector.
+ *
+ * @param variable Variable of which to compute the Hessian.
+ * @param wrt Vector with respect to which to compute the Hessian.
  */
 WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Hessian(Variable variable,
                                                      VectorXvar& wrt);
