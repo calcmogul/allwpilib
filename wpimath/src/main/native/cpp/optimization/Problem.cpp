@@ -133,6 +133,24 @@ void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
   }
 }
 
+double Problem::FractionToTheBoundaryRule(
+    const Eigen::Ref<const Eigen::VectorXd>& x,
+    const Eigen::Ref<const Eigen::VectorXd>& p) {
+  constexpr double tau = 0.995;
+
+  // αᵐᵃˣ = max{α ∈ (0, 1] : x + αp ≥ (1−τ)x}
+  double alpha = 1;
+  for (int i = 0; i < x.rows(); ++i) {
+    if (p[i] != 0) {
+      while (alpha * p[i] < -tau * x[i]) {
+        alpha *= 0.999;
+      }
+    }
+  }
+
+  return alpha;
+}
+
 double Problem::f(const Eigen::Ref<const Eigen::VectorXd>& x) {
   SetAD(m_leaves, x);
   return m_f.value().Value();
@@ -175,8 +193,8 @@ Eigen::VectorXd Problem::InteriorPoint(
   // The fraction-to-the-boundary rule is used to compute αₖᵐᵃˣ and αₖᶻ. See
   // equations (15a) and (15b) in [2].
   //
-  // αₖᵐᵃˣ = max{α ∈ (0,1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
-  // αₖᶻ = max{α ∈ (0,1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
+  // αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
+  // αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
   //
   // xₖ₊₁ = xₖ + αₖᵐᵃˣpₖˣ
   // sₖ₊₁ = xₖ + αₖᵐᵃˣpₖˢ
@@ -338,26 +356,11 @@ Eigen::VectorXd Problem::InteriorPoint(
       Eigen::VectorXd p_s =
           (mu * inverseZ * e - inverseSigma * z - inverseSigma * p_z);
 
-      // Fraction-to-the-boundary rule
-      constexpr double tau = 0.995;
-      double alpha_max = 1;
-      // αₖᵐᵃˣ = max{α ∈ (0,1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
-      for (int index = 0; index < x.rows(); index++) {
-        if (p_x[index] != 0) {
-          while (alpha_max * p_x[index] < -tau * x[index]) {
-            alpha_max *= 0.999;
-          }
-        }
-      }
-      // αₖᶻ = max{α ∈ (0,1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
-      double alpha_z = 1;
-      for (int index = 0; index < z.rows(); index++) {
-        if (p_z[index] != 0) {
-          while (alpha_z * p_z[index] < -tau * z[index]) {
-            alpha_z *= 0.999;
-          }
-        }
-      }
+      // αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
+      double alpha_max = FractionToTheBoundaryRule(x, p_x);
+
+      // αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
+      double alpha_z = FractionToTheBoundaryRule(z, p_z);
 
       // xₖ₊₁ = xₖ + αₖᵐᵃˣpₖˣ
       // sₖ₊₁ = xₖ + αₖᵐᵃˣpₖˢ

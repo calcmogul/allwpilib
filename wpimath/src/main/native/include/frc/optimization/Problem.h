@@ -266,6 +266,18 @@ class WPILIB_DLLEXPORT Problem {
                     const Eigen::Ref<const Eigen::VectorXd>& src);
 
   /**
+   * Applies fraction-to-the-boundary rule to a variable and its iterate, then
+   * returns a fraction of the iterate step size within (0, 1].
+   *
+   * @param x The variable.
+   * @param p The iterate on the variable.
+   * @return Fraction of the iterate step size within (0, 1].
+   */
+  static double FractionToTheBoundaryRule(
+      const Eigen::Ref<const Eigen::VectorXd>& x,
+      const Eigen::Ref<const Eigen::VectorXd>& p);
+
+  /**
    * The cost function f(x).
    *
    * @param x The input of f(x).
