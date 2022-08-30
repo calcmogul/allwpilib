@@ -158,8 +158,12 @@ double Problem::f(const Eigen::Ref<const Eigen::VectorXd>& x) {
 
 Eigen::VectorXd Problem::InteriorPoint(
     const Eigen::Ref<const Eigen::VectorXd>& initialGuess) {
-  // L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ - zₖᵀ(cᵢ(x)ₖ - sₖ)
-  // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
+  // Let f(x)ₖ be the cost function, cₑ(x)ₖ be the equality constraints, and
+  // cᵢ(x)ₖ be the inequality constraints.
+  //
+  // L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ − zₖᵀ(cᵢ(x)ₖ − sₖ)
+  //
+  // H(x)ₖ = ∇²ₓₓL(x, s, y, z)ₖ
   //
   //     [s₁ 0 ⋯ 0 ]
   // S = [0  ⋱   ⋮ ]
@@ -178,14 +182,82 @@ Eigen::VectorXd Problem::InteriorPoint(
   // e is a column vector of ones with a number of rows equal to the number of
   // inequality constraints.
   //
-  // Let f = f(x)ₖ, H = H(x)ₖ, Aₑ = Aₑ(x)ₖ, and Aᵢ = Aᵢ(x)ₖ for clarity.
+  // Let f(x) = f(x)ₖ, H = H(x)ₖ, Aₑ = Aₑ(x)ₖ, and Aᵢ = Aᵢ(x)ₖ for clarity.
   //
-  // We want to solve the Newton-KKT system shown in equation (19.16) in [1].
+  // We want to solve the Newton-KKT system shown in equation (19.12) in [1].
   //
-  // [H + AᵢᵀΣAᵢ  Aₑᵀ][ pₖˣ] = [∇f − Aₑᵀy − Aᵢᵀz + Aᵢᵀ(Σcᵢ − μS⁻¹e)]
-  // [    Aₑ       0 ][−pₖʸ]   [                cₑ                 ]
+  // [H    0  Aₑᵀ  Aᵢᵀ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
+  // [0    Σ   0   −I ][ pₖˢ] = −[     z − μS⁻¹e     ]
+  // [Aₑ   0   0    0 ][-pₖʸ]    [        cₑ         ]
+  // [Aᵢ  −I   0    0 ][-pₖᶻ]    [      cᵢ − s       ]
   //
-  // TODO: Derivations for pₖᶻ and pₖˢ
+  // Take the second row.
+  //
+  // Σpₖˢ + pₖᶻ = μS⁻¹e − z
+  //
+  // Solve for pₖˢ.
+  //
+  // pₖˢ = μΣ⁻¹S⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ
+  //
+  // Substitute Σ = S⁻¹Z into the first two elements.
+  //
+  // pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
+  //
+  // Take the fourth row.
+  //
+  // Aₑpₖˣ − pₖˢ = s − cᵢ
+  //
+  // Substitute the explicit formula for pₖˢ.
+  //
+  // Aₑpₖˣ − μZ⁻¹e + s + Σ⁻¹pₖᶻ = s − cᵢ
+  //
+  // Simplify.
+  //
+  // Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
+  //
+  // Substitute the new second and fourth rows into the system.
+  //
+  // [H   0  Aₑᵀ  Aᵢᵀ ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
+  // [0   I   0    0  ][ pₖˢ] = −[     z − μS⁻¹e     ]
+  // [Aₑ  0   0    0  ][−pₖʸ]    [        cₑ         ]
+  // [Aᵢ  0   0   −Σ⁻¹][−pₖᶻ]    [     cᵢ − μZ⁻¹e    ]
+  //
+  // Eliminate the second row and column.
+  //
+  // [H   Aₑᵀ   Aᵢ ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
+  // [Aₑ   0    0  ][−pₖʸ] = −[        cₑ         ]
+  // [Aᵢ   0   −Σ⁻¹][−pₖᶻ]    [    cᵢ − μZ⁻¹e     ]
+  //
+  // Take the third row.
+  //
+  // Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
+  //
+  // Solve for pₖᶻ.
+  //
+  // pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ
+  //
+  // Take the first row.
+  //
+  // Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀpₖᶻ = −∇f(x) + Aₑᵀy + Aᵢᵀz
+  //
+  // Substitute the explicit formula for pₖᶻ.
+  //
+  // Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀ(−Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ) = −∇f(x) + Aₑᵀy + Aᵢᵀz
+  //
+  // Expand and simplify.
+  //
+  // (H + AᵢᵀΣAᵢ)pₖˣ − Aₑᵀpₖʸ = −∇f(x) + Aₑᵀy − Aᵢᵀ(Σcᵢ − μS⁻¹e − z)
+  //
+  // Substitute the new first and third rows into the system.
+  //
+  // [H   Aₑᵀ  0][ pₖˣ]    [∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
+  // [Aₑ   0   0][−pₖʸ] = −[                cₑ                 ]
+  // [0    0   I][−pₖᶻ]    [       −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ       ]
+  //
+  // Eliminate the third row and column.
+  //
+  // [H + AᵢᵀΣAᵢ  Aₑᵀ][ pₖˣ] = −[∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
+  // [    Aₑ       0 ][−pₖʸ]    [                cₑ                 ]
   //
   // The iterate pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ.
   // The iterate pₖˢ = μZ⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ.
@@ -223,7 +295,7 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   Eigen::MatrixXd e = Eigen::VectorXd::Ones(s.rows());
 
-  // L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ - zₖᵀ(cᵢ(x)ₖ - sₖ)
+  // L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ − zₖᵀ(cᵢ(x)ₖ − sₖ)
   autodiff::Variable L =
       m_f.value() - (yAD.transpose() * m_equalityConstraints -
                      zAD.transpose() * (m_inequalityConstraints - sAD))(0);
@@ -319,8 +391,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       lhs.topRows(lhsTop.rows()) = lhsTop;
       lhs.bottomRows(lhsBottom.rows()) = lhsBottom;
 
-      // rhs = [∇f − Aₑᵀy − Aᵢᵀz + Aᵢᵀ(Σcᵢ − μS⁻¹e)]
-      //       [                cₑ                 ]
+      // rhs = [∇f − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
+      //       [               cₑ               ]
       Eigen::VectorXd c_e{m_equalityConstraints.rows()};
       for (int row = 0; row < m_equalityConstraints.rows(); row++) {
         c_e[row] = m_equalityConstraints(row).Value();
@@ -331,9 +403,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       }
       Eigen::VectorXd rhs{x.rows() + y.rows()};
       rhs.topRows(x.rows()) =
-          Gradient(m_f.value(), m_leaves) - A_e.transpose() * y -
-          A_i.transpose() * z +
-          A_i.transpose() * (sigma * c_i - mu * inverseS * e);
+          Gradient(m_f.value(), m_leaves) - A_e.transpose() * y +
+          A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
       rhs.bottomRows(y.rows()) = c_e;
 
       // Solve the Newton-KKT system
