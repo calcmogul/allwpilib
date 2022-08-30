@@ -201,7 +201,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   // yₖ₊₁ = xₖ + αₖᶻpₖʸ
   // zₖ₊₁ = xₖ + αₖᶻpₖᶻ
   //
-  // [1] Nocedal, J. and Wright, S. Numerical Optimization, 2nd. ed., Ch. 18.
+  // [1] Nocedal, J. and Wright, S. Numerical Optimization, 2nd. ed., Ch. 19.
   //     Springer, 2006.
   // [2] http://cepac.cheme.cmu.edu/pasilectures/biegler/ipopt.pdf
 
