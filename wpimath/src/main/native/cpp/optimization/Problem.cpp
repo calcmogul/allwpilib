@@ -277,6 +277,9 @@ Eigen::VectorXd Problem::InteriorPoint(
   //     Springer, 2006.
   // [2] http://cepac.cheme.cmu.edu/pasilectures/biegler/ipopt.pdf
 
+  // TODO: Add problem infeasibility checks; throw exception?
+
+  // Barrier parameter μ
   double mu = 1;
 
   std::vector<Eigen::Triplet<double>> triplets;
@@ -344,6 +347,8 @@ Eigen::VectorXd Problem::InteriorPoint(
 
       // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
       Eigen::SparseMatrix<double> H = Hessian(L, m_leaves);
+
+      // TODO: Regularize H
 
       //         [∇ᵀcₑ₁(x)ₖ]
       // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
@@ -449,6 +454,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       L.Update();
     }
 
+    // TODO: Adaptively scale mu between iterations
     mu *= 0.1;
   }
 
