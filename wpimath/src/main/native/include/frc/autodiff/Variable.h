@@ -43,85 +43,95 @@ class WPILIB_DLLEXPORT Variable {
 
   Variable& operator=(int value);
 
-  friend Variable operator*(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator*(double lhs, const Variable& rhs);
 
-  friend Variable operator*(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, double rhs);
 
-  friend Variable operator*(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator*(const Variable& lhs,
+                                             const Variable& rhs);
 
   Variable& operator*=(double rhs);
 
   Variable& operator*=(const Variable& rhs);
 
-  friend Variable operator/(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator/(double lhs, const Variable& rhs);
 
-  friend Variable operator/(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, double rhs);
 
-  friend Variable operator/(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator/(const Variable& lhs,
+                                             const Variable& rhs);
 
   Variable& operator/=(double rhs);
 
   Variable& operator/=(const Variable& rhs);
 
-  friend Variable operator+(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator+(double lhs, const Variable& rhs);
 
-  friend Variable operator+(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, double rhs);
 
-  friend Variable operator+(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator+(const Variable& lhs,
+                                             const Variable& rhs);
 
   Variable& operator+=(double rhs);
 
   Variable& operator+=(const Variable& rhs);
 
-  friend Variable operator-(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator-(double lhs, const Variable& rhs);
 
-  friend Variable operator-(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, double rhs);
 
-  friend Variable operator-(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT Variable operator-(const Variable& lhs,
+                                             const Variable& rhs);
 
   Variable& operator-=(double rhs);
 
   Variable& operator-=(const Variable& rhs);
 
-  friend Variable operator-(const Variable& lhs);
+  friend WPILIB_DLLEXPORT Variable operator-(const Variable& lhs);
 
-  friend Variable operator+(const Variable& lhs);
+  friend WPILIB_DLLEXPORT Variable operator+(const Variable& lhs);
 
-  friend bool operator==(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator==(double lhs, const Variable& rhs);
 
-  friend bool operator==(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT bool operator==(const Variable& lhs, double rhs);
 
-  friend bool operator==(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator==(const Variable& lhs,
+                                          const Variable& rhs);
 
-  friend bool operator!=(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator!=(double lhs, const Variable& rhs);
 
-  friend bool operator!=(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT bool operator!=(const Variable& lhs, double rhs);
 
-  friend bool operator!=(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator!=(const Variable& lhs,
+                                          const Variable& rhs);
 
-  friend bool operator<(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator<(double lhs, const Variable& rhs);
 
-  friend bool operator<(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT bool operator<(const Variable& lhs, double rhs);
 
-  friend bool operator<(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator<(const Variable& lhs,
+                                         const Variable& rhs);
 
-  friend bool operator>(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator>(double lhs, const Variable& rhs);
 
-  friend bool operator>(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT bool operator>(const Variable& lhs, double rhs);
 
-  friend bool operator>(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator>(const Variable& lhs,
+                                         const Variable& rhs);
 
-  friend bool operator<=(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator<=(double lhs, const Variable& rhs);
 
-  friend bool operator<=(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT bool operator<=(const Variable& lhs, double rhs);
 
-  friend bool operator<=(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator<=(const Variable& lhs,
+                                          const Variable& rhs);
 
-  friend bool operator>=(double lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator>=(double lhs, const Variable& rhs);
 
-  friend bool operator>=(const Variable& lhs, double rhs);
+  friend WPILIB_DLLEXPORT bool operator>=(const Variable& lhs, double rhs);
 
-  friend bool operator>=(const Variable& lhs, const Variable& rhs);
+  friend WPILIB_DLLEXPORT bool operator>=(const Variable& lhs,
+                                          const Variable& rhs);
 
   /**
    * Returns the value of this variable.

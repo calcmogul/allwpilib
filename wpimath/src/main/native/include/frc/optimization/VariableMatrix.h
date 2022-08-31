@@ -9,6 +9,7 @@
 
 #include <wpi/SmallVector.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/Synchronization.h>
 
 #include "frc/EigenCore.h"
 #include "frc/autodiff/Variable.h"
@@ -182,8 +183,8 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend VariableMatrix operator*(const VariableMatrix& lhs,
-                                  const VariableMatrix& rhs);
+  friend WPILIB_DLLEXPORT VariableMatrix operator*(const VariableMatrix& lhs,
+                                                   const VariableMatrix& rhs);
 
   /**
    * Matrix-scalar multiplication operator.
@@ -191,7 +192,8 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend VariableMatrix operator*(const VariableMatrix& lhs, double rhs);
+  friend WPILIB_DLLEXPORT VariableMatrix operator*(const VariableMatrix& lhs,
+                                                   double rhs);
 
   /**
    * Scalar-matrix multiplication operator.
@@ -199,7 +201,8 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend VariableMatrix operator*(double lhs, const VariableMatrix& rhs);
+  friend WPILIB_DLLEXPORT VariableMatrix operator*(double lhs,
+                                                   const VariableMatrix& rhs);
 
   /**
    * Compound matrix multiplication-assignment operator.
@@ -222,7 +225,8 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend VariableMatrix operator/(const VariableMatrix& lhs, double rhs);
+  friend WPILIB_DLLEXPORT VariableMatrix operator/(const VariableMatrix& lhs,
+                                                   double rhs);
 
   /**
    * Compound matrix division-assignment operator (only enabled when lhs
@@ -238,8 +242,8 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend VariableMatrix operator+(const VariableMatrix& lhs,
-                                  const VariableMatrix& rhs);
+  friend WPILIB_DLLEXPORT VariableMatrix operator+(const VariableMatrix& lhs,
+                                                   const VariableMatrix& rhs);
 
   /**
    * Compound addition-assignment operator.
@@ -254,8 +258,8 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
-  friend VariableMatrix operator-(const VariableMatrix& lhs,
-                                  const VariableMatrix& rhs);
+  friend WPILIB_DLLEXPORT VariableMatrix operator-(const VariableMatrix& lhs,
+                                                   const VariableMatrix& rhs);
 
   /**
    * Compound subtraction-assignment operator.
@@ -269,7 +273,7 @@ class WPILIB_DLLEXPORT VariableMatrix {
    *
    * @param lhs Operand for unary minus.
    */
-  friend VariableMatrix operator-(const VariableMatrix& lhs);
+  friend WPILIB_DLLEXPORT VariableMatrix operator-(const VariableMatrix& lhs);
 
   /**
    * Returns the transpose of the variable matrix.
