@@ -290,12 +290,16 @@ class WPILIB_DLLEXPORT VariableMatrix {
 /**
  * std::abs() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix abs(const VariableMatrix& x);  // NOLINT
 
 /**
  * std::acos() for VariableMatrices.
+ *
+ * The function is applied element-wise to the argument.
  *
  * @param x The argument.
  */
@@ -304,6 +308,8 @@ WPILIB_DLLEXPORT VariableMatrix acos(const VariableMatrix& x);  // NOLINT
 /**
  * std::asin() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix asin(const VariableMatrix& x);  // NOLINT
@@ -311,12 +317,16 @@ WPILIB_DLLEXPORT VariableMatrix asin(const VariableMatrix& x);  // NOLINT
 /**
  * std::atan() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix atan(const VariableMatrix& x);  // NOLINT
 
 /**
  * std::atan2() for VariableMatrices.
+ *
+ * The function is applied element-wise to the arguments.
  *
  * @param y The y argument.
  * @param x The x argument.
@@ -327,12 +337,16 @@ WPILIB_DLLEXPORT VariableMatrix atan2(const VariableMatrix& y,  // NOLINT
 /**
  * std::cos() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix cos(const VariableMatrix& x);  // NOLINT
 
 /**
  * std::cosh() for VariableMatrices.
+ *
+ * The function is applied element-wise to the argument.
  *
  * @param x The argument.
  */
@@ -341,6 +355,8 @@ WPILIB_DLLEXPORT VariableMatrix cosh(const VariableMatrix& x);  // NOLINT
 /**
  * std::erf() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix erf(const VariableMatrix& x);  // NOLINT
@@ -348,12 +364,16 @@ WPILIB_DLLEXPORT VariableMatrix erf(const VariableMatrix& x);  // NOLINT
 /**
  * std::exp() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix exp(const VariableMatrix& x);  // NOLINT
 
 /**
  * std::hypot() for VariableMatrices.
+ *
+ * The function is applied element-wise to the arguments.
  *
  * @param x The x argument.
  * @param y The y argument.
@@ -364,6 +384,8 @@ WPILIB_DLLEXPORT VariableMatrix hypot(const VariableMatrix& x,  // NOLINT
 /**
  * std::log() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix log(const VariableMatrix& x);  // NOLINT
@@ -371,12 +393,16 @@ WPILIB_DLLEXPORT VariableMatrix log(const VariableMatrix& x);  // NOLINT
 /**
  * std::log10() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix log10(const VariableMatrix& x);  // NOLINT
 
 /**
  * std::pow() for VariableMatrices.
+ *
+ * The function is applied element-wise to the arguments.
  *
  * @param base The base.
  * @param power The power.
@@ -387,12 +413,16 @@ WPILIB_DLLEXPORT VariableMatrix pow(const VariableMatrix& base,  // NOLINT
 /**
  * std::sin() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix sin(const VariableMatrix& x);  // NOLINT
 
 /**
  * std::sinh() for VariableMatrices.
+ *
+ * The function is applied element-wise to the argument.
  *
  * @param x The argument.
  */
@@ -401,6 +431,8 @@ WPILIB_DLLEXPORT VariableMatrix sinh(const VariableMatrix& x);  // NOLINT
 /**
  * std::sqrt() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix sqrt(const VariableMatrix& x);  // NOLINT
@@ -408,12 +440,16 @@ WPILIB_DLLEXPORT VariableMatrix sqrt(const VariableMatrix& x);  // NOLINT
 /**
  * std::tan() for VariableMatrices.
  *
+ * The function is applied element-wise to the argument.
+ *
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix tan(const VariableMatrix& x);  // NOLINT
 
 /**
  * std::tanh() for VariableMatrices.
+ *
+ * The function is applied element-wise to the argument.
  *
  * @param x The argument.
  */
