@@ -287,12 +287,13 @@ Eigen::VectorXd Problem::InteriorPoint(
   Eigen::VectorXd x = initialGuess;
 
   Eigen::VectorXd s = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
-  Eigen::VectorXd y{m_equalityConstraints.size(), 1};
+  Eigen::VectorXd y = Eigen::VectorXd::Zero(m_equalityConstraints.size(), 1);
   Eigen::VectorXd z = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
 
   autodiff::VectorXvar sAD =
       autodiff::VectorXvar::Ones(m_inequalityConstraints.size());
-  autodiff::VectorXvar yAD{m_equalityConstraints.size(), 1};
+  autodiff::VectorXvar yAD =
+      autodiff::VectorXvar::Zero(m_equalityConstraints.size(), 1);
   autodiff::VectorXvar zAD =
       autodiff::VectorXvar::Ones(m_inequalityConstraints.size());
 

@@ -106,7 +106,7 @@ VariableMatrix operator*(const VariableMatrix& lhs, const VariableMatrix& rhs) {
 
   for (int i = 0; i < lhs.Rows(); ++i) {
     for (int j = 0; j < rhs.Cols(); ++j) {
-      autodiff::Variable sum;
+      autodiff::Variable sum = 0.0;
       for (int k = 0; k < lhs.Cols(); ++k) {
         sum += lhs.Autodiff(i, k) * rhs.Autodiff(k, j);
       }
@@ -148,7 +148,7 @@ VariableMatrix& VariableMatrix::operator*=(const VariableMatrix& rhs) {
 
   for (int i = 0; i < Rows(); ++i) {
     for (int j = 0; j < rhs.Cols(); ++j) {
-      autodiff::Variable sum;
+      autodiff::Variable sum = 0.0;
       for (int k = 0; k < Cols(); ++k) {
         sum += Autodiff(i, k) * rhs.Autodiff(k, j);
       }

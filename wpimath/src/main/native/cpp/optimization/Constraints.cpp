@@ -26,7 +26,7 @@ std::vector<autodiff::Variable> MakeConstraints(const VariableMatrix& lhs,
     constraints.reserve(rhs.Rows() * rhs.Cols());
 
     for (int row = 0; row < rhs.Rows(); ++row) {
-      for (int col = 0; col < rhs.Cols(); ++row) {
+      for (int col = 0; col < rhs.Cols(); ++col) {
         // Make right-hand side zero
         constraints.emplace_back(lhs.Autodiff(0, 0) - rhs.Autodiff(row, col));
       }
@@ -35,7 +35,7 @@ std::vector<autodiff::Variable> MakeConstraints(const VariableMatrix& lhs,
     constraints.reserve(lhs.Rows() * lhs.Cols());
 
     for (int row = 0; row < lhs.Rows(); ++row) {
-      for (int col = 0; col < lhs.Cols(); ++row) {
+      for (int col = 0; col < lhs.Cols(); ++col) {
         // Make right-hand side zero
         constraints.emplace_back(lhs.Autodiff(row, col) - rhs.Autodiff(0, 0));
       }
@@ -45,7 +45,7 @@ std::vector<autodiff::Variable> MakeConstraints(const VariableMatrix& lhs,
     constraints.reserve(lhs.Rows() * lhs.Cols());
 
     for (int row = 0; row < lhs.Rows(); ++row) {
-      for (int col = 0; col < lhs.Cols(); ++row) {
+      for (int col = 0; col < lhs.Cols(); ++col) {
         // Make right-hand side zero
         constraints.emplace_back(lhs.Autodiff(row, col) -
                                  rhs.Autodiff(row, col));
