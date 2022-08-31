@@ -20,10 +20,11 @@ TapeNode::TapeNode(std::array<Variable, kNumArgs> args,
       valueFunc{std::move(valueFunc)},
       gradientFuncs{std::move(gradientFuncs)} {
   if (std::holds_alternative<UnaryFuncDouble>(this->valueFunc)) {
-    value = std::get<UnaryFuncDouble>(this->valueFunc)(args[0].GetNode().value);
+    value = std::get<UnaryFuncDouble>(this->valueFunc)(
+        this->args[0].GetNode().value);
   } else if (std::holds_alternative<BinaryFuncDouble>(this->valueFunc)) {
     value = std::get<BinaryFuncDouble>(this->valueFunc)(
-        args[0].GetNode().value, args[1].GetNode().value);
+        this->args[0].GetNode().value, this->args[1].GetNode().value);
   }
 }
 
