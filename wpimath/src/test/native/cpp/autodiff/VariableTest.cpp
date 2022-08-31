@@ -408,73 +408,7 @@ TEST(VariableTest, Gradient) {
             Gradient(frc::autodiff::erf(x), x));
 }
 
-TEST(VariableTest, HessianDebugging1) {
-  using frc::autodiff::Hessian;
-
-  // TESTING GRADIENT AND HESSIAN WHEN y = ||x||^2
-  frc::autodiff::VectorXvar x{2};
-  x << 1, 2;
-  frc::autodiff::Variable y = x.cwiseProduct(x).sum();
-
-  Eigen::MatrixXd H = Hessian(y, x);
-  for (int i = 0; i < x.rows(); ++i) {
-    for (int j = 0; j < x.size(); ++j) {
-      if (i == j) {
-        EXPECT_DOUBLE_EQ(2.0, H(i, j));
-      } else {
-        EXPECT_DOUBLE_EQ(0.0, H(i, j));
-      }
-    }
-  }
-}
-
-TEST(VariableTest, HessianDebugging2) {
-  using frc::autodiff::Gradient;
-  using frc::autodiff::Hessian;
-
-  frc::autodiff::Variable y;
-  Eigen::VectorXd g;
-  Eigen::MatrixXd H;
-  frc::autodiff::VectorXvar x{3};
-  x << 1, 2, 3;
-
-  //--------------------------------------------------------------------------
-  // TESTING GRADIENT AND HESSIAN WHEN y = prod(sin(x))
-  //--------------------------------------------------------------------------
-  y = x.array().sin().prod();
-  g = Gradient(y, x);
-
-  EXPECT_EQ(
-      frc::autodiff::sin(1) * frc::autodiff::sin(2) * frc::autodiff::sin(3), y);
-  for (int i = 0; i < x.rows(); ++i) {
-    EXPECT_EQ(y / frc::autodiff::tan(x(i)), g(i));
-  }
-
-  H = Hessian(y, x);
-  for (int i = 0; i < x.rows(); ++i) {
-    for (int j = 0; j < x.rows(); ++j) {
-      if (i == j) {
-        EXPECT_NEAR((g(i) / frc::autodiff::tan(x(i))).Value() *
-                        (1.0 - 1.0 / (frc::autodiff::cos(x(i)) *
-                                      frc::autodiff::cos(x(i))))
-                            .Value(),
-                    H(i, j), 1e-14)
-            << fmt::format("  at ({}, {})\n", i, j);
-      } else {
-        EXPECT_NEAR((g(j) / frc::autodiff::tan(x(i))).Value(), H(i, j), 1e-14)
-            << fmt::format("  at ({}, {})\n", i, j);
-      }
-    }
-  }
-}
-
 TEST(VariableTest, GradientVarsAndConstants) {
-  // FIXME: This line is using double ctor instead of double assignment operator
-  // The former is an implicit ctor for constants and the latter is typically
-  // for assignments to variables
-  //
-  // Copy ellision is causing x1 = 3 to use ctor instead of assignment operator
-  // first
   frc::autodiff::Variable x1 = 3;
   frc::autodiff::Variable y1 = 2 * x1;
 
@@ -558,7 +492,6 @@ TEST(VariableTest, Hessian) {
   frc::autodiff::VectorXvar x{5};
   x << 1, 2, 3, 4, 5;
 
-#if 0
   //--------------------------------------------------------------------------
   // TESTING GRADIENT AND HESSIAN WHEN y = sum(x)
   //--------------------------------------------------------------------------
@@ -599,7 +532,6 @@ TEST(VariableTest, Hessian) {
       }
     }
   }
-#endif
 
   //--------------------------------------------------------------------------
   // TESTING GRADIENT AND HESSIAN WHEN y = prod(sin(x))
@@ -631,7 +563,6 @@ TEST(VariableTest, Hessian) {
       }
     }
   }
-  return;
 
   //--------------------------------------------------------------------------
   // TESTING GRADIENT AND HESSIAN WHEN y = sum(diff(x).^2)
