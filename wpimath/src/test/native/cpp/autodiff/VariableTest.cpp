@@ -10,8 +10,6 @@
 #include "gtest/gtest.h"
 
 TEST(VariableTest, Gradient) {
-  using frc::autodiff::Gradient;
-
   frc::autodiff::Variable a = 10;
   frc::autodiff::Variable b = 20;
   frc::autodiff::Variable c = a;
@@ -426,10 +424,76 @@ TEST(VariableTest, GradientVarsAndConstants) {
   EXPECT_DOUBLE_EQ(2.0, y2.Gradient(1).Value());
 }
 
-TEST(VariableTest, HessianLinear) {
-  using frc::autodiff::Hessian;
+TEST(VariableTest, Jacobian) {
+  frc::autodiff::VectorXvar y{3, 1};
+  Eigen::MatrixXd J;
+  frc::autodiff::VectorXvar x{3};
+  x << 1, 2, 3;
 
   // y = x
+  //
+  //         [1  0  0]
+  // dy/dx = [0  1  0]
+  //         [0  0  1]
+  y = x;
+  J = Jacobian(y, x);
+
+  for (int row = 0; row < 3; ++row) {
+    for (int col = 0; col < 3; ++col) {
+      if (row == col) {
+        EXPECT_DOUBLE_EQ(1.0, J(row, col));
+      } else {
+        EXPECT_DOUBLE_EQ(0.0, J(row, col));
+      }
+    }
+  }
+
+  // y = 3x
+  //
+  //         [3  0  0]
+  // dy/dx = [0  3  0]
+  //         [0  0  3]
+  y = 3 * x;
+  J = Jacobian(y, x);
+
+  for (int row = 0; row < 3; ++row) {
+    for (int col = 0; col < 3; ++col) {
+      if (row == col) {
+        EXPECT_DOUBLE_EQ(3.0, J(row, col));
+      } else {
+        EXPECT_DOUBLE_EQ(0.0, J(row, col));
+      }
+    }
+  }
+
+  //     [x₁x₂]
+  // y = [x₂x₃]
+  //     [x₁x₃]
+  //
+  //         [x₂  x₁  0 ]
+  // dy/dx = [0   x₃  x₂]
+  //         [x₃  0   x₁]
+  //
+  //         [2  1  0]
+  // dy/dx = [0  3  2]
+  //         [3  0  1]
+  y(0) = x(0) * x(1);
+  y(1) = x(1) * x(2);
+  y(2) = x(0) * x(2);
+  J = Jacobian(y, x);
+
+  EXPECT_DOUBLE_EQ(2.0, J(0, 0));
+  EXPECT_DOUBLE_EQ(1.0, J(0, 1));
+  EXPECT_DOUBLE_EQ(0.0, J(0, 2));
+  EXPECT_DOUBLE_EQ(0.0, J(1, 0));
+  EXPECT_DOUBLE_EQ(3.0, J(1, 1));
+  EXPECT_DOUBLE_EQ(2.0, J(1, 2));
+  EXPECT_DOUBLE_EQ(3.0, J(2, 0));
+  EXPECT_DOUBLE_EQ(0.0, J(2, 1));
+  EXPECT_DOUBLE_EQ(1.0, J(2, 2));
+}
+
+TEST(VariableTest, HessianLinear) {
   // y = x
   frc::autodiff::VectorXvar x{1};
   x << 3;
@@ -454,8 +518,6 @@ TEST(VariableTest, HessianLinear) {
 }
 
 TEST(VariableTest, HessianQuadratic) {
-  using frc::autodiff::Hessian;
-
   // y = x²
   // y = x * x
   frc::autodiff::VectorXvar x{1};
@@ -483,9 +545,6 @@ TEST(VariableTest, HessianQuadratic) {
 }
 
 TEST(VariableTest, Hessian) {
-  using frc::autodiff::Gradient;
-  using frc::autodiff::Hessian;
-
   frc::autodiff::Variable y;
   Eigen::VectorXd g;
   Eigen::MatrixXd H;
