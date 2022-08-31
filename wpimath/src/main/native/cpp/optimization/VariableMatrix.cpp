@@ -99,7 +99,8 @@ VariableBlock<const VariableMatrix> VariableMatrix::Col(int col) const {
   return Block(0, col, Rows(), 1);
 }
 
-VariableMatrix operator*(const VariableMatrix& lhs, const VariableMatrix& rhs) {
+WPILIB_DLLEXPORT VariableMatrix operator*(const VariableMatrix& lhs,
+                                          const VariableMatrix& rhs) {
   assert(lhs.Cols() == rhs.Rows());
 
   VariableMatrix result{lhs.Rows(), rhs.Cols()};
@@ -117,7 +118,8 @@ VariableMatrix operator*(const VariableMatrix& lhs, const VariableMatrix& rhs) {
   return result;
 }
 
-VariableMatrix operator*(const VariableMatrix& lhs, double rhs) {
+WPILIB_DLLEXPORT VariableMatrix operator*(const VariableMatrix& lhs,
+                                          double rhs) {
   VariableMatrix result{lhs.Rows(), lhs.Cols()};
 
   autodiff::Variable rhsVar{rhs};
@@ -130,7 +132,8 @@ VariableMatrix operator*(const VariableMatrix& lhs, double rhs) {
   return result;
 }
 
-VariableMatrix operator*(double lhs, const VariableMatrix& rhs) {
+WPILIB_DLLEXPORT VariableMatrix operator*(double lhs,
+                                          const VariableMatrix& rhs) {
   VariableMatrix result{rhs.Rows(), rhs.Cols()};
 
   autodiff::Variable lhsVar{lhs};
@@ -169,7 +172,8 @@ VariableMatrix& VariableMatrix::operator*=(double rhs) {
   return *this;
 }
 
-VariableMatrix operator/(const VariableMatrix& lhs, double rhs) {
+WPILIB_DLLEXPORT VariableMatrix operator/(const VariableMatrix& lhs,
+                                          double rhs) {
   VariableMatrix result{lhs.Rows(), lhs.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
@@ -192,7 +196,8 @@ VariableMatrix& VariableMatrix::operator/=(double rhs) {
   return *this;
 }
 
-VariableMatrix operator+(const VariableMatrix& lhs, const VariableMatrix& rhs) {
+WPILIB_DLLEXPORT VariableMatrix operator+(const VariableMatrix& lhs,
+                                          const VariableMatrix& rhs) {
   VariableMatrix result{lhs.Rows(), lhs.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
@@ -215,7 +220,8 @@ VariableMatrix& VariableMatrix::operator+=(const VariableMatrix& rhs) {
   return *this;
 }
 
-VariableMatrix operator-(const VariableMatrix& lhs, const VariableMatrix& rhs) {
+WPILIB_DLLEXPORT VariableMatrix operator-(const VariableMatrix& lhs,
+                                          const VariableMatrix& rhs) {
   VariableMatrix result{lhs.Rows(), lhs.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
@@ -238,7 +244,7 @@ VariableMatrix& VariableMatrix::operator-=(const VariableMatrix& rhs) {
   return *this;
 }
 
-VariableMatrix operator-(const VariableMatrix& lhs) {
+WPILIB_DLLEXPORT VariableMatrix operator-(const VariableMatrix& lhs) {
   VariableMatrix result{lhs.Rows(), lhs.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {

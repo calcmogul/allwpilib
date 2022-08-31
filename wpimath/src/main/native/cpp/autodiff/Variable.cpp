@@ -50,15 +50,15 @@ Variable& Variable::operator=(int value) {
   return *this;
 }
 
-Variable operator*(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator*(double lhs, const Variable& rhs) {
   return Constant(lhs) * rhs;
 }
 
-Variable operator*(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, double rhs) {
   return lhs * Constant(rhs);
 }
 
-Variable operator*(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, const Variable& rhs) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs * rhs; },
@@ -78,15 +78,15 @@ Variable& Variable::operator*=(const Variable& rhs) {
   return *this;
 }
 
-Variable operator/(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator/(double lhs, const Variable& rhs) {
   return Constant(lhs) / rhs;
 }
 
-Variable operator/(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, double rhs) {
   return lhs / Constant(rhs);
 }
 
-Variable operator/(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, const Variable& rhs) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs / rhs; },
@@ -108,15 +108,15 @@ Variable& Variable::operator/=(const Variable& rhs) {
   return *this;
 }
 
-Variable operator+(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator+(double lhs, const Variable& rhs) {
   return Constant(lhs) + rhs;
 }
 
-Variable operator+(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, double rhs) {
   return lhs + Constant(rhs);
 }
 
-Variable operator+(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, const Variable& rhs) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs + rhs; },
@@ -138,15 +138,15 @@ Variable& Variable::operator+=(const Variable& rhs) {
   return *this;
 }
 
-Variable operator-(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator-(double lhs, const Variable& rhs) {
   return Constant(lhs) - rhs;
 }
 
-Variable operator-(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, double rhs) {
   return lhs - Constant(rhs);
 }
 
-Variable operator-(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, const Variable& rhs) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs - rhs; },
@@ -168,89 +168,89 @@ Variable& Variable::operator-=(const Variable& rhs) {
   return *this;
 }
 
-Variable operator-(const Variable& lhs) {
+WPILIB_DLLEXPORT Variable operator-(const Variable& lhs) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       lhs, [](double lhs) { return -lhs; },
       [](const Variable&) -> Variable { return Constant(-1.0); })};
 }
 
-Variable operator+(const Variable& lhs) {
+WPILIB_DLLEXPORT Variable operator+(const Variable& lhs) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       lhs, [](double lhs) { return +lhs; },
       [](const Variable&) -> Variable { return Constant(1.0); })};
 }
 
-bool operator==(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator==(double lhs, const Variable& rhs) {
   return std::abs(lhs - rhs.Value()) < 1e-9;
 }
 
-bool operator==(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT bool operator==(const Variable& lhs, double rhs) {
   return std::abs(lhs.Value() - rhs) < 1e-9;
 }
 
-bool operator==(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator==(const Variable& lhs, const Variable& rhs) {
   return std::abs(lhs.Value() - rhs.Value()) < 1e-9;
 }
 
-bool operator!=(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator!=(double lhs, const Variable& rhs) {
   return lhs != rhs.Value();
 }
 
-bool operator!=(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT bool operator!=(const Variable& lhs, double rhs) {
   return lhs.Value() != rhs;
 }
 
-bool operator!=(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator!=(const Variable& lhs, const Variable& rhs) {
   return lhs.Value() != rhs.Value();
 }
 
-bool operator<(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator<(double lhs, const Variable& rhs) {
   return lhs < rhs.Value();
 }
 
-bool operator<(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT bool operator<(const Variable& lhs, double rhs) {
   return lhs.Value() < rhs;
 }
 
-bool operator<(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator<(const Variable& lhs, const Variable& rhs) {
   return lhs.Value() < rhs.Value();
 }
 
-bool operator>(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator>(double lhs, const Variable& rhs) {
   return lhs > rhs.Value();
 }
 
-bool operator>(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT bool operator>(const Variable& lhs, double rhs) {
   return lhs.Value() > rhs;
 }
 
-bool operator>(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator>(const Variable& lhs, const Variable& rhs) {
   return lhs.Value() > rhs.Value();
 }
 
-bool operator<=(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator<=(double lhs, const Variable& rhs) {
   return lhs <= rhs.Value();
 }
 
-bool operator<=(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT bool operator<=(const Variable& lhs, double rhs) {
   return lhs.Value() <= rhs;
 }
 
-bool operator<=(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator<=(const Variable& lhs, const Variable& rhs) {
   return lhs.Value() <= rhs.Value();
 }
 
-bool operator>=(double lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator>=(double lhs, const Variable& rhs) {
   return lhs >= rhs.Value();
 }
 
-bool operator>=(const Variable& lhs, double rhs) {
+WPILIB_DLLEXPORT bool operator>=(const Variable& lhs, double rhs) {
   return lhs.Value() >= rhs;
 }
 
-bool operator>=(const Variable& lhs, const Variable& rhs) {
+WPILIB_DLLEXPORT bool operator>=(const Variable& lhs, const Variable& rhs) {
   return lhs.Value() >= rhs.Value();
 }
 
