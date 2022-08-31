@@ -33,33 +33,69 @@ VariableMatrix::VariableMatrix(autodiff::Variable&& variable)
   m_storage.emplace_back(std::move(variable));
 }
 
-VariableMatrix VariableMatrix::operator()(int row, int col) const {
-  assert(row < Rows() && col < Cols());
-  return VariableMatrix{m_storage[row]};
-}
-
-VariableMatrix VariableMatrix::operator()(int row) const {
-  return VariableMatrix{m_storage[row]};
-}
-
-VariableMatrix VariableMatrix::Block(int rowOffset, int colOffset,
-                                     int blockRows, int blockCols) {
-  VariableMatrix result{blockRows, blockCols};
-
-  for (int row = 0; row < blockRows; ++row) {
-    for (int col = 0; col < blockCols; ++col) {
-      result(row, col) = (*this)(row + rowOffset, col + colOffset);
+VariableMatrix::VariableMatrix(const VariableBlock<VariableMatrix>& values)
+    : m_rows{values.Rows()}, m_cols{values.Cols()} {
+  for (int row = 0; row < Rows(); ++row) {
+    for (int col = 0; col < Cols(); ++col) {
+      m_storage.emplace_back(values.Autodiff(row, col));
     }
   }
-
-  return result;
 }
 
-VariableMatrix VariableMatrix::Row(int row) {
+VariableMatrix::VariableMatrix(
+    const VariableBlock<const VariableMatrix>& values)
+    : m_rows{values.Rows()}, m_cols{values.Cols()} {
+  for (int row = 0; row < Rows(); ++row) {
+    for (int col = 0; col < Cols(); ++col) {
+      m_storage.emplace_back(values.Autodiff(row, col));
+    }
+  }
+}
+
+VariableBlock<VariableMatrix> VariableMatrix::operator()(int row, int col) {
+  assert(row < Rows() && col < Cols());
+  return Block(row, col, 1, 1);
+}
+
+VariableBlock<const VariableMatrix> VariableMatrix::operator()(int row,
+                                                               int col) const {
+  assert(row < Rows() && col < Cols());
+  return Block(row, col, 1, 1);
+}
+
+VariableBlock<VariableMatrix> VariableMatrix::operator()(int row) {
+  return Block(row, 0, 1, 1);
+}
+
+VariableBlock<const VariableMatrix> VariableMatrix::operator()(int row) const {
+  return Block(row, 0, 1, 1);
+}
+
+VariableBlock<VariableMatrix> VariableMatrix::Block(int rowOffset,
+                                                    int colOffset,
+                                                    int blockRows,
+                                                    int blockCols) {
+  return VariableBlock{*this, rowOffset, colOffset, blockRows, blockCols};
+}
+
+const VariableBlock<const VariableMatrix> VariableMatrix::Block(
+    int rowOffset, int colOffset, int blockRows, int blockCols) const {
+  return VariableBlock{*this, rowOffset, colOffset, blockRows, blockCols};
+}
+
+VariableBlock<VariableMatrix> VariableMatrix::Row(int row) {
   return Block(row, 0, 1, Cols());
 }
 
-VariableMatrix VariableMatrix::Col(int col) {
+VariableBlock<const VariableMatrix> VariableMatrix::Row(int row) const {
+  return Block(row, 0, 1, Cols());
+}
+
+VariableBlock<VariableMatrix> VariableMatrix::Col(int col) {
+  return Block(0, col, Rows(), 1);
+}
+
+VariableBlock<const VariableMatrix> VariableMatrix::Col(int col) const {
   return Block(0, col, Rows(), 1);
 }
 
@@ -74,7 +110,7 @@ VariableMatrix operator*(const VariableMatrix& lhs, const VariableMatrix& rhs) {
       for (int k = 0; k < lhs.Cols(); ++k) {
         sum += lhs.Autodiff(i, k) * rhs.Autodiff(k, j);
       }
-      result(i, j) = sum;
+      result.Autodiff(i, j) = sum;
     }
   }
 
@@ -87,7 +123,7 @@ VariableMatrix operator*(const VariableMatrix& lhs, double rhs) {
   autodiff::Variable rhsVar{rhs};
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = lhs(row, col) * rhsVar;
+      result.Autodiff(row, col) = lhs.Autodiff(row, col) * rhsVar;
     }
   }
 
@@ -100,7 +136,7 @@ VariableMatrix operator*(double lhs, const VariableMatrix& rhs) {
   autodiff::Variable lhsVar{lhs};
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = rhs(row, col) * lhsVar;
+      result.Autodiff(row, col) = rhs.Autodiff(row, col) * lhsVar;
     }
   }
 
@@ -116,7 +152,7 @@ VariableMatrix& VariableMatrix::operator*=(const VariableMatrix& rhs) {
       for (int k = 0; k < Cols(); ++k) {
         sum += Autodiff(i, k) * rhs.Autodiff(k, j);
       }
-      (*this)(i, j) = sum;
+      Autodiff(i, j) = sum;
     }
   }
 
@@ -126,7 +162,7 @@ VariableMatrix& VariableMatrix::operator*=(const VariableMatrix& rhs) {
 VariableMatrix& VariableMatrix::operator*=(double rhs) {
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      (*this)(row, col) *= autodiff::Variable{rhs};
+      Autodiff(row, col) *= autodiff::Variable{rhs};
     }
   }
 
@@ -138,7 +174,8 @@ VariableMatrix operator/(const VariableMatrix& lhs, double rhs) {
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = lhs.Autodiff(row, col) / autodiff::Variable{rhs};
+      result.Autodiff(row, col) =
+          lhs.Autodiff(row, col) / autodiff::Variable{rhs};
     }
   }
 
@@ -160,7 +197,8 @@ VariableMatrix operator+(const VariableMatrix& lhs, const VariableMatrix& rhs) {
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = lhs(row, col) + rhs(row, col);
+      result.Autodiff(row, col) =
+          lhs.Autodiff(row, col) + rhs.Autodiff(row, col);
     }
   }
 
@@ -170,7 +208,7 @@ VariableMatrix operator+(const VariableMatrix& lhs, const VariableMatrix& rhs) {
 VariableMatrix& VariableMatrix::operator+=(const VariableMatrix& rhs) {
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      (*this)(row, col) += rhs(row, col);
+      Autodiff(row, col) += rhs.Autodiff(row, col);
     }
   }
 
@@ -182,7 +220,8 @@ VariableMatrix operator-(const VariableMatrix& lhs, const VariableMatrix& rhs) {
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = lhs(row, col) - rhs(row, col);
+      result.Autodiff(row, col) =
+          lhs.Autodiff(row, col) - rhs.Autodiff(row, col);
     }
   }
 
@@ -192,7 +231,7 @@ VariableMatrix operator-(const VariableMatrix& lhs, const VariableMatrix& rhs) {
 VariableMatrix& VariableMatrix::operator-=(const VariableMatrix& rhs) {
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      (*this)(row, col) -= rhs(row, col);
+      Autodiff(row, col) -= rhs.Autodiff(row, col);
     }
   }
 
@@ -204,7 +243,7 @@ VariableMatrix operator-(const VariableMatrix& lhs) {
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = -lhs(row, col);
+      result.Autodiff(row, col) = -lhs.Autodiff(row, col);
     }
   }
 
@@ -216,7 +255,7 @@ VariableMatrix VariableMatrix::Transpose() const {
 
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      result(col, row) = (*this)(row, col);
+      result.Autodiff(col, row) = Autodiff(row, col);
     }
   }
 
@@ -264,7 +303,7 @@ VariableMatrix abs(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = abs(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = abs(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -276,7 +315,7 @@ VariableMatrix acos(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = acos(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = acos(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -288,7 +327,7 @@ VariableMatrix asin(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = asin(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = asin(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -300,7 +339,7 @@ VariableMatrix atan(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = atan(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = atan(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -313,7 +352,7 @@ VariableMatrix atan2(const VariableMatrix& y,  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) =
+      result.Autodiff(row, col) =
           atan2(y.Autodiff(row, col), x.Autodiff(row, col));  // NOLINT
     }
   }
@@ -326,7 +365,7 @@ VariableMatrix cos(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = cos(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = cos(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -338,7 +377,7 @@ VariableMatrix cosh(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = cosh(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = cosh(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -350,7 +389,7 @@ VariableMatrix erf(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = erf(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = erf(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -362,7 +401,7 @@ VariableMatrix exp(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = exp(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = exp(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -375,7 +414,7 @@ VariableMatrix hypot(const VariableMatrix& x,  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) =
+      result.Autodiff(row, col) =
           hypot(x.Autodiff(row, col), y.Autodiff(row, col));  // NOLINT
     }
   }
@@ -388,7 +427,7 @@ VariableMatrix log(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = log(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = log(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -400,7 +439,7 @@ VariableMatrix log10(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = log10(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = log10(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -413,7 +452,7 @@ VariableMatrix pow(const VariableMatrix& base,
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) =
+      result.Autodiff(row, col) =
           pow(base.Autodiff(row, col), power.Autodiff(row, col));  // NOLINT
     }
   }
@@ -426,7 +465,7 @@ VariableMatrix sin(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = sin(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = sin(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -438,7 +477,7 @@ VariableMatrix sinh(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = sinh(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = sinh(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -450,7 +489,7 @@ VariableMatrix sqrt(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = sqrt(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = sqrt(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -462,7 +501,7 @@ VariableMatrix tan(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = tan(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = tan(x.Autodiff(row, col));  // NOLINT
     }
   }
 
@@ -474,7 +513,7 @@ VariableMatrix tanh(const VariableMatrix& x) {  // NOLINT
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result(row, col) = tanh(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = tanh(x.Autodiff(row, col));  // NOLINT
     }
   }
 

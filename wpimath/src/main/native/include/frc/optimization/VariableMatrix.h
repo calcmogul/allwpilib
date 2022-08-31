@@ -12,6 +12,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/autodiff/Variable.h"
+#include "frc/optimization/VariableBlock.h"
 
 namespace frc {
 
@@ -38,7 +39,7 @@ class WPILIB_DLLEXPORT VariableMatrix {
   VariableMatrix& operator=(const frc::Matrixd<_Rows, _Cols>& values) {
     for (size_t row = 0; row < _Rows; ++row) {
       for (size_t col = 0; col < _Cols; ++col) {
-        (*this)(row, col) = values(row, col);
+        Autodiff(row, col) = values(row, col);
       }
     }
 
@@ -61,7 +62,7 @@ class WPILIB_DLLEXPORT VariableMatrix {
   VariableMatrix& operator=(frc::Matrixd<_Rows, _Cols>&& values) {
     for (size_t row = 0; row < _Rows; ++row) {
       for (size_t col = 0; col < _Cols; ++col) {
-        (*this)(row, col) = values(row, col);
+        Autodiff(row, col) = values(row, col);
       }
     }
 
@@ -112,9 +113,17 @@ class WPILIB_DLLEXPORT VariableMatrix {
 
   VariableMatrix(autodiff::Variable&& variable);  // NOLINT
 
-  VariableMatrix operator()(int row, int col) const;
+  VariableMatrix(const VariableBlock<VariableMatrix>& values);  // NOLINT
 
-  VariableMatrix operator()(int row) const;
+  VariableMatrix(const VariableBlock<const VariableMatrix>& values);  // NOLINT
+
+  VariableBlock<VariableMatrix> operator()(int row, int col);
+
+  VariableBlock<const VariableMatrix> operator()(int row, int col) const;
+
+  VariableBlock<VariableMatrix> operator()(int row);
+
+  VariableBlock<const VariableMatrix> operator()(int row) const;
 
   /**
    * Returns a block slice of the variable matrix.
@@ -124,22 +133,48 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param blockRows The number of rows in the block selection.
    * @param blockCols The number of columns in the block selection.
    */
-  VariableMatrix Block(int rowOffset, int colOffset, int blockRows,
-                       int blockCols);
+  VariableBlock<VariableMatrix> Block(int rowOffset, int colOffset,
+                                      int blockRows, int blockCols);
+
+  /**
+   * Returns a block slice of the variable matrix.
+   *
+   * @param rowOffset The row offset of the block selection.
+   * @param colOffset The column offset of the block selection.
+   * @param blockRows The number of rows in the block selection.
+   * @param blockCols The number of columns in the block selection.
+   */
+  const VariableBlock<const VariableMatrix> Block(int rowOffset, int colOffset,
+                                                  int blockRows,
+                                                  int blockCols) const;
 
   /**
    * Returns a row slice of the variable matrix.
    *
    * @param row The row to slice.
    */
-  VariableMatrix Row(int row);
+  VariableBlock<VariableMatrix> Row(int row);
+
+  /**
+   * Returns a row slice of the variable matrix.
+   *
+   * @param row The row to slice.
+   */
+  VariableBlock<const VariableMatrix> Row(int row) const;
 
   /**
    * Returns a column slice of the variable matrix.
    *
    * @param col The column to slice.
    */
-  VariableMatrix Col(int col);
+  VariableBlock<VariableMatrix> Col(int col);
+
+  /**
+   * Returns a column slice of the variable matrix.
+   *
+   * @param col The column to slice.
+   */
+  VariableBlock<const VariableMatrix> Col(int col) const;
 
   /**
    * Matrix multiplication operator.

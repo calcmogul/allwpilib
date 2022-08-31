@@ -24,7 +24,7 @@ VariableMatrix Problem::DecisionVariable(int rows, int cols) {
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < cols; ++col) {
       m_leaves[oldSize + row * cols + col] = autodiff::Variable{0.0};
-      vars(row, col) = m_leaves[oldSize + row * cols + col];
+      vars.Autodiff(row, col) = m_leaves[oldSize + row * cols + col];
     }
   }
 
