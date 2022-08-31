@@ -297,7 +297,7 @@ class WPILIB_DLLEXPORT VariableMatrix {
   /**
    * Returns a row of the variable column vector.
    *
-   * @param row The row of the element to return.
+   * @param index The index of the element to return.
    */
   double Value(int index) const;
 
