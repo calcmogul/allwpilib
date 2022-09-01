@@ -161,23 +161,23 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Let f(x)ₖ be the cost function, cₑ(x)ₖ be the equality constraints, and
   // cᵢ(x)ₖ be the inequality constraints.
   //
-  // L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ − zₖᵀ(cᵢ(x)ₖ − sₖ)
+  //   L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ − zₖᵀ(cᵢ(x)ₖ − sₖ)
   //
-  // H(x)ₖ = ∇²ₓₓL(x, s, y, z)ₖ
+  //   H(x)ₖ = ∇²ₓₓL(x, s, y, z)ₖ
   //
-  //     [s₁ 0 ⋯ 0 ]
-  // S = [0  ⋱   ⋮ ]
-  //     [⋮    ⋱ 0 ]
-  //     [0  ⋯ 0 sₘ]
+  //       [s₁ 0 ⋯ 0 ]
+  //   S = [0  ⋱   ⋮ ]
+  //       [⋮    ⋱ 0 ]
+  //       [0  ⋯ 0 sₘ]
   //
-  //     [z₁ 0 ⋯ 0 ]
-  // Z = [0  ⋱   ⋮ ]
-  //     [⋮    ⋱ 0 ]
-  //     [0  ⋯ 0 zₘ]
+  //       [z₁ 0 ⋯ 0 ]
+  //   Z = [0  ⋱   ⋮ ]
+  //       [⋮    ⋱ 0 ]
+  //       [0  ⋯ 0 zₘ]
   //
   // where m is the number of inequality constraints.
   //
-  // Σ = S⁻¹Z
+  //   Σ = S⁻¹Z
   //
   // e is a column vector of ones with a number of rows equal to the number of
   // inequality constraints.
@@ -186,78 +186,78 @@ Eigen::VectorXd Problem::InteriorPoint(
   //
   // We want to solve the Newton-KKT system shown in equation (19.12) in [1].
   //
-  // [H    0  Aₑᵀ  Aᵢᵀ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
-  // [0    Σ   0   −I ][ pₖˢ] = −[     z − μS⁻¹e     ]
-  // [Aₑ   0   0    0 ][-pₖʸ]    [        cₑ         ]
-  // [Aᵢ  −I   0    0 ][-pₖᶻ]    [      cᵢ − s       ]
+  //   [H    0  Aₑᵀ  Aᵢᵀ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
+  //   [0    Σ   0   −I ][ pₖˢ] = −[     z − μS⁻¹e     ]
+  //   [Aₑ   0   0    0 ][-pₖʸ]    [        cₑ         ]
+  //   [Aᵢ  −I   0    0 ][-pₖᶻ]    [      cᵢ − s       ]
   //
   // Take the second row.
   //
-  // Σpₖˢ + pₖᶻ = μS⁻¹e − z
+  //   Σpₖˢ + pₖᶻ = μS⁻¹e − z
   //
   // Solve for pₖˢ.
   //
-  // pₖˢ = μΣ⁻¹S⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ
+  //   pₖˢ = μΣ⁻¹S⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ
   //
   // Substitute Σ = S⁻¹Z into the first two elements.
   //
-  // pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
+  //   pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
   //
   // Take the fourth row.
   //
-  // Aₑpₖˣ − pₖˢ = s − cᵢ
+  //   Aₑpₖˣ − pₖˢ = s − cᵢ
   //
   // Substitute the explicit formula for pₖˢ.
   //
-  // Aₑpₖˣ − μZ⁻¹e + s + Σ⁻¹pₖᶻ = s − cᵢ
+  //   Aₑpₖˣ − μZ⁻¹e + s + Σ⁻¹pₖᶻ = s − cᵢ
   //
   // Simplify.
   //
-  // Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
+  //   Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
   //
   // Substitute the new second and fourth rows into the system.
   //
-  // [H   0  Aₑᵀ  Aᵢᵀ ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
-  // [0   I   0    0  ][ pₖˢ] = −[     z − μS⁻¹e     ]
-  // [Aₑ  0   0    0  ][−pₖʸ]    [        cₑ         ]
-  // [Aᵢ  0   0   −Σ⁻¹][−pₖᶻ]    [     cᵢ − μZ⁻¹e    ]
+  //   [H   0  Aₑᵀ  Aᵢᵀ ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
+  //   [0   I   0    0  ][ pₖˢ] = −[     z − μS⁻¹e     ]
+  //   [Aₑ  0   0    0  ][−pₖʸ]    [        cₑ         ]
+  //   [Aᵢ  0   0   −Σ⁻¹][−pₖᶻ]    [     cᵢ − μZ⁻¹e    ]
   //
   // Eliminate the second row and column.
   //
-  // [H   Aₑᵀ   Aᵢ ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
-  // [Aₑ   0    0  ][−pₖʸ] = −[        cₑ         ]
-  // [Aᵢ   0   −Σ⁻¹][−pₖᶻ]    [    cᵢ − μZ⁻¹e     ]
+  //   [H   Aₑᵀ   Aᵢ ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
+  //   [Aₑ   0    0  ][−pₖʸ] = −[        cₑ         ]
+  //   [Aᵢ   0   −Σ⁻¹][−pₖᶻ]    [    cᵢ − μZ⁻¹e     ]
   //
   // Take the third row.
   //
-  // Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
+  //   Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
   //
   // Solve for pₖᶻ.
   //
-  // pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ
+  //   pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ
   //
   // Take the first row.
   //
-  // Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀpₖᶻ = −∇f(x) + Aₑᵀy + Aᵢᵀz
+  //   Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀpₖᶻ = −∇f(x) + Aₑᵀy + Aᵢᵀz
   //
   // Substitute the explicit formula for pₖᶻ.
   //
-  // Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀ(−Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ) = −∇f(x) + Aₑᵀy + Aᵢᵀz
+  //   Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀ(−Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ) = −∇f(x) + Aₑᵀy + Aᵢᵀz
   //
   // Expand and simplify.
   //
-  // (H + AᵢᵀΣAᵢ)pₖˣ − Aₑᵀpₖʸ = −∇f(x) + Aₑᵀy − Aᵢᵀ(Σcᵢ − μS⁻¹e − z)
+  //   (H + AᵢᵀΣAᵢ)pₖˣ − Aₑᵀpₖʸ = −∇f(x) + Aₑᵀy − Aᵢᵀ(Σcᵢ − μS⁻¹e − z)
   //
   // Substitute the new first and third rows into the system.
   //
-  // [H   Aₑᵀ  0][ pₖˣ]    [∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
-  // [Aₑ   0   0][−pₖʸ] = −[                cₑ                 ]
-  // [0    0   I][−pₖᶻ]    [       −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ       ]
+  //   [H   Aₑᵀ  0][ pₖˣ]    [∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
+  //   [Aₑ   0   0][−pₖʸ] = −[                cₑ                 ]
+  //   [0    0   I][−pₖᶻ]    [       −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ       ]
   //
   // Eliminate the third row and column.
   //
-  // [H + AᵢᵀΣAᵢ  Aₑᵀ][ pₖˣ] = −[∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
-  // [    Aₑ       0 ][−pₖʸ]    [                cₑ                 ]
+  //   [H + AᵢᵀΣAᵢ  Aₑᵀ][ pₖˣ] = −[∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
+  //   [    Aₑ       0 ][−pₖʸ]    [                cₑ                 ]
   //
   // The iterate pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ.
   // The iterate pₖˢ = μZ⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ.
@@ -265,13 +265,13 @@ Eigen::VectorXd Problem::InteriorPoint(
   // The fraction-to-the-boundary rule is used to compute αₖᵐᵃˣ and αₖᶻ. See
   // equations (15a) and (15b) in [2].
   //
-  // αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
-  // αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
+  //   αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
+  //   αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
   //
-  // xₖ₊₁ = xₖ + αₖᵐᵃˣpₖˣ
-  // sₖ₊₁ = xₖ + αₖᵐᵃˣpₖˢ
-  // yₖ₊₁ = xₖ + αₖᶻpₖʸ
-  // zₖ₊₁ = xₖ + αₖᶻpₖᶻ
+  //   xₖ₊₁ = xₖ + αₖᵐᵃˣpₖˣ
+  //   sₖ₊₁ = xₖ + αₖᵐᵃˣpₖˢ
+  //   yₖ₊₁ = xₖ + αₖᶻpₖʸ
+  //   zₖ₊₁ = xₖ + αₖᶻpₖᶻ
   //
   // [1] Nocedal, J. and Wright, S. Numerical Optimization, 2nd. ed., Ch. 19.
   //     Springer, 2006.
@@ -432,7 +432,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       // barrier term Hessian" Σₖ does not deviate arbitrarily much from the
       // "primal Hessian" μⱼSₖ⁻². We ensure this by resetting
       //
-      // zₖ₊₁⁽ⁱ⁾ = max{min{zₖ₊₁⁽ⁱ⁾, κ_Σ μⱼ/xₖ₊₁⁽ⁱ⁾}, μⱼ/(κ_Σ xₖ₊₁⁽ⁱ⁾)}
+      //   zₖ₊₁⁽ⁱ⁾ = max{min{zₖ₊₁⁽ⁱ⁾, κ_Σ μⱼ/xₖ₊₁⁽ⁱ⁾}, μⱼ/(κ_Σ xₖ₊₁⁽ⁱ⁾)}
       //
       // for some fixed κ ≥ 1 after each step. See equation (16) in [2].
       constexpr double kappa_sigma = 1e10;
