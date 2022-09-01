@@ -135,9 +135,7 @@ void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
 
 double Problem::FractionToTheBoundaryRule(
     const Eigen::Ref<const Eigen::VectorXd>& x,
-    const Eigen::Ref<const Eigen::VectorXd>& p) {
-  constexpr double tau = 0.995;
-
+    const Eigen::Ref<const Eigen::VectorXd>& p, double tau) {
   // αᵐᵃˣ = max{α ∈ (0, 1] : x + αp ≥ (1−τ)x}
   double alpha = 1;
   for (int i = 0; i < x.rows(); ++i) {
@@ -279,8 +277,25 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   // TODO: Add problem infeasibility checks; throw exception?
 
+  // Barrier parameter scale factor κ_μ for tolerance checks
+  constexpr double kappa_epsilon = 0.1;
+
+  // Barrier parameter scale factor κ_Σ for inequality constraint Lagrange
+  // multiplier safeguard
+  constexpr double kappa_sigma = 1e10;
+
+  // Fraction-to-the-boundary rule scale factor minimum
+  constexpr double tau_min = 0.995;
+
+  // Tuning parameters for μ update
+  constexpr double kappa_mu = 0.1;  // (0, 1)
+  constexpr double theta_mu = 1.5;  // (1, 2)
+
   // Barrier parameter μ
   double mu = 1;
+
+  // Fraction-to-the-boundary rule scale factor τ
+  double tau = tau_min;
 
   std::vector<Eigen::Triplet<double>> triplets;
 
@@ -309,9 +324,11 @@ Eigen::VectorXd Problem::InteriorPoint(
   SetAD(m_leaves, x);
   L.Update();
 
-  // TODO: Need a convergence test
-  for (int muIterations = 0; muIterations < 7; ++muIterations) {
-    for (int iterations = 0; iterations < m_maxIterations; ++iterations) {
+  // Error estimate E_μ
+  double E_mu = 0.0;
+
+  do {
+    do {
       //     [s₁ 0 ⋯ 0 ]
       // S = [0  ⋱   ⋮ ]
       //     [⋮    ⋱ 0 ]
@@ -414,10 +431,10 @@ Eigen::VectorXd Problem::InteriorPoint(
           (mu * inverseZ * e - inverseSigma * z - inverseSigma * p_z);
 
       // αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
-      double alpha_max = FractionToTheBoundaryRule(x, p_x);
+      double alpha_max = FractionToTheBoundaryRule(x, p_x, tau);
 
       // αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
-      double alpha_z = FractionToTheBoundaryRule(z, p_z);
+      double alpha_z = FractionToTheBoundaryRule(z, p_z, tau);
 
       // xₖ₊₁ = xₖ + αₖᵐᵃˣpₖˣ
       // sₖ₊₁ = xₖ + αₖᵐᵃˣpₖˢ
@@ -434,8 +451,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       //
       //   zₖ₊₁⁽ⁱ⁾ = max{min{zₖ₊₁⁽ⁱ⁾, κ_Σ μⱼ/xₖ₊₁⁽ⁱ⁾}, μⱼ/(κ_Σ xₖ₊₁⁽ⁱ⁾)}
       //
-      // for some fixed κ ≥ 1 after each step. See equation (16) in [2].
-      constexpr double kappa_sigma = 1e10;
+      // for some fixed κ_Σ ≥ 1 after each step. See equation (16) in [2].
       for (int row = 0; row < z.rows(); ++row) {
         z(row) = std::max(std::min(z(row), kappa_sigma * mu / x(row)),
                           mu / (kappa_sigma * x(row)));
@@ -446,11 +462,34 @@ Eigen::VectorXd Problem::InteriorPoint(
       SetAD(yAD, y);
       SetAD(zAD, z);
       L.Update();
-    }
 
-    // TODO: Adaptively scale mu between iterations
-    mu *= 0.1;
-  }
+      // s_d = max{sₘₐₓ, (||y||₁ + ||z||₁) / (m + n)} / sₘₐₓ
+      constexpr double s_max = 100.0;
+      double s_d = std::max(s_max, (y.lpNorm<1>() + z.lpNorm<1>()) /
+                                       (m_equalityConstraints.size() +
+                                        m_inequalityConstraints.size())) /
+                   s_max;
+
+      // Update the error estimate. Based on equation (5) in [2].
+      E_mu = std::max(rhs.topRows(x.rows()).lpNorm<Eigen::Infinity>() / s_d,
+                      c_e.lpNorm<Eigen::Infinity>());
+    } while (E_mu > kappa_epsilon * mu);
+
+    // Update the barrier parameter.
+    //
+    //   μⱼ₊₁ = max{εₜₒₗ/10, min{κ_μ μⱼ, μⱼ^θ_μ}}
+    //
+    // See equation (7) in [2].
+    mu = std::max(m_tolerance / 10.0,
+                  std::min(kappa_mu * mu, std::pow(mu, theta_mu)));
+
+    // Update the fraction-to-the-boundary rule scaling factor.
+    //
+    //   τⱼ = max{τₘᵢₙ, 1 − μⱼ}
+    //
+    // See equation (8) in [2].
+    tau = std::max(tau_min, 1.0 - mu);
+  } while (E_mu > m_tolerance);
 
   return x;
 }

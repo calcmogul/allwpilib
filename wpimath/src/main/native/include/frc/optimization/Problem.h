@@ -271,11 +271,12 @@ class WPILIB_DLLEXPORT Problem {
    *
    * @param x The variable.
    * @param p The iterate on the variable.
+   * @param tau Fraction-to-the-boundary rule scaling factor.
    * @return Fraction of the iterate step size within (0, 1].
    */
   static double FractionToTheBoundaryRule(
       const Eigen::Ref<const Eigen::VectorXd>& x,
-      const Eigen::Ref<const Eigen::VectorXd>& p);
+      const Eigen::Ref<const Eigen::VectorXd>& p, double tau);
 
   /**
    * The cost function f(x).
