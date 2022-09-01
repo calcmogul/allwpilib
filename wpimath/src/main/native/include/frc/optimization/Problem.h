@@ -266,12 +266,12 @@ class WPILIB_DLLEXPORT Problem {
                     const Eigen::Ref<const Eigen::VectorXd>& src);
 
   /**
-   * Regularize a given Hessian (make all its eigenvalues positive) using a
-   * modified Cholesky decomposition.
+   * Regularize a matrix (make all its eigenvalues positive) using a modified
+   * Cholesky decomposition.
    *
-   * @param H The Hessian matrix to regularize.
+   * @param A The matrix to regularize.
    */
-  void Regularize(Eigen::SparseMatrix<double>& H);
+  void Regularize(Eigen::SparseMatrix<double>& A);
 
   /**
    * Applies fraction-to-the-boundary rule to a variable and its iterate, then

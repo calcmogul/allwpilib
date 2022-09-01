@@ -133,7 +133,7 @@ void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
   }
 }
 
-void Problem::Regularize(Eigen::SparseMatrix<double>& H) {
+void Problem::Regularize(Eigen::SparseMatrix<double>& A) {
   // See algorithm 3.4 on page 53 of [1].
   //
   // [1] Nocedal, J. and Wright, S. Numerical Optimization, 2nd. ed., Ch. 19.
@@ -142,13 +142,13 @@ void Problem::Regularize(Eigen::SparseMatrix<double>& H) {
   constexpr double beta = 0.1;
   constexpr double delta = 0.01;
 
-  Eigen::SparseMatrix<double> L{H.rows(), H.cols()};
-  Eigen::SparseMatrix<double> D{H.rows(), H.cols()};
+  Eigen::SparseMatrix<double> L{A.rows(), A.cols()};
+  Eigen::SparseMatrix<double> D{A.rows(), A.cols()};
 
   double c_ij = 0.0;
   double theta_j = 0.0;
-  for (int j = 0; j < H.rows(); ++j) {
-    double c_jj = H.coeffRef(j, j);
+  for (int j = 0; j < A.rows(); ++j) {
+    double c_jj = A.coeffRef(j, j);
     for (int s = 0; s < j - 1; ++s) {
       double l_js = L.coeffRef(j, s);
       c_jj -= D.coeffRef(s, s) * l_js * l_js;
@@ -158,8 +158,8 @@ void Problem::Regularize(Eigen::SparseMatrix<double>& H) {
     D.coeffRef(j, j) = std::max(
         std::max(std::abs(c_jj), (theta_j / beta) * (theta_j / beta)), delta);
 
-    for (int i = j + 1; i < H.rows(); ++i) {
-      c_ij = H.coeffRef(i, j);
+    for (int i = j + 1; i < A.rows(); ++i) {
+      c_ij = A.coeffRef(i, j);
       for (int s = 0; s < j - 1; ++s) {
         c_ij -= D.coeffRef(s, s) * L.coeffRef(i, s) * L.coeffRef(s, j);
       }
@@ -167,7 +167,7 @@ void Problem::Regularize(Eigen::SparseMatrix<double>& H) {
     }
   }
 
-  H = L * D * L.transpose();
+  A = L * D * L.transpose();
 }
 
 double Problem::FractionToTheBoundaryRule(
