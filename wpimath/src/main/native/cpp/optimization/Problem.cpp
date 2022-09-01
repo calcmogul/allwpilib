@@ -5,7 +5,6 @@
 #include "frc/optimization/Problem.h"
 
 #include <cassert>
-#include <cmath>
 #include <vector>
 
 #include "Eigen/IterativeLinearSolvers"
