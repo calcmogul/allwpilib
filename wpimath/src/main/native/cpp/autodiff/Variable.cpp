@@ -15,6 +15,7 @@
 #include <fmt/core.h>
 
 #include "frc/autodiff/Tape.h"
+#include "frc/fmt/Eigen.h"
 
 namespace frc::autodiff {
 
@@ -457,7 +458,11 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
 
   Eigen::SparseMatrix<double> W{tape.Size(), tape.Size()};
 
-  auto GetW = [&W](int row, int col) -> double& {
+  auto GetW = [&W](int row, int col) -> double {
+    return W.coeff(std::max(row, col), std::min(row, col));
+  };
+
+  auto GetWRef = [&W](int row, int col) -> double& {
     return W.coeffRef(std::max(row, col), std::min(row, col));
   };
 
@@ -485,10 +490,10 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
           int j = tape[i].args[jArg].index;
           if (j == p) {
             // w_{pp} += 2∂ϕᵢ/∂vₚ w_{pi}
-            GetW(j, p) += 2.0 * grad * GetW(p, i);
+            GetWRef(j, p) += 2.0 * grad * GetW(p, i);
           } else {
             // w_{jp} += ∂ϕᵢ/∂vⱼ w_{pi}
-            GetW(j, p) += grad * GetW(p, i);
+            GetWRef(j, p) += grad * GetW(p, i);
           }
         }
       } else {
@@ -508,7 +513,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
           // w_{jk} += ∂ϕᵢ/∂vₖ ∂ϕᵢ/∂vⱼ w_{ii}
           int j = tape[i].args[jArg].index;
           int k = tape[i].args[kArg].index;
-          GetW(j, k) += grad * GetW(i, i);
+          GetWRef(j, k) += grad * GetW(i, i);
         }
       }
     }
@@ -532,7 +537,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
       // w_{jk} += v̅ᵢ ∂²ϕᵢ/∂vₖ∂vⱼ
       int j = grad_i_wrt_k.GetNode().args[jArg].index;
       int k = tape[i].args[kArg].index;
-      GetW(j, k) += tape[i].adjoint * grad2_i_wrt_kj;
+      GetWRef(j, k) += tape[i].adjoint * grad2_i_wrt_kj;
     }
 
     // Adjoint
@@ -560,25 +565,13 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
   // copying them to the upper triangle
   for (int row = 1; row < H.rows(); ++row) {
     for (int col = 0; col < row; ++col) {
-      H.coeffRef(col, row) = H.coeffRef(row, col);
+      H.coeffRef(col, row) = H.coeff(row, col);
     }
   }
 
-#if 1
-  auto PrintSparseMatrix = [](std::string_view matrixName,
-                              Eigen::SparseMatrix<double>& M) {
-    fmt::print("{} ({}x{}) =\n", matrixName, M.rows(), M.cols());
-    for (int i = 0; i < M.rows(); ++i) {
-      for (int j = 0; j < M.cols(); ++j) {
-        fmt::print("{} ", M.coeffRef(i, j));
-      }
-      fmt::print("\n");
-    }
-  };
-  PrintSparseMatrix("P", P);
-  PrintSparseMatrix("W", W);
-  PrintSparseMatrix("H", H);
-#endif
+  fmt::print("P =\n{}", P);
+  fmt::print("W =\n{}", W);
+  fmt::print("H =\n{}", H);
 
   return H;
 }

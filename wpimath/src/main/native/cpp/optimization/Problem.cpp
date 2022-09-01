@@ -148,10 +148,10 @@ void Problem::Regularize(Eigen::SparseMatrix<double>& A) {
   double c_ij = 0.0;
   double theta_j = 0.0;
   for (int j = 0; j < A.rows(); ++j) {
-    double c_jj = A.coeffRef(j, j);
+    double c_jj = A.coeff(j, j);
     for (int s = 0; s < j - 1; ++s) {
-      double l_js = L.coeffRef(j, s);
-      c_jj -= D.coeffRef(s, s) * l_js * l_js;
+      double l_js = L.coeff(j, s);
+      c_jj -= D.coeff(s, s) * l_js * l_js;
     }
 
     theta_j = std::max(theta_j, std::abs(c_ij));
@@ -159,11 +159,11 @@ void Problem::Regularize(Eigen::SparseMatrix<double>& A) {
         std::max(std::abs(c_jj), (theta_j / beta) * (theta_j / beta)), delta);
 
     for (int i = j + 1; i < A.rows(); ++i) {
-      c_ij = A.coeffRef(i, j);
+      c_ij = A.coeff(i, j);
       for (int s = 0; s < j - 1; ++s) {
-        c_ij -= D.coeffRef(s, s) * L.coeffRef(i, s) * L.coeffRef(s, j);
+        c_ij -= D.coeff(s, s) * L.coeff(i, s) * L.coeff(s, j);
       }
-      L.coeffRef(i, j) = c_ij / D.coeffRef(j, j);
+      L.coeffRef(i, j) = c_ij / D.coeff(j, j);
     }
   }
 
