@@ -8,7 +8,6 @@
 #include <fmt/core.h>
 #include <wpi/SmallVector.h>
 
-#include "frc/CurrentManager.h"
 #include "frc/EigenCore.h"
 #include "frc/optimization/Problem.h"
 #include "frc/system/Discretization.h"
@@ -344,15 +343,4 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
              duration_cast<microseconds>(end2 - end1).count() / 1000.0);
 
   // TODO: Verify solution
-}
-
-TEST(ProblemTest, CurrentManager) {
-  frc::CurrentManager<4> manager{wpi::array{0.1_A, 5_A, 5_A, 5_A}, 40_A};
-
-  auto currents = manager.Calculate(wpi::array{40_A, 10_A, 5_A, 0_A});
-
-  EXPECT_DOUBLE_EQ(0.0, currents[0].value());
-  EXPECT_DOUBLE_EQ(0.0, currents[1].value());
-  EXPECT_DOUBLE_EQ(0.0, currents[2].value());
-  EXPECT_DOUBLE_EQ(0.0, currents[3].value());
 }
