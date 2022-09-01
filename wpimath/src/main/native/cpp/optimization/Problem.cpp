@@ -5,6 +5,7 @@
 #include "frc/optimization/Problem.h"
 
 #include <cassert>
+#include <cmath>
 #include <vector>
 
 #include "Eigen/IterativeLinearSolvers"
@@ -426,6 +427,19 @@ Eigen::VectorXd Problem::InteriorPoint(
       s += alpha_max * p_s;
       y += alpha_z * p_y;
       z += alpha_z * p_z;
+
+      // A requirement for the convergence proof is that the "primal-dual
+      // barrier term Hessian" Σₖ does not deviate arbitrarily much from the
+      // "primal Hessian" μⱼSₖ⁻². We ensure this by resetting
+      //
+      // zₖ₊₁⁽ⁱ⁾ = max{min{zₖ₊₁⁽ⁱ⁾, κ_Σ μⱼ/xₖ₊₁⁽ⁱ⁾}, μⱼ/(κ_Σ xₖ₊₁⁽ⁱ⁾)}
+      //
+      // for some fixed κ ≥ 1 after each step. See equation (16) in [2].
+      constexpr double kappa_sigma = 1e10;
+      for (int row = 0; row < z.rows(); ++row) {
+        z(row) = std::max(std::min(z(row), kappa_sigma * mu / x(row)),
+                          mu / (kappa_sigma * x(row)));
+      }
 
       SetAD(m_leaves, x);
       SetAD(sAD, s);
