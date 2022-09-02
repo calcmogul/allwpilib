@@ -413,6 +413,43 @@ Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
   return grad;
 }
 
+Eigen::VectorXd GradientSparsity(Variable variable, VectorXvar& wrt) {
+
+  auto& tape = *variable.tape;
+  int tapeSize = tape.Size();
+
+  Variable& minIndexWrtVariable = *std::min_element(
+      wrt.begin(), wrt.end(),
+      [](const auto& i, const auto& j) { return i.index < j.index; });
+
+  std::vector<int> tapeIndices =
+      GenerateBFSList(tape, variable, minIndexWrtVariable);
+
+  // set all wrt to structural zeros, will be modified if encountered during the depth-first search
+  for (int row = 0; row < wrt.rows(); ++row) {
+    wrt(row).GetNode().sparse = true;
+  }
+
+  for (int parent : tapeIndices) {
+    for (int child = 0; child < TapeNode::kNumArgs; ++child) {
+      if (tape[parent].args[child].tape != nullptr) {
+        tape[parent].args[child].GetNode().sparse = false;
+      }
+    }
+  }
+
+  tape.Resize(tapeSize);
+
+  Eigen::VectorXd B = Eigen::VectorXd::Zero(wrt.rows());
+  for (int row = 0; row < wrt.rows(); ++row) {
+    if (!wrt(row).GetNode().sparse) {
+      B(row) = 1;
+    }
+  }
+
+  return B;
+}
+
 Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
   Eigen::SparseMatrix<double> J{variables.rows(), wrt.rows()};
 
@@ -428,6 +465,23 @@ Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
   J.setFromTriplets(triplets.begin(), triplets.end());
 
   return J;
+}
+
+Eigen::SparseMatrix<int> JacobianSparsity(VectorXvar& variables, VectorXvar& wrt) {
+  Eigen::SparseMatrix<int> B{variables.rows(), wrt.rows()};
+
+  std::vector<Eigen::Triplet<int>> triplets;
+  for (int row = 0; row < variables.rows(); ++row) {
+    Eigen::RowVectorXd b = GradientSparsity(variables(row), wrt).transpose();
+    for (int col = 0; col < b.cols(); ++col) {
+      if (b(col) != 0.0) {
+        triplets.emplace_back(row, col, 1);
+      }
+    }
+  }
+  B.setFromTriplets(triplets.begin(), triplets.end());
+
+  return B;
 }
 
 Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {

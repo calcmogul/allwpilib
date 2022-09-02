@@ -180,6 +180,14 @@ WPILIB_DLLEXPORT double Gradient(Variable variable, Variable& wrt);
 WPILIB_DLLEXPORT Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt);
 
 /**
+ * Returns gradient sparsity structure of a variable with respect to the given vector.
+ *
+ * @param variable Variable of which to compute the gradient.
+ * @param wrt Vector with respect to which to compute the gradient.
+ */
+WPILIB_DLLEXPORT Eigen::VectorXd GradientSparsity(Variable variable, VectorXvar& wrt);
+
+/**
  * Returns the Jacobian of an autodiff vector with respect to the given vector.
  *
  * @param variables Vector of which to compute the Jacobian.
@@ -187,6 +195,15 @@ WPILIB_DLLEXPORT Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt);
  */
 WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables,
                                                       VectorXvar& wrt);
+
+/**
+ * Returns the Jacobian sparsity structure of an autodiff vector with respect to the given vector.
+ *
+ * @param variables Vector of which to compute the Jacobian.
+ * @param wrt Vector with respect to which to compute the Jacobian.
+ */
+WPILIB_DLLEXPORT Eigen::SparseMatrix<int> JacobianSparsity(VectorXvar& variables,
+                                                           VectorXvar& wrt);
 
 /**
  * Returns the Hessian of an autodiff variable with respect to the given vector.

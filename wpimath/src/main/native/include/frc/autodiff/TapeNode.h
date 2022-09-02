@@ -33,6 +33,8 @@ struct WPILIB_DLLEXPORT TapeNode {
 
   double adjoint = 0.0;
 
+  bool sparse = true;
+
   // Indices of dependent nodes (function arguments)
   std::array<Variable, kNumArgs> args;
 
