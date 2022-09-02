@@ -552,22 +552,29 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
 
   tape.Resize(tapeSize);
 
+  std::vector<Eigen::Triplet<double>> triplets;
+
   Eigen::SparseMatrix<double> P{wrt.rows(), tape.Size()};
-  P.setZero();
   for (int row = 0; row < wrt.rows(); ++row) {
-    P.coeffRef(row, wrt(row).index) = 1.0;
+    triplets.emplace_back(row, wrt(row).index, 1.0);
   }
+  P.setFromTriplets(triplets.begin(), triplets.end());
 
   W.makeCompressed();
   Eigen::SparseMatrix<double> H = P * W * P.transpose();
 
   // Make H symmetric by iterating over the lower triangular elements and
   // copying them to the upper triangle
-  for (int row = 1; row < H.rows(); ++row) {
-    for (int col = 0; col < row; ++col) {
-      H.coeffRef(col, row) = H.coeff(row, col);
+  triplets.clear();
+  for (int k = 0; k < H.outerSize(); ++k) {
+    for (decltype(H)::InnerIterator it{H, k}; it; ++it) {
+      triplets.emplace_back(it.row(), it.col(), it.value());
+      if (it.row() != it.col()) {
+        triplets.emplace_back(it.col(), it.row(), it.value());
+      }
     }
   }
+  H.setFromTriplets(triplets.begin(), triplets.end());
 
   return H;
 }
