@@ -8,14 +8,10 @@
 #include <cmath>
 #include <initializer_list>
 #include <queue>
-#include <string_view>
 #include <tuple>
 #include <vector>
 
-#include <fmt/core.h>
-
 #include "frc/autodiff/Tape.h"
-#include "frc/fmt/Eigen.h"
 
 namespace frc::autodiff {
 
@@ -568,10 +564,6 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
       H.coeffRef(col, row) = H.coeff(row, col);
     }
   }
-
-  fmt::print("P =\n{}", P);
-  fmt::print("W =\n{}", W);
-  fmt::print("H =\n{}", H);
 
   return H;
 }
