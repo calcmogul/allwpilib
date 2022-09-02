@@ -288,12 +288,12 @@ namespace {
  *
  * @param tape Tape of nodes to enumerate.
  * @param root Starting tape node.
- * @param earliestLeaf Ending tape node. If a multivariate gradient is being
- *                     computed, this should be the leaf node with the smallest
- *                     index.
+ * @param earliestNode Ending tape node. If a multivariate gradient is being
+ *                     computed, this should be the expression tree leaf node
+ *                     with the smallest index.
  */
 std::vector<int> GenerateBFSList(const Tape& tape, Variable& root,
-                                 Variable& earliestLeaf) {
+                                 Variable& earliestNode) {
   std::vector<int> l;
   std::queue<int> q;
 
@@ -303,16 +303,17 @@ std::vector<int> GenerateBFSList(const Tape& tape, Variable& root,
     auto& parent = tape[q.front()];
     q.pop();
 
-    // If parent is most nested leaf of the gradient calculation, don't push any
-    // children because their adjoints won't be used
-    if (parent.index == earliestLeaf.index) {
+    // If parent is earlier in the tape than earliestNode, don't push any of its
+    // children because their adjoints won't be used; the gradient calculation
+    // will stop at earliestNode before they are reached.
+    if (parent.index <= earliestNode.index) {
       continue;
     }
 
     for (int child = 0; child < TapeNode::kNumArgs; ++child) {
       auto& childNode = parent.args[child];
 
-      // Don't push leaf nodes
+      // If child isn't a real node, ignore it
       if (childNode.tape == nullptr) {
         continue;
       }
