@@ -283,6 +283,9 @@ namespace {
 /**
  * Returns a breadth-first search list of tape nodes.
  *
+ * The parent is the first node in the list and followed by its children in a
+ * breadth-first fashion. Duplicates are filtered out.
+ *
  * @param tape Tape of nodes to enumerate.
  * @param root Starting tape node.
  * @param earliestLeaf Ending tape node. If a multivariate gradient is being
@@ -341,7 +344,7 @@ double Gradient(Variable variable, Variable& wrt) {
   std::vector<int> tapeIndices = GenerateBFSList(tape, variable, wrt);
   int tapeIndicesSize = static_cast<int>(tapeIndices.size());
 
-  // wrt might not be in tape
+  // wrt might not be in tape, so zero its adjoints separately
   wrt.GetNode().adjoint = 0.0;
 
   tape[tapeIndices[0]].adjoint = 1.0;
