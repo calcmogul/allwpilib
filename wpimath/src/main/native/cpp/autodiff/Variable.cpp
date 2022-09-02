@@ -579,11 +579,11 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
   return H;
 }
 
-Variable abs(double x) {  // NOLINT
-  return abs(Constant(x));
+Variable abs(double x) {
+  return autodiff::abs(Constant(x));
 }
 
-Variable abs(const Variable& x) {  // NOLINT
+Variable abs(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::abs(x); },
@@ -598,52 +598,52 @@ Variable abs(const Variable& x) {  // NOLINT
       })};
 }
 
-Variable acos(double x) {  // NOLINT
-  return acos(Constant(x));
+Variable acos(double x) {
+  return autodiff::acos(Constant(x));
 }
 
-Variable acos(const Variable& x) {  // NOLINT
+Variable acos(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::acos(x); },
       [](const Variable& x) -> Variable {
-        return -1.0 / frc::autodiff::sqrt(1.0 - x * x);
+        return -1.0 / autodiff::sqrt(1.0 - x * x);
       })};
 }
 
-Variable asin(double x) {  // NOLINT
-  return asin(Constant(x));
+Variable asin(double x) {
+  return autodiff::asin(Constant(x));
 }
 
-Variable asin(const Variable& x) {  // NOLINT
+Variable asin(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::asin(x); },
       [](const Variable& x) -> Variable {
-        return 1.0 / frc::autodiff::sqrt(1.0 - x * x);
+        return 1.0 / autodiff::sqrt(1.0 - x * x);
       })};
 }
 
-Variable atan(double x) {  // NOLINT
-  return atan(Constant(x));
+Variable atan(double x) {
+  return autodiff::atan(Constant(x));
 }
 
-Variable atan(const Variable& x) {  // NOLINT
+Variable atan(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::atan(x); },
       [](const Variable& x) -> Variable { return 1.0 / (1.0 + x * x); })};
 }
 
-Variable atan2(double y, const Variable& x) {  // NOLINT
-  return atan2(Constant(y), x);
+Variable atan2(double y, const Variable& x) {
+  return autodiff::atan2(Constant(y), x);
 }
 
-Variable atan2(const Variable& y, double x) {  // NOLINT
-  return atan2(y, Constant(x));
+Variable atan2(const Variable& y, double x) {
+  return autodiff::atan2(y, Constant(x));
 }
 
-Variable atan2(const Variable& y, const Variable& x) {  // NOLINT
+Variable atan2(const Variable& y, const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushBinary(
       y, x, [](double y, double x) { return std::atan2(y, x); },
@@ -655,33 +655,33 @@ Variable atan2(const Variable& y, const Variable& x) {  // NOLINT
       })};
 }
 
-Variable cos(double x) {  // NOLINT
-  return cos(Constant(x));
+Variable cos(double x) {
+  return autodiff::cos(Constant(x));
 }
 
-Variable cos(const Variable& x) {  // NOLINT
+Variable cos(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::cos(x); },
-      [](const Variable& x) -> Variable { return -frc::autodiff::sin(x); })};
+      [](const Variable& x) -> Variable { return -autodiff::sin(x); })};
 }
 
-Variable cosh(double x) {  // NOLINT
-  return cosh(Constant(x));
+Variable cosh(double x) {
+  return autodiff::cosh(Constant(x));
 }
 
-Variable cosh(const Variable& x) {  // NOLINT
+Variable cosh(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::cosh(x); },
-      [](const Variable& x) -> Variable { return frc::autodiff::sinh(x); })};
+      [](const Variable& x) -> Variable { return autodiff::sinh(x); })};
 }
 
-Variable erf(double x) {  // NOLINT
-  return erf(Constant(x));
+Variable erf(double x) {
+  return autodiff::erf(Constant(x));
 }
 
-Variable erf(const Variable& x) {  // NOLINT
+Variable erf(const Variable& x) {
   static constexpr double sqrt_pi =
       1.7724538509055160272981674833411451872554456638435L;
 
@@ -689,57 +689,57 @@ Variable erf(const Variable& x) {  // NOLINT
   return Variable{tape.PushUnary(
       x, [](double x) { return std::erf(x); },
       [](const Variable& x) -> Variable {
-        return 2.0 / sqrt_pi * frc::autodiff::exp(-x * x);
+        return 2.0 / sqrt_pi * autodiff::exp(-x * x);
       })};
 }
 
-Variable exp(double x) {  // NOLINT
-  return exp(Constant(x));
+Variable exp(double x) {
+  return autodiff::exp(Constant(x));
 }
 
-Variable exp(const Variable& x) {  // NOLINT
+Variable exp(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::exp(x); },
-      [](const Variable& x) -> Variable { return frc::autodiff::exp(x); })};
+      [](const Variable& x) -> Variable { return autodiff::exp(x); })};
 }
 
-Variable hypot(double x, const Variable& y) {  // NOLINT
-  return hypot(Constant(x), y);
+Variable hypot(double x, const Variable& y) {
+  return autodiff::hypot(Constant(x), y);
 }
 
-Variable hypot(const Variable& x, double y) {  // NOLINT
-  return hypot(x, Constant(y));
+Variable hypot(const Variable& x, double y) {
+  return autodiff::hypot(x, Constant(y));
 }
 
-Variable hypot(const Variable& x, const Variable& y) {  // NOLINT
+Variable hypot(const Variable& x, const Variable& y) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushBinary(
       x, y, [](double x, double y) { return std::hypot(x, y); },
       [](const Variable& x, const Variable& y) -> Variable {
-        return x / frc::autodiff::hypot(x, y);
+        return x / autodiff::hypot(x, y);
       },
       [](const Variable& x, const Variable& y) -> Variable {
-        return y / frc::autodiff::hypot(x, y);
+        return y / autodiff::hypot(x, y);
       })};
 }
 
-Variable log(double x) {  // NOLINT
-  return log(Constant(x));
+Variable log(double x) {
+  return autodiff::log(Constant(x));
 }
 
-Variable log(const Variable& x) {  // NOLINT
+Variable log(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::log(x); },
       [](const Variable& x) -> Variable { return 1.0 / x; })};
 }
 
-Variable log10(double x) {  // NOLINT
-  return log10(Constant(x));
+Variable log10(double x) {
+  return autodiff::log10(Constant(x));
 }
 
-Variable log10(const Variable& x) {  // NOLINT
+Variable log10(const Variable& x) {
   static constexpr double ln10 = 2.3025850929940456840179914546843L;
 
   auto& tape = Tape::GetCurrentTape();
@@ -748,91 +748,90 @@ Variable log10(const Variable& x) {  // NOLINT
       [](const Variable& x) -> Variable { return 1.0 / (ln10 * x); })};
 }
 
-Variable pow(double base, const Variable& power) {  // NOLINT
-  return pow(Constant(base), power);
+Variable pow(double base, const Variable& power) {
+  return autodiff::pow(Constant(base), power);
 }
 
-Variable pow(const Variable& base, double power) {  // NOLINT
-  return pow(base, Constant(power));
+Variable pow(const Variable& base, double power) {
+  return autodiff::pow(base, Constant(power));
 }
 
-Variable pow(const Variable& base, const Variable& power) {  // NOLINT
+Variable pow(const Variable& base, const Variable& power) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushBinary(
       base, power,
       [](double base, double power) { return std::pow(base, power); },
       [](const Variable& base, const Variable& power) -> Variable {
-        return frc::autodiff::pow(base, power - 1) * power;
+        return autodiff::pow(base, power - 1) * power;
       },
       [](const Variable& base, const Variable& power) -> Variable {
         // Since x * std::log(x) -> 0 as x -> 0
         if (base.Value() == 0.0) {
           return Constant(0.0);
         } else {
-          return frc::autodiff::pow(base, power - 1) * base *
-                 frc::autodiff::log(base);
+          return autodiff::pow(base, power - 1) * base * autodiff::log(base);
         }
       })};
 }
 
-Variable sin(double x) {  // NOLINT
-  return sin(Constant(x));
+Variable sin(double x) {
+  return autodiff::sin(Constant(x));
 }
 
-Variable sin(const Variable& x) {  // NOLINT
+Variable sin(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::sin(x); },
-      [](const Variable& x) -> Variable { return frc::autodiff::cos(x); })};
+      [](const Variable& x) -> Variable { return autodiff::cos(x); })};
 }
 
-Variable sinh(double x) {  // NOLINT
-  return sinh(Constant(x));
+Variable sinh(double x) {
+  return autodiff::sinh(Constant(x));
 }
 
-Variable sinh(const Variable& x) {  // NOLINT
+Variable sinh(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::sinh(x); },
-      [](const Variable& x) -> Variable { return frc::autodiff::cosh(x); })};
+      [](const Variable& x) -> Variable { return autodiff::cosh(x); })};
 }
 
-Variable sqrt(double x) {  // NOLINT
-  return sqrt(Constant(x));
+Variable sqrt(double x) {
+  return autodiff::sqrt(Constant(x));
 }
 
-Variable sqrt(const Variable& x) {  // NOLINT
+Variable sqrt(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::sqrt(x); },
       [](const Variable& x) -> Variable {
-        return 1.0 / (2.0 * frc::autodiff::sqrt(x));
+        return 1.0 / (2.0 * autodiff::sqrt(x));
       })};
 }
 
-Variable tan(double x) {  // NOLINT
-  return tan(Constant(x));
+Variable tan(double x) {
+  return autodiff::tan(Constant(x));
 }
 
-Variable tan(const Variable& x) {  // NOLINT
+Variable tan(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::tan(x); },
       [](const Variable& x) -> Variable {
-        return 1.0 / (frc::autodiff::cos(x) * frc::autodiff::cos(x));
+        return 1.0 / (autodiff::cos(x) * autodiff::cos(x));
       })};
 }
 
-Variable tanh(double x) {  // NOLINT
-  return tanh(Constant(x));
+Variable tanh(double x) {
+  return autodiff::tanh(Constant(x));
 }
 
-Variable tanh(const Variable& x) {  // NOLINT
+Variable tanh(const Variable& x) {
   auto& tape = Tape::GetCurrentTape();
   return Variable{tape.PushUnary(
       x, [](double x) { return std::tanh(x); },
       [](const Variable& x) -> Variable {
-        return 1.0 / (frc::autodiff::cosh(x) * frc::autodiff::cosh(x));
+        return 1.0 / (autodiff::cosh(x) * autodiff::cosh(x));
       })};
 }
 

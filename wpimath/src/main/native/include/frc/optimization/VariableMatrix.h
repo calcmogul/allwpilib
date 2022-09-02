@@ -333,7 +333,7 @@ class WPILIB_DLLEXPORT VariableMatrix {
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix abs(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix abs(const VariableMatrix& x);
 
 /**
  * std::acos() for VariableMatrices.
@@ -342,7 +342,7 @@ WPILIB_DLLEXPORT VariableMatrix abs(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix acos(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix acos(const VariableMatrix& x);
 
 /**
  * std::asin() for VariableMatrices.
@@ -351,7 +351,7 @@ WPILIB_DLLEXPORT VariableMatrix acos(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix asin(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix asin(const VariableMatrix& x);
 
 /**
  * std::atan() for VariableMatrices.
@@ -360,7 +360,7 @@ WPILIB_DLLEXPORT VariableMatrix asin(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix atan(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix atan(const VariableMatrix& x);
 
 /**
  * std::atan2() for VariableMatrices.
@@ -370,7 +370,7 @@ WPILIB_DLLEXPORT VariableMatrix atan(const VariableMatrix& x);  // NOLINT
  * @param y The y argument.
  * @param x The x argument.
  */
-WPILIB_DLLEXPORT VariableMatrix atan2(const VariableMatrix& y,  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix atan2(const VariableMatrix& y,
                                       const VariableMatrix& x);
 
 /**
@@ -380,7 +380,7 @@ WPILIB_DLLEXPORT VariableMatrix atan2(const VariableMatrix& y,  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix cos(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix cos(const VariableMatrix& x);
 
 /**
  * std::cosh() for VariableMatrices.
@@ -389,7 +389,7 @@ WPILIB_DLLEXPORT VariableMatrix cos(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix cosh(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix cosh(const VariableMatrix& x);
 
 /**
  * std::erf() for VariableMatrices.
@@ -398,7 +398,7 @@ WPILIB_DLLEXPORT VariableMatrix cosh(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix erf(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix erf(const VariableMatrix& x);
 
 /**
  * std::exp() for VariableMatrices.
@@ -407,7 +407,7 @@ WPILIB_DLLEXPORT VariableMatrix erf(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix exp(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix exp(const VariableMatrix& x);
 
 /**
  * std::hypot() for VariableMatrices.
@@ -417,7 +417,7 @@ WPILIB_DLLEXPORT VariableMatrix exp(const VariableMatrix& x);  // NOLINT
  * @param x The x argument.
  * @param y The y argument.
  */
-WPILIB_DLLEXPORT VariableMatrix hypot(const VariableMatrix& x,  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix hypot(const VariableMatrix& x,
                                       const VariableMatrix& y);
 
 /**
@@ -427,7 +427,7 @@ WPILIB_DLLEXPORT VariableMatrix hypot(const VariableMatrix& x,  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix log(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix log(const VariableMatrix& x);
 
 /**
  * std::log10() for VariableMatrices.
@@ -436,7 +436,7 @@ WPILIB_DLLEXPORT VariableMatrix log(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix log10(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix log10(const VariableMatrix& x);
 
 /**
  * std::pow() for VariableMatrices.
@@ -446,7 +446,7 @@ WPILIB_DLLEXPORT VariableMatrix log10(const VariableMatrix& x);  // NOLINT
  * @param base The base.
  * @param power The power.
  */
-WPILIB_DLLEXPORT VariableMatrix pow(const VariableMatrix& base,  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix pow(const VariableMatrix& base,
                                     const VariableMatrix& power);
 
 /**
@@ -456,7 +456,7 @@ WPILIB_DLLEXPORT VariableMatrix pow(const VariableMatrix& base,  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix sin(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix sin(const VariableMatrix& x);
 
 /**
  * std::sinh() for VariableMatrices.
@@ -465,7 +465,7 @@ WPILIB_DLLEXPORT VariableMatrix sin(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix sinh(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix sinh(const VariableMatrix& x);
 
 /**
  * std::sqrt() for VariableMatrices.
@@ -474,7 +474,7 @@ WPILIB_DLLEXPORT VariableMatrix sinh(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix sqrt(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix sqrt(const VariableMatrix& x);
 
 /**
  * std::tan() for VariableMatrices.
@@ -483,7 +483,7 @@ WPILIB_DLLEXPORT VariableMatrix sqrt(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix tan(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix tan(const VariableMatrix& x);
 
 /**
  * std::tanh() for VariableMatrices.
@@ -492,6 +492,6 @@ WPILIB_DLLEXPORT VariableMatrix tan(const VariableMatrix& x);  // NOLINT
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT VariableMatrix tanh(const VariableMatrix& x);  // NOLINT
+WPILIB_DLLEXPORT VariableMatrix tanh(const VariableMatrix& x);
 
 }  // namespace frc
