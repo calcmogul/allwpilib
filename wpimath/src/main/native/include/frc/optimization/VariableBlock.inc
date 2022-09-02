@@ -207,12 +207,12 @@ const autodiff::Variable& VariableBlock<Mat>::Autodiff(int row, int col) const {
 }
 
 template <typename Mat>
-Mat abs(const VariableBlock<Mat>& x) {  // NOLINT
+Mat abs(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = abs(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::abs(x.Autodiff(row, col));
     }
   }
 
@@ -220,12 +220,12 @@ Mat abs(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat acos(const VariableBlock<Mat>& x) {  // NOLINT
+Mat acos(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = acos(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::acos(x.Autodiff(row, col));
     }
   }
 
@@ -233,12 +233,12 @@ Mat acos(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat asin(const VariableBlock<Mat>& x) {  // NOLINT
+Mat asin(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = asin(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::asin(x.Autodiff(row, col));
     }
   }
 
@@ -246,12 +246,12 @@ Mat asin(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat atan(const VariableBlock<Mat>& x) {  // NOLINT
+Mat atan(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = atan(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::atan(x.Autodiff(row, col));
     }
   }
 
@@ -259,81 +259,13 @@ Mat atan(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat atan2(const VariableBlock<Mat>& y,  // NOLINT
-          const VariableBlock<Mat>& x) {
-  Mat result{x.Rows(), x.Cols()};
-
-  for (int row = 0; row < result.Rows(); ++row) {
-    for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) =
-          atan2(y.Autodiff(row, col), x.Autodiff(row, col));  // NOLINT
-    }
-  }
-
-  return result;
-}
-
-template <typename Mat>
-Mat cos(const VariableBlock<Mat>& x) {  // NOLINT
-  Mat result{x.Rows(), x.Cols()};
-
-  for (int row = 0; row < result.Rows(); ++row) {
-    for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = cos(x.Autodiff(row, col));  // NOLINT
-    }
-  }
-
-  return result;
-}
-
-template <typename Mat>
-Mat cosh(const VariableBlock<Mat>& x) {  // NOLINT
-  Mat result{x.Rows(), x.Cols()};
-
-  for (int row = 0; row < result.Rows(); ++row) {
-    for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = cosh(x.Autodiff(row, col));  // NOLINT
-    }
-  }
-
-  return result;
-}
-
-template <typename Mat>
-Mat erf(const VariableBlock<Mat>& x) {  // NOLINT
-  Mat result{x.Rows(), x.Cols()};
-
-  for (int row = 0; row < result.Rows(); ++row) {
-    for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = erf(x.Autodiff(row, col));  // NOLINT
-    }
-  }
-
-  return result;
-}
-
-template <typename Mat>
-Mat exp(const VariableBlock<Mat>& x) {  // NOLINT
-  Mat result{x.Rows(), x.Cols()};
-
-  for (int row = 0; row < result.Rows(); ++row) {
-    for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = exp(x.Autodiff(row, col));  // NOLINT
-    }
-  }
-
-  return result;
-}
-
-template <typename Mat>
-Mat hypot(const VariableBlock<Mat>& x,  // NOLINT
-          const VariableBlock<Mat>& y) {
+Mat atan2(const VariableBlock<Mat>& y, const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
       result.Autodiff(row, col) =
-          hypot(x.Autodiff(row, col), y.Autodiff(row, col));  // NOLINT
+          autodiff::atan2(y.Autodiff(row, col), x.Autodiff(row, col));
     }
   }
 
@@ -341,12 +273,12 @@ Mat hypot(const VariableBlock<Mat>& x,  // NOLINT
 }
 
 template <typename Mat>
-Mat log(const VariableBlock<Mat>& x) {  // NOLINT
+Mat cos(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = log(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::cos(x.Autodiff(row, col));
     }
   }
 
@@ -354,12 +286,12 @@ Mat log(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat log10(const VariableBlock<Mat>& x) {  // NOLINT
+Mat cosh(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = log10(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::cosh(x.Autodiff(row, col));
     }
   }
 
@@ -367,14 +299,79 @@ Mat log10(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat pow(const VariableBlock<Mat>& base,
-        const VariableBlock<Mat>& power) {  // NOLINT
+Mat erf(const VariableBlock<Mat>& x) {
+  Mat result{x.Rows(), x.Cols()};
+
+  for (int row = 0; row < result.Rows(); ++row) {
+    for (int col = 0; col < result.Cols(); ++col) {
+      result.Autodiff(row, col) = autodiff::erf(x.Autodiff(row, col));
+    }
+  }
+
+  return result;
+}
+
+template <typename Mat>
+Mat exp(const VariableBlock<Mat>& x) {
+  Mat result{x.Rows(), x.Cols()};
+
+  for (int row = 0; row < result.Rows(); ++row) {
+    for (int col = 0; col < result.Cols(); ++col) {
+      result.Autodiff(row, col) = autodiff::exp(x.Autodiff(row, col));
+    }
+  }
+
+  return result;
+}
+
+template <typename Mat>
+Mat hypot(const VariableBlock<Mat>& x, const VariableBlock<Mat>& y) {
+  Mat result{x.Rows(), x.Cols()};
+
+  for (int row = 0; row < result.Rows(); ++row) {
+    for (int col = 0; col < result.Cols(); ++col) {
+      result.Autodiff(row, col) =
+          autodiff::hypot(x.Autodiff(row, col), y.Autodiff(row, col));
+    }
+  }
+
+  return result;
+}
+
+template <typename Mat>
+Mat log(const VariableBlock<Mat>& x) {
+  Mat result{x.Rows(), x.Cols()};
+
+  for (int row = 0; row < result.Rows(); ++row) {
+    for (int col = 0; col < result.Cols(); ++col) {
+      result.Autodiff(row, col) = autodiff::log(x.Autodiff(row, col));
+    }
+  }
+
+  return result;
+}
+
+template <typename Mat>
+Mat log10(const VariableBlock<Mat>& x) {
+  Mat result{x.Rows(), x.Cols()};
+
+  for (int row = 0; row < result.Rows(); ++row) {
+    for (int col = 0; col < result.Cols(); ++col) {
+      result.Autodiff(row, col) = autodiff::log10(x.Autodiff(row, col));
+    }
+  }
+
+  return result;
+}
+
+template <typename Mat>
+Mat pow(const VariableBlock<Mat>& base, const VariableBlock<Mat>& power) {
   Mat result{base.Rows(), base.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
       result.Autodiff(row, col) =
-          pow(base.Autodiff(row, col), power.Autodiff(row, col));  // NOLINT
+          autodiff::pow(base.Autodiff(row, col), power.Autodiff(row, col));
     }
   }
 
@@ -382,12 +379,12 @@ Mat pow(const VariableBlock<Mat>& base,
 }
 
 template <typename Mat>
-Mat sin(const VariableBlock<Mat>& x) {  // NOLINT
+Mat sin(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = sin(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::sin(x.Autodiff(row, col));
     }
   }
 
@@ -395,12 +392,12 @@ Mat sin(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat sinh(const VariableBlock<Mat>& x) {  // NOLINT
+Mat sinh(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = sinh(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::sinh(x.Autodiff(row, col));
     }
   }
 
@@ -408,12 +405,12 @@ Mat sinh(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat sqrt(const VariableBlock<Mat>& x) {  // NOLINT
+Mat sqrt(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = sqrt(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::sqrt(x.Autodiff(row, col));
     }
   }
 
@@ -421,12 +418,12 @@ Mat sqrt(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat tan(const VariableBlock<Mat>& x) {  // NOLINT
+Mat tan(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = tan(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::tan(x.Autodiff(row, col));
     }
   }
 
@@ -434,12 +431,12 @@ Mat tan(const VariableBlock<Mat>& x) {  // NOLINT
 }
 
 template <typename Mat>
-Mat tanh(const VariableBlock<Mat>& x) {  // NOLINT
+Mat tanh(const VariableBlock<Mat>& x) {
   Mat result{x.Rows(), x.Cols()};
 
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
-      result.Autodiff(row, col) = tanh(x.Autodiff(row, col));  // NOLINT
+      result.Autodiff(row, col) = autodiff::tanh(x.Autodiff(row, col));
     }
   }
 

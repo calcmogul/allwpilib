@@ -225,7 +225,7 @@ class VariableBlock {
  * @param x The argument.
  */
 template <typename Mat>
-Mat abs(const VariableBlock<Mat>& x);  // NOLINT
+Mat abs(const VariableBlock<Mat>& x);
 
 /**
  * std::acos() for VariableMatrices.
@@ -235,7 +235,7 @@ Mat abs(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat acos(const VariableBlock<Mat>& x);  // NOLINT
+Mat acos(const VariableBlock<Mat>& x);
 
 /**
  * std::asin() for VariableMatrices.
@@ -245,7 +245,7 @@ Mat acos(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat asin(const VariableBlock<Mat>& x);  // NOLINT
+Mat asin(const VariableBlock<Mat>& x);
 
 /**
  * std::atan() for VariableMatrices.
@@ -255,7 +255,7 @@ Mat asin(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat atan(const VariableBlock<Mat>& x);  // NOLINT
+Mat atan(const VariableBlock<Mat>& x);
 
 /**
  * std::atan2() for VariableMatrices.
@@ -266,8 +266,7 @@ Mat atan(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The x argument.
  */
 template <typename Mat>
-Mat atan2(const VariableBlock<Mat>& y,  // NOLINT
-          const VariableBlock<Mat>& x);
+Mat atan2(const VariableBlock<Mat>& y, const VariableBlock<Mat>& x);
 
 /**
  * std::cos() for VariableMatrices.
@@ -277,7 +276,7 @@ Mat atan2(const VariableBlock<Mat>& y,  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat cos(const VariableBlock<Mat>& x);  // NOLINT
+Mat cos(const VariableBlock<Mat>& x);
 
 /**
  * std::cosh() for VariableMatrices.
@@ -287,7 +286,7 @@ Mat cos(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat cosh(const VariableBlock<Mat>& x);  // NOLINT
+Mat cosh(const VariableBlock<Mat>& x);
 
 /**
  * std::erf() for VariableMatrices.
@@ -297,7 +296,7 @@ Mat cosh(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat erf(const VariableBlock<Mat>& x);  // NOLINT
+Mat erf(const VariableBlock<Mat>& x);
 
 /**
  * std::exp() for VariableMatrices.
@@ -307,7 +306,7 @@ Mat erf(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat exp(const VariableBlock<Mat>& x);  // NOLINT
+Mat exp(const VariableBlock<Mat>& x);
 
 /**
  * std::hypot() for VariableMatrices.
@@ -318,8 +317,7 @@ Mat exp(const VariableBlock<Mat>& x);  // NOLINT
  * @param y The y argument.
  */
 template <typename Mat>
-Mat hypot(const VariableBlock<Mat>& x,  // NOLINT
-          const VariableBlock<Mat>& y);
+Mat hypot(const VariableBlock<Mat>& x, const VariableBlock<Mat>& y);
 
 /**
  * std::log() for VariableMatrices.
@@ -329,7 +327,7 @@ Mat hypot(const VariableBlock<Mat>& x,  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat log(const VariableBlock<Mat>& x);  // NOLINT
+Mat log(const VariableBlock<Mat>& x);
 
 /**
  * std::log10() for VariableMatrices.
@@ -339,7 +337,7 @@ Mat log(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat log10(const VariableBlock<Mat>& x);  // NOLINT
+Mat log10(const VariableBlock<Mat>& x);
 
 /**
  * std::pow() for VariableMatrices.
@@ -350,8 +348,7 @@ Mat log10(const VariableBlock<Mat>& x);  // NOLINT
  * @param power The power.
  */
 template <typename Mat>
-Mat pow(const VariableBlock<Mat>& base,  // NOLINT
-        const VariableBlock<Mat>& power);
+Mat pow(const VariableBlock<Mat>& base, const VariableBlock<Mat>& power);
 
 /**
  * std::sin() for VariableMatrices.
@@ -361,7 +358,7 @@ Mat pow(const VariableBlock<Mat>& base,  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat sin(const VariableBlock<Mat>& x);  // NOLINT
+Mat sin(const VariableBlock<Mat>& x);
 
 /**
  * std::sinh() for VariableMatrices.
@@ -371,7 +368,7 @@ Mat sin(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat sinh(const VariableBlock<Mat>& x);  // NOLINT
+Mat sinh(const VariableBlock<Mat>& x);
 
 /**
  * std::sqrt() for VariableMatrices.
@@ -381,7 +378,7 @@ Mat sinh(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat sqrt(const VariableBlock<Mat>& x);  // NOLINT
+Mat sqrt(const VariableBlock<Mat>& x);
 
 /**
  * std::tan() for VariableMatrices.
@@ -391,7 +388,7 @@ Mat sqrt(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat tan(const VariableBlock<Mat>& x);  // NOLINT
+Mat tan(const VariableBlock<Mat>& x);
 
 /**
  * std::tanh() for VariableMatrices.
@@ -401,7 +398,7 @@ Mat tan(const VariableBlock<Mat>& x);  // NOLINT
  * @param x The argument.
  */
 template <typename Mat>
-Mat tanh(const VariableBlock<Mat>& x);  // NOLINT
+Mat tanh(const VariableBlock<Mat>& x);
 
 }  // namespace frc
 
