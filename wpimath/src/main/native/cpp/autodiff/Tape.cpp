@@ -22,7 +22,7 @@ Variable Tape::PushNullary(double value, BinaryFuncVar gradientFunc) {
                   Variable::PrivateInit{}};
 }
 
-Variable Tape::PushUnary(Variable arg, VariantValueFunc valueFunc,
+Variable Tape::PushUnary(Variable arg, BinaryFuncDouble valueFunc,
                          BinaryFuncVar gradientFunc) {
   m_expressions.emplace_back(
       std::array<Variable, Expression::kNumArgs>{arg, Variable{}},
@@ -36,7 +36,7 @@ Variable Tape::PushUnary(Variable arg, VariantValueFunc valueFunc,
 }
 
 Variable Tape::PushBinary(Variable lhs, Variable rhs,
-                          VariantValueFunc valueFunc,
+                          BinaryFuncDouble valueFunc,
                           BinaryFuncVar lhsGradientFunc,
                           BinaryFuncVar rhsGradientFunc) {
   m_expressions.emplace_back(

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <array>
-#include <variant>
 
 #include <wpi/SymbolExports.h>
 
@@ -13,17 +12,13 @@
 
 namespace frc::autodiff {
 
-using UnaryFuncDouble = double (*)(double);
 using BinaryFuncDouble = double (*)(double, double);
-using VariantValueFunc =
-    std::variant<std::monostate, UnaryFuncDouble, BinaryFuncDouble>;
-
 using BinaryFuncVar = Variable (*)(const Variable&, const Variable&);
 
 struct WPILIB_DLLEXPORT Expression {
   static constexpr int kNumArgs = 2;
 
-  int index = 0;
+  int index = -1;
 
   double value = 0.0;
 
@@ -35,10 +30,12 @@ struct WPILIB_DLLEXPORT Expression {
   // Either nullary operator with no arguments, unary operator with one
   // argument, or binary operator with two arguments. This operator is
   // used to update the node's value.
-  VariantValueFunc valueFunc;
+  BinaryFuncDouble valueFunc = [](double, double) { return 0.0; };
 
   // Gradients with respect to each argument
-  std::array<BinaryFuncVar, kNumArgs> gradientFuncs;
+  std::array<BinaryFuncVar, kNumArgs> gradientFuncs{
+      [](const Variable&, const Variable&) { return Constant(0.0); },
+      [](const Variable&, const Variable&) { return Constant(0.0); }};
 
   Expression(const Expression&) = default;
   Expression& operator=(const Expression&) = default;
@@ -62,7 +59,7 @@ struct WPILIB_DLLEXPORT Expression {
    * @param valueFunc Binary operator that produces this node's value.
    * @param gradientFuncs Gradients with respect to each operand.
    */
-  Expression(std::array<Variable, kNumArgs> args, VariantValueFunc valueFunc,
+  Expression(std::array<Variable, kNumArgs> args, BinaryFuncDouble valueFunc,
              std::array<BinaryFuncVar, kNumArgs> gradientFuncs);
 
   /**

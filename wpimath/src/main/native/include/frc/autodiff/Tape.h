@@ -32,7 +32,7 @@ class WPILIB_DLLEXPORT Tape {
    * @param valueFunc Unary operator that produces this expression's value.
    * @param gradientFunc Gradient with respect to operand.
    */
-  Variable PushUnary(Variable arg, VariantValueFunc valueFunc,
+  Variable PushUnary(Variable arg, BinaryFuncDouble valueFunc,
                      BinaryFuncVar gradientFunc);
 
   /**
@@ -44,7 +44,7 @@ class WPILIB_DLLEXPORT Tape {
    * @param lhsGradientFunc Gradient with respect to left operand.
    * @param rhsGradientFunc Gradient with respect to right operand.
    */
-  Variable PushBinary(Variable lhs, Variable rhs, VariantValueFunc valueFunc,
+  Variable PushBinary(Variable lhs, Variable rhs, BinaryFuncDouble valueFunc,
                       BinaryFuncVar lhsGradientFunc,
                       BinaryFuncVar rhsGradientFunc);
 

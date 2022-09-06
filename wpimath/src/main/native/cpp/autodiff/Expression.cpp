@@ -15,18 +15,20 @@ Expression::Expression(double value, BinaryFuncVar gradientFunc)
                     }} {}
 
 Expression::Expression(std::array<Variable, kNumArgs> args,
-                       VariantValueFunc valueFunc,
+                       BinaryFuncDouble valueFunc,
                        std::array<BinaryFuncVar, kNumArgs> gradientFuncs)
     : args{std::move(args)},
       valueFunc{std::move(valueFunc)},
       gradientFuncs{std::move(gradientFuncs)} {
-  if (std::holds_alternative<UnaryFuncDouble>(this->valueFunc)) {
-    value = std::get<UnaryFuncDouble>(this->valueFunc)(
-        this->args[0].GetExpression().value);
-  } else if (std::holds_alternative<BinaryFuncDouble>(this->valueFunc)) {
-    value = std::get<BinaryFuncDouble>(this->valueFunc)(
-        this->args[0].GetExpression().value,
-        this->args[1].GetExpression().value);
+  if (this->args[0].index != -1) {
+    if (this->args[1].index == -1) {
+      auto& lhs = this->args[0].GetExpression();
+      value = this->valueFunc(lhs.value, 0.0);
+    } else {
+      auto& lhs = this->args[0].GetExpression();
+      auto& rhs = this->args[1].GetExpression();
+      value = this->valueFunc(lhs.value, rhs.value);
+    }
   }
 }
 
@@ -35,20 +37,20 @@ Variable Expression::Gradient(int arg) const {
 }
 
 void Expression::Update() {
-  if (std::holds_alternative<UnaryFuncDouble>(valueFunc)) {
-    auto& lhs = args[0].GetExpression();
-    lhs.Update();
+  if (args[0].index != -1) {
+    if (args[1].index == -1) {
+      auto& lhs = args[0].GetExpression();
+      lhs.Update();
 
-    value = std::get<UnaryFuncDouble>(valueFunc)(lhs.value);
-  } else if (std::holds_alternative<BinaryFuncDouble>(valueFunc)) {
-    auto& lhs = args[0].GetExpression();
-    lhs.Update();
+      value = valueFunc(lhs.value, 0.0);
+    } else {
+      auto& lhs = args[0].GetExpression();
+      lhs.Update();
 
-    auto& rhs = args[1].GetExpression();
-    rhs.Update();
+      auto& rhs = args[1].GetExpression();
+      rhs.Update();
 
-    value = std::get<BinaryFuncDouble>(valueFunc)(lhs.value, rhs.value);
-  } else {
-    return;
+      value = valueFunc(lhs.value, rhs.value);
+    }
   }
 }
