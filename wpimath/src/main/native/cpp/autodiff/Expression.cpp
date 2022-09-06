@@ -21,12 +21,13 @@ Expression::Expression(std::array<Variable, kNumArgs> args,
       valueFunc{std::move(valueFunc)},
       gradientFuncs{std::move(gradientFuncs)} {
   if (this->args[0].index != -1) {
+    auto& lhs = this->args[0].GetExpression();
+
     if (this->args[1].index == -1) {
-      auto& lhs = this->args[0].GetExpression();
       value = this->valueFunc(lhs.value, 0.0);
     } else {
-      auto& lhs = this->args[0].GetExpression();
       auto& rhs = this->args[1].GetExpression();
+
       value = this->valueFunc(lhs.value, rhs.value);
     }
   }
@@ -38,15 +39,12 @@ Variable Expression::Gradient(int arg) const {
 
 void Expression::Update() {
   if (args[0].index != -1) {
-    if (args[1].index == -1) {
-      auto& lhs = args[0].GetExpression();
-      lhs.Update();
+    auto& lhs = args[0].GetExpression();
+    lhs.Update();
 
+    if (args[1].index == -1) {
       value = valueFunc(lhs.value, 0.0);
     } else {
-      auto& lhs = args[0].GetExpression();
-      lhs.Update();
-
       auto& rhs = args[1].GetExpression();
       rhs.Update();
 
