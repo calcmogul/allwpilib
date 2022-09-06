@@ -8,17 +8,22 @@
 
 using namespace frc::autodiff;
 
-Expression::Expression(double value, BinaryFuncVar gradientFunc)
+Expression::Expression(double value, BinaryFuncDouble gradientValueFunc,
+                       BinaryFuncVar gradientFunc)
     : value{value},
-      gradientFuncs{gradientFunc, [](const Variable&, const Variable&) {
-                      return Constant(0.0);
-                    }} {}
+      gradientValueFuncs{gradientValueFunc, [](double, double) { return 0.0; }},
+      gradientFuncs{gradientFunc, [](const Variable&,
+                                     const Variable&) { return Constant(0.0); }}
 
-Expression::Expression(std::array<Variable, kNumArgs> args,
-                       BinaryFuncDouble valueFunc,
-                       std::array<BinaryFuncVar, kNumArgs> gradientFuncs)
+{}
+
+Expression::Expression(
+    std::array<Variable, kNumArgs> args, BinaryFuncDouble valueFunc,
+    std::array<BinaryFuncDouble, kNumArgs> gradientValueFuncs,
+    std::array<BinaryFuncVar, kNumArgs> gradientFuncs)
     : args{std::move(args)},
       valueFunc{std::move(valueFunc)},
+      gradientValueFuncs{std::move(gradientValueFuncs)},
       gradientFuncs{std::move(gradientFuncs)} {
   if (this->args[0].index != -1) {
     auto& lhs = this->args[0].GetExpression();
@@ -31,6 +36,10 @@ Expression::Expression(std::array<Variable, kNumArgs> args,
       value = this->valueFunc(lhs.value, rhs.value);
     }
   }
+}
+
+double Expression::GradientValue(int arg) const {
+  return gradientValueFuncs[arg](args[0].Value(), args[1].Value());
 }
 
 Variable Expression::Gradient(int arg) const {

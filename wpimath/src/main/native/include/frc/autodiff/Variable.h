@@ -144,6 +144,13 @@ class WPILIB_DLLEXPORT Variable {
    *
    * @param arg The argument index (0 to kNumDeps - 1).
    */
+  double GradientValue(int arg) const;
+
+  /**
+   * Returns gradient with respect to the given argument index.
+   *
+   * @param arg The argument index (0 to kNumDeps - 1).
+   */
   Variable Gradient(int arg) const;
 
   /**

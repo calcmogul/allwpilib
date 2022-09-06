@@ -11,18 +11,23 @@
 
 using namespace frc::autodiff;
 
-Variable Tape::PushNullary(double value, BinaryFuncVar gradientFunc) {
-  m_expressions.emplace_back(value, std::move(gradientFunc));
+Variable Tape::PushNullary(double value, BinaryFuncDouble gradientValueFunc,
+                           BinaryFuncVar gradientFunc) {
+  m_expressions.emplace_back(value, std::move(gradientValueFunc),
+                             std::move(gradientFunc));
   m_expressions.back().index = m_expressions.size() - 1;
   return Variable{static_cast<int>(m_expressions.size() - 1),
                   Variable::PrivateInit{}};
 }
 
 Variable Tape::PushUnary(Variable arg, BinaryFuncDouble valueFunc,
+                         BinaryFuncDouble gradientValueFunc,
                          BinaryFuncVar gradientFunc) {
   m_expressions.emplace_back(
       std::array<Variable, Expression::kNumArgs>{arg, Variable{}},
       std::move(valueFunc),
+      std::array<BinaryFuncDouble, Expression::kNumArgs>{
+          std::move(gradientValueFunc), [](double, double) { return 0.0; }},
       std::array<BinaryFuncVar, Expression::kNumArgs>{
           std::move(gradientFunc),
           [](const Variable&, const Variable&) { return Constant(0.0); }});
@@ -33,11 +38,15 @@ Variable Tape::PushUnary(Variable arg, BinaryFuncDouble valueFunc,
 
 Variable Tape::PushBinary(Variable lhs, Variable rhs,
                           BinaryFuncDouble valueFunc,
+                          BinaryFuncDouble lhsGradientValueFunc,
                           BinaryFuncVar lhsGradientFunc,
+                          BinaryFuncDouble rhsGradientValueFunc,
                           BinaryFuncVar rhsGradientFunc) {
   m_expressions.emplace_back(
       std::array<Variable, Expression::kNumArgs>{lhs, rhs},
       std::move(valueFunc),
+      std::array<BinaryFuncDouble, Expression::kNumArgs>{
+          std::move(lhsGradientValueFunc), std::move(rhsGradientValueFunc)},
       std::array<BinaryFuncVar, Expression::kNumArgs>{
           std::move(lhsGradientFunc), std::move(rhsGradientFunc)});
   m_expressions.back().index = m_expressions.size() - 1;
