@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include <wpi/SmallVector.h>
+#include <vector>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/autodiff/TapeNode.h"
@@ -15,8 +16,6 @@ namespace frc::autodiff {
 class WPILIB_DLLEXPORT Tape {
  public:
   Tape();
-
-  ~Tape();
 
   /**
    * Pushes a new node with no arguments and returns its location.
@@ -71,20 +70,12 @@ class WPILIB_DLLEXPORT Tape {
   int Size() const;
 
   /**
-   * Returns the currently active tape. This is typically the most recently
-   * created one.
+   * Returns the global tape.
    */
-  static Tape& GetCurrentTape();
+  static Tape& GetTape();
 
  private:
-  static wpi::SmallVector<Tape*, 8> m_tapeStack;
-
-  wpi::SmallVector<TapeNode, 2048> m_nodes;
-
-  /**
-   * Returns the default tape.
-   */
-  static Tape& GetDefaultTape();
+  std::vector<TapeNode> m_nodes;
 };
 
 }  // namespace frc::autodiff

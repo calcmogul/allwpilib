@@ -9,14 +9,8 @@
 
 using namespace frc::autodiff;
 
-wpi::SmallVector<Tape*, 8> Tape::m_tapeStack;
-
 Tape::Tape() {
-  m_tapeStack.emplace_back(this);
-}
-
-Tape::~Tape() {
-  m_tapeStack.pop_back();
+  m_nodes.reserve(64000);
 }
 
 Variable Tape::PushNullary(double value, VariantGradientFunc gradientFunc) {
@@ -68,14 +62,7 @@ int Tape::Size() const {
   return m_nodes.size();
 }
 
-Tape& Tape::GetCurrentTape() {
-  if (m_tapeStack.size() == 0) {
-    m_tapeStack.emplace_back(&GetDefaultTape());
-  }
-  return *m_tapeStack.back();
-}
-
-Tape& Tape::GetDefaultTape() {
+Tape& Tape::GetTape() {
   static Tape tape;
   return tape;
 }
