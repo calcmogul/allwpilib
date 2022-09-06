@@ -305,13 +305,6 @@ std::vector<int> GenerateBFSList(const Tape& tape, Variable& root,
     auto& parent = tape[q.front()];
     q.pop();
 
-    // If parent is earlier in the tape than earliestNode, don't push any of its
-    // children because their adjoints won't be used; the gradient calculation
-    // will stop at earliestNode before they are reached.
-    if (parent.index <= earliestNode.index) {
-      continue;
-    }
-
     for (int child = 0; child < Expression::kNumArgs; ++child) {
       auto& childNode = parent.args[child];
 

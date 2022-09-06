@@ -18,8 +18,6 @@ using BinaryFuncVar = Variable (*)(const Variable&, const Variable&);
 struct WPILIB_DLLEXPORT Expression {
   static constexpr int kNumArgs = 2;
 
-  int index = -1;
-
   double value = 0.0;
 
   double adjoint = 0.0;
