@@ -15,8 +15,6 @@ namespace frc::autodiff {
 
 class WPILIB_DLLEXPORT Tape {
  public:
-  Tape();
-
   /**
    * Pushes a new expression with no arguments and returns its location.
    *
@@ -76,6 +74,8 @@ class WPILIB_DLLEXPORT Tape {
 
  private:
   std::vector<Expression> m_expressions;
+
+  Tape();
 };
 
 }  // namespace frc::autodiff

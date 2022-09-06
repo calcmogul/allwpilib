@@ -11,10 +11,6 @@
 
 using namespace frc::autodiff;
 
-Tape::Tape() {
-  m_expressions.reserve(64000);
-}
-
 Variable Tape::PushNullary(double value, BinaryFuncVar gradientFunc) {
   m_expressions.emplace_back(value, std::move(gradientFunc));
   m_expressions.back().index = m_expressions.size() - 1;
@@ -72,4 +68,8 @@ int Tape::Size() const {
 Tape& Tape::GetTape() {
   static Tape tape;
   return tape;
+}
+
+Tape::Tape() {
+  m_expressions.reserve(64000);
 }
