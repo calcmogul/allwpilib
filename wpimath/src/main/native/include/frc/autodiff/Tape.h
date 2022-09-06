@@ -23,7 +23,7 @@ class WPILIB_DLLEXPORT Tape {
    * @param value The expression value.
    * @param gradientFunc Gradient with respect to variable.
    */
-  Variable PushNullary(double value, VariantGradientFunc gradientFunc);
+  Variable PushNullary(double value, BinaryFuncVar gradientFunc);
 
   /**
    * Pushes a new expression with one argument and returns its location.
@@ -33,7 +33,7 @@ class WPILIB_DLLEXPORT Tape {
    * @param gradientFunc Gradient with respect to operand.
    */
   Variable PushUnary(Variable arg, VariantValueFunc valueFunc,
-                     VariantGradientFunc gradientFunc);
+                     BinaryFuncVar gradientFunc);
 
   /**
    * Pushes a new expression with two arguments and returns its location.
@@ -45,8 +45,8 @@ class WPILIB_DLLEXPORT Tape {
    * @param rhsGradientFunc Gradient with respect to right operand.
    */
   Variable PushBinary(Variable lhs, Variable rhs, VariantValueFunc valueFunc,
-                      VariantGradientFunc lhsGradientFunc,
-                      VariantGradientFunc rhsGradientFunc);
+                      BinaryFuncVar lhsGradientFunc,
+                      BinaryFuncVar rhsGradientFunc);
 
   /**
    * Clear the tape. All Variables pointing to the tape will become invalid.

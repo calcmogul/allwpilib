@@ -18,11 +18,7 @@ using BinaryFuncDouble = double (*)(double, double);
 using VariantValueFunc =
     std::variant<std::monostate, UnaryFuncDouble, BinaryFuncDouble>;
 
-using NullaryFuncVar = Variable (*)();
-using UnaryFuncVar = Variable (*)(const Variable&);
 using BinaryFuncVar = Variable (*)(const Variable&, const Variable&);
-using VariantGradientFunc =
-    std::variant<std::monostate, NullaryFuncVar, UnaryFuncVar, BinaryFuncVar>;
 
 struct WPILIB_DLLEXPORT Expression {
   static constexpr int kNumArgs = 2;
@@ -42,7 +38,7 @@ struct WPILIB_DLLEXPORT Expression {
   VariantValueFunc valueFunc;
 
   // Gradients with respect to each argument
-  std::array<VariantGradientFunc, kNumArgs> gradientFuncs;
+  std::array<BinaryFuncVar, kNumArgs> gradientFuncs;
 
   Expression(const Expression&) = default;
   Expression& operator=(const Expression&) = default;
@@ -56,7 +52,7 @@ struct WPILIB_DLLEXPORT Expression {
    * @param value The variable's value.
    * @param gradientFunc Gradient with respect to the variable.
    */
-  Expression(double value, VariantGradientFunc gradientFunc);
+  Expression(double value, BinaryFuncVar gradientFunc);
 
   /**
    * Constructs a node with the given gradients, argument indices, and function
@@ -67,7 +63,7 @@ struct WPILIB_DLLEXPORT Expression {
    * @param gradientFuncs Gradients with respect to each operand.
    */
   Expression(std::array<Variable, kNumArgs> args, VariantValueFunc valueFunc,
-             std::array<VariantGradientFunc, kNumArgs> gradientFuncs);
+             std::array<BinaryFuncVar, kNumArgs> gradientFuncs);
 
   /**
    * Returns gradient with respect to the given argument index.
