@@ -4,7 +4,6 @@
 
 #include <wpi/numbers>
 
-#include "frc/autodiff/TapeNode.h"
 #include "frc/autodiff/Variable.h"
 #include "gtest/gtest.h"
 

@@ -32,7 +32,7 @@ Variable& Variable::operator=(double value) {
     *this = Tape::GetTape().PushNullary(
         value, []() -> Variable { return Constant(1.0); });
   } else {
-    GetNode().value = value;
+    GetExpression().value = value;
   }
   return *this;
 }
@@ -42,7 +42,7 @@ Variable& Variable::operator=(int value) {
     *this = Tape::GetTape().PushNullary(
         value, []() -> Variable { return Constant(1.0); });
   } else {
-    GetNode().value = value;
+    GetExpression().value = value;
   }
   return *this;
 }
@@ -255,7 +255,7 @@ double Variable::Value() const {
   if (tape == nullptr) {
     return 0.0;
   } else {
-    return GetNode().value;
+    return GetExpression().value;
   }
 }
 
@@ -263,19 +263,19 @@ Variable Variable::Gradient(int arg) const {
   if (tape == nullptr) {
     return Constant(0.0);
   } else {
-    return GetNode().Gradient(arg);
+    return GetExpression().Gradient(arg);
   }
 }
 
 void Variable::Update() {
-  GetNode().Update();
+  GetExpression().Update();
 }
 
-const TapeNode& Variable::GetNode() const {
+const Expression& Variable::GetExpression() const {
   return (*tape)[index];
 }
 
-TapeNode& Variable::GetNode() {
+Expression& Variable::GetExpression() {
   return (*tape)[index];
 }
 
@@ -310,7 +310,7 @@ std::vector<int> GenerateBFSList(const Tape& tape, Variable& root,
       continue;
     }
 
-    for (int child = 0; child < TapeNode::kNumArgs; ++child) {
+    for (int child = 0; child < Expression::kNumArgs; ++child) {
       auto& childNode = parent.args[child];
 
       // If child isn't a real node, ignore it
@@ -346,7 +346,7 @@ double Gradient(Variable variable, Variable& wrt) {
   int tapeIndicesSize = static_cast<int>(tapeIndices.size());
 
   // wrt might not be in tape, so zero its adjoints separately
-  wrt.GetNode().adjoint = 0.0;
+  wrt.GetExpression().adjoint = 0.0;
 
   tape[tapeIndices[0]].adjoint = 1.0;
   for (int i = 1; i < tapeIndicesSize; ++i) {
@@ -354,10 +354,10 @@ double Gradient(Variable variable, Variable& wrt) {
   }
 
   for (int parent : tapeIndices) {
-    for (int child = 0; child < TapeNode::kNumArgs; ++child) {
+    for (int child = 0; child < Expression::kNumArgs; ++child) {
       if (tape[parent].args[child].tape != nullptr) {
         // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
-        tape[parent].args[child].GetNode().adjoint +=
+        tape[parent].args[child].GetExpression().adjoint +=
             tape[parent].adjoint * tape[parent].Gradient(child).Value();
       }
     }
@@ -365,7 +365,7 @@ double Gradient(Variable variable, Variable& wrt) {
 
   tape.Resize(tapeSize);
 
-  return wrt.GetNode().adjoint;
+  return wrt.GetExpression().adjoint;
 }
 
 Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
@@ -385,7 +385,7 @@ Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
 
   // wrt might not be in tape, so zero its adjoints separately
   for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetNode().adjoint = 0.0;
+    wrt(row).GetExpression().adjoint = 0.0;
   }
 
   tape[tapeIndices[0]].adjoint = 1.0;
@@ -394,10 +394,10 @@ Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
   }
 
   for (int parent : tapeIndices) {
-    for (int child = 0; child < TapeNode::kNumArgs; ++child) {
+    for (int child = 0; child < Expression::kNumArgs; ++child) {
       if (tape[parent].args[child].tape != nullptr) {
         // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
-        tape[parent].args[child].GetNode().adjoint +=
+        tape[parent].args[child].GetExpression().adjoint +=
             tape[parent].adjoint * tape[parent].Gradient(child).Value();
       }
     }
@@ -408,7 +408,7 @@ Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
   // Select elements of gradient in wrt
   Eigen::VectorXd grad{wrt.rows(), 1};
   for (int row = 0; row < wrt.rows(); ++row) {
-    grad(row) = wrt(row).GetNode().adjoint;
+    grad(row) = wrt(row).GetExpression().adjoint;
   }
 
   return grad;
@@ -448,7 +448,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
 
   // wrt might not be in tape, so zero its adjoints separately
   for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetNode().adjoint = 0.0;
+    wrt(row).GetExpression().adjoint = 0.0;
   }
 
   tape[tapeIndices[0]].adjoint = 1.0;
@@ -477,7 +477,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
 
       if (p != i) {
         // for each j < i
-        for (int jArg = 0; jArg < TapeNode::kNumArgs; ++jArg) {
+        for (int jArg = 0; jArg < Expression::kNumArgs; ++jArg) {
           if (tape[i].args[jArg].tape == nullptr) {
             continue;
           }
@@ -526,7 +526,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
       }
       auto grad_i_wrt_k = tape[i].Gradient(kArg);
 
-      if (grad_i_wrt_k.GetNode().args[jArg].tape == nullptr) {
+      if (grad_i_wrt_k.GetExpression().args[jArg].tape == nullptr) {
         continue;
       }
       double grad2_i_wrt_kj = grad_i_wrt_k.Gradient(jArg).Value();
@@ -535,16 +535,16 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
       }
 
       // w_{jk} += v̅ᵢ ∂²ϕᵢ/∂vₖ∂vⱼ
-      int j = grad_i_wrt_k.GetNode().args[jArg].index;
+      int j = grad_i_wrt_k.GetExpression().args[jArg].index;
       int k = tape[i].args[kArg].index;
       GetWRef(j, k) += tape[i].adjoint * grad2_i_wrt_kj;
     }
 
     // Adjoint
-    for (int jArg = 0; jArg < TapeNode::kNumArgs; ++jArg) {
+    for (int jArg = 0; jArg < Expression::kNumArgs; ++jArg) {
       // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
       if (tape[i].args[jArg].tape != nullptr) {
-        tape[i].args[jArg].GetNode().adjoint +=
+        tape[i].args[jArg].GetExpression().adjoint +=
             tape[i].adjoint * tape[i].Gradient(jArg).Value();
       }
     }

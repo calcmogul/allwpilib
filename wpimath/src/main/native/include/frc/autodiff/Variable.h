@@ -12,7 +12,7 @@
 namespace frc::autodiff {
 
 class WPILIB_DLLEXPORT Tape;
-struct WPILIB_DLLEXPORT TapeNode;
+struct WPILIB_DLLEXPORT Expression;
 
 class WPILIB_DLLEXPORT Variable {
  public:
@@ -151,9 +151,9 @@ class WPILIB_DLLEXPORT Variable {
    */
   void Update();
 
-  const TapeNode& GetNode() const;
+  const Expression& GetExpression() const;
 
-  TapeNode& GetNode();
+  Expression& GetExpression();
 };
 
 /**

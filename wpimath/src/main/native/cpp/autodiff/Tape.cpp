@@ -10,56 +10,57 @@
 using namespace frc::autodiff;
 
 Tape::Tape() {
-  m_nodes.reserve(64000);
+  m_expressions.reserve(64000);
 }
 
 Variable Tape::PushNullary(double value, VariantGradientFunc gradientFunc) {
-  m_nodes.emplace_back(value, std::move(gradientFunc));
-  m_nodes.back().index = m_nodes.size() - 1;
-  return Variable{this, static_cast<int>(m_nodes.size() - 1)};
+  m_expressions.emplace_back(value, std::move(gradientFunc));
+  m_expressions.back().index = m_expressions.size() - 1;
+  return Variable{this, static_cast<int>(m_expressions.size() - 1)};
 }
 
 Variable Tape::PushUnary(Variable arg, VariantValueFunc valueFunc,
                          VariantGradientFunc gradientFunc) {
-  m_nodes.emplace_back(
-      std::array<Variable, TapeNode::kNumArgs>{arg, Variable{}},
+  m_expressions.emplace_back(
+      std::array<Variable, Expression::kNumArgs>{arg, Variable{}},
       std::move(valueFunc),
-      std::array<VariantGradientFunc, TapeNode::kNumArgs>{
+      std::array<VariantGradientFunc, Expression::kNumArgs>{
           std::move(gradientFunc), []() -> Variable { return Constant(0.0); }});
-  m_nodes.back().index = m_nodes.size() - 1;
-  return Variable{this, static_cast<int>(m_nodes.size() - 1)};
+  m_expressions.back().index = m_expressions.size() - 1;
+  return Variable{this, static_cast<int>(m_expressions.size() - 1)};
 }
 
 Variable Tape::PushBinary(Variable lhs, Variable rhs,
                           VariantValueFunc valueFunc,
                           VariantGradientFunc lhsGradientFunc,
                           VariantGradientFunc rhsGradientFunc) {
-  m_nodes.emplace_back(
-      std::array<Variable, TapeNode::kNumArgs>{lhs, rhs}, std::move(valueFunc),
-      std::array<VariantGradientFunc, TapeNode::kNumArgs>{
+  m_expressions.emplace_back(
+      std::array<Variable, Expression::kNumArgs>{lhs, rhs},
+      std::move(valueFunc),
+      std::array<VariantGradientFunc, Expression::kNumArgs>{
           std::move(lhsGradientFunc), std::move(rhsGradientFunc)});
-  m_nodes.back().index = m_nodes.size() - 1;
-  return Variable{this, static_cast<int>(m_nodes.size() - 1)};
+  m_expressions.back().index = m_expressions.size() - 1;
+  return Variable{this, static_cast<int>(m_expressions.size() - 1)};
 }
 
 void Tape::Clear() {
-  m_nodes.clear();
+  m_expressions.clear();
 }
 
-TapeNode& Tape::operator[](int pos) {
-  return m_nodes[pos];
+Expression& Tape::operator[](int pos) {
+  return m_expressions[pos];
 }
 
-const TapeNode& Tape::operator[](int pos) const {
-  return m_nodes[pos];
+const Expression& Tape::operator[](int pos) const {
+  return m_expressions[pos];
 }
 
 void Tape::Resize(int size) {
-  m_nodes.erase(m_nodes.begin() + size, m_nodes.end());
+  m_expressions.erase(m_expressions.begin() + size, m_expressions.end());
 }
 
 int Tape::Size() const {
-  return m_nodes.size();
+  return m_expressions.size();
 }
 
 Tape& Tape::GetTape() {

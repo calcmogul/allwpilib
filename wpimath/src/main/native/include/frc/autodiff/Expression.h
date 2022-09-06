@@ -24,7 +24,7 @@ using BinaryFuncVar = Variable (*)(const Variable&, const Variable&);
 using VariantGradientFunc =
     std::variant<std::monostate, NullaryFuncVar, UnaryFuncVar, BinaryFuncVar>;
 
-struct WPILIB_DLLEXPORT TapeNode {
+struct WPILIB_DLLEXPORT Expression {
   static constexpr int kNumArgs = 2;
 
   int index = 0;
@@ -44,11 +44,11 @@ struct WPILIB_DLLEXPORT TapeNode {
   // Gradients with respect to each argument
   std::array<VariantGradientFunc, kNumArgs> gradientFuncs;
 
-  TapeNode(const TapeNode&) = default;
-  TapeNode& operator=(const TapeNode&) = default;
+  Expression(const Expression&) = default;
+  Expression& operator=(const Expression&) = default;
 
-  TapeNode(TapeNode&&) = default;
-  TapeNode& operator=(TapeNode&&) = default;
+  Expression(Expression&&) = default;
+  Expression& operator=(Expression&&) = default;
 
   /**
    * Constructs a node with the given value.
@@ -56,7 +56,7 @@ struct WPILIB_DLLEXPORT TapeNode {
    * @param value The variable's value.
    * @param gradientFunc Gradient with respect to the variable.
    */
-  TapeNode(double value, VariantGradientFunc gradientFunc);
+  Expression(double value, VariantGradientFunc gradientFunc);
 
   /**
    * Constructs a node with the given gradients, argument indices, and function
@@ -66,8 +66,8 @@ struct WPILIB_DLLEXPORT TapeNode {
    * @param valueFunc Binary operator that produces this node's value.
    * @param gradientFuncs Gradients with respect to each operand.
    */
-  TapeNode(std::array<Variable, kNumArgs> args, VariantValueFunc valueFunc,
-           std::array<VariantGradientFunc, kNumArgs> gradientFuncs);
+  Expression(std::array<Variable, kNumArgs> args, VariantValueFunc valueFunc,
+             std::array<VariantGradientFunc, kNumArgs> gradientFuncs);
 
   /**
    * Returns gradient with respect to the given argument index.

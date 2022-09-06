@@ -8,7 +8,7 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/autodiff/TapeNode.h"
+#include "frc/autodiff/Expression.h"
 #include "frc/autodiff/Variable.h"
 
 namespace frc::autodiff {
@@ -18,29 +18,29 @@ class WPILIB_DLLEXPORT Tape {
   Tape();
 
   /**
-   * Pushes a new node with no arguments and returns its location.
+   * Pushes a new expression with no arguments and returns its location.
    *
-   * @param value The node value.
+   * @param value The expression value.
    * @param gradientFunc Gradient with respect to variable.
    */
   Variable PushNullary(double value, VariantGradientFunc gradientFunc);
 
   /**
-   * Pushes a new node with one argument and returns its location.
+   * Pushes a new expression with one argument and returns its location.
    *
    * @param arg Unary operator's operand.
-   * @param valueFunc Unary operator that produces this node's value.
+   * @param valueFunc Unary operator that produces this expression's value.
    * @param gradientFunc Gradient with respect to operand.
    */
   Variable PushUnary(Variable arg, VariantValueFunc valueFunc,
                      VariantGradientFunc gradientFunc);
 
   /**
-   * Pushes a new node with two arguments and returns its location.
+   * Pushes a new expression with two arguments and returns its location.
    *
    * @param lhs Binary operator's left operand.
    * @param rhs Binary operator's right operand.
-   * @param valueFunc Binary operator that produces this node's value.
+   * @param valueFunc Binary operator that produces this expression's value.
    * @param lhsGradientFunc Gradient with respect to left operand.
    * @param rhsGradientFunc Gradient with respect to right operand.
    */
@@ -53,9 +53,9 @@ class WPILIB_DLLEXPORT Tape {
    */
   void Clear();
 
-  TapeNode& operator[](int pos);
+  Expression& operator[](int pos);
 
-  const TapeNode& operator[](int pos) const;
+  const Expression& operator[](int pos) const;
 
   /**
    * Resize the tape.
@@ -75,7 +75,7 @@ class WPILIB_DLLEXPORT Tape {
   static Tape& GetTape();
 
  private:
-  std::vector<TapeNode> m_nodes;
+  std::vector<Expression> m_expressions;
 };
 
 }  // namespace frc::autodiff
