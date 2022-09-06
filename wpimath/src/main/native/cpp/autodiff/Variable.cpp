@@ -25,10 +25,10 @@ Variable::Variable(int value) {
       value, []() -> Variable { return Constant(1.0); });
 }
 
-Variable::Variable(Tape* tape, int index) : tape{tape}, index{index} {}
+Variable::Variable(int index, const PrivateInit&) : index{index} {}
 
 Variable& Variable::operator=(double value) {
-  if (tape == nullptr) {
+  if (index == -1) {
     *this = Tape::GetTape().PushNullary(
         value, []() -> Variable { return Constant(1.0); });
   } else {
@@ -38,7 +38,7 @@ Variable& Variable::operator=(double value) {
 }
 
 Variable& Variable::operator=(int value) {
-  if (tape == nullptr) {
+  if (index == -1) {
     *this = Tape::GetTape().PushNullary(
         value, []() -> Variable { return Constant(1.0); });
   } else {
@@ -252,7 +252,7 @@ WPILIB_DLLEXPORT bool operator>=(const Variable& lhs, const Variable& rhs) {
 }
 
 double Variable::Value() const {
-  if (tape == nullptr) {
+  if (index == -1) {
     return 0.0;
   } else {
     return GetExpression().value;
@@ -260,7 +260,7 @@ double Variable::Value() const {
 }
 
 Variable Variable::Gradient(int arg) const {
-  if (tape == nullptr) {
+  if (index == -1) {
     return Constant(0.0);
   } else {
     return GetExpression().Gradient(arg);
@@ -272,11 +272,11 @@ void Variable::Update() {
 }
 
 const Expression& Variable::GetExpression() const {
-  return (*tape)[index];
+  return Tape::GetTape()[index];
 }
 
 Expression& Variable::GetExpression() {
-  return (*tape)[index];
+  return Tape::GetTape()[index];
 }
 
 namespace {
@@ -314,7 +314,7 @@ std::vector<int> GenerateBFSList(const Tape& tape, Variable& root,
       auto& childNode = parent.args[child];
 
       // If child isn't a real node, ignore it
-      if (childNode.tape == nullptr) {
+      if (childNode.index == -1) {
         continue;
       }
 
@@ -339,7 +339,7 @@ double Gradient(Variable variable, Variable& wrt) {
   // Based on algorithm 2 of "A new framework for the computation of Hessians"
   // https://arxiv.org/pdf/2007.15040.pdf
 
-  auto& tape = *variable.tape;
+  auto& tape = Tape::GetTape();
   int tapeSize = tape.Size();
 
   std::vector<int> tapeIndices = GenerateBFSList(tape, variable, wrt);
@@ -355,7 +355,7 @@ double Gradient(Variable variable, Variable& wrt) {
 
   for (int parent : tapeIndices) {
     for (int child = 0; child < Expression::kNumArgs; ++child) {
-      if (tape[parent].args[child].tape != nullptr) {
+      if (tape[parent].args[child].index != -1) {
         // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
         tape[parent].args[child].GetExpression().adjoint +=
             tape[parent].adjoint * tape[parent].Gradient(child).Value();
@@ -372,7 +372,7 @@ Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
   // Based on algorithm 2 of "A new framework for the computation of Hessians"
   // https://arxiv.org/pdf/2007.15040.pdf
 
-  auto& tape = *variable.tape;
+  auto& tape = Tape::GetTape();
   int tapeSize = tape.Size();
 
   Variable& minIndexWrtVariable = *std::min_element(
@@ -395,7 +395,7 @@ Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
 
   for (int parent : tapeIndices) {
     for (int child = 0; child < Expression::kNumArgs; ++child) {
-      if (tape[parent].args[child].tape != nullptr) {
+      if (tape[parent].args[child].index != -1) {
         // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
         tape[parent].args[child].GetExpression().adjoint +=
             tape[parent].adjoint * tape[parent].Gradient(child).Value();
@@ -435,7 +435,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
   // Based on algorithm 4 of "A new framework for the computation of Hessians"
   // https://arxiv.org/pdf/2007.15040.pdf
 
-  auto& tape = *variable.tape;
+  auto& tape = Tape::GetTape();
   int tapeSize = tape.Size();
 
   Variable& minIndexWrtVariable = *std::min_element(
@@ -478,7 +478,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
       if (p != i) {
         // for each j < i
         for (int jArg = 0; jArg < Expression::kNumArgs; ++jArg) {
-          if (tape[i].args[jArg].tape == nullptr) {
+          if (tape[i].args[jArg].index == -1) {
             continue;
           }
 
@@ -499,8 +499,8 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
       } else {
         for (auto [jArg, kArg] : std::initializer_list<std::tuple<int, int>>{
                  {0, 0}, {1, 0}, {1, 1}}) {
-          if (tape[i].args[jArg].tape == nullptr ||
-              tape[i].args[kArg].tape == nullptr) {
+          if (tape[i].args[jArg].index == -1 ||
+              tape[i].args[kArg].index == -1) {
             continue;
           }
 
@@ -521,12 +521,12 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
     // Creating
     for (auto [jArg, kArg] :
          std::initializer_list<std::tuple<int, int>>{{0, 0}, {1, 0}, {1, 1}}) {
-      if (tape[i].args[kArg].tape == nullptr) {
+      if (tape[i].args[kArg].index == -1) {
         continue;
       }
       auto grad_i_wrt_k = tape[i].Gradient(kArg);
 
-      if (grad_i_wrt_k.GetExpression().args[jArg].tape == nullptr) {
+      if (grad_i_wrt_k.GetExpression().args[jArg].index == -1) {
         continue;
       }
       double grad2_i_wrt_kj = grad_i_wrt_k.Gradient(jArg).Value();
@@ -543,7 +543,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
     // Adjoint
     for (int jArg = 0; jArg < Expression::kNumArgs; ++jArg) {
       // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
-      if (tape[i].args[jArg].tape != nullptr) {
+      if (tape[i].args[jArg].index != -1) {
         tape[i].args[jArg].GetExpression().adjoint +=
             tape[i].adjoint * tape[i].Gradient(jArg).Value();
       }

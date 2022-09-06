@@ -15,9 +15,11 @@ class WPILIB_DLLEXPORT Tape;
 struct WPILIB_DLLEXPORT Expression;
 
 class WPILIB_DLLEXPORT Variable {
+ private:
+  struct PrivateInit {};
+
  public:
-  Tape* tape = nullptr;
-  int index = 0;
+  int index = -1;
 
   constexpr Variable() = default;
 
@@ -34,10 +36,9 @@ class WPILIB_DLLEXPORT Variable {
   /**
    * Constructs a Variable pointing to the specified entry on a tape.
    *
-   * @param tape The tape the autodiff variable is on.
    * @param index The index of the autodiff variable on the tape.
    */
-  explicit Variable(Tape* tape, int index);
+  explicit Variable(int index, const PrivateInit&);
 
   Variable& operator=(double value);
 
@@ -154,6 +155,9 @@ class WPILIB_DLLEXPORT Variable {
   const Expression& GetExpression() const;
 
   Expression& GetExpression();
+
+ private:
+  friend class WPILIB_DLLEXPORT Tape;
 };
 
 /**

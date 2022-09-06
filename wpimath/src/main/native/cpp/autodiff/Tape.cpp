@@ -16,7 +16,8 @@ Tape::Tape() {
 Variable Tape::PushNullary(double value, VariantGradientFunc gradientFunc) {
   m_expressions.emplace_back(value, std::move(gradientFunc));
   m_expressions.back().index = m_expressions.size() - 1;
-  return Variable{this, static_cast<int>(m_expressions.size() - 1)};
+  return Variable{static_cast<int>(m_expressions.size() - 1),
+                  Variable::PrivateInit{}};
 }
 
 Variable Tape::PushUnary(Variable arg, VariantValueFunc valueFunc,
@@ -27,7 +28,8 @@ Variable Tape::PushUnary(Variable arg, VariantValueFunc valueFunc,
       std::array<VariantGradientFunc, Expression::kNumArgs>{
           std::move(gradientFunc), []() -> Variable { return Constant(0.0); }});
   m_expressions.back().index = m_expressions.size() - 1;
-  return Variable{this, static_cast<int>(m_expressions.size() - 1)};
+  return Variable{static_cast<int>(m_expressions.size() - 1),
+                  Variable::PrivateInit{}};
 }
 
 Variable Tape::PushBinary(Variable lhs, Variable rhs,
@@ -40,7 +42,8 @@ Variable Tape::PushBinary(Variable lhs, Variable rhs,
       std::array<VariantGradientFunc, Expression::kNumArgs>{
           std::move(lhsGradientFunc), std::move(rhsGradientFunc)});
   m_expressions.back().index = m_expressions.size() - 1;
-  return Variable{this, static_cast<int>(m_expressions.size() - 1)};
+  return Variable{static_cast<int>(m_expressions.size() - 1),
+                  Variable::PrivateInit{}};
 }
 
 void Tape::Clear() {
