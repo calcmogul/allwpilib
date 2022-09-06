@@ -252,11 +252,7 @@ double Variable::Value() const {
 }
 
 Variable Variable::Gradient(int arg) const {
-  if (index == -1) {
-    return Constant(0.0);
-  } else {
-    return GetExpression().Gradient(arg);
-  }
+  return GetExpression().Gradient(arg);
 }
 
 void Variable::Update() {
