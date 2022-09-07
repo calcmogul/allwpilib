@@ -523,16 +523,14 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
     for (auto [jArg, kArg] : std::initializer_list<std::tuple<int, int>>{
              {0, 0}, {0, 1}, {1, 0}, {1, 1}}) {
       int k = tape[i].args[kArg].index;
-      if (tape[i].args[kArg].index == -1) {
+      if (k == -1) {
         k = i;
-        // continue;
       }
       auto grad_i_wrt_k = tape[i].Gradient(kArg);
 
       int j = grad_i_wrt_k.GetExpression().args[jArg].index;
-      if (j == -1) {
+      if (j == -1 || j >= tapeSize) {
         j = k;
-        // continue;
       }
 
       double grad2_i_wrt_kj = grad_i_wrt_k.GradientValue(jArg);
