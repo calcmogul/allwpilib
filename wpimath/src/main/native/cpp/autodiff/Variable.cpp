@@ -313,6 +313,11 @@ std::vector<int> GenerateBFSList(const Tape& tape, Variable& root,
         continue;
       }
 
+      // If child node is before earliest node, ignore it
+      if (childNode.index < earliestNode.index) {
+        continue;
+      }
+
       // Push child if it's not a duplicate
       if (std::find(l.begin(), l.end(), childNode.index) == l.end()) {
         l.push_back(childNode.index);
@@ -494,7 +499,7 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
         }
       } else {
         for (auto [jArg, kArg] : std::initializer_list<std::tuple<int, int>>{
-                 {0, 0}, {1, 0}, {1, 1}}) {
+                 {0, 0}, {0, 1}, {1, 0}, {1, 1}}) {
           if (tape[i].args[jArg].index == -1 ||
               tape[i].args[kArg].index == -1) {
             continue;
@@ -515,24 +520,27 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
     }
 
     // Creating
-    for (auto [jArg, kArg] :
-         std::initializer_list<std::tuple<int, int>>{{0, 0}, {1, 0}, {1, 1}}) {
+    for (auto [jArg, kArg] : std::initializer_list<std::tuple<int, int>>{
+             {0, 0}, {0, 1}, {1, 0}, {1, 1}}) {
+      int k = tape[i].args[kArg].index;
       if (tape[i].args[kArg].index == -1) {
-        continue;
+        k = i;
+        // continue;
       }
       auto grad_i_wrt_k = tape[i].Gradient(kArg);
 
-      if (grad_i_wrt_k.GetExpression().args[jArg].index == -1) {
-        continue;
+      int j = grad_i_wrt_k.GetExpression().args[jArg].index;
+      if (j == -1) {
+        j = k;
+        // continue;
       }
+
       double grad2_i_wrt_kj = grad_i_wrt_k.GradientValue(jArg);
       if (grad2_i_wrt_kj == 0.0) {
         continue;
       }
 
       // w_{jk} += v̅ᵢ ∂²ϕᵢ/∂vₖ∂vⱼ
-      int j = grad_i_wrt_k.GetExpression().args[jArg].index;
-      int k = tape[i].args[kArg].index;
       GetWRef(j, k) += tape[i].adjoint * grad2_i_wrt_kj;
     }
 
@@ -564,9 +572,11 @@ Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
   triplets.clear();
   for (int k = 0; k < H.outerSize(); ++k) {
     for (decltype(H)::InnerIterator it{H, k}; it; ++it) {
-      triplets.emplace_back(it.row(), it.col(), it.value());
       if (it.row() != it.col()) {
-        triplets.emplace_back(it.col(), it.row(), it.value());
+        triplets.emplace_back(it.row(), it.col(), it.value() / 2.0);
+        triplets.emplace_back(it.col(), it.row(), it.value() / 2.0);
+      } else {
+        triplets.emplace_back(it.row(), it.col(), it.value());
       }
     }
   }

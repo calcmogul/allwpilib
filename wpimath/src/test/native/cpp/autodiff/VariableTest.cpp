@@ -533,11 +533,11 @@ TEST(VariableTest, HessianQuadratic) {
   //         = 1 + 1
   //         = 2
   EXPECT_DOUBLE_EQ(1.0, y.Gradient(0).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(1.0, y.Gradient(1).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(1).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(1).Value());
   EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(0).Gradient(0).Value());
+  EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(1).Value());
+  EXPECT_DOUBLE_EQ(1.0, y.Gradient(1).Gradient(0).Value());
   EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(0).Gradient(0).Value());
+  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(1).Value());
   Eigen::MatrixXd H = Hessian(y, x);
   EXPECT_DOUBLE_EQ(2.0, H(0, 0));
 }
