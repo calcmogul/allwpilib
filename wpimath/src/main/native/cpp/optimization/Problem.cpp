@@ -177,11 +177,20 @@ double Problem::f(const Eigen::Ref<const Eigen::VectorXd>& x) {
 Eigen::VectorXd Problem::InteriorPoint(
     const Eigen::Ref<const Eigen::VectorXd>& initialGuess) {
   // Let f(x)ₖ be the cost function, cₑ(x)ₖ be the equality constraints, and
-  // cᵢ(x)ₖ be the inequality constraints.
+  // cᵢ(x)ₖ be the inequality constraints. The Lagrangian of the optimization
+  // problem is
   //
   //   L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ − zₖᵀ(cᵢ(x)ₖ − sₖ)
   //
+  // The Hessian of the Lagrangian is
+  //
   //   H(x)ₖ = ∇²ₓₓL(x, s, y, z)ₖ
+  //
+  // The primal-dual barrier term Hessian Σ is defined as
+  //
+  //   Σ = S⁻¹Z
+  //
+  // where
   //
   //       [s₁ 0 ⋯ 0 ]
   //   S = [0  ⋱   ⋮ ]
@@ -193,50 +202,43 @@ Eigen::VectorXd Problem::InteriorPoint(
   //       [⋮    ⋱ 0 ]
   //       [0  ⋯ 0 zₘ]
   //
-  // where m is the number of inequality constraints.
+  // and where m is the number of inequality constraints.
   //
-  //   Σ = S⁻¹Z
-  //
-  // e is a column vector of ones with a number of rows equal to the number of
-  // inequality constraints.
-  //
-  // Let f(x) = f(x)ₖ, H = H(x)ₖ, Aₑ = Aₑ(x)ₖ, and Aᵢ = Aᵢ(x)ₖ for clarity.
-  //
-  // We want to solve the Newton-KKT system shown in equation (19.12) in [1].
+  // Let f(x) = f(x)ₖ, H = H(x)ₖ, Aₑ = Aₑ(x)ₖ, and Aᵢ = Aᵢ(x)ₖ for clarity. We
+  // want to solve the following Newton-KKT system shown in equation (19.12) of
+  // [1].
   //
   //   [H    0  Aₑᵀ  Aᵢᵀ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
   //   [0    Σ   0   −I ][ pₖˢ] = −[     z − μS⁻¹e     ]
-  //   [Aₑ   0   0    0 ][-pₖʸ]    [        cₑ         ]
-  //   [Aᵢ  −I   0    0 ][-pₖᶻ]    [      cᵢ − s       ]
+  //   [Aₑ   0   0    0 ][−pₖʸ]    [        cₑ         ]
+  //   [Aᵢ  −I   0    0 ][−pₖᶻ]    [      cᵢ − s       ]
   //
-  // Take the second row.
+  // where e is a column vector of ones with a number of rows equal to the
+  // number of inequality constraints.
+  //
+  // Solve the second row for pₖˢ.
   //
   //   Σpₖˢ + pₖᶻ = μS⁻¹e − z
-  //
-  // Solve for pₖˢ.
-  //
+  //   Σpₖˢ = μS⁻¹e − z − pₖᶻ
   //   pₖˢ = μΣ⁻¹S⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ
   //
-  // Substitute Σ = S⁻¹Z into the first two elements.
+  // Substitute Σ = S⁻¹Z into the first two terms.
   //
+  //   pₖˢ = μ(S⁻¹Z)⁻¹S⁻¹e − (S⁻¹Z)⁻¹z − Σ⁻¹pₖᶻ
+  //   pₖˢ = μZ⁻¹SS⁻¹e − Z⁻¹Sz − Σ⁻¹pₖᶻ
   //   pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
   //
-  // Take the fourth row.
+  // Substitute the explicit formula for pₖˢ into the fourth row and simplify.
   //
-  //   Aₑpₖˣ − pₖˢ = s − cᵢ
-  //
-  // Substitute the explicit formula for pₖˢ.
-  //
-  //   Aₑpₖˣ − μZ⁻¹e + s + Σ⁻¹pₖᶻ = s − cᵢ
-  //
-  // Simplify.
-  //
-  //   Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
+  //   Aᵢpₖˣ − pₖˢ = s − cᵢ
+  //   Aᵢpₖˣ − (μZ⁻¹e − s − Σ⁻¹pₖᶻ) = s − cᵢ
+  //   Aᵢpₖˣ − μZ⁻¹e + s + Σ⁻¹pₖᶻ = s − cᵢ
+  //   Aᵢpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
   //
   // Substitute the new second and fourth rows into the system.
   //
   //   [H   0  Aₑᵀ  Aᵢᵀ ][ pₖˣ]    [∇f(x) − Aₑᵀy − Aᵢᵀz]
-  //   [0   I   0    0  ][ pₖˢ] = −[     z − μS⁻¹e     ]
+  //   [0   I   0    0  ][ pₖˢ] = −[−μZ⁻¹e + s + Σ⁻¹pₖᶻ]
   //   [Aₑ  0   0    0  ][−pₖʸ]    [        cₑ         ]
   //   [Aᵢ  0   0   −Σ⁻¹][−pₖᶻ]    [     cᵢ − μZ⁻¹e    ]
   //
@@ -246,50 +248,52 @@ Eigen::VectorXd Problem::InteriorPoint(
   //   [Aₑ   0    0  ][−pₖʸ] = −[        cₑ         ]
   //   [Aᵢ   0   −Σ⁻¹][−pₖᶻ]    [    cᵢ − μZ⁻¹e     ]
   //
-  // Take the third row.
+  // Solve the third row for pₖᶻ.
   //
   //   Aₑpₖˣ + Σ⁻¹pₖᶻ = −cᵢ + μZ⁻¹e
-  //
-  // Solve for pₖᶻ.
-  //
   //   pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ
   //
-  // Take the first row.
+  // Substitute the explicit formula for pₖᶻ into the first row.
   //
   //   Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀpₖᶻ = −∇f(x) + Aₑᵀy + Aᵢᵀz
-  //
-  // Substitute the explicit formula for pₖᶻ.
-  //
   //   Hpₖˣ − Aₑᵀpₖʸ − Aᵢᵀ(−Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ) = −∇f(x) + Aₑᵀy + Aᵢᵀz
   //
   // Expand and simplify.
   //
+  //   Hpₖˣ − Aₑᵀpₖʸ + AᵢᵀΣcᵢ − AᵢᵀμS⁻¹e + AᵢᵀΣAᵢpₖˣ = −∇f(x) + Aₑᵀy + Aᵢᵀz
+  //   Hpₖˣ + AᵢᵀΣAᵢpₖˣ − Aₑᵀpₖʸ  = −∇f(x) + Aₑᵀy + AᵢᵀΣcᵢ + AᵢᵀμS⁻¹e + Aᵢᵀz
   //   (H + AᵢᵀΣAᵢ)pₖˣ − Aₑᵀpₖʸ = −∇f(x) + Aₑᵀy − Aᵢᵀ(Σcᵢ − μS⁻¹e − z)
+  //   (H + AᵢᵀΣAᵢ)pₖˣ − Aₑᵀpₖʸ = −(∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z))
   //
   // Substitute the new first and third rows into the system.
   //
-  //   [H   Aₑᵀ  0][ pₖˣ]    [∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
-  //   [Aₑ   0   0][−pₖʸ] = −[                cₑ                 ]
-  //   [0    0   I][−pₖᶻ]    [       −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ       ]
+  //   [H + AᵢᵀΣAᵢ   Aₑᵀ  0][ pₖˣ]    [∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
+  //   [    Aₑ        0   0][−pₖʸ] = −[                cₑ                 ]
+  //   [    0         0   I][−pₖᶻ]    [       −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ       ]
   //
   // Eliminate the third row and column.
   //
   //   [H + AᵢᵀΣAᵢ  Aₑᵀ][ pₖˣ] = −[∇f(x) − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
   //   [    Aₑ       0 ][−pₖʸ]    [                cₑ                 ]
   //
-  // The iterate pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ.
-  // The iterate pₖˢ = μZ⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ.
+  // This reduced 2x2 block system gives the iterates pₖˣ and pₖʸ with the
+  // iterates pₖᶻ and pₖˢ given by
   //
-  // The fraction-to-the-boundary rule is used to compute αₖᵐᵃˣ and αₖᶻ. See
-  // equations (15a) and (15b) in [2].
+  //   pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ
+  //   pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
   //
-  //   αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
-  //   αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
+  // The iterates are applied like so
   //
   //   xₖ₊₁ = xₖ + αₖᵐᵃˣpₖˣ
   //   sₖ₊₁ = xₖ + αₖᵐᵃˣpₖˢ
   //   yₖ₊₁ = xₖ + αₖᶻpₖʸ
   //   zₖ₊₁ = xₖ + αₖᶻpₖᶻ
+  //
+  // where αₖᵐᵃˣ and αₖᶻ are computed via the fraction-to-the-boundary rule
+  // shown in equations (15a) and (15b) of [2].
+  //
+  //   αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
+  //   αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
   //
   // [1] Nocedal, J. and Wright, S. Numerical Optimization, 2nd. ed., Ch. 19.
   //     Springer, 2006.
@@ -452,9 +456,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       Eigen::VectorXd p_z =
           -sigma * c_i + mu * inverseS * e - sigma * A_i * p_x;
 
-      // pₖˢ = μZ⁻¹e − Σ⁻¹z − Σ⁻¹pₖᶻ
-      Eigen::VectorXd p_s =
-          (mu * inverseZ * e - inverseSigma * z - inverseSigma * p_z);
+      // pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
+      Eigen::VectorXd p_s = (mu * inverseZ * e - s - inverseSigma * p_z);
 
       // αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
       double alpha_max = FractionToTheBoundaryRule(x, p_x, tau);
