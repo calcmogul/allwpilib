@@ -7,7 +7,6 @@
 #include <cassert>
 #include <utility>
 
-#include <wpi/SmallVector.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/EigenCore.h"

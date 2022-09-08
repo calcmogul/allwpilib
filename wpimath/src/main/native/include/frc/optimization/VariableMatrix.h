@@ -6,8 +6,8 @@
 
 #include <cassert>
 #include <utility>
+#include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/Synchronization.h>
 
@@ -321,7 +321,7 @@ class WPILIB_DLLEXPORT VariableMatrix {
   const autodiff::Variable& Autodiff(int row, int col) const;
 
  private:
-  wpi::SmallVector<autodiff::Variable, 32> m_storage;
+  std::vector<autodiff::Variable> m_storage;
   int m_rows = 0;
   int m_cols = 0;
 };
