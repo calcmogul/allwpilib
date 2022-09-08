@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <limits>
 #include <vector>
 
 #include "Eigen/IterativeLinearSolvers"
@@ -349,12 +350,16 @@ Eigen::VectorXd Problem::InteriorPoint(
   autodiff::VectorXvar zAD =
       autodiff::VectorXvar::Ones(m_inequalityConstraints.size());
 
-  Eigen::MatrixXd e = Eigen::VectorXd::Ones(s.rows());
+  const Eigen::MatrixXd e = Eigen::VectorXd::Ones(s.rows());
 
   // L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ − zₖᵀ(cᵢ(x)ₖ − sₖ)
-  autodiff::Variable L =
-      m_f.value() - (yAD.transpose() * m_equalityConstraints -
-                     zAD.transpose() * (m_inequalityConstraints - sAD))(0);
+  autodiff::Variable L = m_f.value();
+  if (m_equalityConstraints.size() > 0) {
+    L -= yAD.transpose() * m_equalityConstraints;
+  }
+  if (m_inequalityConstraints.size() > 0) {
+    L -= zAD.transpose() * (m_inequalityConstraints - sAD);
+  }
 
   Eigen::VectorXd step = Eigen::VectorXd::Zero(x.rows(), 1);
 
@@ -362,10 +367,11 @@ Eigen::VectorXd Problem::InteriorPoint(
   L.Update();
 
   // Error estimate E_μ
-  double E_mu = 0.0;
+  double E_mu = std::numeric_limits<double>::infinity();
 
-  do {
-    do {
+  int iterations = 0;
+  while (E_mu > m_tolerance) {
+    while (E_mu > kappa_epsilon * mu) {
       //     [s₁ 0 ⋯ 0 ]
       // S = [0  ⋱   ⋮ ]
       //     [⋮    ⋱ 0 ]
@@ -511,7 +517,12 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Update the error estimate. Based on equation (5) in [2].
       E_mu = std::max(rhs.topRows(x.rows()).lpNorm<Eigen::Infinity>() / s_d,
                       c_e.lpNorm<Eigen::Infinity>());
-    } while (E_mu > kappa_epsilon * mu);
+
+      ++iterations;
+      if (iterations == m_maxIterations) {
+        return x;
+      }
+    }
 
     // Update the barrier parameter.
     //
@@ -527,7 +538,7 @@ Eigen::VectorXd Problem::InteriorPoint(
     //
     // See equation (8) in [2].
     tau = std::max(tau_min, 1.0 - mu);
-  } while (E_mu > m_tolerance);
+  }
 
   return x;
 }
