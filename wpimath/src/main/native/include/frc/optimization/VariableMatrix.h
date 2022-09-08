@@ -9,7 +9,6 @@
 #include <vector>
 
 #include <wpi/SymbolExports.h>
-#include <wpi/Synchronization.h>
 
 #include "frc/EigenCore.h"
 #include "frc/autodiff/Variable.h"
