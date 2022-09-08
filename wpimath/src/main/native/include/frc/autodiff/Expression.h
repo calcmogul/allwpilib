@@ -23,7 +23,7 @@ struct WPILIB_DLLEXPORT Expression {
   double adjoint = 0.0;
 
   // Indices of dependent nodes (function arguments)
-  std::array<Variable, kNumArgs> args;
+  std::array<Variable, kNumArgs> args{Variable{}, Variable{}};
 
   // Either nullary operator with no arguments, unary operator with one
   // argument, or binary operator with two arguments. This operator is
