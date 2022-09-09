@@ -52,10 +52,19 @@ void Problem::Minimize(VariableMatrix&& cost) {
 }
 
 void Problem::SubjectTo(EqualityConstraints&& constraint) {
+  int oldSize = m_equalityConstraints.rows();
   auto& storage = constraint.constraints;
 
-  int oldSize = m_equalityConstraints.rows();
-  m_equalityConstraints.resize(oldSize + storage.size());
+  // We move the autodiff variables into a temporary during the resize, then
+  // back, because resize() makes all the gradients it contains always return
+  // zero after that
+  autodiff::VectorXvar newConstraintStorage{
+      m_equalityConstraints.rows() + storage.size(), 1};
+  for (int row = 0; row < m_equalityConstraints.rows(); ++row) {
+    newConstraintStorage(row) = std::move(m_equalityConstraints(row));
+  }
+  m_equalityConstraints.resize(m_equalityConstraints.rows() + storage.size());
+  m_equalityConstraints = std::move(newConstraintStorage);
 
   for (size_t i = 0; i < storage.size(); ++i) {
     m_equalityConstraints(oldSize + i) = std::move(storage[i]);
@@ -63,10 +72,20 @@ void Problem::SubjectTo(EqualityConstraints&& constraint) {
 }
 
 void Problem::SubjectTo(InequalityConstraints&& constraint) {
+  int oldSize = m_inequalityConstraints.rows();
   auto& storage = constraint.constraints;
 
-  int oldSize = m_inequalityConstraints.rows();
-  m_inequalityConstraints.resize(oldSize + storage.size());
+  // We move the autodiff variables into a temporary during the resize, then
+  // back, because resize() makes all the gradients it contains always return
+  // zero after that
+  autodiff::VectorXvar newConstraintStorage{
+      m_inequalityConstraints.rows() + storage.size(), 1};
+  for (int row = 0; row < m_inequalityConstraints.rows(); ++row) {
+    newConstraintStorage(row) = std::move(m_inequalityConstraints(row));
+  }
+  m_inequalityConstraints.resize(m_inequalityConstraints.rows() +
+                                 storage.size());
+  m_inequalityConstraints = std::move(newConstraintStorage);
 
   for (size_t i = 0; i < storage.size(); ++i) {
     m_inequalityConstraints(oldSize + i) = std::move(storage[i]);
