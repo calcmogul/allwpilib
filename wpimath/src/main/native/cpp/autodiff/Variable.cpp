@@ -4,36 +4,100 @@
 
 #include "frc/autodiff/Variable.h"
 
-#include <algorithm>
 #include <cmath>
-#include <initializer_list>
-#include <queue>
-#include <tuple>
-#include <vector>
+
+#include <wpi/SymbolExports.h>
 
 #include "frc/autodiff/Tape.h"
 
 namespace frc::autodiff {
 
+namespace {
+
+/**
+ * Generates the given variable's gradient tree.
+ *
+ * @param variable Variable of which to compute the gradient.
+ * @param adjoint Variable adjoint of the given variable.
+ */
+void GenerateVariableAdjoints(Variable& var, Variable adjoint) {
+  auto& varExpr = var.GetExpression();
+  auto& lhs = varExpr.args[0];
+  auto& rhs = varExpr.args[1];
+
+  varExpr.adjointVar += adjoint;
+
+  if (lhs.index != -1) {
+    GenerateVariableAdjoints(lhs, adjoint * varExpr.gradientFuncs[0](lhs, rhs));
+
+    if (rhs.index != -1) {
+      GenerateVariableAdjoints(rhs,
+                               adjoint * varExpr.gradientFuncs[1](lhs, rhs));
+    }
+  }
+}
+
+/**
+ * Returns the given variable's gradient tree.
+ *
+ * @param variable Variable of which to compute the gradient.
+ * @param wrt Variables with respect to which to compute the gradient.
+ */
+VectorXvar GenerateVariableAdjoints(Variable& var, VectorXvar& wrt) {
+  for (int row = 0; row < wrt.rows(); ++row) {
+    wrt(row).GetExpression().adjointVar = Constant(0.0);
+  }
+
+  Variable adj = Constant(1.0);
+  GenerateVariableAdjoints(var, adj);
+
+  VectorXvar grad{wrt.rows()};
+  for (int row = 0; row < wrt.rows(); ++row) {
+    grad(row) = wrt(row).GetExpression().adjointVar;
+  }
+
+  return grad;
+}
+
+/**
+ * Accumulates the adjoints for the given variable.
+ *
+ * @param variable Variable of which to compute the gradient.
+ * @param adjoint Variable adjoint of the given variable.
+ */
+void GenerateDoubleAdjoints(Variable& var, double adjoint) {
+  auto& varExpr = var.GetExpression();
+  auto& lhs = varExpr.args[0];
+  auto& rhs = varExpr.args[1];
+
+  varExpr.adjoint += adjoint;
+
+  if (lhs.index != -1) {
+    GenerateDoubleAdjoints(
+        lhs, adjoint * varExpr.gradientValueFuncs[0](lhs.Value(), rhs.Value()));
+
+    if (rhs.index != -1) {
+      GenerateDoubleAdjoints(rhs, adjoint * varExpr.gradientValueFuncs[1](
+                                                lhs.Value(), rhs.Value()));
+    }
+  }
+}
+
+}  // namespace
+
 Variable::Variable(double value) {
-  *this = Tape::GetTape().PushNullary(
-      value, [](double, double) { return 1.0; },
-      [](const Variable&, const Variable&) { return Constant(1.0); });
+  *this = Tape::GetTape().PushNullary(value);
 }
 
 Variable::Variable(int value) {
-  *this = Tape::GetTape().PushNullary(
-      value, [](double, double) { return 1.0; },
-      [](const Variable&, const Variable&) { return Constant(1.0); });
+  *this = Tape::GetTape().PushNullary(value);
 }
 
 Variable::Variable(int index, const PrivateInit&) : index{index} {}
 
 Variable& Variable::operator=(double value) {
   if (index == -1) {
-    *this = Tape::GetTape().PushNullary(
-        value, [](double, double) { return 1.0; },
-        [](const Variable&, const Variable&) { return Constant(1.0); });
+    *this = Tape::GetTape().PushNullary(value);
   } else {
     GetExpression().value = value;
   }
@@ -42,9 +106,7 @@ Variable& Variable::operator=(double value) {
 
 Variable& Variable::operator=(int value) {
   if (index == -1) {
-    *this = Tape::GetTape().PushNullary(
-        value, [](double, double) { return 1.0; },
-        [](const Variable&, const Variable&) { return Constant(1.0); });
+    *this = Tape::GetTape().PushNullary(value);
   } else {
     GetExpression().value = value;
   }
@@ -60,13 +122,12 @@ WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, const Variable& rhs) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushBinary(
+  return Tape::GetTape().PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs * rhs; },
       [](double lhs, double rhs) { return rhs; },
       [](const Variable& lhs, const Variable& rhs) { return rhs; },
       [](double lhs, double rhs) { return lhs; },
-      [](const Variable& lhs, const Variable& rhs) { return lhs; })};
+      [](const Variable& lhs, const Variable& rhs) { return lhs; });
 }
 
 Variable& Variable::operator*=(double rhs) {
@@ -88,15 +149,14 @@ WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, const Variable& rhs) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushBinary(
+  return Tape::GetTape().PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs / rhs; },
       [](double lhs, double rhs) { return 1.0 / rhs; },
       [](const Variable& lhs, const Variable& rhs) { return 1.0 / rhs; },
       [](double lhs, double rhs) { return -lhs / (rhs * rhs); },
       [](const Variable& lhs, const Variable& rhs) {
         return -lhs / (rhs * rhs);
-      })};
+      });
 }
 
 Variable& Variable::operator/=(double rhs) {
@@ -118,13 +178,12 @@ WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, const Variable& rhs) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushBinary(
+  return Tape::GetTape().PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs + rhs; },
-      [](double, double) { return 1.0; },
-      [](const Variable&, const Variable&) { return Constant(1.0); },
-      [](double, double) { return 1.0; },
-      [](const Variable&, const Variable&) { return Constant(1.0); })};
+      [](double lhs, double rhs) { return 1.0; },
+      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); },
+      [](double lhs, double rhs) { return 1.0; },
+      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); });
 }
 
 Variable& Variable::operator+=(double rhs) {
@@ -146,13 +205,12 @@ WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, const Variable& rhs) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushBinary(
+  return Tape::GetTape().PushBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs - rhs; },
-      [](double, double) { return 1.0; },
-      [](const Variable&, const Variable&) { return Constant(1.0); },
-      [](double, double) { return -1.0; },
-      [](const Variable&, const Variable&) { return Constant(-1.0); })};
+      [](double lhs, double rhs) { return 1.0; },
+      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); },
+      [](double lhs, double rhs) { return -1.0; },
+      [](const Variable& lhs, const Variable& rhs) { return Constant(-1.0); });
 }
 
 Variable& Variable::operator-=(double rhs) {
@@ -166,19 +224,17 @@ Variable& Variable::operator-=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Tape::GetTape().PushUnary(
       lhs, [](double lhs, double) { return -lhs; },
-      [](double, double) { return -1.0; },
-      [](const Variable&, const Variable&) { return Constant(-1.0); })};
+      [](double lhs, double rhs) { return -1.0; },
+      [](const Variable& lhs, const Variable& rhs) { return Constant(-1.0); });
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
-      lhs, [](double lhs, double) { return +lhs; },
-      [](double, double) { return 1.0; },
-      [](const Variable&, const Variable&) { return Constant(1.0); })};
+  return Tape::GetTape().PushUnary(
+      lhs, [](double lhs, double) { return lhs; },
+      [](double lhs, double rhs) { return 1.0; },
+      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); });
 }
 
 WPILIB_DLLEXPORT bool operator==(double lhs, const Variable& rhs) {
@@ -261,14 +317,6 @@ double Variable::Value() const {
   }
 }
 
-double Variable::GradientValue(int arg) const {
-  return GetExpression().GradientValue(arg);
-}
-
-Variable Variable::Gradient(int arg) const {
-  return GetExpression().Gradient(arg);
-}
-
 void Variable::Update() {
   GetExpression().Update();
 }
@@ -281,133 +329,24 @@ Expression& Variable::GetExpression() {
   return Tape::GetTape()[index];
 }
 
-namespace {
-/**
- * Returns a breadth-first search list of tape nodes.
- *
- * The parent is the first node in the list and followed by its children in a
- * breadth-first fashion. Duplicates are filtered out.
- *
- * @param tape Tape of nodes to enumerate.
- * @param root Starting tape node.
- * @param earliestNode Ending tape node. If a multivariate gradient is being
- *                     computed, this should be the expression tree leaf node
- *                     with the smallest index.
- */
-std::vector<int> GenerateBFSList(const Tape& tape, Variable& root,
-                                 Variable& earliestNode) {
-  std::vector<int> l;
-  std::queue<int> q;
-
-  l.push_back(root.index);
-  q.push(root.index);
-  while (!q.empty()) {
-    auto& parent = tape[q.front()];
-    q.pop();
-
-    for (int child = 0; child < Expression::kNumArgs; ++child) {
-      auto& childNode = parent.args[child];
-
-      // If child isn't a real node, ignore it
-      if (childNode.index == -1) {
-        continue;
-      }
-
-      // If child node is before earliest node, ignore it
-      if (childNode.index < earliestNode.index) {
-        continue;
-      }
-
-      // Push child if it's not a duplicate
-      if (std::find(l.begin(), l.end(), childNode.index) == l.end()) {
-        l.push_back(childNode.index);
-        q.push(childNode.index);
-      }
-    }
-  }
-
-  return l;
-}
-}  // namespace
-
-WPILIB_DLLEXPORT Variable Constant(double value) {
-  return Tape::GetTape().PushNullary(
-      value, [](double, double) { return 0.0; },
-      [](const Variable&, const Variable&) { return Constant(0.0); });
+Variable Constant(double value) {
+  return Tape::GetTape().PushNullary(value);
 }
 
-double Gradient(Variable variable, Variable& wrt) {
-  // Based on algorithm 2 of "A new framework for the computation of Hessians"
-  // https://arxiv.org/pdf/2007.15040.pdf
-
-  auto& tape = Tape::GetTape();
-  int tapeSize = tape.Size();
-
-  std::vector<int> tapeIndices = GenerateBFSList(tape, variable, wrt);
-  int tapeIndicesSize = static_cast<int>(tapeIndices.size());
-
-  // wrt might not be in tape, so zero its adjoints separately
+double Gradient(Variable var, Variable& wrt) {
   wrt.GetExpression().adjoint = 0.0;
-
-  tape[tapeIndices[0]].adjoint = 1.0;
-  for (int i = 1; i < tapeIndicesSize; ++i) {
-    tape[tapeIndices[i]].adjoint = 0.0;
-  }
-
-  for (int parent : tapeIndices) {
-    for (int child = 0; child < Expression::kNumArgs; ++child) {
-      if (tape[parent].args[child].index != -1) {
-        // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
-        tape[parent].args[child].GetExpression().adjoint +=
-            tape[parent].adjoint * tape[parent].GradientValue(child);
-      }
-    }
-  }
-
-  tape.Resize(tapeSize);
+  GenerateDoubleAdjoints(var, 1.0);
 
   return wrt.GetExpression().adjoint;
 }
 
-Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt) {
-  // Based on algorithm 2 of "A new framework for the computation of Hessians"
-  // https://arxiv.org/pdf/2007.15040.pdf
-
-  auto& tape = Tape::GetTape();
-  int tapeSize = tape.Size();
-
-  Variable& minIndexWrtVariable = *std::min_element(
-      wrt.begin(), wrt.end(),
-      [](const auto& i, const auto& j) { return i.index < j.index; });
-
-  std::vector<int> tapeIndices =
-      GenerateBFSList(tape, variable, minIndexWrtVariable);
-  int tapeIndicesSize = static_cast<int>(tapeIndices.size());
-
-  // wrt might not be in tape, so zero its adjoints separately
+Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
   for (int row = 0; row < wrt.rows(); ++row) {
     wrt(row).GetExpression().adjoint = 0.0;
   }
+  GenerateDoubleAdjoints(var, 1.0);
 
-  tape[tapeIndices[0]].adjoint = 1.0;
-  for (int i = 1; i < tapeIndicesSize; ++i) {
-    tape[tapeIndices[i]].adjoint = 0.0;
-  }
-
-  for (int parent : tapeIndices) {
-    for (int child = 0; child < Expression::kNumArgs; ++child) {
-      if (tape[parent].args[child].index != -1) {
-        // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
-        tape[parent].args[child].GetExpression().adjoint +=
-            tape[parent].adjoint * tape[parent].GradientValue(child);
-      }
-    }
-  }
-
-  tape.Resize(tapeSize);
-
-  // Select elements of gradient in wrt
-  Eigen::VectorXd grad{wrt.rows(), 1};
+  Eigen::VectorXd grad{wrt.rows()};
   for (int row = 0; row < wrt.rows(); ++row) {
     grad(row) = wrt(row).GetExpression().adjoint;
   }
@@ -432,152 +371,24 @@ Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
   return J;
 }
 
-Eigen::SparseMatrix<double> Hessian(Variable variable, VectorXvar& wrt) {
-  // Based on algorithm 4 of "A new framework for the computation of Hessians"
-  // https://arxiv.org/pdf/2007.15040.pdf
+Eigen::SparseMatrix<double> Hessian(Variable& variable, VectorXvar& wrt) {
+  int tapeSize = Tape::GetTape().Size();
 
-  auto& tape = Tape::GetTape();
-  int tapeSize = tape.Size();
-
-  Variable& minIndexWrtVariable = *std::min_element(
-      wrt.begin(), wrt.end(),
-      [](const auto& i, const auto& j) { return i.index < j.index; });
-
-  std::vector<int> tapeIndices =
-      GenerateBFSList(tape, variable, minIndexWrtVariable);
-  int tapeIndicesSize = static_cast<int>(tapeIndices.size());
-
-  // wrt might not be in tape, so zero its adjoints separately
-  for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetExpression().adjoint = 0.0;
-  }
-
-  tape[tapeIndices[0]].adjoint = 1.0;
-  for (int i = 1; i < tapeIndicesSize; ++i) {
-    tape[tapeIndices[i]].adjoint = 0.0;
-  }
-
-  Eigen::SparseMatrix<double> W{tape.Size(), tape.Size()};
-
-  auto GetW = [&W](int row, int col) -> double {
-    return W.coeff(std::max(row, col), std::min(row, col));
-  };
-
-  auto GetWRef = [&W](int row, int col) -> double& {
-    return W.coeffRef(std::max(row, col), std::min(row, col));
-  };
-
-  // for i from l to 1
-  for (int i : tapeIndices) {
-    // Pushing
-    // for each p such that p <= i and w_{pi} != 0
-    for (int p : tapeIndices) {
-      if (!(p <= i && GetW(p, i) != 0.0)) {
-        continue;
-      }
-
-      if (p != i) {
-        // for each j < i
-        for (int jArg = 0; jArg < Expression::kNumArgs; ++jArg) {
-          if (tape[i].args[jArg].index == -1) {
-            continue;
-          }
-
-          double grad = tape[i].GradientValue(jArg);
-          if (grad == 0.0) {
-            continue;
-          }
-
-          int j = tape[i].args[jArg].index;
-          if (j == p) {
-            // w_{pp} += 2∂ϕᵢ/∂vₚ w_{pi}
-            GetWRef(j, p) += 2.0 * grad * GetW(p, i);
-          } else {
-            // w_{jp} += ∂ϕᵢ/∂vⱼ w_{pi}
-            GetWRef(j, p) += grad * GetW(p, i);
-          }
-        }
-      } else {
-        for (auto [jArg, kArg] : std::initializer_list<std::tuple<int, int>>{
-                 {0, 0}, {0, 1}, {1, 0}, {1, 1}}) {
-          if (tape[i].args[jArg].index == -1 ||
-              tape[i].args[kArg].index == -1) {
-            continue;
-          }
-
-          double grad =
-              tape[i].GradientValue(kArg) * tape[i].GradientValue(jArg);
-          if (grad == 0.0) {
-            continue;
-          }
-
-          // w_{jk} += ∂ϕᵢ/∂vₖ ∂ϕᵢ/∂vⱼ w_{ii}
-          int j = tape[i].args[jArg].index;
-          int k = tape[i].args[kArg].index;
-          GetWRef(j, k) += grad * GetW(i, i);
-        }
-      }
-    }
-
-    // Creating
-    for (auto [jArg, kArg] : std::initializer_list<std::tuple<int, int>>{
-             {0, 0}, {0, 1}, {1, 0}, {1, 1}}) {
-      int k = tape[i].args[kArg].index;
-      if (k == -1) {
-        k = i;
-      }
-      auto grad_i_wrt_k = tape[i].Gradient(kArg);
-
-      int j = grad_i_wrt_k.GetExpression().args[jArg].index;
-      if (j == -1 || j >= tapeSize) {
-        j = k;
-      }
-
-      double grad2_i_wrt_kj = grad_i_wrt_k.GradientValue(jArg);
-      if (grad2_i_wrt_kj == 0.0) {
-        continue;
-      }
-
-      // w_{jk} += v̅ᵢ ∂²ϕᵢ/∂vₖ∂vⱼ
-      GetWRef(j, k) += tape[i].adjoint * grad2_i_wrt_kj;
-    }
-
-    // Adjoint
-    for (int jArg = 0; jArg < Expression::kNumArgs; ++jArg) {
-      // v̅ⱼ += v̅ᵢ ∂ϕᵢ/∂vⱼ
-      if (tape[i].args[jArg].index != -1) {
-        tape[i].args[jArg].GetExpression().adjoint +=
-            tape[i].adjoint * tape[i].GradientValue(jArg);
-      }
-    }
-  }
-
-  tape.Resize(tapeSize);
+  VectorXvar gradientTree = GenerateVariableAdjoints(variable, wrt);
 
   std::vector<Eigen::Triplet<double>> triplets;
-
-  Eigen::SparseMatrix<double> P{wrt.rows(), tape.Size()};
-  for (int row = 0; row < wrt.rows(); ++row) {
-    triplets.emplace_back(row, wrt(row).index, 1.0);
-  }
-  P.setFromTriplets(triplets.begin(), triplets.end());
-
-  W.makeCompressed();
-  Eigen::SparseMatrix<double> H = P * W * P.transpose();
-
-  // Make H symmetric by iterating over the lower triangular elements and
-  // copying them to the upper triangle
-  triplets.clear();
-  for (int k = 0; k < H.outerSize(); ++k) {
-    for (decltype(H)::InnerIterator it{H, k}; it; ++it) {
-      if (it.row() != it.col()) {
-        triplets.emplace_back(it.row(), it.col(), it.value() / 2.0);
-        triplets.emplace_back(it.col(), it.row(), it.value() / 2.0);
-      } else {
-        triplets.emplace_back(it.row(), it.col(), it.value());
+  for (int row = 0; row < gradientTree.rows(); ++row) {
+    Eigen::RowVectorXd g = Gradient(gradientTree(row), wrt).transpose();
+    for (int col = 0; col < g.cols(); ++col) {
+      if (g(col) != 0.0) {
+        triplets.emplace_back(row, col, g(col));
       }
     }
   }
+
+  Tape::GetTape().Resize(tapeSize);
+
+  Eigen::SparseMatrix<double> H{wrt.rows(), wrt.rows()};
   H.setFromTriplets(triplets.begin(), triplets.end());
 
   return H;

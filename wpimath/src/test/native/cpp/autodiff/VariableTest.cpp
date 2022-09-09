@@ -404,24 +404,6 @@ TEST(VariableTest, Gradient) {
             Gradient(frc::autodiff::erf(x), x));
 }
 
-TEST(VariableTest, GradientVarsAndConstants) {
-  frc::autodiff::Variable x1 = 3;
-  frc::autodiff::Variable y1 = 2 * x1;
-
-  EXPECT_DOUBLE_EQ(1.0, x1.Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, x1.Gradient(1).Value());
-  EXPECT_DOUBLE_EQ(3.0, y1.Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(2.0, y1.Gradient(1).Value());
-
-  frc::autodiff::Variable x2 = 3;
-  frc::autodiff::Variable y2 = 2 * x2;
-
-  EXPECT_DOUBLE_EQ(1.0, x2.Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, x2.Gradient(1).Value());
-  EXPECT_DOUBLE_EQ(3.0, y2.Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(2.0, y2.Gradient(1).Value());
-}
-
 TEST(VariableTest, Jacobian) {
   frc::autodiff::VectorXvar y{3, 1};
   Eigen::MatrixXd J;
@@ -498,19 +480,11 @@ TEST(VariableTest, HessianLinear) {
   frc::autodiff::Variable y = x(0);
 
   // dy/dx = 1
-  EXPECT_DOUBLE_EQ(1.0, y.Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Value());
   EXPECT_DOUBLE_EQ(1.0, Gradient(y, x(0)));
 
   // d²y/dx² = d/dx(x (rhs) + x (lhs))
   //         = 1 + 1
   //         = 2
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(1).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(1).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(0).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(0).Gradient(0).Value());
   Eigen::MatrixXd H = Hessian(y, x);
   EXPECT_DOUBLE_EQ(0.0, H(0, 0));
 }
@@ -525,19 +499,11 @@ TEST(VariableTest, HessianQuadratic) {
   // dy/dx = x (rhs) + x (lhs)
   //       = (3) + (3)
   //       = 6
-  EXPECT_DOUBLE_EQ(3.0, y.Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(3.0, y.Gradient(1).Value());
   EXPECT_DOUBLE_EQ(6.0, Gradient(y, x(0)));
 
   // d²y/dx² = d/dx(x (rhs) + x (lhs))
   //         = 1 + 1
   //         = 2
-  EXPECT_DOUBLE_EQ(1.0, y.Gradient(0).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(0).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(0).Gradient(1).Value());
-  EXPECT_DOUBLE_EQ(1.0, y.Gradient(1).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(0).Gradient(0).Value());
-  EXPECT_DOUBLE_EQ(0.0, y.Gradient(1).Gradient(1).Value());
   Eigen::MatrixXd H = Hessian(y, x);
   EXPECT_DOUBLE_EQ(2.0, H(0, 0));
 }

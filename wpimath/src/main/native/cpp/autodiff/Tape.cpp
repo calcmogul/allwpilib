@@ -11,25 +11,24 @@
 
 using namespace frc::autodiff;
 
-Variable Tape::PushNullary(double value, BinaryFuncDouble gradientValueFunc,
-                           BinaryFuncVar gradientFunc) {
-  m_expressions.emplace_back(value, std::move(gradientValueFunc),
-                             std::move(gradientFunc));
+Variable Tape::PushNullary(double value) {
+  m_expressions.emplace_back(
+      value, [](double, double) { return 0.0; },
+      std::array{BinaryFuncDouble{}, BinaryFuncDouble{}},
+      std::array{BinaryFuncVar{}, BinaryFuncVar{}},
+      std::array{Variable{}, Variable{}});
   return Variable{static_cast<int>(m_expressions.size() - 1),
                   Variable::PrivateInit{}};
 }
 
-Variable Tape::PushUnary(Variable arg, BinaryFuncDouble valueFunc,
-                         BinaryFuncDouble gradientValueFunc,
-                         BinaryFuncVar gradientFunc) {
+Variable Tape::PushUnary(Variable lhs, BinaryFuncDouble valueFunc,
+                         BinaryFuncDouble lhsGradientValueFunc,
+                         BinaryFuncVar lhsGradientFunc) {
   m_expressions.emplace_back(
-      std::array<Variable, Expression::kNumArgs>{arg, Variable{}},
-      std::move(valueFunc),
-      std::array<BinaryFuncDouble, Expression::kNumArgs>{
-          std::move(gradientValueFunc), [](double, double) { return 0.0; }},
-      std::array<BinaryFuncVar, Expression::kNumArgs>{
-          std::move(gradientFunc),
-          [](const Variable&, const Variable&) { return Constant(0.0); }});
+      valueFunc(lhs.Value(), 0.0), valueFunc,
+      std::array{lhsGradientValueFunc, BinaryFuncDouble{}},
+      std::array{lhsGradientFunc, BinaryFuncVar{}},
+      std::array{lhs, Variable{}});
   return Variable{static_cast<int>(m_expressions.size() - 1),
                   Variable::PrivateInit{}};
 }
@@ -41,12 +40,9 @@ Variable Tape::PushBinary(Variable lhs, Variable rhs,
                           BinaryFuncDouble rhsGradientValueFunc,
                           BinaryFuncVar rhsGradientFunc) {
   m_expressions.emplace_back(
-      std::array<Variable, Expression::kNumArgs>{lhs, rhs},
-      std::move(valueFunc),
-      std::array<BinaryFuncDouble, Expression::kNumArgs>{
-          std::move(lhsGradientValueFunc), std::move(rhsGradientValueFunc)},
-      std::array<BinaryFuncVar, Expression::kNumArgs>{
-          std::move(lhsGradientFunc), std::move(rhsGradientFunc)});
+      valueFunc(lhs.Value(), rhs.Value()), valueFunc,
+      std::array{lhsGradientValueFunc, rhsGradientValueFunc},
+      std::array{lhsGradientFunc, rhsGradientFunc}, std::array{lhs, rhs});
   return Variable{static_cast<int>(m_expressions.size() - 1),
                   Variable::PrivateInit{}};
 }

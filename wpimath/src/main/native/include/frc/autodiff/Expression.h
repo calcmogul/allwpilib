@@ -22,6 +22,8 @@ struct WPILIB_DLLEXPORT Expression {
 
   double adjoint = 0.0;
 
+  Variable adjointVar;
+
   // Indices of dependent nodes (function arguments)
   std::array<Variable, kNumArgs> args{Variable{}, Variable{}};
 
@@ -46,16 +48,6 @@ struct WPILIB_DLLEXPORT Expression {
   Expression& operator=(Expression&&) = default;
 
   /**
-   * Constructs a node with the given value.
-   *
-   * @param value The variable's value.
-   * @param gradientValueFunc Gradient with respect to the variable.
-   * @param gradientFunc Gradient with respect to the variable.
-   */
-  Expression(double value, BinaryFuncDouble gradientValueFunc,
-             BinaryFuncVar gradientFunc);
-
-  /**
    * Constructs a node with the given gradients, argument indices, and function
    * pointer to a binary operator between them.
    *
@@ -64,9 +56,10 @@ struct WPILIB_DLLEXPORT Expression {
    * @param gradientValueFuncs Gradients with respect to each operand.
    * @param gradientFuncs Gradients with respect to each operand.
    */
-  Expression(std::array<Variable, kNumArgs> args, BinaryFuncDouble valueFunc,
+  Expression(double value, BinaryFuncDouble valueFunc,
              std::array<BinaryFuncDouble, kNumArgs> gradientValueFuncs,
-             std::array<BinaryFuncVar, kNumArgs> gradientFuncs);
+             std::array<BinaryFuncVar, kNumArgs> gradientFuncs,
+             std::array<Variable, kNumArgs> args);
 
   /**
    * Returns gradient with respect to the given argument index.
@@ -80,7 +73,7 @@ struct WPILIB_DLLEXPORT Expression {
    *
    * @param arg The argument index (0 to kNumArgs - 1).
    */
-  Variable Gradient(int arg) const;
+  void GradientVar(Variable var, Variable adjoint) const;
 
   /**
    * Update the value of this node based on the values of its dependent
