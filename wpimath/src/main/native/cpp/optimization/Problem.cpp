@@ -411,9 +411,6 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
       Eigen::SparseMatrix<double> H = autodiff::Hessian(L, m_leaves);
 
-      // TODO: Write tests to ensure Regularize() works
-      // Regularize(H);
-
       //         [∇ᵀcₑ₁(x)ₖ]
       // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
       //         [    ⋮    ]
@@ -440,8 +437,10 @@ Eigen::VectorXd Problem::InteriorPoint(
       lhs.topRows(lhsTop.rows()) = lhsTop;
       lhs.bottomRows(lhsBottom.rows()) = lhsBottom;
 
-      // rhs = [∇f − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
-      //       [               cₑ               ]
+      // rhs = −[∇f − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
+      //        [               cₑ               ]
+      //
+      // The outer negative sign is applied in the solve() call.
       Eigen::VectorXd c_e{m_equalityConstraints.rows()};
       for (int row = 0; row < m_equalityConstraints.rows(); row++) {
         c_e[row] = m_equalityConstraints(row).Value();
@@ -455,6 +454,15 @@ Eigen::VectorXd Problem::InteriorPoint(
           Gradient(m_f.value(), m_leaves) - A_e.transpose() * y +
           A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
       rhs.bottomRows(y.rows()) = c_e;
+
+      // Regularize lhs by adding a multiple of the identity matrix
+      // TODO: Use LDLT regularization instead? Needs tests.
+      // Regularize(lhs);
+      Eigen::SparseMatrix<double, Eigen::RowMajor> regularization{lhs.rows(),
+                                                                  lhs.cols()};
+      regularization.setIdentity();
+      regularization *= 1e-9;
+      lhs += regularization;
 
       // Solve the Newton-KKT system
       Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
