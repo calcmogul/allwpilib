@@ -14,27 +14,27 @@ namespace frc::autodiff {
 
 namespace {
 
-// In reverse accumulation AD, the dependent variable to be differentiated is fixed
-// and the derivative is computed with respect to each sub-expression recursively.
-// In a pen-and-paper calculation, the derivative of the outer functions is
-// repeatedly substituted in the chain rule:
+// In reverse accumulation AD, the dependent variable to be differentiated is
+// fixed and the derivative is computed with respect to each sub-expression
+// recursively. In a pen-and-paper calculation, the derivative of the outer
+// functions is repeatedly substituted in the chain rule:
 //
 // (∂y/∂x) = (∂y/∂w₁) * (∂w₁/∂x) = ((∂y/∂w₂) * (∂w₂/∂w₁)) * (∂w₁/∂x) = ...
 //
 // In reverse accumulation, the quantity of interest is the adjoint,
-// denoted with a bar (w̄); it is a derivative of a chosen dependent variable with
-// respect to a subexpression w: ∂y/∂w.
+// denoted with a bar (w̄); it is a derivative of a chosen dependent variable
+// with respect to a subexpression w: ∂y/∂w.
 //
-// Given the expression f(x₁, x₂) = sin(x₁) + x₁x₂, the computational graph is:
+// Given the expression f(x₁,x₂)=sin(x₁) + x₁x₂, the computational graph is:
 //
-//                 f(x₁, x₂)
-//                     |
-//                     w₅     w₅ = w₄ + w₃
-//                    /  \
-//                   /    \
-//  w₄ = sin(w₁)    w₄     w₃    w₃ = w₁w₂
-//                  |   /  |
-//      w₁ = x₁     w₁     w₂    w₂ = x₃
+//                f(x₁,x₂)
+//                   |
+//                   w₅     w₅=w₄+w₃
+//                  /  \
+//                 /    \
+//  w₄=sin(w₁)    w₄     w₃    w₃=w₁w₂
+//                |   /  |
+//      w₁=x₁     w₁     w₂    w₂=x₃
 //
 // The operations to compute the derivative:
 //
