@@ -471,6 +471,19 @@ TEST(VariableTest, Jacobian) {
   EXPECT_DOUBLE_EQ(3.0, J(2, 0));
   EXPECT_DOUBLE_EQ(0.0, J(2, 1));
   EXPECT_DOUBLE_EQ(1.0, J(2, 2));
+
+  // z = [x₁ + 3x₂ − 5x₃]
+  //
+  // dz/dx = [1  3  −5]
+  frc::autodiff::VectorXvar z{1, 1};
+  z(0) = x(0) + 3 * x(1) - 5 * x(2);
+  J = Jacobian(z, x);
+
+  EXPECT_EQ(1, J.rows());
+  EXPECT_EQ(3, J.cols());
+  EXPECT_DOUBLE_EQ(1.0, J(0, 0));
+  EXPECT_DOUBLE_EQ(3.0, J(0, 1));
+  EXPECT_DOUBLE_EQ(-5.0, J(0, 2));
 }
 
 TEST(VariableTest, HessianLinear) {
