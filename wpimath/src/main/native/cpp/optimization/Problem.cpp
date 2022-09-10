@@ -483,8 +483,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       // pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
       Eigen::VectorXd p_s = (mu * inverseZ * e - s - inverseSigma * p_z);
 
-      // αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
-      double alpha_max = FractionToTheBoundaryRule(x, p_x, tau);
+      // αₖᵐᵃˣ = max{α ∈ (0, 1] : sₖ + αpₖˢ ≥ (1−τⱼ)sₖ}
+      double alpha_max = FractionToTheBoundaryRule(s, p_s, tau);
 
       // αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
       double alpha_z = FractionToTheBoundaryRule(z, p_z, tau);
