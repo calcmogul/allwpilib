@@ -140,20 +140,6 @@ class WPILIB_DLLEXPORT Variable {
   double Value() const;
 
   /**
-   * Returns gradient with respect to the given argument index.
-   *
-   * @param arg The argument index (0 to kNumDeps - 1).
-   */
-  double GradientValue(int arg) const;
-
-  /**
-   * Returns gradient with respect to the given argument index.
-   *
-   * @param arg The argument index (0 to kNumDeps - 1).
-   */
-  Variable Gradient(int arg) const;
-
-  /**
    * Update the value of this variable based on the values of its dependent
    * variables.
    */
@@ -167,26 +153,26 @@ class WPILIB_DLLEXPORT Variable {
   friend class WPILIB_DLLEXPORT Tape;
 };
 
+using VectorXvar = Eigen::Vector<frc::autodiff::Variable, Eigen::Dynamic>;
+
 /**
  * Create a Variable from a constant that has a derivative of zero.
  */
 WPILIB_DLLEXPORT Variable Constant(double value);
 
-using VectorXvar = Eigen::Vector<frc::autodiff::Variable, Eigen::Dynamic>;
-
 /**
  * Returns gradient of a variable with respect to the given variable.
  *
- * @param variable Variable of which to compute gradient.
+ * @param variable Variable of which to compute the gradient.
  * @param wrt Variable with respect to which to compute the gradient.
  */
 WPILIB_DLLEXPORT double Gradient(Variable variable, Variable& wrt);
 
 /**
- * Returns gradient of a variable with respect to the given vector.
+ * Returns gradient of a variable with respect to the given variable.
  *
  * @param variable Variable of which to compute the gradient.
- * @param wrt Vector with respect to which to compute the gradient.
+ * @param wrt Variables with respect to which to compute the gradient.
  */
 WPILIB_DLLEXPORT Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt);
 
@@ -205,7 +191,7 @@ WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables,
  * @param variable Variable of which to compute the Hessian.
  * @param wrt Vector with respect to which to compute the Hessian.
  */
-WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Hessian(Variable variable,
+WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Hessian(Variable& variable,
                                                      VectorXvar& wrt);
 
 /**

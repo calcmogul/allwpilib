@@ -19,23 +19,19 @@ class WPILIB_DLLEXPORT Tape {
    * Pushes a new expression with no arguments and returns its location.
    *
    * @param value The expression value.
-   * @param gradientValueFunc Gradient with respect to variable.
-   * @param gradientFunc Gradient with respect to variable.
    */
-  Variable PushNullary(double value, BinaryFuncDouble gradientValueFunc,
-                       BinaryFuncVar gradientFunc);
+  Variable PushNullary(double value);
 
   /**
    * Pushes a new expression with one argument and returns its location.
    *
-   * @param arg Unary operator's operand.
-   * @param valueFunc Unary operator that produces this expression's value.
-   * @param gradientValueFunc Gradient with respect to operand.
-   * @param gradientFunc Gradient with respect to operand.
+   * @param lhs Unary operator's operand.
+   * @param lhsGradientValueFunc Gradient with respect to the operand.
+   * @param gradientFunc Gradient with respect to the operand.
    */
-  Variable PushUnary(Variable arg, BinaryFuncDouble valueFunc,
-                     BinaryFuncDouble gradientValueFunc,
-                     BinaryFuncVar gradientFunc);
+  Variable PushUnary(Variable lhs, BinaryFuncDouble valueFunc,
+                     BinaryFuncDouble lhsGradientValueFunc,
+                     BinaryFuncVar lhsGradientFunc);
 
   /**
    * Pushes a new expression with two arguments and returns its location.
@@ -43,10 +39,10 @@ class WPILIB_DLLEXPORT Tape {
    * @param lhs Binary operator's left operand.
    * @param rhs Binary operator's right operand.
    * @param valueFunc Binary operator that produces this expression's value.
-   * @param lhsGradientValueFunc Gradient with respect to left operand.
-   * @param lhsGradientFunc Gradient with respect to left operand.
-   * @param rhsGradientValueFunc Gradient with respect to right operand.
-   * @param rhsGradientFunc Gradient with respect to right operand.
+   * @param lhsGradientValueFunc Gradient with respect to the left operand.
+   * @param lhsGradientFunc Gradient with respect to the left operand.
+   * @param rhsGradientValueFunc Gradient with respect to the right operand.
+   * @param rhsGradientFunc Gradient with respect to the right operand.
    */
   Variable PushBinary(Variable lhs, Variable rhs, BinaryFuncDouble valueFunc,
                       BinaryFuncDouble lhsGradientValueFunc,

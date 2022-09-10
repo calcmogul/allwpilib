@@ -19,9 +19,9 @@ Problem::Problem(ProblemType problemType) : m_problemType{problemType} {}
 
 VariableMatrix Problem::DecisionVariable(int rows, int cols) {
   VariableMatrix vars{rows, cols};
-
   int oldSize = m_leaves.rows();
-  m_leaves.resize(oldSize + rows * cols);
+
+  GrowAutodiffVector(m_leaves, rows * cols);
 
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < cols; ++col) {
@@ -55,16 +55,7 @@ void Problem::SubjectTo(EqualityConstraints&& constraint) {
   int oldSize = m_equalityConstraints.rows();
   auto& storage = constraint.constraints;
 
-  // We move the autodiff variables into a temporary during the resize, then
-  // back, because resize() makes all the gradients it contains always return
-  // zero after that
-  autodiff::VectorXvar newConstraintStorage{
-      m_equalityConstraints.rows() + storage.size(), 1};
-  for (int row = 0; row < m_equalityConstraints.rows(); ++row) {
-    newConstraintStorage(row) = std::move(m_equalityConstraints(row));
-  }
-  m_equalityConstraints.resize(m_equalityConstraints.rows() + storage.size());
-  m_equalityConstraints = std::move(newConstraintStorage);
+  GrowAutodiffVector(m_equalityConstraints, storage.size());
 
   for (size_t i = 0; i < storage.size(); ++i) {
     m_equalityConstraints(oldSize + i) = std::move(storage[i]);
@@ -75,31 +66,21 @@ void Problem::SubjectTo(InequalityConstraints&& constraint) {
   int oldSize = m_inequalityConstraints.rows();
   auto& storage = constraint.constraints;
 
-  // We move the autodiff variables into a temporary during the resize, then
-  // back, because resize() makes all the gradients it contains always return
-  // zero after that
-  autodiff::VectorXvar newConstraintStorage{
-      m_inequalityConstraints.rows() + storage.size(), 1};
-  for (int row = 0; row < m_inequalityConstraints.rows(); ++row) {
-    newConstraintStorage(row) = std::move(m_inequalityConstraints(row));
-  }
-  m_inequalityConstraints.resize(m_inequalityConstraints.rows() +
-                                 storage.size());
-  m_inequalityConstraints = std::move(newConstraintStorage);
+  GrowAutodiffVector(m_inequalityConstraints, storage.size());
 
   for (size_t i = 0; i < storage.size(); ++i) {
     m_inequalityConstraints(oldSize + i) = std::move(storage[i]);
   }
 }
 
-void Problem::Solve(double tolerance, int maxIterations) {
+Problem::SolverStatus Problem::Solve(double tolerance, int maxIterations) {
   m_tolerance = tolerance;
   m_maxIterations = maxIterations;
 
   if (!m_f.has_value() && m_equalityConstraints.rows() == 0 &&
       m_inequalityConstraints.rows() == 0) {
     // If there's no cost function or constraints, do nothing
-    return;
+    return Problem::SolverStatus::kOk;
   } else if (!m_f.has_value()) {
     // If there's no cost function, make it zero and continue
     m_f = 0.0;
@@ -113,17 +94,32 @@ void Problem::Solve(double tolerance, int maxIterations) {
 
   // Solve the optimization problem
   Eigen::VectorXd solution;
+  SolverStatus status = SolverStatus::kOk;
   if (m_problemType == ProblemType::kLinear) {
-    solution = InteriorPoint(x);
+    solution = InteriorPoint(x, &status);
   } else if (m_problemType == ProblemType::kQuadratic) {
     // TODO: Use OSQP?
-    solution = InteriorPoint(x);
+    solution = InteriorPoint(x, &status);
   } else if (m_problemType == ProblemType::kNonlinear) {
-    solution = InteriorPoint(x);
+    solution = InteriorPoint(x, &status);
   }
 
   // Assign solution to the original Variable instances
   SetAD(m_leaves, solution);
+
+  return status;
+}
+
+void Problem::GrowAutodiffVector(autodiff::VectorXvar& v, int growth) {
+  // We move the autodiff variables into a temporary during the resize, then
+  // back, because resize() makes all the gradients it contains always return
+  // zero after that
+  autodiff::VectorXvar newStorage{v.rows() + growth, 1};
+  for (int row = 0; row < v.rows(); ++row) {
+    newStorage(row) = std::move(v(row));
+  }
+  v.resize(v.rows() + growth);
+  v = std::move(newStorage);
 }
 
 void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
@@ -194,7 +190,8 @@ double Problem::f(const Eigen::Ref<const Eigen::VectorXd>& x) {
 }
 
 Eigen::VectorXd Problem::InteriorPoint(
-    const Eigen::Ref<const Eigen::VectorXd>& initialGuess) {
+    const Eigen::Ref<const Eigen::VectorXd>& initialGuess,
+    SolverStatus* status) {
   // Let f(x)ₖ be the cost function, cₑ(x)ₖ be the equality constraints, and
   // cᵢ(x)ₖ be the inequality constraints. The Lagrangian of the optimization
   // problem is
@@ -519,11 +516,13 @@ Eigen::VectorXd Problem::InteriorPoint(
                    s_max;
 
       // Update the error estimate. Based on equation (5) in [2].
+      // TODO: Recompute rhs with latest x, s, y, z to avoid an extra iteration
       E_mu = std::max(rhs.topRows(x.rows()).lpNorm<Eigen::Infinity>() / s_d,
                       c_e.lpNorm<Eigen::Infinity>());
 
       ++iterations;
       if (iterations == m_maxIterations) {
+        *status = SolverStatus::kMaxIterations;
         return x;
       }
     }
@@ -544,5 +543,6 @@ Eigen::VectorXd Problem::InteriorPoint(
     tau = std::max(tau_min, 1.0 - mu);
   }
 
+  *status = SolverStatus::kOk;
   return x;
 }

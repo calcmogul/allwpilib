@@ -149,6 +149,19 @@ class WPILIB_DLLEXPORT Problem {
   };
 
   /**
+   * Solver return status.
+   */
+  enum class SolverStatus {
+    /// The solver found a solution
+    kOk,
+    /// The solver returned a solution that was infeasible
+    kInfeasible,
+    /// The solver returned a solution after exceeding the maximum number of
+    /// iterations
+    kMaxIterations
+  };
+
+  /**
    * Construct the optimization problem.
    *
    * @param problemType The type of optimization problem to solve. Nonlinear is
@@ -232,7 +245,8 @@ class WPILIB_DLLEXPORT Problem {
    * @param maxIterations The maximum number of solver iterations before
    *                      returning a solution.
    */
-  void Solve(double tolerance = kTolerance, int maxIterations = kMaxIterations);
+  SolverStatus Solve(double tolerance = kTolerance,
+                     int maxIterations = kMaxIterations);
 
  private:
   // Leaves of the problem's expression tree
@@ -241,10 +255,10 @@ class WPILIB_DLLEXPORT Problem {
   // Cost function: f(x)
   std::optional<autodiff::Variable> m_f;
 
-  // Equality constraints: c_e(x) = 0
+  // Equality constraints: cₑ(x) = 0
   autodiff::VectorXvar m_equalityConstraints;
 
-  // Inequality constraints: c_i(x) ≥ 0
+  // Inequality constraints: cᵢ(x) ≥ 0
   autodiff::VectorXvar m_inequalityConstraints;
 
   // Problem type
@@ -255,6 +269,14 @@ class WPILIB_DLLEXPORT Problem {
 
   // Maximum number of solver iterations
   int m_maxIterations = kMaxIterations;
+
+  /**
+   * Grows an autodiff vector without breaking links to old autodiff variables.
+   *
+   * @param v Vector to grow.
+   * @param growth Amount by which to grow the vector.
+   */
+  static void GrowAutodiffVector(autodiff::VectorXvar& v, int growth);
 
   /**
    * Assigns the contents of a double vector to an autodiff vector.
@@ -308,10 +330,12 @@ class WPILIB_DLLEXPORT Problem {
   where f(x) is the cost function, cₑ(x) are the equality constraints, and cᵢ(x)
   are the inequality constraints.
 
-  @param initialGuess The initial guess.
+  @param[in] initialGuess The initial guess.
+  @param[out] status The solver status.
   */
   Eigen::VectorXd InteriorPoint(
-      const Eigen::Ref<const Eigen::VectorXd>& initialGuess);
+      const Eigen::Ref<const Eigen::VectorXd>& initialGuess,
+      SolverStatus* status);
 };
 
 }  // namespace frc
