@@ -315,7 +315,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   //     Springer, 2006.
   // [2] http://cepac.cheme.cmu.edu/pasilectures/biegler/ipopt.pdf
 
-  // TODO: Add problem infeasibility checks; throw exception?
+  // TODO: Add problem infeasibility checks; return SolverStatus::kInfeasible
 
   // Barrier parameter scale factor κ_μ for tolerance checks
   constexpr double kappa_epsilon = 0.1;
