@@ -174,8 +174,8 @@ double Problem::FractionToTheBoundaryRule(
   // αᵐᵃˣ = max{α ∈ (0, 1] : x + αp ≥ (1−τ)x}
   double alpha = 1;
   for (int i = 0; i < x.rows(); ++i) {
-    if (p[i] != 0) {
-      while (alpha * p[i] < -tau * x[i]) {
+    if (p(i) != 0.0) {
+      while (alpha * p(i) < -tau * x(i)) {
         alpha *= 0.999;
       }
     }
