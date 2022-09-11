@@ -69,8 +69,8 @@ VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
     s.pop();
 
     auto& varExpr = var.GetExpression();
-    auto& lhs = varExpr.args[0];
-    auto& rhs = varExpr.args[1];
+    Variable lhs = varExpr.args[0];
+    Variable rhs = varExpr.args[1];
 
     varExpr.adjointVar += adjoint;
 
@@ -352,8 +352,8 @@ double Gradient(Variable var, Variable& wrt) {
     s.pop();
 
     auto& varExpr = var.GetExpression();
-    auto& lhs = varExpr.args[0];
-    auto& rhs = varExpr.args[1];
+    Variable lhs = varExpr.args[0];
+    Variable rhs = varExpr.args[1];
 
     varExpr.adjoint += adjoint;
 
@@ -384,8 +384,8 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
     s.pop();
 
     auto& varExpr = var.GetExpression();
-    auto& lhs = varExpr.args[0];
-    auto& rhs = varExpr.args[1];
+    Variable lhs = varExpr.args[0];
+    Variable rhs = varExpr.args[1];
 
     varExpr.adjoint += adjoint;
 
@@ -453,8 +453,7 @@ Variable abs(double x) {
 }
 
 Variable abs(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::abs(x); },
       [](double x, double) {
         if (x < 0.0) {
@@ -481,8 +480,7 @@ Variable acos(double x) {
 }
 
 Variable acos(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::acos(x); },
       [](double x, double) { return -1.0 / std::sqrt(1.0 - x * x); },
       [](const Variable& x, const Variable&) {
@@ -495,8 +493,7 @@ Variable asin(double x) {
 }
 
 Variable asin(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::asin(x); },
       [](double x, double) { return 1.0 / std::sqrt(1.0 - x * x); },
       [](const Variable& x, const Variable&) {
@@ -509,8 +506,7 @@ Variable atan(double x) {
 }
 
 Variable atan(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::atan(x); },
       [](double x, double) { return 1.0 / (1.0 + x * x); },
       [](const Variable& x, const Variable&) { return 1.0 / (1.0 + x * x); })};
@@ -525,8 +521,7 @@ Variable atan2(const Variable& y, double x) {
 }
 
 Variable atan2(const Variable& y, const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushBinary(
+  return Variable{Tape::GetTape().PushBinary(
       y, x, [](double y, double x) { return std::atan2(y, x); },
       [](double y, double x) { return x / (y * y + x * x); },
       [](const Variable& y, const Variable& x) { return x / (y * y + x * x); },
@@ -541,8 +536,7 @@ Variable cos(double x) {
 }
 
 Variable cos(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::cos(x); },
       [](double x, double) { return -std::sin(x); },
       [](const Variable& x, const Variable&) { return -autodiff::sin(x); })};
@@ -553,8 +547,7 @@ Variable cosh(double x) {
 }
 
 Variable cosh(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::cosh(x); },
       [](double x, double) { return std::sinh(x); },
       [](const Variable& x, const Variable&) { return autodiff::sinh(x); })};
@@ -568,8 +561,7 @@ Variable erf(const Variable& x) {
   static constexpr double sqrt_pi =
       1.7724538509055160272981674833411451872554456638435L;
 
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::erf(x); },
       [](double x, double) { return 2.0 / sqrt_pi * std::exp(-x * x); },
       [](const Variable& x, const Variable&) {
@@ -582,8 +574,7 @@ Variable exp(double x) {
 }
 
 Variable exp(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::exp(x); },
       [](double x, double) { return std::exp(x); },
       [](const Variable& x, const Variable&) { return autodiff::exp(x); })};
@@ -598,8 +589,7 @@ Variable hypot(const Variable& x, double y) {
 }
 
 Variable hypot(const Variable& x, const Variable& y) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushBinary(
+  return Variable{Tape::GetTape().PushBinary(
       x, y, [](double x, double y) { return std::hypot(x, y); },
       [](double x, double y) { return x / std::hypot(x, y); },
       [](const Variable& x, const Variable& y) {
@@ -616,8 +606,7 @@ Variable log(double x) {
 }
 
 Variable log(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::log(x); },
       [](double x, double) { return 1.0 / x; },
       [](const Variable& x, const Variable&) { return 1.0 / x; })};
@@ -630,8 +619,7 @@ Variable log10(double x) {
 Variable log10(const Variable& x) {
   static constexpr double ln10 = 2.3025850929940456840179914546843L;
 
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::log10(x); },
       [](double x, double) { return 1.0 / (ln10 * x); },
       [](const Variable& x, const Variable&) { return 1.0 / (ln10 * x); })};
@@ -646,8 +634,7 @@ Variable pow(const Variable& base, double power) {
 }
 
 Variable pow(const Variable& base, const Variable& power) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushBinary(
+  return Variable{Tape::GetTape().PushBinary(
       base, power,
       [](double base, double power) { return std::pow(base, power); },
       [](double base, double power) {
@@ -679,8 +666,7 @@ Variable sin(double x) {
 }
 
 Variable sin(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::sin(x); },
       [](double x, double) { return std::cos(x); },
       [](const Variable& x, const Variable&) { return autodiff::cos(x); })};
@@ -691,8 +677,7 @@ Variable sinh(double x) {
 }
 
 Variable sinh(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::sinh(x); },
       [](double x, double) { return std::cosh(x); },
       [](const Variable& x, const Variable&) { return autodiff::cosh(x); })};
@@ -703,8 +688,7 @@ Variable sqrt(double x) {
 }
 
 Variable sqrt(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::sqrt(x); },
       [](double x, double) { return 1.0 / (2.0 * std::sqrt(x)); },
       [](const Variable& x, const Variable&) {
@@ -717,8 +701,7 @@ Variable tan(double x) {
 }
 
 Variable tan(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::tan(x); },
       [](double x, double) { return 1.0 / (std::cos(x) * std::cos(x)); },
       [](const Variable& x, const Variable&) {
@@ -731,8 +714,7 @@ Variable tanh(double x) {
 }
 
 Variable tanh(const Variable& x) {
-  auto& tape = Tape::GetTape();
-  return Variable{tape.PushUnary(
+  return Variable{Tape::GetTape().PushUnary(
       x, [](double x, double) { return std::tanh(x); },
       [](double x, double) { return 1.0 / (std::cosh(x) * std::cosh(x)); },
       [](const Variable& x, const Variable&) {
