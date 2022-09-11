@@ -327,7 +327,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   // TODO: Add problem infeasibility checks; return SolverStatus::kInfeasible
 
   // Barrier parameter scale factor κ_μ for tolerance checks
-  constexpr double kappa_epsilon = 0.1;
+  constexpr double kappa_epsilon = 10.0;
 
   // Barrier parameter scale factor κ_Σ for inequality constraint Lagrange
   // multiplier safeguard
@@ -337,11 +337,11 @@ Eigen::VectorXd Problem::InteriorPoint(
   constexpr double tau_min = 0.995;
 
   // Tuning parameters for μ update
-  constexpr double kappa_mu = 0.1;  // (0, 1)
+  constexpr double kappa_mu = 0.2;  // (0, 1)
   constexpr double theta_mu = 1.5;  // (1, 2)
 
   // Barrier parameter μ
-  double mu = 1;
+  double mu = 0.1;
 
   // Fraction-to-the-boundary rule scale factor τ
   double tau = tau_min;
