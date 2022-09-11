@@ -15,6 +15,15 @@
 
 using namespace frc;
 
+template <typename... Args>
+constexpr double Max(double a, double b, Args... args) {
+  if constexpr (sizeof...(Args) > 0) {
+    return Max(std::max(a, b), args...);
+  } else {
+    return std::max(a, b);
+  }
+}
+
 Problem::Problem(ProblemType problemType) : m_problemType{problemType} {}
 
 VariableMatrix Problem::DecisionVariable(int rows, int cols) {
@@ -481,7 +490,7 @@ Eigen::VectorXd Problem::InteriorPoint(
           -sigma * c_i + mu * inverseS * e - sigma * A_i * p_x;
 
       // pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
-      Eigen::VectorXd p_s = (mu * inverseZ * e - s - inverseSigma * p_z);
+      Eigen::VectorXd p_s = mu * inverseZ * e - s - inverseSigma * p_z;
 
       // αₖᵐᵃˣ = max{α ∈ (0, 1] : sₖ + αpₖˢ ≥ (1−τⱼ)sₖ}
       double alpha_max = FractionToTheBoundaryRule(s, p_s, tau);
@@ -523,10 +532,48 @@ Eigen::VectorXd Problem::InteriorPoint(
                                         m_inequalityConstraints.size())) /
                    s_max;
 
-      // Update the error estimate. Based on equation (5) in [2].
-      // TODO: Recompute rhs with latest x, s, y, z to avoid an extra iteration
-      E_mu = std::max(rhs.topRows(x.rows()).lpNorm<Eigen::Infinity>() / s_d,
-                      c_e.lpNorm<Eigen::Infinity>());
+      // s_c = max{sₘₐₓ, ||z||₁ / n} / sₘₐₓ
+      double s_c =
+          std::max(s_max, z.lpNorm<1>() / m_inequalityConstraints.size()) /
+          s_max;
+
+      // Update variables needed in error estimate
+      A_e = autodiff::Jacobian(m_equalityConstraints, m_leaves);
+      A_i = autodiff::Jacobian(m_inequalityConstraints, m_leaves);
+      for (int row = 0; row < m_equalityConstraints.rows(); row++) {
+        c_e[row] = m_equalityConstraints(row).Value();
+      }
+      for (int row = 0; row < m_inequalityConstraints.rows(); row++) {
+        c_i[row] = m_inequalityConstraints(row).Value();
+      }
+      triplets.clear();
+      for (int k = 0; k < s.rows(); k++) {
+        triplets.emplace_back(k, k, s[k]);
+      }
+      S.setFromTriplets(triplets.begin(), triplets.end());
+
+      // Update the error estimate using the KKT conditions from equations
+      // (19.5a) through (19.5d) in [1].
+      //
+      //   ∇f − Aₑᵀy − Aᵢᵀz = 0
+      //   Sz − μe = 0
+      //   cₑ = 0
+      //   cᵢ − s = 0
+      //
+      // The error tolerance is the max of the following infinity norms scaled
+      // by s_d and s_c (see equation (5) in [2]).
+      //
+      //   ||∇f − Aₑᵀy − Aᵢᵀz||_∞ / s_d
+      //   ||Sz − μe||_∞ / s_c
+      //   ||cₑ||_∞
+      //   ||cᵢ − s||_∞
+      E_mu = Max((Gradient(m_f.value(), m_leaves) - A_e.transpose() * y -
+                  A_i.transpose() * z)
+                         .lpNorm<Eigen::Infinity>() /
+                     s_d,
+                 (S * z - mu * e).lpNorm<Eigen::Infinity>() / s_c,
+                 c_e.lpNorm<Eigen::Infinity>(),
+                 (c_i - s).lpNorm<Eigen::Infinity>());
 
       ++iterations;
       if (iterations == m_maxIterations) {
