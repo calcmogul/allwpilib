@@ -56,7 +56,7 @@ namespace {
  * @param variable Variable of which to compute the gradient.
  * @param wrt Variables with respect to which to compute the gradient.
  */
-VectorXvar GenerateVariableAdjoints(Variable& var, VectorXvar& wrt) {
+VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
   for (int row = 0; row < wrt.rows(); ++row) {
     wrt(row).GetExpression().adjointVar = Constant(0.0);
   }
@@ -428,7 +428,7 @@ Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
 Eigen::SparseMatrix<double> Hessian(Variable& variable, VectorXvar& wrt) {
   int tapeSize = Tape::GetTape().Size();
 
-  VectorXvar gradientTree = GenerateVariableAdjoints(variable, wrt);
+  VectorXvar gradientTree = GenerateGradientTree(variable, wrt);
 
   std::vector<Eigen::Triplet<double>> triplets;
   for (int row = 0; row < gradientTree.rows(); ++row) {
