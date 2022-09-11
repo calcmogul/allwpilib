@@ -5,6 +5,8 @@
 #include "frc/autodiff/Variable.h"
 
 #include <cmath>
+#include <stack>
+#include <tuple>
 
 #include <wpi/SymbolExports.h>
 
@@ -49,29 +51,6 @@ namespace {
  */
 
 /**
- * Generates the given variable's gradient tree.
- *
- * @param variable Variable of which to compute the gradient.
- * @param adjoint Variable adjoint of the given variable.
- */
-void GenerateVariableAdjoints(Variable& var, Variable adjoint) {
-  auto& varExpr = var.GetExpression();
-  auto& lhs = varExpr.args[0];
-  auto& rhs = varExpr.args[1];
-
-  varExpr.adjointVar += adjoint;
-
-  if (lhs.index != -1) {
-    GenerateVariableAdjoints(lhs, adjoint * varExpr.gradientFuncs[0](lhs, rhs));
-
-    if (rhs.index != -1) {
-      GenerateVariableAdjoints(rhs,
-                               adjoint * varExpr.gradientFuncs[1](lhs, rhs));
-    }
-  }
-}
-
-/**
  * Returns the given variable's gradient tree.
  *
  * @param variable Variable of which to compute the gradient.
@@ -82,8 +61,27 @@ VectorXvar GenerateVariableAdjoints(Variable& var, VectorXvar& wrt) {
     wrt(row).GetExpression().adjointVar = Constant(0.0);
   }
 
-  Variable adj = Constant(1.0);
-  GenerateVariableAdjoints(var, adj);
+  // Stack element is variable and its adjoint
+  std::stack<std::tuple<Variable, Variable>> s;
+  s.emplace(var, Constant(1.0));
+  while (!s.empty()) {
+    auto [var, adjoint] = s.top();
+    s.pop();
+
+    auto& varExpr = var.GetExpression();
+    auto& lhs = varExpr.args[0];
+    auto& rhs = varExpr.args[1];
+
+    varExpr.adjointVar += adjoint;
+
+    if (lhs.index != -1) {
+      s.emplace(lhs, adjoint * varExpr.gradientFuncs[0](lhs, rhs));
+
+      if (rhs.index != -1) {
+        s.emplace(rhs, adjoint * varExpr.gradientFuncs[1](lhs, rhs));
+      }
+    }
+  }
 
   VectorXvar grad{wrt.rows()};
   for (int row = 0; row < wrt.rows(); ++row) {
@@ -91,30 +89,6 @@ VectorXvar GenerateVariableAdjoints(Variable& var, VectorXvar& wrt) {
   }
 
   return grad;
-}
-
-/**
- * Accumulates the adjoints for the given variable.
- *
- * @param variable Variable of which to compute the gradient.
- * @param adjoint Variable adjoint of the given variable.
- */
-void GenerateDoubleAdjoints(Variable& var, double adjoint) {
-  auto& varExpr = var.GetExpression();
-  auto& lhs = varExpr.args[0];
-  auto& rhs = varExpr.args[1];
-
-  varExpr.adjoint += adjoint;
-
-  if (lhs.index != -1) {
-    GenerateDoubleAdjoints(
-        lhs, adjoint * varExpr.gradientValueFuncs[0](lhs.Value(), rhs.Value()));
-
-    if (rhs.index != -1) {
-      GenerateDoubleAdjoints(rhs, adjoint * varExpr.gradientValueFuncs[1](
-                                                lhs.Value(), rhs.Value()));
-    }
-  }
 }
 
 }  // namespace
@@ -369,7 +343,30 @@ Variable Constant(double value) {
 
 double Gradient(Variable var, Variable& wrt) {
   wrt.GetExpression().adjoint = 0.0;
-  GenerateDoubleAdjoints(var, 1.0);
+
+  // Stack element is variable and its adjoint
+  std::stack<std::tuple<Variable, double>> s;
+  s.emplace(var, 1.0);
+  while (!s.empty()) {
+    auto [var, adjoint] = s.top();
+    s.pop();
+
+    auto& varExpr = var.GetExpression();
+    auto& lhs = varExpr.args[0];
+    auto& rhs = varExpr.args[1];
+
+    varExpr.adjoint += adjoint;
+
+    if (lhs.index != -1) {
+      s.emplace(lhs, adjoint * varExpr.gradientValueFuncs[0](lhs.Value(),
+                                                             rhs.Value()));
+
+      if (rhs.index != -1) {
+        s.emplace(rhs, adjoint * varExpr.gradientValueFuncs[1](lhs.Value(),
+                                                               rhs.Value()));
+      }
+    }
+  }
 
   return wrt.GetExpression().adjoint;
 }
@@ -378,7 +375,30 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
   for (int row = 0; row < wrt.rows(); ++row) {
     wrt(row).GetExpression().adjoint = 0.0;
   }
-  GenerateDoubleAdjoints(var, 1.0);
+
+  // Stack element is variable and its adjoint
+  std::stack<std::tuple<Variable, double>> s;
+  s.emplace(var, 1.0);
+  while (!s.empty()) {
+    auto [var, adjoint] = s.top();
+    s.pop();
+
+    auto& varExpr = var.GetExpression();
+    auto& lhs = varExpr.args[0];
+    auto& rhs = varExpr.args[1];
+
+    varExpr.adjoint += adjoint;
+
+    if (lhs.index != -1) {
+      s.emplace(lhs, adjoint * varExpr.gradientValueFuncs[0](lhs.Value(),
+                                                             rhs.Value()));
+
+      if (rhs.index != -1) {
+        s.emplace(rhs, adjoint * varExpr.gradientValueFuncs[1](lhs.Value(),
+                                                               rhs.Value()));
+      }
+    }
+  }
 
   Eigen::VectorXd grad{wrt.rows()};
   for (int row = 0; row < wrt.rows(); ++row) {
