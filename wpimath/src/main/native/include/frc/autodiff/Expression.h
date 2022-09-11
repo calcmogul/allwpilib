@@ -51,29 +51,15 @@ struct WPILIB_DLLEXPORT Expression {
    * Constructs a node with the given gradients, argument indices, and function
    * pointer to a binary operator between them.
    *
-   * @param args Tape locations of binary operator's operands.
-   * @param valueFunc Binary operator that produces this node's value.
+   * @param value This node's value.
    * @param gradientValueFuncs Gradients with respect to each operand.
    * @param gradientFuncs Gradients with respect to each operand.
+   * @param args Tape locations of binary operator's operands.
    */
   Expression(double value, BinaryFuncDouble valueFunc,
              std::array<BinaryFuncDouble, kNumArgs> gradientValueFuncs,
              std::array<BinaryFuncVar, kNumArgs> gradientFuncs,
              std::array<Variable, kNumArgs> args);
-
-  /**
-   * Returns gradient with respect to the given argument index.
-   *
-   * @param arg The argument index (0 to kNumArgs - 1).
-   */
-  double GradientValue(int arg) const;
-
-  /**
-   * Returns gradient with respect to the given argument index.
-   *
-   * @param arg The argument index (0 to kNumArgs - 1).
-   */
-  void GradientVar(Variable var, Variable adjoint) const;
 
   /**
    * Update the value of this node based on the values of its dependent

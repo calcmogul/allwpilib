@@ -26,8 +26,9 @@ class WPILIB_DLLEXPORT Tape {
    * Pushes a new expression with one argument and returns its location.
    *
    * @param lhs Unary operator's operand.
+   * @param valueFunc Unary operator that produces this expression's value.
    * @param lhsGradientValueFunc Gradient with respect to the operand.
-   * @param gradientFunc Gradient with respect to the operand.
+   * @param lhsGradientFunc Gradient with respect to the operand.
    */
   Variable PushUnary(Variable lhs, BinaryFuncDouble valueFunc,
                      BinaryFuncDouble lhsGradientValueFunc,
