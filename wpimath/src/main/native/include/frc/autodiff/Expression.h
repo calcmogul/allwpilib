@@ -52,6 +52,7 @@ struct WPILIB_DLLEXPORT Expression {
    * pointer to a binary operator between them.
    *
    * @param value This node's value.
+   * @param valueFunc Binary operator that produces this node's value.
    * @param gradientValueFuncs Gradients with respect to each operand.
    * @param gradientFuncs Gradients with respect to each operand.
    * @param args Tape locations of binary operator's operands.
