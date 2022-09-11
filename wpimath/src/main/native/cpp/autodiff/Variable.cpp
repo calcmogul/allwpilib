@@ -61,7 +61,7 @@ VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
     wrt(row).GetExpression().adjointVar = Constant(0.0);
   }
 
-  // Stack element is variable and its adjoint
+  // Stack element contains variable and its adjoint
   std::stack<std::tuple<Variable, Variable>> s;
   s.emplace(var, Constant(1.0));
   while (!s.empty()) {
@@ -344,7 +344,7 @@ Variable Constant(double value) {
 double Gradient(Variable var, Variable& wrt) {
   wrt.GetExpression().adjoint = 0.0;
 
-  // Stack element is variable and its adjoint
+  // Stack element contains variable and its adjoint
   std::stack<std::tuple<Variable, double>> s;
   s.emplace(var, 1.0);
   while (!s.empty()) {
@@ -376,7 +376,7 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
     wrt(row).GetExpression().adjoint = 0.0;
   }
 
-  // Stack element is variable and its adjoint
+  // Stack element contains variable and its adjoint
   std::stack<std::tuple<Variable, double>> s;
   s.emplace(var, 1.0);
   while (!s.empty()) {
