@@ -38,8 +38,8 @@ struct WPILIB_DLLEXPORT Expression {
 
   // Gradients with respect to each argument
   std::array<BinaryFuncVar, kNumArgs> gradientFuncs{
-      [](const Variable&, const Variable&) { return Constant(0.0); },
-      [](const Variable&, const Variable&) { return Constant(0.0); }};
+      [](const Variable&, const Variable&) { return Variable::Constant(0.0); },
+      [](const Variable&, const Variable&) { return Variable::Constant(0.0); }};
 
   Expression(const Expression&) = default;
   Expression& operator=(const Expression&) = default;
@@ -55,7 +55,7 @@ struct WPILIB_DLLEXPORT Expression {
    * @param valueFunc Binary operator that produces this node's value.
    * @param gradientValueFuncs Gradients with respect to each operand.
    * @param gradientFuncs Gradients with respect to each operand.
-   * @param args Tape locations of binary operator's operands.
+   * @param args Binary operator's operands.
    */
   Expression(double value, BinaryFuncDouble valueFunc,
              std::array<BinaryFuncDouble, kNumArgs> gradientValueFuncs,

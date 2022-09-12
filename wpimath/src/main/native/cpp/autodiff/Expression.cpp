@@ -20,11 +20,11 @@ Expression::Expression(
       gradientFuncs{std::move(gradientFuncs)} {}
 
 void Expression::Update() {
-  if (args[0].index != -1) {
+  if (args[0].expr != nullptr) {
     auto& lhs = args[0].GetExpression();
     lhs.Update();
 
-    if (args[1].index == -1) {
+    if (args[1].expr == nullptr) {
       value = valueFunc(lhs.value, 0.0);
     } else {
       auto& rhs = args[1].GetExpression();

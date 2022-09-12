@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <wpi/SymbolExports.h>
 
 #include "Eigen/Core"
@@ -11,15 +13,18 @@
 
 namespace frc::autodiff {
 
-class WPILIB_DLLEXPORT Tape;
 struct WPILIB_DLLEXPORT Expression;
+class WPILIB_DLLEXPORT Variable;
+
+using BinaryFuncDouble = double (*)(double, double);
+using BinaryFuncVar = Variable (*)(const Variable&, const Variable&);
 
 class WPILIB_DLLEXPORT Variable {
  private:
   struct PrivateInit {};
 
  public:
-  int index = -1;
+  std::shared_ptr<Expression> expr;
 
   constexpr Variable() = default;
 
@@ -32,13 +37,6 @@ class WPILIB_DLLEXPORT Variable {
   Variable(double value);  // NOLINT
 
   Variable(int value);  // NOLINT
-
-  /**
-   * Constructs a Variable pointing to the specified entry on a tape.
-   *
-   * @param index The index of the autodiff variable on the tape.
-   */
-  explicit Variable(int index, const PrivateInit&);
 
   Variable& operator=(double value);
 
@@ -149,16 +147,61 @@ class WPILIB_DLLEXPORT Variable {
 
   Expression& GetExpression();
 
+  /**
+   * Makes a variable representing a nullary expression (an operator with no
+   * arguments).
+   *
+   * @param value The expression value.
+   */
+  static Variable MakeNullary(double value);
+
+  /**
+   * Makes a variable representing an unary expression (an operator with one
+   * argument).
+   *
+   * @param lhs Unary operator's operand.
+   * @param valueFunc Unary operator that produces this expression's value.
+   * @param lhsGradientValueFunc Gradient with respect to the operand.
+   * @param lhsGradientFunc Gradient with respect to the operand.
+   */
+  static Variable MakeUnary(Variable lhs, BinaryFuncDouble valueFunc,
+                            BinaryFuncDouble lhsGradientValueFunc,
+                            BinaryFuncVar lhsGradientFunc);
+
+  /**
+   * Makes a variable representing a binary expression (an operator with two
+   * arguments).
+   *
+   * @param lhs Binary operator's left operand.
+   * @param rhs Binary operator's right operand.
+   * @param valueFunc Binary operator that produces this expression's value.
+   * @param lhsGradientValueFunc Gradient with respect to the left operand.
+   * @param lhsGradientFunc Gradient with respect to the left operand.
+   * @param rhsGradientValueFunc Gradient with respect to the right operand.
+   * @param rhsGradientFunc Gradient with respect to the right operand.
+   */
+  static Variable MakeBinary(Variable lhs, Variable rhs,
+                             BinaryFuncDouble valueFunc,
+                             BinaryFuncDouble lhsGradientValueFunc,
+                             BinaryFuncVar lhsGradientFunc,
+                             BinaryFuncDouble rhsGradientValueFunc,
+                             BinaryFuncVar rhsGradientFunc);
+
+  /**
+   * Create a Variable from a constant that has a derivative of zero.
+   */
+  static Variable Constant(double value);
+
  private:
-  friend class WPILIB_DLLEXPORT Tape;
+  /**
+   * Constructs a Variable pointing to the specified entry on a tape.
+   *
+   * @param expr The autodiff variable.
+   */
+  explicit Variable(std::shared_ptr<Expression> expr, const PrivateInit&);
 };
 
 using VectorXvar = Eigen::Vector<frc::autodiff::Variable, Eigen::Dynamic>;
-
-/**
- * Create a Variable from a constant that has a derivative of zero.
- */
-WPILIB_DLLEXPORT Variable Constant(double value);
 
 /**
  * Returns gradient of a variable with respect to the given variable.

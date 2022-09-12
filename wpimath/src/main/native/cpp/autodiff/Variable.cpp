@@ -10,7 +10,7 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/autodiff/Tape.h"
+#include "frc/autodiff/Expression.h"
 
 namespace frc::autodiff {
 
@@ -58,12 +58,12 @@ namespace {
  */
 VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
   for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetExpression().adjointVar = Constant(0.0);
+    wrt(row).GetExpression().adjointVar = Variable::Constant(0.0);
   }
 
   // Stack element contains variable and its adjoint
   std::stack<std::tuple<Variable, Variable>> s;
-  s.emplace(var, Constant(1.0));
+  s.emplace(var, Variable::Constant(1.0));
   while (!s.empty()) {
     auto [var, adjoint] = s.top();
     s.pop();
@@ -74,10 +74,10 @@ VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
 
     varExpr.adjointVar += adjoint;
 
-    if (lhs.index != -1) {
+    if (lhs.expr != nullptr) {
       s.emplace(lhs, adjoint * varExpr.gradientFuncs[0](lhs, rhs));
 
-      if (rhs.index != -1) {
+      if (rhs.expr != nullptr) {
         s.emplace(rhs, adjoint * varExpr.gradientFuncs[1](lhs, rhs));
       }
     }
@@ -94,18 +94,16 @@ VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
 }  // namespace
 
 Variable::Variable(double value) {
-  *this = Tape::GetTape().PushNullary(value);
+  *this = MakeNullary(value);
 }
 
 Variable::Variable(int value) {
-  *this = Tape::GetTape().PushNullary(value);
+  *this = MakeNullary(value);
 }
 
-Variable::Variable(int index, const PrivateInit&) : index{index} {}
-
 Variable& Variable::operator=(double value) {
-  if (index == -1) {
-    *this = Tape::GetTape().PushNullary(value);
+  if (expr == nullptr) {
+    *this = MakeNullary(value);
   } else {
     GetExpression().value = value;
   }
@@ -113,8 +111,8 @@ Variable& Variable::operator=(double value) {
 }
 
 Variable& Variable::operator=(int value) {
-  if (index == -1) {
-    *this = Tape::GetTape().PushNullary(value);
+  if (expr == nullptr) {
+    *this = MakeNullary(value);
   } else {
     GetExpression().value = value;
   }
@@ -122,15 +120,15 @@ Variable& Variable::operator=(int value) {
 }
 
 WPILIB_DLLEXPORT Variable operator*(double lhs, const Variable& rhs) {
-  return Constant(lhs) * rhs;
+  return Variable::Constant(lhs) * rhs;
 }
 
 WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, double rhs) {
-  return lhs * Constant(rhs);
+  return lhs * Variable::Constant(rhs);
 }
 
 WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, const Variable& rhs) {
-  return Tape::GetTape().PushBinary(
+  return Variable::MakeBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs * rhs; },
       [](double lhs, double rhs) { return rhs; },
       [](const Variable& lhs, const Variable& rhs) { return rhs; },
@@ -149,15 +147,15 @@ Variable& Variable::operator*=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator/(double lhs, const Variable& rhs) {
-  return Constant(lhs) / rhs;
+  return Variable::Constant(lhs) / rhs;
 }
 
 WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, double rhs) {
-  return lhs / Constant(rhs);
+  return lhs / Variable::Constant(rhs);
 }
 
 WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, const Variable& rhs) {
-  return Tape::GetTape().PushBinary(
+  return Variable::MakeBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs / rhs; },
       [](double lhs, double rhs) { return 1.0 / rhs; },
       [](const Variable& lhs, const Variable& rhs) { return 1.0 / rhs; },
@@ -178,20 +176,24 @@ Variable& Variable::operator/=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator+(double lhs, const Variable& rhs) {
-  return Constant(lhs) + rhs;
+  return Variable::Constant(lhs) + rhs;
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, double rhs) {
-  return lhs + Constant(rhs);
+  return lhs + Variable::Constant(rhs);
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, const Variable& rhs) {
-  return Tape::GetTape().PushBinary(
+  return Variable::MakeBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs + rhs; },
       [](double lhs, double rhs) { return 1.0; },
-      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); },
+      [](const Variable& lhs, const Variable& rhs) {
+        return Variable::Constant(1.0);
+      },
       [](double lhs, double rhs) { return 1.0; },
-      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); });
+      [](const Variable& lhs, const Variable& rhs) {
+        return Variable::Constant(1.0);
+      });
 }
 
 Variable& Variable::operator+=(double rhs) {
@@ -205,20 +207,24 @@ Variable& Variable::operator+=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator-(double lhs, const Variable& rhs) {
-  return Constant(lhs) - rhs;
+  return Variable::Constant(lhs) - rhs;
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, double rhs) {
-  return lhs - Constant(rhs);
+  return lhs - Variable::Constant(rhs);
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, const Variable& rhs) {
-  return Tape::GetTape().PushBinary(
+  return Variable::MakeBinary(
       lhs, rhs, [](double lhs, double rhs) { return lhs - rhs; },
       [](double lhs, double rhs) { return 1.0; },
-      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); },
+      [](const Variable& lhs, const Variable& rhs) {
+        return Variable::Constant(1.0);
+      },
       [](double lhs, double rhs) { return -1.0; },
-      [](const Variable& lhs, const Variable& rhs) { return Constant(-1.0); });
+      [](const Variable& lhs, const Variable& rhs) {
+        return Variable::Constant(-1.0);
+      });
 }
 
 Variable& Variable::operator-=(double rhs) {
@@ -232,17 +238,21 @@ Variable& Variable::operator-=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs) {
-  return Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       lhs, [](double lhs, double) { return -lhs; },
       [](double lhs, double rhs) { return -1.0; },
-      [](const Variable& lhs, const Variable& rhs) { return Constant(-1.0); });
+      [](const Variable& lhs, const Variable& rhs) {
+        return Variable::Constant(-1.0);
+      });
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs) {
-  return Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       lhs, [](double lhs, double) { return lhs; },
       [](double lhs, double rhs) { return 1.0; },
-      [](const Variable& lhs, const Variable& rhs) { return Constant(1.0); });
+      [](const Variable& lhs, const Variable& rhs) {
+        return Variable::Constant(1.0);
+      });
 }
 
 WPILIB_DLLEXPORT bool operator==(double lhs, const Variable& rhs) {
@@ -318,7 +328,7 @@ WPILIB_DLLEXPORT bool operator>=(const Variable& lhs, const Variable& rhs) {
 }
 
 double Variable::Value() const {
-  if (index == -1) {
+  if (expr == nullptr) {
     return 0.0;
   } else {
     return GetExpression().value;
@@ -330,16 +340,53 @@ void Variable::Update() {
 }
 
 const Expression& Variable::GetExpression() const {
-  return Tape::GetTape()[index];
+  return *expr;
 }
 
 Expression& Variable::GetExpression() {
-  return Tape::GetTape()[index];
+  return *expr;
 }
 
-Variable Constant(double value) {
-  return Tape::GetTape().PushNullary(value);
+Variable Variable::MakeNullary(double value) {
+  return Variable{std::make_shared<Expression>(
+                      value, [](double, double) { return 0.0; },
+                      std::array{BinaryFuncDouble{}, BinaryFuncDouble{}},
+                      std::array{BinaryFuncVar{}, BinaryFuncVar{}},
+                      std::array{Variable{}, Variable{}}),
+                  Variable::PrivateInit{}};
 }
+
+Variable Variable::MakeUnary(Variable lhs, BinaryFuncDouble valueFunc,
+                             BinaryFuncDouble lhsGradientValueFunc,
+                             BinaryFuncVar lhsGradientFunc) {
+  return Variable{std::make_shared<Expression>(
+                      valueFunc(lhs.Value(), 0.0), valueFunc,
+                      std::array{lhsGradientValueFunc, BinaryFuncDouble{}},
+                      std::array{lhsGradientFunc, BinaryFuncVar{}},
+                      std::array{lhs, Variable{}}),
+                  PrivateInit{}};
+}
+
+Variable Variable::MakeBinary(Variable lhs, Variable rhs,
+                              BinaryFuncDouble valueFunc,
+                              BinaryFuncDouble lhsGradientValueFunc,
+                              BinaryFuncVar lhsGradientFunc,
+                              BinaryFuncDouble rhsGradientValueFunc,
+                              BinaryFuncVar rhsGradientFunc) {
+  return Variable{
+      std::make_shared<Expression>(
+          valueFunc(lhs.Value(), rhs.Value()), valueFunc,
+          std::array{lhsGradientValueFunc, rhsGradientValueFunc},
+          std::array{lhsGradientFunc, rhsGradientFunc}, std::array{lhs, rhs}),
+      PrivateInit{}};
+}
+
+Variable Variable::Constant(double value) {
+  return MakeNullary(value);
+}
+
+Variable::Variable(std::shared_ptr<Expression> expr, const PrivateInit&)
+    : expr{std::move(expr)} {}
 
 double Gradient(Variable var, Variable& wrt) {
   wrt.GetExpression().adjoint = 0.0;
@@ -357,11 +404,11 @@ double Gradient(Variable var, Variable& wrt) {
 
     varExpr.adjoint += adjoint;
 
-    if (lhs.index != -1) {
+    if (lhs.expr != nullptr) {
       s.emplace(lhs, adjoint * varExpr.gradientValueFuncs[0](lhs.Value(),
                                                              rhs.Value()));
 
-      if (rhs.index != -1) {
+      if (rhs.expr != nullptr) {
         s.emplace(rhs, adjoint * varExpr.gradientValueFuncs[1](lhs.Value(),
                                                                rhs.Value()));
       }
@@ -389,11 +436,11 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
 
     varExpr.adjoint += adjoint;
 
-    if (lhs.index != -1) {
+    if (lhs.expr != nullptr) {
       s.emplace(lhs, adjoint * varExpr.gradientValueFuncs[0](lhs.Value(),
                                                              rhs.Value()));
 
-      if (rhs.index != -1) {
+      if (rhs.expr != nullptr) {
         s.emplace(rhs, adjoint * varExpr.gradientValueFuncs[1](lhs.Value(),
                                                                rhs.Value()));
       }
@@ -426,8 +473,6 @@ Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
 }
 
 Eigen::SparseMatrix<double> Hessian(Variable& variable, VectorXvar& wrt) {
-  int tapeSize = Tape::GetTape().Size();
-
   VectorXvar gradientTree = GenerateGradientTree(variable, wrt);
 
   std::vector<Eigen::Triplet<double>> triplets;
@@ -440,8 +485,6 @@ Eigen::SparseMatrix<double> Hessian(Variable& variable, VectorXvar& wrt) {
     }
   }
 
-  Tape::GetTape().Resize(tapeSize);
-
   Eigen::SparseMatrix<double> H{wrt.rows(), wrt.rows()};
   H.setFromTriplets(triplets.begin(), triplets.end());
 
@@ -449,11 +492,11 @@ Eigen::SparseMatrix<double> Hessian(Variable& variable, VectorXvar& wrt) {
 }
 
 Variable abs(double x) {
-  return autodiff::abs(Constant(x));
+  return autodiff::abs(Variable::Constant(x));
 }
 
 Variable abs(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::abs(x); },
       [](double x, double) {
         if (x < 0.0) {
@@ -466,130 +509,130 @@ Variable abs(const Variable& x) {
       },
       [](const Variable& x, const Variable&) {
         if (x.Value() < 0.0) {
-          return Constant(-1.0);
+          return Variable::Constant(-1.0);
         } else if (x.Value() > 0.0) {
-          return Constant(1.0);
+          return Variable::Constant(1.0);
         } else {
-          return Constant(0.0);
+          return Variable::Constant(0.0);
         }
-      })};
+      });
 }
 
 Variable acos(double x) {
-  return autodiff::acos(Constant(x));
+  return autodiff::acos(Variable::Constant(x));
 }
 
 Variable acos(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::acos(x); },
       [](double x, double) { return -1.0 / std::sqrt(1.0 - x * x); },
       [](const Variable& x, const Variable&) {
         return -1.0 / autodiff::sqrt(1.0 - x * x);
-      })};
+      });
 }
 
 Variable asin(double x) {
-  return autodiff::asin(Constant(x));
+  return autodiff::asin(Variable::Constant(x));
 }
 
 Variable asin(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::asin(x); },
       [](double x, double) { return 1.0 / std::sqrt(1.0 - x * x); },
       [](const Variable& x, const Variable&) {
         return 1.0 / autodiff::sqrt(1.0 - x * x);
-      })};
+      });
 }
 
 Variable atan(double x) {
-  return autodiff::atan(Constant(x));
+  return autodiff::atan(Variable::Constant(x));
 }
 
 Variable atan(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::atan(x); },
       [](double x, double) { return 1.0 / (1.0 + x * x); },
-      [](const Variable& x, const Variable&) { return 1.0 / (1.0 + x * x); })};
+      [](const Variable& x, const Variable&) { return 1.0 / (1.0 + x * x); });
 }
 
 Variable atan2(double y, const Variable& x) {
-  return autodiff::atan2(Constant(y), x);
+  return autodiff::atan2(Variable::Constant(y), x);
 }
 
 Variable atan2(const Variable& y, double x) {
-  return autodiff::atan2(y, Constant(x));
+  return autodiff::atan2(y, Variable::Constant(x));
 }
 
 Variable atan2(const Variable& y, const Variable& x) {
-  return Variable{Tape::GetTape().PushBinary(
+  return Variable::MakeBinary(
       y, x, [](double y, double x) { return std::atan2(y, x); },
       [](double y, double x) { return x / (y * y + x * x); },
       [](const Variable& y, const Variable& x) { return x / (y * y + x * x); },
       [](double y, double x) { return -y / (y * y + x * x); },
       [](const Variable& y, const Variable& x) {
         return -y / (y * y + x * x);
-      })};
+      });
 }
 
 Variable cos(double x) {
-  return autodiff::cos(Constant(x));
+  return autodiff::cos(Variable::Constant(x));
 }
 
 Variable cos(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::cos(x); },
       [](double x, double) { return -std::sin(x); },
-      [](const Variable& x, const Variable&) { return -autodiff::sin(x); })};
+      [](const Variable& x, const Variable&) { return -autodiff::sin(x); });
 }
 
 Variable cosh(double x) {
-  return autodiff::cosh(Constant(x));
+  return autodiff::cosh(Variable::Constant(x));
 }
 
 Variable cosh(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::cosh(x); },
       [](double x, double) { return std::sinh(x); },
-      [](const Variable& x, const Variable&) { return autodiff::sinh(x); })};
+      [](const Variable& x, const Variable&) { return autodiff::sinh(x); });
 }
 
 Variable erf(double x) {
-  return autodiff::erf(Constant(x));
+  return autodiff::erf(Variable::Constant(x));
 }
 
 Variable erf(const Variable& x) {
   static constexpr double sqrt_pi =
       1.7724538509055160272981674833411451872554456638435L;
 
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::erf(x); },
       [](double x, double) { return 2.0 / sqrt_pi * std::exp(-x * x); },
       [](const Variable& x, const Variable&) {
         return 2.0 / sqrt_pi * autodiff::exp(-x * x);
-      })};
+      });
 }
 
 Variable exp(double x) {
-  return autodiff::exp(Constant(x));
+  return autodiff::exp(Variable::Constant(x));
 }
 
 Variable exp(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::exp(x); },
       [](double x, double) { return std::exp(x); },
-      [](const Variable& x, const Variable&) { return autodiff::exp(x); })};
+      [](const Variable& x, const Variable&) { return autodiff::exp(x); });
 }
 
 Variable hypot(double x, const Variable& y) {
-  return autodiff::hypot(Constant(x), y);
+  return autodiff::hypot(Variable::Constant(x), y);
 }
 
 Variable hypot(const Variable& x, double y) {
-  return autodiff::hypot(x, Constant(y));
+  return autodiff::hypot(x, Variable::Constant(y));
 }
 
 Variable hypot(const Variable& x, const Variable& y) {
-  return Variable{Tape::GetTape().PushBinary(
+  return Variable::MakeBinary(
       x, y, [](double x, double y) { return std::hypot(x, y); },
       [](double x, double y) { return x / std::hypot(x, y); },
       [](const Variable& x, const Variable& y) {
@@ -598,43 +641,43 @@ Variable hypot(const Variable& x, const Variable& y) {
       [](double x, double y) { return y / std::hypot(x, y); },
       [](const Variable& x, const Variable& y) {
         return y / autodiff::hypot(x, y);
-      })};
+      });
 }
 
 Variable log(double x) {
-  return autodiff::log(Constant(x));
+  return autodiff::log(Variable::Constant(x));
 }
 
 Variable log(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::log(x); },
       [](double x, double) { return 1.0 / x; },
-      [](const Variable& x, const Variable&) { return 1.0 / x; })};
+      [](const Variable& x, const Variable&) { return 1.0 / x; });
 }
 
 Variable log10(double x) {
-  return autodiff::log10(Constant(x));
+  return autodiff::log10(Variable::Constant(x));
 }
 
 Variable log10(const Variable& x) {
   static constexpr double ln10 = 2.3025850929940456840179914546843L;
 
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::log10(x); },
       [](double x, double) { return 1.0 / (ln10 * x); },
-      [](const Variable& x, const Variable&) { return 1.0 / (ln10 * x); })};
+      [](const Variable& x, const Variable&) { return 1.0 / (ln10 * x); });
 }
 
 Variable pow(double base, const Variable& power) {
-  return autodiff::pow(Constant(base), power);
+  return autodiff::pow(Variable::Constant(base), power);
 }
 
 Variable pow(const Variable& base, double power) {
-  return autodiff::pow(base, Constant(power));
+  return autodiff::pow(base, Variable::Constant(power));
 }
 
 Variable pow(const Variable& base, const Variable& power) {
-  return Variable{Tape::GetTape().PushBinary(
+  return Variable::MakeBinary(
       base, power,
       [](double base, double power) { return std::pow(base, power); },
       [](double base, double power) {
@@ -654,72 +697,72 @@ Variable pow(const Variable& base, const Variable& power) {
       [](const Variable& base, const Variable& power) {
         // Since x * std::log(x) -> 0 as x -> 0
         if (base.Value() == 0.0) {
-          return Constant(0.0);
+          return Variable::Constant(0.0);
         } else {
           return autodiff::pow(base, power - 1) * base * autodiff::log(base);
         }
-      })};
+      });
 }
 
 Variable sin(double x) {
-  return autodiff::sin(Constant(x));
+  return autodiff::sin(Variable::Constant(x));
 }
 
 Variable sin(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::sin(x); },
       [](double x, double) { return std::cos(x); },
-      [](const Variable& x, const Variable&) { return autodiff::cos(x); })};
+      [](const Variable& x, const Variable&) { return autodiff::cos(x); });
 }
 
 Variable sinh(double x) {
-  return autodiff::sinh(Constant(x));
+  return autodiff::sinh(Variable::Constant(x));
 }
 
 Variable sinh(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::sinh(x); },
       [](double x, double) { return std::cosh(x); },
-      [](const Variable& x, const Variable&) { return autodiff::cosh(x); })};
+      [](const Variable& x, const Variable&) { return autodiff::cosh(x); });
 }
 
 Variable sqrt(double x) {
-  return autodiff::sqrt(Constant(x));
+  return autodiff::sqrt(Variable::Constant(x));
 }
 
 Variable sqrt(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::sqrt(x); },
       [](double x, double) { return 1.0 / (2.0 * std::sqrt(x)); },
       [](const Variable& x, const Variable&) {
         return 1.0 / (2.0 * autodiff::sqrt(x));
-      })};
+      });
 }
 
 Variable tan(double x) {
-  return autodiff::tan(Constant(x));
+  return autodiff::tan(Variable::Constant(x));
 }
 
 Variable tan(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::tan(x); },
       [](double x, double) { return 1.0 / (std::cos(x) * std::cos(x)); },
       [](const Variable& x, const Variable&) {
         return 1.0 / (autodiff::cos(x) * autodiff::cos(x));
-      })};
+      });
 }
 
 Variable tanh(double x) {
-  return autodiff::tanh(Constant(x));
+  return autodiff::tanh(Variable::Constant(x));
 }
 
 Variable tanh(const Variable& x) {
-  return Variable{Tape::GetTape().PushUnary(
+  return Variable::MakeUnary(
       x, [](double x, double) { return std::tanh(x); },
       [](double x, double) { return 1.0 / (std::cosh(x) * std::cosh(x)); },
       [](const Variable& x, const Variable&) {
         return 1.0 / (autodiff::cosh(x) * autodiff::cosh(x));
-      })};
+      });
 }
 
 }  // namespace frc::autodiff
