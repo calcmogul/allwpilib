@@ -13,26 +13,25 @@ Expression::Expression(double value) : value{value} {}
 Expression::Expression(BinaryFuncDouble valueFunc,
                        BinaryFuncDouble lhsGradientValueFunc,
                        BinaryFuncExpr lhsGradientFunc,
-                       std::shared_ptr<Expression> lhs)
+                       SharedPtr<Expression> lhs)
     : value{valueFunc(lhs->value, 0.0)},
       valueFunc{valueFunc},
       gradientValueFuncs{std::array{lhsGradientValueFunc, BinaryFuncDouble{}}},
       gradientFuncs{std::array{lhsGradientFunc, BinaryFuncExpr{}}},
-      args{std::array<std::shared_ptr<Expression>, 2>{lhs, nullptr}} {}
+      args{std::array<SharedPtr<Expression>, 2>{lhs, nullptr}} {}
 
 Expression::Expression(BinaryFuncDouble valueFunc,
                        BinaryFuncDouble lhsGradientValueFunc,
                        BinaryFuncDouble rhsGradientValueFunc,
                        BinaryFuncExpr lhsGradientFunc,
                        BinaryFuncExpr rhsGradientFunc,
-                       std::shared_ptr<Expression> lhs,
-                       std::shared_ptr<Expression> rhs)
+                       SharedPtr<Expression> lhs, SharedPtr<Expression> rhs)
     : value{valueFunc(lhs->value, rhs->value)},
       valueFunc{valueFunc},
       gradientValueFuncs{
           std::array{lhsGradientValueFunc, rhsGradientValueFunc}},
       gradientFuncs{std::array{lhsGradientFunc, rhsGradientFunc}},
-      args{std::array<std::shared_ptr<Expression>, 2>{lhs, rhs}} {}
+      args{std::array<SharedPtr<Expression>, 2>{lhs, rhs}} {}
 
 void Expression::Update() {
   if (args[0] != nullptr) {

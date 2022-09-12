@@ -5,16 +5,17 @@
 #pragma once
 
 #include <array>
-#include <memory>
 
 #include <wpi/SymbolExports.h>
+
+#include "frc/autodiff/SharedPtr.h"
 
 namespace frc::autodiff {
 
 struct WPILIB_DLLEXPORT Expression {
   using BinaryFuncDouble = double (*)(double, double);
-  using BinaryFuncExpr = std::shared_ptr<Expression> (*)(
-      const std::shared_ptr<Expression>&, const std::shared_ptr<Expression>&);
+  using BinaryFuncExpr = SharedPtr<Expression> (*)(
+      const SharedPtr<Expression>&, const SharedPtr<Expression>&);
 
   static constexpr int kNumArgs = 2;
 
@@ -22,7 +23,7 @@ struct WPILIB_DLLEXPORT Expression {
 
   double adjoint = 0.0;
 
-  std::shared_ptr<Expression> adjointExpr;
+  SharedPtr<Expression> adjointExpr;
 
   // Either nullary operator with no arguments, unary operator with one
   // argument, or binary operator with two arguments. This operator is
@@ -35,17 +36,15 @@ struct WPILIB_DLLEXPORT Expression {
 
   // Gradients with respect to each argument
   std::array<BinaryFuncExpr, kNumArgs> gradientFuncs{
-      [](const std::shared_ptr<Expression>&,
-         const std::shared_ptr<Expression>&) {
-        return std::make_shared<Expression>(0.0);
+      [](const SharedPtr<Expression>&, const SharedPtr<Expression>&) {
+        return MakeShared<Expression>(0.0);
       },
-      [](const std::shared_ptr<Expression>&,
-         const std::shared_ptr<Expression>&) {
-        return std::make_shared<Expression>(0.0);
+      [](const SharedPtr<Expression>&, const SharedPtr<Expression>&) {
+        return MakeShared<Expression>(0.0);
       }};
 
   // Indices of dependent nodes (function arguments)
-  std::array<std::shared_ptr<Expression>, kNumArgs> args{nullptr, nullptr};
+  std::array<SharedPtr<Expression>, kNumArgs> args{nullptr, nullptr};
 
   Expression(const Expression&) = default;
   Expression& operator=(const Expression&) = default;
@@ -69,7 +68,7 @@ struct WPILIB_DLLEXPORT Expression {
    * @param lhs Unary operator's operand.
    */
   Expression(BinaryFuncDouble valueFunc, BinaryFuncDouble lhsGradientValueFunc,
-             BinaryFuncExpr lhsGradientFunc, std::shared_ptr<Expression> lhs);
+             BinaryFuncExpr lhsGradientFunc, SharedPtr<Expression> lhs);
 
   /**
    * Constructs a binary expression (an operator with two arguments).
@@ -85,7 +84,7 @@ struct WPILIB_DLLEXPORT Expression {
   Expression(BinaryFuncDouble valueFunc, BinaryFuncDouble lhsGradientValueFunc,
              BinaryFuncDouble rhsGradientValueFunc,
              BinaryFuncExpr lhsGradientFunc, BinaryFuncExpr rhsGradientFunc,
-             std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs);
+             SharedPtr<Expression> lhs, SharedPtr<Expression> rhs);
 
   /**
    * Update the value of this node based on the values of its dependent
