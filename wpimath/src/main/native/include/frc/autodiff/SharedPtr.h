@@ -32,9 +32,7 @@ class SharedPtr {
     m_ptr = rhs.m_ptr;
     m_refCount = rhs.m_refCount;
 
-    if (m_ptr != nullptr) {
-      ++*m_refCount;
-    }
+    Retain();
   }
 
   SharedPtr<T>& operator=(const SharedPtr<T>& rhs) noexcept {  // NOLINT
