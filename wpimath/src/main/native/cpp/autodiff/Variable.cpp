@@ -75,19 +75,14 @@ VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
     if (varExpr.adjointExpr == nullptr) {
       varExpr.adjointExpr = adjoint;
     } else {
-      varExpr.adjointExpr =
-          (Variable{varExpr.adjointExpr} + Variable{adjoint}).expr;
+      varExpr.adjointExpr = varExpr.adjointExpr + adjoint;
     }
 
     if (lhs != nullptr) {
-      stack.emplace_back(lhs, (Variable{adjoint} *
-                               Variable{varExpr.gradientFuncs[0](lhs, rhs)})
-                                  .expr);
+      stack.emplace_back(lhs, adjoint * varExpr.gradientFuncs[0](lhs, rhs));
 
       if (rhs != nullptr) {
-        stack.emplace_back(rhs, (Variable{adjoint} *
-                                 Variable{varExpr.gradientFuncs[1](lhs, rhs)})
-                                    .expr);
+        stack.emplace_back(rhs, adjoint * varExpr.gradientFuncs[1](lhs, rhs));
       }
     }
   }
@@ -135,15 +130,7 @@ WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, const Variable& rhs) {
-  return Variable{MakeShared<Expression>(
-      [](double lhs, double rhs) { return lhs * rhs; },
-      [](double lhs, double rhs) { return rhs; },
-      [](double lhs, double rhs) { return lhs; },
-      [](const SharedPtr<Expression>& lhsExpr,
-         const SharedPtr<Expression>& rhsExpr) { return rhsExpr; },
-      [](const SharedPtr<Expression>& lhsExpr,
-         const SharedPtr<Expression>& rhsExpr) { return lhsExpr; },
-      lhs.expr, rhs.expr)};
+  return Variable{lhs.expr * rhs.expr};
 }
 
 Variable& Variable::operator*=(double rhs) {
@@ -165,23 +152,7 @@ WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, const Variable& rhs) {
-  return Variable{MakeShared<Expression>(
-      [](double lhs, double rhs) { return lhs / rhs; },
-      [](double lhs, double rhs) { return 1.0 / rhs; },
-      [](double lhs, double rhs) { return -lhs / (rhs * rhs); },
-      [](const SharedPtr<Expression>& lhsExpr,
-         const SharedPtr<Expression>& rhsExpr) {
-        Variable rhs{rhsExpr};
-        return (1.0 / rhs).expr;
-      },
-      [](const SharedPtr<Expression>& lhsExpr,
-         const SharedPtr<Expression>& rhsExpr) {
-        Variable lhs{lhsExpr};
-        Variable rhs{rhsExpr};
-
-        return (-lhs / (rhs * rhs)).expr;
-      },
-      lhs.expr, rhs.expr)};
+  return Variable{lhs.expr / rhs.expr};
 }
 
 Variable& Variable::operator/=(double rhs) {
@@ -203,19 +174,7 @@ WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, const Variable& rhs) {
-  return Variable{
-      MakeShared<Expression>([](double lhs, double rhs) { return lhs + rhs; },
-                             [](double lhs, double rhs) { return 1.0; },
-                             [](double lhs, double rhs) { return 1.0; },
-                             [](const SharedPtr<Expression>& lhsExpr,
-                                const SharedPtr<Expression>& rhsExpr) {
-                               return MakeShared<Expression>(1.0);
-                             },
-                             [](const SharedPtr<Expression>& lhsExpr,
-                                const SharedPtr<Expression>& rhsExpr) {
-                               return MakeShared<Expression>(1.0);
-                             },
-                             lhs.expr, rhs.expr)};
+  return Variable{lhs.expr + rhs.expr};
 }
 
 Variable& Variable::operator+=(double rhs) {
@@ -237,19 +196,7 @@ WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, double rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, const Variable& rhs) {
-  return Variable{
-      MakeShared<Expression>([](double lhs, double rhs) { return lhs - rhs; },
-                             [](double lhs, double rhs) { return 1.0; },
-                             [](double lhs, double rhs) { return -1.0; },
-                             [](const SharedPtr<Expression>& lhsExpr,
-                                const SharedPtr<Expression>& rhsExpr) {
-                               return MakeShared<Expression>(1.0);
-                             },
-                             [](const SharedPtr<Expression>& lhsExpr,
-                                const SharedPtr<Expression>& rhsExpr) {
-                               return MakeShared<Expression>(-1.0);
-                             },
-                             lhs.expr, rhs.expr)};
+  return Variable{lhs.expr - rhs.expr};
 }
 
 Variable& Variable::operator-=(double rhs) {
@@ -263,25 +210,11 @@ Variable& Variable::operator-=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs) {
-  return Variable{
-      MakeShared<Expression>([](double lhs, double) { return -lhs; },
-                             [](double lhs, double rhs) { return -1.0; },
-                             [](const SharedPtr<Expression>& lhsExpr,
-                                const SharedPtr<Expression>& rhsExpr) {
-                               return MakeShared<Expression>(-1.0);
-                             },
-                             lhs.expr)};
+  return Variable{-lhs.expr};
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs) {
-  return Variable{
-      MakeShared<Expression>([](double lhs, double) { return lhs; },
-                             [](double lhs, double rhs) { return 1.0; },
-                             [](const SharedPtr<Expression>& lhsExpr,
-                                const SharedPtr<Expression>& rhsExpr) {
-                               return MakeShared<Expression>(1.0);
-                             },
-                             lhs.expr)};
+  return Variable{+lhs.expr};
 }
 
 WPILIB_DLLEXPORT bool operator==(double lhs, const Variable& rhs) {
@@ -492,27 +425,7 @@ Variable abs(double x) {
 }
 
 Variable abs(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::abs(x); },
-      [](double x, double) {
-        if (x < 0.0) {
-          return -1.0;
-        } else if (x > 0.0) {
-          return 1.0;
-        } else {
-          return 0.0;
-        }
-      },
-      [](const SharedPtr<Expression>& x, const SharedPtr<Expression>&) {
-        if (x->value < 0.0) {
-          return MakeShared<Expression>(-1.0);
-        } else if (x->value > 0.0) {
-          return MakeShared<Expression>(1.0);
-        } else {
-          return MakeShared<Expression>(0.0);
-        }
-      },
-      x.expr)};
+  return Variable{abs(x.expr)};
 }
 
 Variable acos(double x) {
@@ -520,14 +433,7 @@ Variable acos(double x) {
 }
 
 Variable acos(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::acos(x); },
-      [](double x, double) { return -1.0 / std::sqrt(1.0 - x * x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (-1.0 / autodiff::sqrt(1.0 - x * x)).expr;
-      },
-      x.expr)};
+  return Variable{acos(x.expr)};
 }
 
 Variable asin(double x) {
@@ -535,14 +441,7 @@ Variable asin(double x) {
 }
 
 Variable asin(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::asin(x); },
-      [](double x, double) { return 1.0 / std::sqrt(1.0 - x * x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (1.0 / autodiff::sqrt(1.0 - x * x)).expr;
-      },
-      x.expr)};
+  return Variable{asin(x.expr)};
 }
 
 Variable atan(double x) {
@@ -550,14 +449,7 @@ Variable atan(double x) {
 }
 
 Variable atan(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::atan(x); },
-      [](double x, double) { return 1.0 / (1.0 + x * x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (1.0 / (1.0 + x * x)).expr;
-      },
-      x.expr)};
+  return Variable{atan(x.expr)};
 }
 
 Variable atan2(double y, const Variable& x) {
@@ -569,23 +461,7 @@ Variable atan2(const Variable& y, double x) {
 }
 
 Variable atan2(const Variable& y, const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double y, double x) { return std::atan2(y, x); },
-      [](double y, double x) { return x / (y * y + x * x); },
-      [](double y, double x) { return -y / (y * y + x * x); },
-      [](const SharedPtr<Expression>& yExpr,
-         const SharedPtr<Expression>& xExpr) {
-        Variable x{xExpr};
-        Variable y{yExpr};
-        return (x / (y * y + x * x)).expr;
-      },
-      [](const SharedPtr<Expression>& yExpr,
-         const SharedPtr<Expression>& xExpr) {
-        Variable y{yExpr};
-        Variable x{xExpr};
-        return (-y / (y * y + x * x)).expr;
-      },
-      y.expr, x.expr)};
+  return Variable{atan2(y.expr, x.expr)};
 }
 
 Variable cos(double x) {
@@ -593,14 +469,7 @@ Variable cos(double x) {
 }
 
 Variable cos(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::cos(x); },
-      [](double x, double) { return -std::sin(x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (-autodiff::sin(x)).expr;
-      },
-      x.expr)};
+  return Variable{cos(x.expr)};
 }
 
 Variable cosh(double x) {
@@ -608,14 +477,7 @@ Variable cosh(double x) {
 }
 
 Variable cosh(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::cosh(x); },
-      [](double x, double) { return std::sinh(x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return autodiff::sinh(x).expr;
-      },
-      x.expr)};
+  return Variable{cosh(x.expr)};
 }
 
 Variable erf(double x) {
@@ -623,17 +485,7 @@ Variable erf(double x) {
 }
 
 Variable erf(const Variable& x) {
-  static constexpr double sqrt_pi =
-      1.7724538509055160272981674833411451872554456638435L;
-
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::erf(x); },
-      [](double x, double) { return 2.0 / sqrt_pi * std::exp(-x * x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (2.0 / sqrt_pi * autodiff::exp(-x * x)).expr;
-      },
-      x.expr)};
+  return Variable{erf(x.expr)};
 }
 
 Variable exp(double x) {
@@ -641,14 +493,7 @@ Variable exp(double x) {
 }
 
 Variable exp(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::exp(x); },
-      [](double x, double) { return std::exp(x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (autodiff::exp(x)).expr;
-      },
-      x.expr)};
+  return Variable{exp(x.expr)};
 }
 
 Variable hypot(double x, const Variable& y) {
@@ -660,23 +505,7 @@ Variable hypot(const Variable& x, double y) {
 }
 
 Variable hypot(const Variable& x, const Variable& y) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double y) { return std::hypot(x, y); },
-      [](double x, double y) { return x / std::hypot(x, y); },
-      [](double x, double y) { return y / std::hypot(x, y); },
-      [](const SharedPtr<Expression>& xExpr,
-         const SharedPtr<Expression>& yExpr) {
-        Variable x{xExpr};
-        Variable y{yExpr};
-        return (x / autodiff::hypot(x, y)).expr;
-      },
-      [](const SharedPtr<Expression>& xExpr,
-         const SharedPtr<Expression>& yExpr) {
-        Variable x{xExpr};
-        Variable y{yExpr};
-        return (y / autodiff::hypot(x, y)).expr;
-      },
-      x.expr, y.expr)};
+  return Variable{hypot(x.expr, y.expr)};
 }
 
 Variable log(double x) {
@@ -684,14 +513,7 @@ Variable log(double x) {
 }
 
 Variable log(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::log(x); },
-      [](double x, double) { return 1.0 / x; },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (1.0 / x).expr;
-      },
-      x.expr)};
+  return Variable{log(x.expr)};
 }
 
 Variable log10(double x) {
@@ -699,16 +521,7 @@ Variable log10(double x) {
 }
 
 Variable log10(const Variable& x) {
-  static constexpr double ln10 = 2.3025850929940456840179914546843L;
-
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::log10(x); },
-      [](double x, double) { return 1.0 / (ln10 * x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (1.0 / (ln10 * x)).expr;
-      },
-      x.expr)};
+  return Variable{log10(x.expr)};
 }
 
 Variable pow(double base, const Variable& power) {
@@ -720,40 +533,7 @@ Variable pow(const Variable& base, double power) {
 }
 
 Variable pow(const Variable& base, const Variable& power) {
-  return Variable{MakeShared<Expression>(
-      [](double base, double power) { return std::pow(base, power); },
-      [](double base, double power) {
-        return std::pow(base, power - 1) * power;
-      },
-      [](double base, double power) {
-        // Since x * std::log(x) -> 0 as x -> 0
-        if (base == 0.0) {
-          return 0.0;
-        } else {
-          return std::pow(base, power - 1) * base * std::log(base);
-        }
-      },
-      [](const SharedPtr<Expression>& baseExpr,
-         const SharedPtr<Expression>& powerExpr) {
-        Variable base{baseExpr};
-        Variable power{powerExpr};
-
-        return (autodiff::pow(base, power - 1) * power).expr;
-      },
-      [](const SharedPtr<Expression>& baseExpr,
-         const SharedPtr<Expression>& powerExpr) {
-        Variable base{baseExpr};
-        Variable power{powerExpr};
-
-        // Since x * std::log(x) -> 0 as x -> 0
-        if (base.Value() == 0.0) {
-          return MakeShared<Expression>(0.0);
-        } else {
-          return (autodiff::pow(base, power - 1) * base * autodiff::log(base))
-              .expr;
-        }
-      },
-      base.expr, power.expr)};
+  return Variable{pow(base.expr, power.expr)};
 }
 
 Variable sin(double x) {
@@ -761,14 +541,7 @@ Variable sin(double x) {
 }
 
 Variable sin(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::sin(x); },
-      [](double x, double) { return std::cos(x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return autodiff::cos(x).expr;
-      },
-      x.expr)};
+  return Variable{sin(x.expr)};
 }
 
 Variable sinh(double x) {
@@ -776,14 +549,7 @@ Variable sinh(double x) {
 }
 
 Variable sinh(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::sinh(x); },
-      [](double x, double) { return std::cosh(x); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return autodiff::cosh(x).expr;
-      },
-      x.expr)};
+  return Variable{sinh(x.expr)};
 }
 
 Variable sqrt(double x) {
@@ -791,14 +557,7 @@ Variable sqrt(double x) {
 }
 
 Variable sqrt(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::sqrt(x); },
-      [](double x, double) { return 1.0 / (2.0 * std::sqrt(x)); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (1.0 / (2.0 * autodiff::sqrt(x))).expr;
-      },
-      x.expr)};
+  return Variable{sqrt(x.expr)};
 }
 
 Variable tan(double x) {
@@ -806,14 +565,7 @@ Variable tan(double x) {
 }
 
 Variable tan(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::tan(x); },
-      [](double x, double) { return 1.0 / (std::cos(x) * std::cos(x)); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (1.0 / (autodiff::cos(x) * autodiff::cos(x))).expr;
-      },
-      x.expr)};
+  return Variable{tan(x.expr)};
 }
 
 Variable tanh(double x) {
@@ -821,14 +573,7 @@ Variable tanh(double x) {
 }
 
 Variable tanh(const Variable& x) {
-  return Variable{MakeShared<Expression>(
-      [](double x, double) { return std::tanh(x); },
-      [](double x, double) { return 1.0 / (std::cosh(x) * std::cosh(x)); },
-      [](const SharedPtr<Expression>& xExpr, const SharedPtr<Expression>&) {
-        Variable x{xExpr};
-        return (1.0 / (autodiff::cosh(x) * autodiff::cosh(x))).expr;
-      },
-      x.expr)};
+  return Variable{tanh(x.expr)};
 }
 
 }  // namespace frc::autodiff

@@ -86,11 +86,198 @@ struct WPILIB_DLLEXPORT Expression {
              BinaryFuncExpr lhsGradientFunc, BinaryFuncExpr rhsGradientFunc,
              SharedPtr<Expression> lhs, SharedPtr<Expression> rhs);
 
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator*(
+      double lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator*(
+      const SharedPtr<Expression>& lhs, double rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator*(
+      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator/(
+      double lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator/(
+      const SharedPtr<Expression>& lhs, double rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator/(
+      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
+      double lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
+      const SharedPtr<Expression>& lhs, double rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
+      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
+      double lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
+      const SharedPtr<Expression>& lhs, double rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
+      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
+      const SharedPtr<Expression>& lhs);
+
+  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
+      const SharedPtr<Expression>& lhs);
+
   /**
    * Update the value of this node based on the values of its dependent
    * nodes.
    */
   void Update();
 };
+
+/**
+ * std::abs() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> abs(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::acos() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> acos(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::asin() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> asin(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::atan() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> atan(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::atan2() for Expressions.
+ *
+ * @param y The y argument.
+ * @param x The x argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> atan2(  // NOLINT
+    const SharedPtr<Expression>& y, const SharedPtr<Expression>& x);
+
+/**
+ * std::cos() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> cos(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::cosh() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> cosh(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::erf() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> erf(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::exp() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> exp(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::hypot() for Expressions.
+ *
+ * @param x The x argument.
+ * @param y The y argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> hypot(  // NOLINT
+    const SharedPtr<Expression>& x, const SharedPtr<Expression>& y);
+
+/**
+ * std::log() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> log(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::log10() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> log10(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::pow() for Expressions.
+ *
+ * @param base The base.
+ * @param power The power.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> pow(  // NOLINT
+    const SharedPtr<Expression>& base, const SharedPtr<Expression>& power);
+
+/**
+ * std::sin() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> sin(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::sinh() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> sinh(const SharedPtr<Expression>& x);
+
+/**
+ * std::sqrt() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> sqrt(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::tan() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> tan(  // NOLINT
+    const SharedPtr<Expression>& x);
+
+/**
+ * std::tanh() for Expressions.
+ *
+ * @param x The argument.
+ */
+WPILIB_DLLEXPORT SharedPtr<Expression> tanh(const SharedPtr<Expression>& x);
 
 }  // namespace frc::autodiff
