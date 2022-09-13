@@ -73,7 +73,8 @@ VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
     if (varExpr.adjointExpr == nullptr) {
       varExpr.adjointExpr = adjoint;
     } else {
-      Variable{varExpr.adjointExpr} += Variable{adjoint};
+      varExpr.adjointExpr =
+          (Variable{varExpr.adjointExpr} + Variable{adjoint}).expr;
     }
 
     if (lhs != nullptr) {
@@ -390,10 +391,12 @@ double Gradient(Variable var, Variable& wrt) {
     varExpr.adjoint += adjoint;
 
     if (lhs != nullptr) {
-      s.emplace(
-          lhs, adjoint * varExpr.gradientValueFuncs[0](lhs->value, rhs->value));
-
-      if (rhs != nullptr) {
+      if (rhs == nullptr) {
+        s.emplace(lhs,
+                  adjoint * varExpr.gradientValueFuncs[0](lhs->value, 0.0));
+      } else {
+        s.emplace(lhs, adjoint * varExpr.gradientValueFuncs[0](lhs->value,
+                                                               rhs->value));
         s.emplace(rhs, adjoint * varExpr.gradientValueFuncs[1](lhs->value,
                                                                rhs->value));
       }
@@ -422,10 +425,12 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
     varExpr.adjoint += adjoint;
 
     if (lhs != nullptr) {
-      s.emplace(
-          lhs, adjoint * varExpr.gradientValueFuncs[0](lhs->value, rhs->value));
-
-      if (rhs != nullptr) {
+      if (rhs == nullptr) {
+        s.emplace(lhs,
+                  adjoint * varExpr.gradientValueFuncs[0](lhs->value, 0.0));
+      } else {
+        s.emplace(lhs, adjoint * varExpr.gradientValueFuncs[0](lhs->value,
+                                                               rhs->value));
         s.emplace(rhs, adjoint * varExpr.gradientValueFuncs[1](lhs->value,
                                                                rhs->value));
       }
