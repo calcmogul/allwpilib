@@ -8,29 +8,44 @@
 
 using namespace frc::autodiff;
 
-Expression::Expression(
-    double value, BinaryFuncDouble valueFunc,
-    std::array<BinaryFuncDouble, kNumArgs> gradientValueFuncs,
-    std::array<BinaryFuncVar, kNumArgs> gradientFuncs,
-    std::array<Variable, kNumArgs> args)
-    : value{value},
-      args{std::move(args)},
-      valueFunc{std::move(valueFunc)},
-      gradientValueFuncs{std::move(gradientValueFuncs)},
-      gradientFuncs{std::move(gradientFuncs)} {}
+Expression::Expression(double value) : value{value} {}
+
+Expression::Expression(BinaryFuncDouble valueFunc,
+                       BinaryFuncDouble lhsGradientValueFunc,
+                       BinaryFuncExpr lhsGradientFunc,
+                       std::shared_ptr<Expression> lhs)
+    : value{valueFunc(lhs->value, 0.0)},
+      valueFunc{valueFunc},
+      gradientValueFuncs{std::array{lhsGradientValueFunc, BinaryFuncDouble{}}},
+      gradientFuncs{std::array{lhsGradientFunc, BinaryFuncExpr{}}},
+      args{std::array<std::shared_ptr<Expression>, 2>{lhs, nullptr}} {}
+
+Expression::Expression(BinaryFuncDouble valueFunc,
+                       BinaryFuncDouble lhsGradientValueFunc,
+                       BinaryFuncDouble rhsGradientValueFunc,
+                       BinaryFuncExpr lhsGradientFunc,
+                       BinaryFuncExpr rhsGradientFunc,
+                       std::shared_ptr<Expression> lhs,
+                       std::shared_ptr<Expression> rhs)
+    : value{valueFunc(lhs->value, rhs->value)},
+      valueFunc{valueFunc},
+      gradientValueFuncs{
+          std::array{lhsGradientValueFunc, rhsGradientValueFunc}},
+      gradientFuncs{std::array{lhsGradientFunc, rhsGradientFunc}},
+      args{std::array<std::shared_ptr<Expression>, 2>{lhs, rhs}} {}
 
 void Expression::Update() {
-  if (args[0].expr != nullptr) {
-    auto& lhs = args[0].GetExpression();
-    lhs.Update();
+  if (args[0] != nullptr) {
+    auto& lhs = args[0];
+    lhs->Update();
 
-    if (args[1].expr == nullptr) {
-      value = valueFunc(lhs.value, 0.0);
+    if (args[1] == nullptr) {
+      value = valueFunc(lhs->value, 0.0);
     } else {
-      auto& rhs = args[1].GetExpression();
-      rhs.Update();
+      auto& rhs = args[1];
+      rhs->Update();
 
-      value = valueFunc(lhs.value, rhs.value);
+      value = valueFunc(lhs->value, rhs->value);
     }
   }
 }

@@ -5,27 +5,24 @@
 #pragma once
 
 #include <array>
+#include <memory>
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/autodiff/Variable.h"
-
 namespace frc::autodiff {
 
-using BinaryFuncDouble = double (*)(double, double);
-using BinaryFuncVar = Variable (*)(const Variable&, const Variable&);
-
 struct WPILIB_DLLEXPORT Expression {
+  using BinaryFuncDouble = double (*)(double, double);
+  using BinaryFuncExpr = std::shared_ptr<Expression> (*)(
+      const std::shared_ptr<Expression>&, const std::shared_ptr<Expression>&);
+
   static constexpr int kNumArgs = 2;
 
   double value = 0.0;
 
   double adjoint = 0.0;
 
-  Variable adjointVar;
-
-  // Indices of dependent nodes (function arguments)
-  std::array<Variable, kNumArgs> args{Variable{}, Variable{}};
+  std::shared_ptr<Expression> adjointExpr;
 
   // Either nullary operator with no arguments, unary operator with one
   // argument, or binary operator with two arguments. This operator is
@@ -37,9 +34,18 @@ struct WPILIB_DLLEXPORT Expression {
       [](double, double) { return 0.0; }, [](double, double) { return 0.0; }};
 
   // Gradients with respect to each argument
-  std::array<BinaryFuncVar, kNumArgs> gradientFuncs{
-      [](const Variable&, const Variable&) { return Variable::Constant(0.0); },
-      [](const Variable&, const Variable&) { return Variable::Constant(0.0); }};
+  std::array<BinaryFuncExpr, kNumArgs> gradientFuncs{
+      [](const std::shared_ptr<Expression>&,
+         const std::shared_ptr<Expression>&) {
+        return std::make_shared<Expression>(0.0);
+      },
+      [](const std::shared_ptr<Expression>&,
+         const std::shared_ptr<Expression>&) {
+        return std::make_shared<Expression>(0.0);
+      }};
+
+  // Indices of dependent nodes (function arguments)
+  std::array<std::shared_ptr<Expression>, kNumArgs> args{nullptr, nullptr};
 
   Expression(const Expression&) = default;
   Expression& operator=(const Expression&) = default;
@@ -48,19 +54,38 @@ struct WPILIB_DLLEXPORT Expression {
   Expression& operator=(Expression&&) = default;
 
   /**
-   * Constructs a node with the given gradients, argument indices, and function
-   * pointer to a binary operator between them.
+   * Constructs a nullary expression (an operator with no arguments).
    *
-   * @param value This node's value.
-   * @param valueFunc Binary operator that produces this node's value.
-   * @param gradientValueFuncs Gradients with respect to each operand.
-   * @param gradientFuncs Gradients with respect to each operand.
-   * @param args Binary operator's operands.
+   * @param value The expression value.
    */
-  Expression(double value, BinaryFuncDouble valueFunc,
-             std::array<BinaryFuncDouble, kNumArgs> gradientValueFuncs,
-             std::array<BinaryFuncVar, kNumArgs> gradientFuncs,
-             std::array<Variable, kNumArgs> args);
+  explicit Expression(double value);
+
+  /**
+   * Constructs an unary expression (an operator with one argument).
+   *
+   * @param valueFunc Unary operator that produces this expression's value.
+   * @param lhsGradientValueFunc Gradient with respect to the operand.
+   * @param lhsGradientFunc Gradient with respect to the operand.
+   * @param lhs Unary operator's operand.
+   */
+  Expression(BinaryFuncDouble valueFunc, BinaryFuncDouble lhsGradientValueFunc,
+             BinaryFuncExpr lhsGradientFunc, std::shared_ptr<Expression> lhs);
+
+  /**
+   * Constructs a binary expression (an operator with two arguments).
+   *
+   * @param valueFunc Unary operator that produces this expression's value.
+   * @param lhsGradientValueFunc Gradient with respect to the left operand.
+   * @param rhsGradientValueFunc Gradient with respect to the right operand.
+   * @param lhsGradientFunc Gradient with respect to the left operand.
+   * @param rhsGradientFunc Gradient with respect to the right operand.
+   * @param lhs Binary operator's left operand.
+   * @param rhs Binary operator's right operand.
+   */
+  Expression(BinaryFuncDouble valueFunc, BinaryFuncDouble lhsGradientValueFunc,
+             BinaryFuncDouble rhsGradientValueFunc,
+             BinaryFuncExpr lhsGradientFunc, BinaryFuncExpr rhsGradientFunc,
+             std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs);
 
   /**
    * Update the value of this node based on the values of its dependent
