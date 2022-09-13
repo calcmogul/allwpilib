@@ -27,7 +27,8 @@ Expression::Expression(BinaryFuncDouble valueFunc,
                        BinaryFuncExpr lhsGradientFunc,
                        BinaryFuncExpr rhsGradientFunc,
                        SharedPtr<Expression> lhs, SharedPtr<Expression> rhs)
-    : value{valueFunc(lhs->value, rhs->value)},
+    : value{valueFunc(lhs != nullptr ? lhs->value : 0.0,
+                      rhs != nullptr ? rhs->value : 0.0)},
       valueFunc{valueFunc},
       gradientValueFuncs{
           std::array{lhsGradientValueFunc, rhsGradientValueFunc}},
