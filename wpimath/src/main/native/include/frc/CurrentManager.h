@@ -34,7 +34,7 @@ class CurrentManager {
       units::ampere_t maxCurrent)
       : m_desiredCurrents{Subsystems, 1},
         m_allocatedCurrents{m_problem.DecisionVariable(Subsystems, 1)} {
-    frc::VariableMatrix J = 0.0;
+    VariableMatrix J = 0.0;
     for (int i = 0; i < Subsystems; ++i) {
       // The weight is 1/tolᵢ² where tolᵢ is the tolerance between the desired
       // and allocated current for subsystem i
