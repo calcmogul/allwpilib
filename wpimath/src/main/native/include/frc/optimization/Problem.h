@@ -28,14 +28,14 @@ namespace frc {
  * This class supports problems of the
  * form:
  * @verbatim
- *      min_x f(x)
- * subject to b(x) ≥ 0
- *            c(x) = 0
+ *       minₓ f(x)
+ * subject to cᵢ(x) ≥ 0
+ *            cₑ(x) = 0
  * @endverbatim
  *
  * where f(x) is the scalar cost function, x is the vector of decision variables
- * (variables the solver can tweak to minimize the cost function), b(x) are the
- * inequality constraints, and c(x) are the equality constraints. Constraints
+ * (variables the solver can tweak to minimize the cost function), cᵢ(x) are the
+ * inequality constraints, and cₑ(x) are the equality constraints. Constraints
  * are equations or inequalities of the decision variables that constrain what
  * values the solver is allowed to use when searching for an optimal solution.
  *
