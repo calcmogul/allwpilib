@@ -43,7 +43,7 @@ struct WPILIB_DLLEXPORT Expression {
         return MakeShared<Expression>(0.0);
       }};
 
-  // Indices of dependent nodes (function arguments)
+  // Expression arguments
   std::array<SharedPtr<Expression>, kNumArgs> args{nullptr, nullptr};
 
   Expression(const Expression&) = default;
