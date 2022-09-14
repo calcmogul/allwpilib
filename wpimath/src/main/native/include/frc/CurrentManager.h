@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include <wpi/array.h>
 
 #include "frc/EigenCore.h"
@@ -75,7 +77,7 @@ class CurrentManager {
 
     wpi::array<units::ampere_t, Subsystems> result{wpi::empty_array};
     for (int i = 0; i < Subsystems; ++i) {
-      result[i] = units::ampere_t{m_allocatedCurrents.Value(i)};
+      result[i] = units::ampere_t{std::max(m_allocatedCurrents.Value(i), 0.0)};
     }
 
     return result;
