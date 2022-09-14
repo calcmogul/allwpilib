@@ -183,28 +183,6 @@ class WPILIB_DLLEXPORT Problem {
    * will find the closest solution to the initial conditions that's in the
    * feasible set.
    *
-   * @param cost The cost function to minimize.
-   */
-  void Minimize(const autodiff::Variable& cost);
-
-  /**
-   * Tells the solver to minimize the output of the given cost function.
-   *
-   * Note that this is optional. If only constraints are specified, the solver
-   * will find the closest solution to the initial conditions that's in the
-   * feasible set.
-   *
-   * @param cost The cost function to minimize.
-   */
-  void Minimize(autodiff::Variable&& cost);
-
-  /**
-   * Tells the solver to minimize the output of the given cost function.
-   *
-   * Note that this is optional. If only constraints are specified, the solver
-   * will find the closest solution to the initial conditions that's in the
-   * feasible set.
-   *
    * @param cost The cost function to minimize. It must return a 1x1 matrix.
    */
   void Minimize(const VariableMatrix& cost);

@@ -45,14 +45,6 @@ VariableMatrix Problem::DecisionVariable(int rows, int cols) {
   return vars;
 }
 
-void Problem::Minimize(const autodiff::Variable& cost) {
-  m_f = cost;
-}
-
-void Problem::Minimize(autodiff::Variable&& cost) {
-  m_f = std::move(cost);
-}
-
 void Problem::Minimize(const VariableMatrix& cost) {
   assert(cost.Rows() == 1 && cost.Cols() == 1);
   m_f = cost.Autodiff(0, 0);
