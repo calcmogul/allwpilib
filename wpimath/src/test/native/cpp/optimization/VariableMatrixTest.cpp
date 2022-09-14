@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/EigenCore.h"
+#include "frc/autodiff/Hessian.h"
 #include "frc/optimization/Problem.h"
+#include "frc/optimization/VariableMatrix.h"
 #include "gtest/gtest.h"
 
 TEST(VariableMatrixTest, ScalarInitAssign) {
@@ -81,5 +83,26 @@ TEST(VariableMatrixTest, MatrixInitAssign) {
 
     frc::Matrixd<3, 2> expectedResult{{1.0, 8.0}, {1.0, 10.0}, {11.0, 12.0}};
     EXPECT_EQ(expectedResult, z.Value());
+  }
+}
+
+TEST(VariableMatrixTest, HessianSumOfSquares) {
+  frc::autodiff::VectorXvar r{{25.0, 10.0, 5.0, 0.0}};
+  frc::autodiff::VectorXvar x{{0.0, 0.0, 0.0, 0.0}};
+
+  frc::VariableMatrix J = 0.0;
+  for (int i = 0; i < 4; ++i) {
+    J += (r(i) - x(i)) * (r(i) - x(i));
+  }
+
+  Eigen::MatrixXd H = frc::autodiff::Hessian{J.Autodiff(0, 0), x}.Calculate();
+  for (int row = 0; row < 4; ++row) {
+    for (int col = 0; col < 4; ++col) {
+      if (row == col) {
+        EXPECT_EQ(2.0, H(row, col));
+      } else {
+        EXPECT_EQ(0.0, H(row, col));
+      }
+    }
   }
 }
