@@ -12,91 +12,6 @@
 
 namespace frc::autodiff {
 
-namespace {
-
-/**
- * In reverse accumulation AD, the dependent variable to be differentiated is
- * fixed and the derivative is computed with respect to each sub-expression
- * recursively. In a pen-and-paper calculation, the derivative of the outer
- * functions is repeatedly substituted in the chain rule:
- *
- * (∂y/∂x) = (∂y/∂w₁) * (∂w₁/∂x) = ((∂y/∂w₂) * (∂w₂/∂w₁)) * (∂w₁/∂x) = ...
- *
- * In reverse accumulation, the quantity of interest is the adjoint,
- * denoted with a bar (w̄); it is a derivative of a chosen dependent variable
- * with respect to a subexpression w: ∂y/∂w.
- *
- * Given the expression f(x₁,x₂)=sin(x₁) + x₁x₂, the computational graph is:
- *
- *                f(x₁,x₂)
- *                   |
- *                   w₅     w₅=w₄+w₃
- *                  /  \
- *                 /    \
- *  w₄=sin(w₁)    w₄     w₃    w₃=w₁w₂
- *                |   /  |
- *      w₁=x₁     w₁     w₂    w₂=x₃
- *
- * The operations to compute the derivative:
- *
- * w̄₅ = 1 (seed)
- * w̄₄ = w̄₅(∂w₅/∂w₄) = w̄₅
- * w̄₃ = w̄₅(∂w₅/∂w₃) = w̄₅
- * w̄₂ = w̄₃(∂w₃/∂w₂) = w̄₃w₁
- * w̄₁ = w̄₄(∂w₄/∂w₁) + w̄₃(∂w₃/∂w₁) = w̄₄cos(w₁) + w̄₃w₂
- *
- * https://en.wikipedia.org/wiki/Automatic_differentiation#Beyond_forward_and_reverse_accumulation
- */
-
-/**
- * Returns the given variable's gradient tree.
- *
- * @param variable Variable of which to compute the gradient.
- * @param wrt Variables with respect to which to compute the gradient.
- */
-VectorXvar GenerateGradientTree(Variable& var, VectorXvar& wrt) {
-  for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetExpression().adjointExpr = MakeShared<Expression>(0.0);
-  }
-
-  // Stack element contains variable and its adjoint
-  std::vector<std::tuple<Variable, SharedPtr<Expression>>> stack;
-  stack.reserve(1024);
-
-  stack.emplace_back(var, MakeShared<Expression>(1.0));
-  while (!stack.empty()) {
-    auto [var, adjoint] = stack.back();
-    stack.pop_back();
-
-    auto& varExpr = var.GetExpression();
-    auto& lhs = varExpr.args[0];
-    auto& rhs = varExpr.args[1];
-
-    if (varExpr.adjointExpr == nullptr) {
-      varExpr.adjointExpr = adjoint;
-    } else {
-      varExpr.adjointExpr = varExpr.adjointExpr + adjoint;
-    }
-
-    if (lhs != nullptr) {
-      stack.emplace_back(lhs, adjoint * varExpr.gradientFuncs[0](lhs, rhs));
-
-      if (rhs != nullptr) {
-        stack.emplace_back(rhs, adjoint * varExpr.gradientFuncs[1](lhs, rhs));
-      }
-    }
-  }
-
-  VectorXvar grad{wrt.rows()};
-  for (int row = 0; row < wrt.rows(); ++row) {
-    grad(row) = Variable{wrt(row).GetExpression().adjointExpr};
-  }
-
-  return grad;
-}
-
-}  // namespace
-
 Variable::Variable(double value) : expr{MakeShared<Expression>(value)} {}
 
 Variable::Variable(int value) : expr{MakeShared<Expression>(value)} {}
@@ -310,6 +225,9 @@ Expression& Variable::GetExpression() {
 }
 
 double Gradient(Variable var, Variable& wrt) {
+  // Read wpimath/README.md#Reverse_accumulation_automatic_differentiation for
+  // background on reverse accumulation automatic differentiation.
+
   wrt.GetExpression().adjoint = 0.0;
 
   // Stack element contains variable and its adjoint
@@ -344,6 +262,9 @@ double Gradient(Variable var, Variable& wrt) {
 }
 
 Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
+  // Read wpimath/README.md#Reverse_accumulation_automatic_differentiation for
+  // background on reverse accumulation automatic differentiation.
+
   for (int row = 0; row < wrt.rows(); ++row) {
     wrt(row).GetExpression().adjoint = 0.0;
   }
@@ -399,25 +320,6 @@ Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
   J.setFromTriplets(triplets.begin(), triplets.end());
 
   return J;
-}
-
-Eigen::SparseMatrix<double> Hessian(Variable& variable, VectorXvar& wrt) {
-  VectorXvar gradientTree = GenerateGradientTree(variable, wrt);
-
-  std::vector<Eigen::Triplet<double>> triplets;
-  for (int row = 0; row < gradientTree.rows(); ++row) {
-    Eigen::RowVectorXd g = Gradient(gradientTree(row), wrt).transpose();
-    for (int col = 0; col < g.cols(); ++col) {
-      if (g(col) != 0.0) {
-        triplets.emplace_back(row, col, g(col));
-      }
-    }
-  }
-
-  Eigen::SparseMatrix<double> H{wrt.rows(), wrt.rows()};
-  H.setFromTriplets(triplets.begin(), triplets.end());
-
-  return H;
 }
 
 Variable abs(double x) {

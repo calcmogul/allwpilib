@@ -11,6 +11,7 @@
 
 #include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
+#include "frc/autodiff/Hessian.h"
 #include "frc/autodiff/Variable.h"
 
 using namespace frc;
@@ -380,6 +381,8 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Error estimate E_μ
   double E_mu = std::numeric_limits<double>::infinity();
 
+  autodiff::Hessian hessian{L, m_leaves};
+
   int iterations = 0;
   while (E_mu > m_tolerance) {
     while (E_mu > kappa_epsilon * mu) {
@@ -418,7 +421,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       Eigen::SparseMatrix<double> inverseSigma = S * inverseZ;
 
       // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
-      Eigen::SparseMatrix<double> H = autodiff::Hessian(L, m_leaves);
+      Eigen::SparseMatrix<double> H = hessian.Calculate();
 
       //         [∇ᵀcₑ₁(x)ₖ]
       // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]

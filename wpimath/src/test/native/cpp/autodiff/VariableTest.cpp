@@ -4,6 +4,7 @@
 
 #include <wpi/numbers>
 
+#include "frc/autodiff/Hessian.h"
 #include "frc/autodiff/Variable.h"
 #include "gtest/gtest.h"
 
@@ -498,7 +499,7 @@ TEST(VariableTest, HessianLinear) {
   // d²y/dx² = d/dx(x (rhs) + x (lhs))
   //         = 1 + 1
   //         = 2
-  Eigen::MatrixXd H = Hessian(y, x);
+  Eigen::MatrixXd H = frc::autodiff::Hessian{y, x}.Calculate();
   EXPECT_DOUBLE_EQ(0.0, H(0, 0));
 }
 
@@ -517,7 +518,7 @@ TEST(VariableTest, HessianQuadratic) {
   // d²y/dx² = d/dx(x (rhs) + x (lhs))
   //         = 1 + 1
   //         = 2
-  Eigen::MatrixXd H = Hessian(y, x);
+  Eigen::MatrixXd H = frc::autodiff::Hessian{y, x}.Calculate();
   EXPECT_DOUBLE_EQ(2.0, H(0, 0));
 }
 
@@ -539,7 +540,7 @@ TEST(VariableTest, Hessian) {
     EXPECT_DOUBLE_EQ(1.0, g(i));
   }
 
-  H = Hessian(y, x);
+  H = frc::autodiff::Hessian{y, x}.Calculate();
   for (int i = 0; i < x.rows(); ++i) {
     for (int j = 0; j < x.rows(); ++j) {
       EXPECT_DOUBLE_EQ(0.0, H(i, j));
@@ -558,7 +559,7 @@ TEST(VariableTest, Hessian) {
     EXPECT_EQ(2 * x(i), g(i));
   }
 
-  H = Hessian(y, x);
+  H = frc::autodiff::Hessian{y, x}.Calculate();
   for (int i = 0; i < x.rows(); ++i) {
     for (int j = 0; j < x.size(); ++j) {
       if (i == j) {
@@ -583,7 +584,7 @@ TEST(VariableTest, Hessian) {
     EXPECT_EQ(y / frc::autodiff::tan(x(i)), g(i));
   }
 
-  H = Hessian(y, x);
+  H = frc::autodiff::Hessian{y, x}.Calculate();
   for (int i = 0; i < x.rows(); ++i) {
     for (int j = 0; j < x.rows(); ++j) {
       if (i == j) {
@@ -612,7 +613,7 @@ TEST(VariableTest, Hessian) {
   EXPECT_EQ(-2 * x[2] + 4 * x[3] - 2 * x[4], g(3));
   EXPECT_EQ(-2 * x[3] + 2 * x[4], g(4));
 
-  H = Hessian(y, x);
+  H = frc::autodiff::Hessian{y, x}.Calculate();
   EXPECT_EQ(2.0, H(0, 0));
   EXPECT_EQ(-2.0, H(0, 1));
   EXPECT_EQ(0.0, H(0, 2));

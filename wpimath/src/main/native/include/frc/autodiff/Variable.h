@@ -174,15 +174,6 @@ WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables,
                                                       VectorXvar& wrt);
 
 /**
- * Returns the Hessian of an autodiff variable with respect to the given vector.
- *
- * @param variable Variable of which to compute the Hessian.
- * @param wrt Vector with respect to which to compute the Hessian.
- */
-WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Hessian(Variable& variable,
-                                                     VectorXvar& wrt);
-
-/**
  * std::abs() for Variables.
  *
  * @param x The argument.
