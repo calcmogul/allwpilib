@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include <tuple>
 #include <vector>
 
 #include <wpi/SymbolExports.h>
 
+#include "Eigen/Core"
+#include "Eigen/SparseCore"
 #include "frc/autodiff/Variable.h"
 
 namespace frc::autodiff {

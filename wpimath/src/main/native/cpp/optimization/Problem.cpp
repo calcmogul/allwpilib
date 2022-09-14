@@ -11,7 +11,9 @@
 
 #include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
+#include "frc/autodiff/Gradient.h"
 #include "frc/autodiff/Hessian.h"
+#include "frc/autodiff/Jacobian.h"
 #include "frc/autodiff/Variable.h"
 
 using namespace frc;
@@ -463,7 +465,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       }
       Eigen::VectorXd rhs{x.rows() + y.rows()};
       rhs.topRows(x.rows()) =
-          Gradient(m_f.value(), m_leaves) - A_e.transpose() * y +
+          autodiff::Gradient(m_f.value(), m_leaves) - A_e.transpose() * y +
           A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
       rhs.bottomRows(y.rows()) = c_e;
 
@@ -570,8 +572,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       //   ||Sz − μe||_∞ / s_c
       //   ||cₑ||_∞
       //   ||cᵢ − s||_∞
-      E_mu = Max((Gradient(m_f.value(), m_leaves) - A_e.transpose() * y -
-                  A_i.transpose() * z)
+      E_mu = Max((autodiff::Gradient(m_f.value(), m_leaves) -
+                  A_e.transpose() * y - A_i.transpose() * z)
                          .lpNorm<Eigen::Infinity>() /
                      s_d,
                  (S * z - mu * e).lpNorm<Eigen::Infinity>() / s_c,

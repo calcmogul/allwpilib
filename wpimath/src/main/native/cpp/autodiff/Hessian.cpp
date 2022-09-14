@@ -4,6 +4,11 @@
 
 #include "frc/autodiff/Hessian.h"
 
+#include <tuple>
+
+#include "frc/autodiff/Gradient.h"
+#include "frc/autodiff/SharedPtr.h"
+
 using namespace frc::autodiff;
 
 Hessian::Hessian(Variable& variable, VectorXvar& wrt)

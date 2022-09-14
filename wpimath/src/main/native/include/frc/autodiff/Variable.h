@@ -149,31 +149,6 @@ class WPILIB_DLLEXPORT Variable {
 using VectorXvar = Eigen::Vector<frc::autodiff::Variable, Eigen::Dynamic>;
 
 /**
- * Returns gradient of a variable with respect to the given variable.
- *
- * @param variable Variable of which to compute the gradient.
- * @param wrt Variable with respect to which to compute the gradient.
- */
-WPILIB_DLLEXPORT double Gradient(Variable variable, Variable& wrt);
-
-/**
- * Returns gradient of a variable with respect to the given variable.
- *
- * @param variable Variable of which to compute the gradient.
- * @param wrt Variables with respect to which to compute the gradient.
- */
-WPILIB_DLLEXPORT Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt);
-
-/**
- * Returns the Jacobian of an autodiff vector with respect to the given vector.
- *
- * @param variables Vector of which to compute the Jacobian.
- * @param wrt Vector with respect to which to compute the Jacobian.
- */
-WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables,
-                                                      VectorXvar& wrt);
-
-/**
  * std::abs() for Variables.
  *
  * @param x The argument.
