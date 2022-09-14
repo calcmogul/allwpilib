@@ -7,10 +7,10 @@
 #include <cstddef>
 #include <utility>
 
-#if defined(__GNUC__) && !defined(__clang__)
+#if __GNUC__ == 12 && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuse-after-free"
-#endif  // defined(__GNUC__) && !defined(__clang__)
+#endif  // __GNUC__ == 12 && !defined(__clang__)
 
 namespace frc::autodiff {
 
@@ -127,6 +127,6 @@ SharedPtr<T> MakeShared(Args&&... args) {
 
 }  // namespace frc::autodiff
 
-#if defined(__GNUC__) && !defined(__clang__)
+#if __GNUC__ == 12 && !defined(__clang__)
 #pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
+#endif  // __GNUC__ == 12 && !defined(__clang__)
