@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <limits>
+
 #include "units/time.h"
 
 namespace frc {
@@ -19,7 +21,7 @@ struct SolverConfig {
   int maxIterations = 1000;
 
   /// The maximum elapsed wall clock time before returning a solution.
-  units::second_t timeout = 10_s;
+  units::second_t timeout{std::numeric_limits<double>::infinity()};
 };
 
 }  // namespace frc
