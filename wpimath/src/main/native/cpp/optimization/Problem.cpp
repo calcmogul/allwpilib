@@ -578,7 +578,7 @@ Eigen::VectorXd Problem::InteriorPoint(
                  (c_i - s).lpNorm<Eigen::Infinity>());
 
       ++iterations;
-      if (iterations == m_config.maxIterations) {
+      if (iterations >= m_config.maxIterations) {
         *status = SolverStatus::kMaxIterations;
         return x;
       }

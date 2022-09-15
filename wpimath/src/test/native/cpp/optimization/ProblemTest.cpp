@@ -34,6 +34,32 @@ TEST(ProblemTest, EmptyProblem) {
   EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 }
 
+TEST(ProblemTest, SolverStatusTimeout) {
+  frc::Problem problem;
+
+  auto x = problem.DecisionVariable();
+  x = 0.0;
+  problem.Minimize(x);
+
+  frc::SolverConfig config;
+  config.timeout = 0_s;
+
+  EXPECT_EQ(frc::SolverStatus::kTimeout, problem.Solve(config));
+}
+
+TEST(ProblemTest, SolverStatusMaxIterations) {
+  frc::Problem problem;
+
+  auto x = problem.DecisionVariable();
+  x = 0.0;
+  problem.Minimize(x);
+
+  frc::SolverConfig config;
+  config.maxIterations = 0;
+
+  EXPECT_EQ(frc::SolverStatus::kMaxIterations, problem.Solve(config));
+}
+
 TEST(ProblemTest, NoCostUnconstrained) {
   {
     frc::Problem problem;
