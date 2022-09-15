@@ -12,6 +12,9 @@
 #include "Eigen/Core"
 #include "frc/autodiff/Variable.h"
 #include "frc/optimization/Constraints.h"
+#include "frc/optimization/ProblemType.h"
+#include "frc/optimization/SolverConfig.h"
+#include "frc/optimization/SolverStatus.h"
 #include "frc/optimization/VariableMatrix.h"
 
 namespace frc {
@@ -130,37 +133,6 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT Problem {
  public:
-  static constexpr double kTolerance = 1e-6;
-  static constexpr int kMaxIterations = 1000;
-
-  /**
-   * The type of optimization problem to solve.
-   */
-  enum class ProblemType {
-    /// The optimization problem has a linear cost function and linear
-    /// constraints
-    kLinear,
-    /// The optimization problem has a quadratic cost function and linear
-    /// constraints
-    kQuadratic,
-    /// The optimization problem has a nonlinear cost function or nonlinear
-    /// constraints
-    kNonlinear
-  };
-
-  /**
-   * Solver return status.
-   */
-  enum class SolverStatus {
-    /// The solver found a solution
-    kOk,
-    /// The solver returned a solution that was infeasible
-    kInfeasible,
-    /// The solver returned a solution after exceeding the maximum number of
-    /// iterations
-    kMaxIterations
-  };
-
   /**
    * Construct the optimization problem.
    *
@@ -218,13 +190,9 @@ class WPILIB_DLLEXPORT Problem {
    * Solve the optimization problem. The solution will be stored in the original
    * variables used to construct the problem.
    *
-   * @param tolerance The solver will stop once the norm of the gradient is
-   *                  below this tolerance.
-   * @param maxIterations The maximum number of solver iterations before
-   *                      returning a solution.
+   * @param config Configuration options for the solver.
    */
-  SolverStatus Solve(double tolerance = kTolerance,
-                     int maxIterations = kMaxIterations);
+  SolverStatus Solve(const SolverConfig& config = SolverConfig{});
 
  private:
   // Leaves of the problem's expression tree
@@ -242,11 +210,7 @@ class WPILIB_DLLEXPORT Problem {
   // Problem type
   ProblemType m_problemType;
 
-  // Convergence tolerance
-  double m_tolerance = kTolerance;
-
-  // Maximum number of solver iterations
-  int m_maxIterations = kMaxIterations;
+  SolverConfig m_config;
 
   /**
    * Grows an autodiff vector without breaking links to old autodiff variables.

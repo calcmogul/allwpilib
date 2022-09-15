@@ -5,6 +5,7 @@
 #include "frc/optimization/Problem.h"
 
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <limits>
 #include <vector>
@@ -15,6 +16,7 @@
 #include "frc/autodiff/Hessian.h"
 #include "frc/autodiff/Jacobian.h"
 #include "frc/autodiff/Variable.h"
+#include "units/time.h"
 
 using namespace frc;
 
@@ -77,14 +79,13 @@ void Problem::SubjectTo(InequalityConstraints&& constraint) {
   }
 }
 
-Problem::SolverStatus Problem::Solve(double tolerance, int maxIterations) {
-  m_tolerance = tolerance;
-  m_maxIterations = maxIterations;
+SolverStatus Problem::Solve(const SolverConfig& config) {
+  m_config = config;
 
   if (!m_f.has_value() && m_equalityConstraints.rows() == 0 &&
       m_inequalityConstraints.rows() == 0) {
     // If there's no cost function or constraints, do nothing
-    return Problem::SolverStatus::kOk;
+    return SolverStatus::kOk;
   } else if (!m_f.has_value()) {
     // If there's no cost function, make it zero and continue
     m_f = 0.0;
@@ -378,7 +379,11 @@ Eigen::VectorXd Problem::InteriorPoint(
   autodiff::Hessian hessian{L, m_leaves};
 
   int iterations = 0;
-  while (E_mu > m_tolerance) {
+
+  auto startTime = std::chrono::system_clock::now();
+  auto endTime = startTime;
+
+  while (E_mu > m_config.tolerance) {
     while (E_mu > kappa_epsilon * mu) {
       //     [s₁ 0 ⋯ 0 ]
       // S = [0  ⋱   ⋮ ]
@@ -573,8 +578,14 @@ Eigen::VectorXd Problem::InteriorPoint(
                  (c_i - s).lpNorm<Eigen::Infinity>());
 
       ++iterations;
-      if (iterations == m_maxIterations) {
+      if (iterations == m_config.maxIterations) {
         *status = SolverStatus::kMaxIterations;
+        return x;
+      }
+
+      endTime = std::chrono::system_clock::now();
+      if (units::second_t{endTime - startTime} > m_config.timeout) {
+        *status = SolverStatus::kTimeout;
         return x;
       }
     }
@@ -584,7 +595,7 @@ Eigen::VectorXd Problem::InteriorPoint(
     //   μⱼ₊₁ = max{εₜₒₗ/10, min{κ_μ μⱼ, μⱼ^θ_μ}}
     //
     // See equation (7) in [2].
-    mu = std::max(m_tolerance / 10.0,
+    mu = std::max(m_config.tolerance / 10.0,
                   std::min(kappa_mu * mu, std::pow(mu, theta_mu)));
 
     // Update the fraction-to-the-boundary rule scaling factor.

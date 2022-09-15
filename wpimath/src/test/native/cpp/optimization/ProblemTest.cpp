@@ -31,7 +31,7 @@ wpi::SmallVector<double> Range(double start, double end, double step) {
 
 TEST(ProblemTest, EmptyProblem) {
   frc::Problem problem;
-  EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 }
 
 TEST(ProblemTest, NoCostUnconstrained) {
@@ -40,7 +40,7 @@ TEST(ProblemTest, NoCostUnconstrained) {
 
     auto X = problem.DecisionVariable(2, 3);
 
-    EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
     for (int row = 0; row < X.Rows(); ++row) {
       for (int col = 0; col < X.Cols(); ++col) {
@@ -55,7 +55,7 @@ TEST(ProblemTest, NoCostUnconstrained) {
     auto X = problem.DecisionVariable(2, 3);
     X = frc::Matrixd<2, 3>{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
 
-    EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
     for (int row = 0; row < X.Rows(); ++row) {
       for (int col = 0; col < X.Cols(); ++col) {
@@ -73,9 +73,9 @@ TEST(ProblemTest, QuadraticUnconstrained1) {
 
   problem.Minimize(x * x - 6.0 * x);
 
-  EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
-  EXPECT_NEAR(3.0, x.Value(0), frc::Problem::kTolerance);
+  EXPECT_NEAR(3.0, x.Value(0), 1e-6);
 }
 
 TEST(ProblemTest, QuadraticUnconstrained2) {
@@ -89,10 +89,10 @@ TEST(ProblemTest, QuadraticUnconstrained2) {
 
     problem.Minimize(x * x + y * y);
 
-    EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
-    EXPECT_NEAR(0.0, x.Value(0), frc::Problem::kTolerance);
-    EXPECT_NEAR(0.0, y.Value(0), frc::Problem::kTolerance);
+    EXPECT_NEAR(0.0, x.Value(0), 1e-6);
+    EXPECT_NEAR(0.0, y.Value(0), 1e-6);
   }
 
   {
@@ -104,10 +104,10 @@ TEST(ProblemTest, QuadraticUnconstrained2) {
 
     problem.Minimize(x.Transpose() * x);
 
-    EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
-    EXPECT_NEAR(0.0, x.Value(0), frc::Problem::kTolerance);
-    EXPECT_NEAR(0.0, x.Value(1), frc::Problem::kTolerance);
+    EXPECT_NEAR(0.0, x.Value(0), 1e-6);
+    EXPECT_NEAR(0.0, x.Value(1), 1e-6);
   }
 }
 
@@ -161,10 +161,10 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
 
     problem.SubjectTo(x + 3 * y == 36);
 
-    EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
-    EXPECT_NEAR(18.0, x.Value(0), frc::Problem::kTolerance);
-    EXPECT_NEAR(6.0, y.Value(0), frc::Problem::kTolerance);
+    EXPECT_NEAR(18.0, x.Value(0), 1e-6);
+    EXPECT_NEAR(6.0, y.Value(0), 1e-6);
   }
 
   {
@@ -178,10 +178,10 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
 
     problem.SubjectTo(x == frc::Matrixd<2, 1>{{3.0, 3.0}});
 
-    EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
-    EXPECT_NEAR(3.0, x.Value(0), frc::Problem::kTolerance);
-    EXPECT_NEAR(3.0, x.Value(1), frc::Problem::kTolerance);
+    EXPECT_NEAR(3.0, x.Value(0), 1e-6);
+    EXPECT_NEAR(3.0, x.Value(1), 1e-6);
   }
 }
 
@@ -202,10 +202,10 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedWithCubicAndLine) {
       problem.SubjectTo(frc::pow(x - 1, 3) - y + 1 <= 0);
       problem.SubjectTo(x + y - 2 <= 0);
 
-      EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+      EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
-      EXPECT_NEAR(1.0, x.Value(0), frc::Problem::kTolerance);
-      EXPECT_NEAR(1.0, y.Value(0), frc::Problem::kTolerance);
+      EXPECT_NEAR(1.0, x.Value(0), 1e-6);
+      EXPECT_NEAR(1.0, y.Value(0), 1e-6);
     }
   }
 }
@@ -226,10 +226,10 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedToDisk) {
 
       problem.SubjectTo(frc::pow(x, 2) + frc::pow(y, 2) <= 2);
 
-      EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+      EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 
-      EXPECT_NEAR(1.0, x.Value(0), frc::Problem::kTolerance);
-      EXPECT_NEAR(1.0, y.Value(0), frc::Problem::kTolerance);
+      EXPECT_NEAR(1.0, x.Value(0), 1e-6);
+      EXPECT_NEAR(1.0, y.Value(0), 1e-6);
     }
   }
 }
@@ -280,7 +280,7 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   problem.Minimize(J);
 
   auto end1 = std::chrono::system_clock::now();
-  EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
   auto end2 = std::chrono::system_clock::now();
 
   using std::chrono::duration_cast;
@@ -332,7 +332,7 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
   problem.Minimize(J);
 
   auto end1 = std::chrono::system_clock::now();
-  EXPECT_EQ(frc::Problem::SolverStatus::kOk, problem.Solve());
+  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
   auto end2 = std::chrono::system_clock::now();
 
   using std::chrono::duration_cast;
