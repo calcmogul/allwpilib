@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <cstddef>
 #include <utility>
 
@@ -27,7 +29,7 @@ class SharedPtr {
   explicit SharedPtr(T* ptr) {
     if (ptr != nullptr) {
       m_ptr = ptr;
-      m_refCount = new int{1};
+      m_refCount = new uint16_t{1};
     }
   }
 
@@ -97,7 +99,7 @@ class SharedPtr {
 
  private:
   T* m_ptr = nullptr;
-  int* m_refCount = nullptr;
+  uint16_t* m_refCount = nullptr;
 
   void Retain() {
     if (m_refCount != nullptr) {
