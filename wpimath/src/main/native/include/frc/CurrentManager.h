@@ -33,9 +33,7 @@ class CurrentManager {
    */
   CurrentManager(
       const wpi::array<units::ampere_t, Subsystems>& currentTolerances,
-      units::ampere_t maxCurrent)
-      : m_desiredCurrents{Subsystems, 1},
-        m_allocatedCurrents{m_problem.DecisionVariable(Subsystems)} {
+      units::ampere_t maxCurrent) {
     VariableMatrix J = 0.0;
     for (int i = 0; i < Subsystems; ++i) {
       // The weight is 1/tolᵢ² where tolᵢ is the tolerance between the desired
@@ -85,8 +83,8 @@ class CurrentManager {
 
  private:
   Problem m_problem;
-  VariableMatrix m_desiredCurrents;
-  VariableMatrix m_allocatedCurrents;
+  VariableMatrix m_desiredCurrents{Subsystems, 1};
+  VariableMatrix m_allocatedCurrents{m_problem.DecisionVariable(Subsystems)};
 };
 
 }  // namespace frc
