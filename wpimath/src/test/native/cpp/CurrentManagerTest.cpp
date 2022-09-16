@@ -8,7 +8,7 @@
 #include "gtest/gtest.h"
 
 TEST(CurrentManagerTest, EnoughCurrent) {
-  frc::CurrentManager<4> manager{wpi::array{1_A, 5_A, 10_A, 5_A}, 40_A};
+  frc::CurrentManager manager{wpi::array{1_A, 5_A, 10_A, 5_A}, 40_A};
 
   auto currents = manager.Calculate(wpi::array{25_A, 10_A, 5_A, 0_A});
 
@@ -19,7 +19,7 @@ TEST(CurrentManagerTest, EnoughCurrent) {
 }
 
 TEST(CurrentManagerTest, NotEnoughCurrent) {
-  frc::CurrentManager<4> manager{wpi::array{1_A, 5_A, 10_A, 5_A}, 40_A};
+  frc::CurrentManager manager{wpi::array{1_A, 5_A, 10_A, 5_A}, 40_A};
 
   auto currents = manager.Calculate(wpi::array{30_A, 10_A, 5_A, 0_A});
 
@@ -36,8 +36,8 @@ TEST(CurrentManagerTest, NotEnoughCurrent) {
   // current_tolerances = np.array([[1.0], [5.0], [10.0], [5.0]])
   // desired_currents = np.array([[30.0], [10.0], [5.0], [0.0]])
   //
-  // current_sum = 0.0
   // J = 0.0
+  // current_sum = 0.0
   // for i in range(4):
   //     error = desired_currents[i, 0] - allocated_currents[i, 0]
   //     J += error**2 / current_tolerances[i] ** 2
