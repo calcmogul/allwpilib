@@ -4,18 +4,21 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <array>
 
 #include <wpi/SymbolExports.h>
 
-#include "frc/autodiff/SharedPtr.h"
+#include "frc/autodiff/IntrusiveSharedPtr.h"
 
 namespace frc::autodiff {
 
 struct WPILIB_DLLEXPORT Expression {
   using BinaryFuncDouble = double (*)(double, double);
-  using BinaryFuncExpr = SharedPtr<Expression> (*)(
-      const SharedPtr<Expression>&, const SharedPtr<Expression>&);
+  using BinaryFuncExpr =
+      IntrusiveSharedPtr<Expression> (*)(const IntrusiveSharedPtr<Expression>&,
+                                         const IntrusiveSharedPtr<Expression>&);
 
   static constexpr int kNumArgs = 2;
 
@@ -23,7 +26,7 @@ struct WPILIB_DLLEXPORT Expression {
 
   double adjoint = 0.0;
 
-  SharedPtr<Expression> adjointExpr;
+  IntrusiveSharedPtr<Expression> adjointExpr;
 
   // Either nullary operator with no arguments, unary operator with one
   // argument, or binary operator with two arguments. This operator is
@@ -36,15 +39,20 @@ struct WPILIB_DLLEXPORT Expression {
 
   // Gradients with respect to each argument
   std::array<BinaryFuncExpr, kNumArgs> gradientFuncs{
-      [](const SharedPtr<Expression>&, const SharedPtr<Expression>&) {
-        return MakeShared<Expression>(0.0);
+      [](const IntrusiveSharedPtr<Expression>&,
+         const IntrusiveSharedPtr<Expression>&) {
+        return MakeIntrusiveShared<Expression>(0.0);
       },
-      [](const SharedPtr<Expression>&, const SharedPtr<Expression>&) {
-        return MakeShared<Expression>(0.0);
+      [](const IntrusiveSharedPtr<Expression>&,
+         const IntrusiveSharedPtr<Expression>&) {
+        return MakeIntrusiveShared<Expression>(0.0);
       }};
 
   // Expression arguments
-  std::array<SharedPtr<Expression>, kNumArgs> args{nullptr, nullptr};
+  std::array<IntrusiveSharedPtr<Expression>, kNumArgs> args{nullptr, nullptr};
+
+  // Reference count for intrusive shared pointer
+  uint32_t refCount = 0;
 
   Expression(const Expression&) = default;
   Expression& operator=(const Expression&) = default;
@@ -68,7 +76,8 @@ struct WPILIB_DLLEXPORT Expression {
    * @param lhs Unary operator's operand.
    */
   Expression(BinaryFuncDouble valueFunc, BinaryFuncDouble lhsGradientValueFunc,
-             BinaryFuncExpr lhsGradientFunc, SharedPtr<Expression> lhs);
+             BinaryFuncExpr lhsGradientFunc,
+             IntrusiveSharedPtr<Expression> lhs);
 
   /**
    * Constructs a binary expression (an operator with two arguments).
@@ -84,49 +93,54 @@ struct WPILIB_DLLEXPORT Expression {
   Expression(BinaryFuncDouble valueFunc, BinaryFuncDouble lhsGradientValueFunc,
              BinaryFuncDouble rhsGradientValueFunc,
              BinaryFuncExpr lhsGradientFunc, BinaryFuncExpr rhsGradientFunc,
-             SharedPtr<Expression> lhs, SharedPtr<Expression> rhs);
+             IntrusiveSharedPtr<Expression> lhs,
+             IntrusiveSharedPtr<Expression> rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator*(
-      double lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator*(
+      double lhs, const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator*(
-      const SharedPtr<Expression>& lhs, double rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator*(
+      const IntrusiveSharedPtr<Expression>& lhs, double rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator*(
-      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator*(
+      const IntrusiveSharedPtr<Expression>& lhs,
+      const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator/(
-      double lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator/(
+      double lhs, const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator/(
-      const SharedPtr<Expression>& lhs, double rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator/(
+      const IntrusiveSharedPtr<Expression>& lhs, double rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator/(
-      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator/(
+      const IntrusiveSharedPtr<Expression>& lhs,
+      const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
-      double lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator+(
+      double lhs, const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
-      const SharedPtr<Expression>& lhs, double rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator+(
+      const IntrusiveSharedPtr<Expression>& lhs, double rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
-      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator+(
+      const IntrusiveSharedPtr<Expression>& lhs,
+      const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
-      double lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator-(
+      double lhs, const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
-      const SharedPtr<Expression>& lhs, double rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator-(
+      const IntrusiveSharedPtr<Expression>& lhs, double rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
-      const SharedPtr<Expression>& lhs, const SharedPtr<Expression>& rhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator-(
+      const IntrusiveSharedPtr<Expression>& lhs,
+      const IntrusiveSharedPtr<Expression>& rhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator-(
-      const SharedPtr<Expression>& lhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator-(
+      const IntrusiveSharedPtr<Expression>& lhs);
 
-  friend WPILIB_DLLEXPORT SharedPtr<Expression> operator+(
-      const SharedPtr<Expression>& lhs);
+  friend WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> operator+(
+      const IntrusiveSharedPtr<Expression>& lhs);
 
   /**
    * Update the value of this node based on the values of its dependent
@@ -136,36 +150,56 @@ struct WPILIB_DLLEXPORT Expression {
 };
 
 /**
+ * Refcount increment for intrusive shared pointer.
+ *
+ * @param expr The shared pointer's managed object.
+ */
+inline void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+  ++expr->refCount;
+}
+
+/**
+ * Refcount decrement for intrusive shared pointer.
+ *
+ * @param expr The shared pointer's managed object.
+ */
+inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
+  if (--expr->refCount == 0) {
+    delete expr;
+  }
+}
+
+/**
  * std::abs() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> abs(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> abs(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::acos() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> acos(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> acos(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::asin() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> asin(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> asin(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::atan() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> atan(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> atan(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::atan2() for Expressions.
@@ -173,40 +207,41 @@ WPILIB_DLLEXPORT SharedPtr<Expression> atan(  // NOLINT
  * @param y The y argument.
  * @param x The x argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> atan2(  // NOLINT
-    const SharedPtr<Expression>& y, const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> atan2(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& y,
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::cos() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> cos(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> cos(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::cosh() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> cosh(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> cosh(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::erf() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> erf(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> erf(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::exp() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> exp(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> exp(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::hypot() for Expressions.
@@ -214,24 +249,25 @@ WPILIB_DLLEXPORT SharedPtr<Expression> exp(  // NOLINT
  * @param x The x argument.
  * @param y The y argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> hypot(  // NOLINT
-    const SharedPtr<Expression>& x, const SharedPtr<Expression>& y);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> hypot(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x,
+    const IntrusiveSharedPtr<Expression>& y);
 
 /**
  * std::log() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> log(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> log(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::log10() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> log10(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> log10(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::pow() for Expressions.
@@ -239,45 +275,48 @@ WPILIB_DLLEXPORT SharedPtr<Expression> log10(  // NOLINT
  * @param base The base.
  * @param power The power.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> pow(  // NOLINT
-    const SharedPtr<Expression>& base, const SharedPtr<Expression>& power);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> pow(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& base,
+    const IntrusiveSharedPtr<Expression>& power);
 
 /**
  * std::sin() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> sin(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> sin(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::sinh() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> sinh(const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> sinh(
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::sqrt() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> sqrt(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> sqrt(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::tan() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> tan(  // NOLINT
-    const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> tan(  // NOLINT
+    const IntrusiveSharedPtr<Expression>& x);
 
 /**
  * std::tanh() for Expressions.
  *
  * @param x The argument.
  */
-WPILIB_DLLEXPORT SharedPtr<Expression> tanh(const SharedPtr<Expression>& x);
+WPILIB_DLLEXPORT IntrusiveSharedPtr<Expression> tanh(
+    const IntrusiveSharedPtr<Expression>& x);
 
 }  // namespace frc::autodiff

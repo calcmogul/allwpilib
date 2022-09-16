@@ -12,15 +12,17 @@
 
 namespace frc::autodiff {
 
-Variable::Variable(double value) : expr{MakeShared<Expression>(value)} {}
+Variable::Variable(double value)
+    : expr{MakeIntrusiveShared<Expression>(value)} {}
 
-Variable::Variable(int value) : expr{MakeShared<Expression>(value)} {}
+Variable::Variable(int value) : expr{MakeIntrusiveShared<Expression>(value)} {}
 
-Variable::Variable(SharedPtr<Expression> expr) : expr{std::move(expr)} {}
+Variable::Variable(IntrusiveSharedPtr<Expression> expr)
+    : expr{std::move(expr)} {}
 
 Variable& Variable::operator=(double value) {
   if (expr == nullptr) {
-    expr = MakeShared<Expression>(value);
+    expr = MakeIntrusiveShared<Expression>(value);
   } else {
     GetExpression().value = value;
   }
@@ -29,7 +31,7 @@ Variable& Variable::operator=(double value) {
 
 Variable& Variable::operator=(int value) {
   if (expr == nullptr) {
-    expr = MakeShared<Expression>(value);
+    expr = MakeIntrusiveShared<Expression>(value);
   } else {
     GetExpression().value = value;
   }

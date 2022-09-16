@@ -9,13 +9,13 @@
 #include "Eigen/Core"
 #include "Eigen/SparseCore"
 #include "frc/autodiff/Expression.h"
-#include "frc/autodiff/SharedPtr.h"
+#include "frc/autodiff/IntrusiveSharedPtr.h"
 
 namespace frc::autodiff {
 
 class WPILIB_DLLEXPORT Variable {
  public:
-  SharedPtr<Expression> expr;
+  IntrusiveSharedPtr<Expression> expr;
 
   constexpr Variable() = default;
 
@@ -34,7 +34,7 @@ class WPILIB_DLLEXPORT Variable {
    *
    * @param expr The autodiff variable.
    */
-  explicit Variable(SharedPtr<Expression> expr);
+  explicit Variable(IntrusiveSharedPtr<Expression> expr);
 
   Variable& operator=(double value);
 

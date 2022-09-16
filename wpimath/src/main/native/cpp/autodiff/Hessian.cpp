@@ -7,7 +7,7 @@
 #include <tuple>
 
 #include "frc/autodiff/Gradient.h"
-#include "frc/autodiff/SharedPtr.h"
+#include "frc/autodiff/IntrusiveSharedPtr.h"
 
 using namespace frc::autodiff;
 
@@ -38,14 +38,14 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
   // background on reverse accumulation automatic differentiation.
 
   for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetExpression().adjointExpr = MakeShared<Expression>(0.0);
+    wrt(row).GetExpression().adjointExpr = MakeIntrusiveShared<Expression>(0.0);
   }
 
   // Stack element contains variable and its adjoint
-  std::vector<std::tuple<Variable, SharedPtr<Expression>>> stack;
+  std::vector<std::tuple<Variable, IntrusiveSharedPtr<Expression>>> stack;
   stack.reserve(1024);
 
-  stack.emplace_back(variable, MakeShared<Expression>(1.0));
+  stack.emplace_back(variable, MakeIntrusiveShared<Expression>(1.0));
   while (!stack.empty()) {
     auto [var, adjoint] = stack.back();
     stack.pop_back();
