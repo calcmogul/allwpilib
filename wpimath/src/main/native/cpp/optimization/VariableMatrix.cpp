@@ -8,7 +8,11 @@ namespace frc {
 
 VariableMatrix::VariableMatrix(int rows, int cols)
     : m_rows{rows}, m_cols{cols} {
-  m_storage.resize(rows * cols);
+  for (int row = 0; row < rows; ++row) {
+    for (int col = 0; col < cols; ++col) {
+      m_storage.emplace_back(0.0);
+    }
+  }
 }
 
 VariableMatrix::VariableMatrix(double value) : m_rows{1}, m_cols{1} {
