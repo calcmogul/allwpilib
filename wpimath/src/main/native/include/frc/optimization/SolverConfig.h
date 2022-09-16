@@ -22,6 +22,9 @@ struct SolverConfig {
 
   /// The maximum elapsed wall clock time before returning a solution.
   units::second_t timeout{std::numeric_limits<double>::infinity()};
+
+  /// Enables diagnostic prints.
+  bool diagnostics = false;
 };
 
 }  // namespace frc

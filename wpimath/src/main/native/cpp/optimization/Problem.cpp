@@ -10,6 +10,8 @@
 #include <limits>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
 #include "frc/autodiff/Gradient.h"
@@ -604,6 +606,17 @@ Eigen::VectorXd Problem::InteriorPoint(
     //
     // See equation (8) in [2].
     tau = std::max(tau_min, 1.0 - mu);
+  }
+
+  if (m_config.diagnostics) {
+    endTime = std::chrono::system_clock::now();
+    fmt::print("Number of iterations: {}\n", iterations);
+
+    using std::chrono::duration_cast;
+    using std::chrono::microseconds;
+    fmt::print(
+        "Solve time: {} ms\n",
+        duration_cast<microseconds>(endTime - startTime).count() / 1000.0);
   }
 
   *status = SolverStatus::kOk;
