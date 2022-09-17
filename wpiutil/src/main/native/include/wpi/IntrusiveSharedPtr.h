@@ -10,6 +10,11 @@
 #include <memory>
 #include <utility>
 
+#if __GNUC__ == 12 && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif  // __GNUC__ == 12 && !defined(__clang__)
+
 namespace wpi {
 
 /**
@@ -56,35 +61,50 @@ class IntrusiveSharedPtr {
 
   IntrusiveSharedPtr<T>& operator=(  // NOLINT
       const IntrusiveSharedPtr<T>& rhs) noexcept {
-    if (m_ptr != rhs.m_ptr) {
-      if (m_ptr != nullptr) {
-        IntrusiveSharedPtrDecRefCount(m_ptr);
-      }
+    if (m_ptr == rhs.m_ptr) {
+      return *this;
+    }
 
-      m_ptr = rhs.m_ptr;
+    if (m_ptr != nullptr) {
+      IntrusiveSharedPtrDecRefCount(m_ptr);
+    }
 
-      if (m_ptr != nullptr) {
-        IntrusiveSharedPtrIncRefCount(m_ptr);
-      }
+    m_ptr = rhs.m_ptr;
+
+    if (m_ptr != nullptr) {
+      IntrusiveSharedPtrIncRefCount(m_ptr);
     }
 
     return *this;
   }
 
-  IntrusiveSharedPtr(IntrusiveSharedPtr<T>&& rhs) noexcept : m_ptr{rhs.m_ptr} {
+  IntrusiveSharedPtr(IntrusiveSharedPtr<T>&& rhs) noexcept {
+    if (this == &rhs) {
+      return;
+    }
+
+    m_ptr = rhs.m_ptr;
     rhs.m_ptr = nullptr;
   }
 
   IntrusiveSharedPtr<T>& operator=(IntrusiveSharedPtr<T>&& rhs) noexcept {
+    if (this == &rhs) {
+      return *this;
+    }
+
     m_ptr = rhs.m_ptr;
     rhs.m_ptr = nullptr;
 
     return *this;
   }
 
+  T* Get() const noexcept { return m_ptr; }
+
   T& operator*() const noexcept { return *m_ptr; }
 
   T* operator->() const noexcept { return m_ptr; }
+
+  explicit operator bool() const noexcept { return m_ptr != nullptr; }
 
   friend bool operator==(const IntrusiveSharedPtr<T>& lhs,
                          const IntrusiveSharedPtr<T>& rhs) noexcept {
@@ -135,3 +155,7 @@ IntrusiveSharedPtr<T> AllocateIntrusiveShared(const Alloc& alloc,
 }
 
 }  // namespace wpi
+
+#if __GNUC__ == 12 && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ == 12 && !defined(__clang__)
