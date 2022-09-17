@@ -575,11 +575,10 @@ Eigen::VectorXd Problem::InteriorPoint(
       // where cᵢ⁻ = max(0, −cᵢ).
       //
       // See "Infeasibility detection" in section 6 of [3].
-      if (m_equalityConstraints.size() > 0) {
-        if ((A_e.transpose() * c_e).norm() < 1e-2 && c_e.norm() > 1e-2) {
-          *status = SolverStatus::kInfeasible;
-          return x;
-        }
+      if (m_equalityConstraints.size() > 0 &&
+          (A_e.transpose() * c_e).norm() < 1e-2 && c_e.norm() > 1e-2) {
+        *status = SolverStatus::kInfeasible;
+        return x;
       }
       if (m_inequalityConstraints.size() > 0) {
         Eigen::VectorXd c_i_minus = (-c_i).cwiseMax(0.0);
