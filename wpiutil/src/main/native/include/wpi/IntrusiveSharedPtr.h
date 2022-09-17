@@ -10,7 +10,7 @@
 #include <memory>
 #include <utility>
 
-namespace frc::autodiff {
+namespace wpi {
 
 /**
  * A custom intrusive shared pointer implementation without thread
@@ -134,4 +134,4 @@ IntrusiveSharedPtr<T> AllocateIntrusiveShared(const Alloc& alloc,
   return IntrusiveSharedPtr<T>{ptr};
 }
 
-}  // namespace frc::autodiff
+}  // namespace wpi

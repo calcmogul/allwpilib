@@ -4,18 +4,18 @@
 
 #pragma once
 
+#include <wpi/IntrusiveSharedPtr.h>
 #include <wpi/SymbolExports.h>
 
 #include "Eigen/Core"
 #include "Eigen/SparseCore"
 #include "frc/autodiff/Expression.h"
-#include "frc/autodiff/IntrusiveSharedPtr.h"
 
 namespace frc::autodiff {
 
 class WPILIB_DLLEXPORT Variable {
  public:
-  IntrusiveSharedPtr<Expression> expr;
+  wpi::IntrusiveSharedPtr<Expression> expr;
 
   constexpr Variable() = default;
 
@@ -34,7 +34,7 @@ class WPILIB_DLLEXPORT Variable {
    *
    * @param expr The autodiff variable.
    */
-  explicit Variable(IntrusiveSharedPtr<Expression> expr);
+  explicit Variable(wpi::IntrusiveSharedPtr<Expression> expr);
 
   Variable& operator=(double value);
 
