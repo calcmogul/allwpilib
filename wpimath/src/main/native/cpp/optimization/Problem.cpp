@@ -324,6 +324,13 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   // TODO: Add problem infeasibility checks; return SolverStatus::kInfeasible
 
+  if (m_config.diagnostics) {
+    fmt::print("Number of equality constraints: {}\n",
+               m_equalityConstraints.size());
+    fmt::print("Number of inequality constraints: {}\n",
+               m_inequalityConstraints.size());
+  }
+
   // Barrier parameter scale factor κ_μ for tolerance checks
   constexpr double kappa_epsilon = 10.0;
 
