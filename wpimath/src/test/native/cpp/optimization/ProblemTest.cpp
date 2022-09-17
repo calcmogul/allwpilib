@@ -35,17 +35,36 @@ TEST(ProblemTest, EmptyProblem) {
   EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
 }
 
-TEST(ProblemTest, SolverStatusTimeout) {
-  frc::Problem problem;
+TEST(ProblemTest, SolverStatusInfeasible) {
+  // Equality constraints
+  {
+    frc::Problem problem;
 
-  auto x = problem.DecisionVariable();
-  x = 0.0;
-  problem.Minimize(x);
+    auto x = problem.DecisionVariable();
+    auto y = problem.DecisionVariable();
+    auto z = problem.DecisionVariable();
 
-  frc::SolverConfig config;
-  config.timeout = 0_s;
+    problem.SubjectTo(x == y + 1);
+    problem.SubjectTo(y == z + 1);
+    problem.SubjectTo(z == x + 1);
 
-  EXPECT_EQ(frc::SolverStatus::kTimeout, problem.Solve(config));
+    EXPECT_EQ(frc::SolverStatus::kInfeasible, problem.Solve());
+  }
+
+  // Inequality constraints
+  {
+    frc::Problem problem;
+
+    auto x = problem.DecisionVariable();
+    auto y = problem.DecisionVariable();
+    auto z = problem.DecisionVariable();
+
+    problem.SubjectTo(x >= y + 1);
+    problem.SubjectTo(y >= z + 1);
+    problem.SubjectTo(z >= x + 1);
+
+    EXPECT_EQ(frc::SolverStatus::kInfeasible, problem.Solve());
+  }
 }
 
 TEST(ProblemTest, SolverStatusMaxIterations) {
@@ -59,6 +78,19 @@ TEST(ProblemTest, SolverStatusMaxIterations) {
   config.maxIterations = 0;
 
   EXPECT_EQ(frc::SolverStatus::kMaxIterations, problem.Solve(config));
+}
+
+TEST(ProblemTest, SolverStatusTimeout) {
+  frc::Problem problem;
+
+  auto x = problem.DecisionVariable();
+  x = 0.0;
+  problem.Minimize(x);
+
+  frc::SolverConfig config;
+  config.timeout = 0_s;
+
+  EXPECT_EQ(frc::SolverStatus::kTimeout, problem.Solve(config));
 }
 
 TEST(ProblemTest, NoCostUnconstrained) {
