@@ -145,13 +145,16 @@ TEST(IntrusiveSharedPtrTest, Counting) {
   // Self-assignment
   {
     auto object = new Mock{};
-    wpi::IntrusiveSharedPtr<Mock> ptr{object};
+    wpi::IntrusiveSharedPtr<Mock> ptr1{object};
+    wpi::IntrusiveSharedPtr<Mock> ptr2{object};
 
-    ptr = ptr;
-    EXPECT_EQ(object->refCount, 1);
+    EXPECT_EQ(object->refCount, 2);
+    ptr1 = ptr2;
+    EXPECT_EQ(object->refCount, 2);
 
-    ptr = std::move(ptr);
-    EXPECT_EQ(ptr.Get(), object);
-    EXPECT_EQ(object->refCount, 1);
+    ptr1 = std::move(ptr2);
+    EXPECT_EQ(ptr1.Get(), object);
+    EXPECT_EQ(ptr2.Get(), object);
+    EXPECT_EQ(object->refCount, 2);
   }
 }

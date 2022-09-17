@@ -80,7 +80,7 @@ class IntrusiveSharedPtr {
   }
 
   IntrusiveSharedPtr(IntrusiveSharedPtr<T>&& rhs) noexcept {
-    if (this == &rhs) {
+    if (this == &rhs || m_ptr == rhs.m_ptr) {
       return;
     }
 
@@ -89,7 +89,7 @@ class IntrusiveSharedPtr {
   }
 
   IntrusiveSharedPtr<T>& operator=(IntrusiveSharedPtr<T>&& rhs) noexcept {
-    if (this == &rhs) {
+    if (this == &rhs || m_ptr == rhs.m_ptr) {
       return *this;
     }
 
