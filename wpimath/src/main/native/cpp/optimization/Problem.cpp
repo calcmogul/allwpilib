@@ -103,9 +103,10 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   Eigen::VectorXd solution;
   SolverStatus status = SolverStatus::kOk;
   if (m_problemType == ProblemType::kLinear) {
+    // TODO: Precompute gradients once
     solution = InteriorPoint(x, &status);
   } else if (m_problemType == ProblemType::kQuadratic) {
-    // TODO: Use OSQP?
+    // TODO: Precompute gradients and hessian once
     solution = InteriorPoint(x, &status);
   } else if (m_problemType == ProblemType::kNonlinear) {
     solution = InteriorPoint(x, &status);
