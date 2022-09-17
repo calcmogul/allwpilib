@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/span.h>
 
 #include "frc/optimization/Problem.h"
@@ -19,7 +20,7 @@ namespace frc {
  * which subsystem gets less current if the current budget is exceeded.
  * Subsystems with a smaller tolerance are given higher priority.
  */
-class CurrentManager {
+class WPILIB_DLLEXPORT CurrentManager {
  public:
   /**
    * Constructs a CurrentManager.
