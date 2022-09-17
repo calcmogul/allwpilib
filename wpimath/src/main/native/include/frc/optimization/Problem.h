@@ -82,7 +82,7 @@ namespace frc {
  *   auto a_k = U(0, k);
  *
  *   // pₖ₊₁ = 1/2aₖt² + vₖt
- *   problem.SubjectTo(p_k1 == 0.5 * frc::pow(t, 2) * a_k + t * v_k);
+ *   problem.SubjectTo(p_k1 == 0.5 * std::pow(t, 2) * a_k + t * v_k);
  * }
  * @endcode
  *

@@ -284,7 +284,7 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
     auto a_k = U(0, k);
 
     // pₖ₊₁ = 1/2aₖt² + vₖt
-    problem.SubjectTo(p_k1 == 0.5 * a_k * frc::pow(t, 2) + v_k * t);
+    problem.SubjectTo(p_k1 == 0.5 * a_k * std::pow(t, 2) + v_k * t);
   }
 
   // Start and end at rest
