@@ -107,14 +107,14 @@ TEST(IntrusiveSharedPtrTest, Counting) {
     // Attach
     wpi::IntrusiveSharedPtr<Mock> ptr1{object};
     EXPECT_EQ(object, ptr1.Get());
-    EXPECT_EQ(object->refCount, 1);
+    EXPECT_EQ(object->refCount, 1u);
     EXPECT_TRUE(static_cast<bool>(ptr1));
     EXPECT_EQ(ptr1.operator->(), object);
 
     // Ref
     wpi::IntrusiveSharedPtr<Mock> ptr2{object};
     EXPECT_EQ(object, ptr2.Get());
-    EXPECT_EQ(object->refCount, 2);
+    EXPECT_EQ(object->refCount, 2u);
     EXPECT_TRUE(static_cast<bool>(ptr2));
     EXPECT_EQ(ptr2.operator->(), object);
   }
@@ -123,13 +123,13 @@ TEST(IntrusiveSharedPtrTest, Counting) {
   {
     auto object = new Mock{};
     wpi::IntrusiveSharedPtr<Mock> ptr1{object};
-    EXPECT_EQ(object->refCount, 1);
+    EXPECT_EQ(object->refCount, 1u);
 
     wpi::IntrusiveSharedPtr<Mock> ptr2{ptr1};
-    EXPECT_EQ(object->refCount, 2);
+    EXPECT_EQ(object->refCount, 2u);
 
     wpi::IntrusiveSharedPtr<Mock> ptr3{object};
-    EXPECT_EQ(object->refCount, 3);
+    EXPECT_EQ(object->refCount, 3u);
   }
 
   // Move
