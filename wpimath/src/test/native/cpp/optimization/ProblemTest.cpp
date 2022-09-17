@@ -282,11 +282,16 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   for (int k = 0; k < N; ++k) {
     constexpr double t = dt.value();
     auto p_k1 = X(0, k + 1);
+    auto v_k1 = X(1, k + 1);
+    auto p_k = X(0, k);
     auto v_k = X(1, k);
     auto a_k = U(0, k);
 
-    // pₖ₊₁ = 1/2aₖt² + vₖt
-    problem.SubjectTo(p_k1 == 0.5 * a_k * std::pow(t, 2) + v_k * t);
+    // pₖ₊₁ = pₖ + vₖt
+    problem.SubjectTo(p_k1 == p_k + v_k * t);
+
+    // vₖ₊₁ = vₖ + aₖt
+    problem.SubjectTo(v_k1 == v_k + a_k * t);
   }
 
   // Start and end at rest

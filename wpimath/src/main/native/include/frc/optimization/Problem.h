@@ -78,11 +78,16 @@ namespace frc {
  * for (int k = 0; k < N; ++k) {
  *   constexpr double t = dt.value();
  *   auto p_k1 = X(0, k + 1);
+ *   auto v_k1 = X(1, k + 1);
+ *   auto p_k = X(0, k);
  *   auto v_k = X(1, k);
  *   auto a_k = U(0, k);
  *
- *   // pₖ₊₁ = 1/2aₖt² + vₖt
- *   problem.SubjectTo(p_k1 == 0.5 * std::pow(t, 2) * a_k + t * v_k);
+ *   // pₖ₊₁ = pₖ + vₖt
+ *   problem.SubjectTo(p_k1 == p_k + v_k * t);
+ *
+ *   // vₖ₊₁ = vₖ + aₖt
+ *   problem.SubjectTo(v_k1 == v_k + a_k * t);
  * }
  * @endcode
  *
@@ -91,11 +96,11 @@ namespace frc {
  * // Start and end at rest
  * problem.SubjectTo(X.Col(0) == frc::Matrixd<2, 1>{{0.0}, {0.0}});
  * problem.SubjectTo(X.Col(N + 1) == frc::Matrixd<2, 1>{{10.0}, {0.0}});
-
+ *
  * // Limit velocity
  * problem.SubjectTo(-1 <= X.Row(1));
  * problem.SubjectTo(X.Row(1) <= 1);
-
+ *
  * // Limit acceleration
  * problem.SubjectTo(-1 <= U);
  * problem.SubjectTo(U <= 1);
