@@ -268,6 +268,8 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   constexpr auto dt = 5_ms;
   constexpr int N = T / dt;
 
+  constexpr double r = 2.0;
+
   frc::Problem problem;
 
   // 2x1 state vector with N + 1 timesteps (includes last state)
@@ -289,7 +291,7 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
 
   // Start and end at rest
   problem.SubjectTo(X.Col(0) == frc::Matrixd<2, 1>{{0.0}, {0.0}});
-  problem.SubjectTo(X.Col(N) == frc::Matrixd<2, 1>{{10.0}, {0.0}});
+  problem.SubjectTo(X.Col(N) == frc::Matrixd<2, 1>{{r}, {0.0}});
 
   // Limit velocity
   problem.SubjectTo(-1 <= X.Row(1));
@@ -302,7 +304,7 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   // Cost function - minimize position error
   frc::VariableMatrix J = 0.0;
   for (int k = 0; k < N + 1; ++k) {
-    J += frc::pow(10.0 - X(0, k), 2);
+    J += frc::pow(r - X(0, k), 2);
   }
   problem.Minimize(J);
 
