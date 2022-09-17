@@ -264,7 +264,7 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedToDisk) {
 TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   auto start = std::chrono::system_clock::now();
 
-  constexpr auto T = 5_s;
+  constexpr auto T = 3.5_s;
   constexpr auto dt = 5_ms;
   constexpr int N = T / dt;
 
