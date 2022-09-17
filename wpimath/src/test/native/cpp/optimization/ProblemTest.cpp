@@ -8,6 +8,7 @@
 #include <fmt/core.h>
 #include <wpi/SmallVector.h>
 
+#include "Eigen/QR"
 #include "frc/EigenCore.h"
 #include "frc/optimization/Problem.h"
 #include "frc/system/Discretization.h"
@@ -366,5 +367,36 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
   config.diagnostics = true;
   EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve(config));
 
-  // TODO: Verify solution
+  // Voltage for steady-state velocity:
+  //
+  // rₖ₊₁ = Arₖ + Buₖ
+  // uₖ = B⁺(rₖ₊₁ − Arₖ)
+  // uₖ = B⁺(rₖ − Arₖ)
+  // uₖ = B⁺(I − A)rₖ
+  frc::Matrixd<1, 1> u_ss =
+      B.householderQr().solve(decltype(A)::Identity() - A) * r;
+
+  frc::Matrixd<1, 1> x{{0.0}};
+  for (int k = 0; k < N; ++k) {
+    // Verify state
+    EXPECT_NEAR(x(0), X.Value(0, k), 1e-2);
+
+    double error = r(0) - x(0);
+    if (error > 1e-2) {
+      // Max control input until the reference is reached
+      EXPECT_NEAR(12.0, U.Value(0, k), 1e-2);
+
+      // Project state forward
+      x = A * x + B * 12.0;
+    } else {
+      // If control input isn't at transition value
+      if (std::abs(U.Value(0, k) - 10.7065) > 1e-2) {
+        // Control input that maintains steady-state velocity
+        EXPECT_NEAR(u_ss(0), U.Value(0, k), 1e-2);
+      }
+
+      // Project state forward
+      x = A * x + B * u_ss;
+    }
+  }
 }
