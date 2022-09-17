@@ -47,6 +47,7 @@ class IntrusiveSharedPtr {
   }
 
   ~IntrusiveSharedPtr() {
+    // NOLINTNEXTLINE (clang-analyzer-core.UndefinedBinaryOperatorResult)
     if (m_ptr != nullptr) {
       IntrusiveSharedPtrDecRefCount(m_ptr);
     }
