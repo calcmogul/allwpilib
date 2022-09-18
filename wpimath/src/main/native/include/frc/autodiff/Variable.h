@@ -140,10 +140,6 @@ class WPILIB_DLLEXPORT Variable {
    * variables.
    */
   void Update();
-
-  const Expression& GetExpression() const;
-
-  Expression& GetExpression();
 };
 
 using VectorXvar = Eigen::Vector<frc::autodiff::Variable, Eigen::Dynamic>;

@@ -13,7 +13,7 @@ double Gradient(Variable var, Variable& wrt) {
   // Read wpimath/README.md#Reverse_accumulation_automatic_differentiation for
   // background on reverse accumulation automatic differentiation.
 
-  wrt.GetExpression().adjoint = 0.0;
+  wrt.expr->adjoint = 0.0;
 
   // Stack element contains variable and its adjoint
   std::vector<std::tuple<Variable, double>> stack;
@@ -24,7 +24,7 @@ double Gradient(Variable var, Variable& wrt) {
     auto [var, adjoint] = stack.back();
     stack.pop_back();
 
-    auto& varExpr = var.GetExpression();
+    auto& varExpr = *var.expr;
     auto& lhs = varExpr.args[0];
     auto& rhs = varExpr.args[1];
 
@@ -43,7 +43,7 @@ double Gradient(Variable var, Variable& wrt) {
     }
   }
 
-  return wrt.GetExpression().adjoint;
+  return wrt.expr->adjoint;
 }
 
 Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
@@ -51,7 +51,7 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
   // background on reverse accumulation automatic differentiation.
 
   for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetExpression().adjoint = 0.0;
+    wrt(row).expr->adjoint = 0.0;
   }
 
   // Stack element contains variable and its adjoint
@@ -63,7 +63,7 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
     auto [var, adjoint] = stack.back();
     stack.pop_back();
 
-    auto& varExpr = var.GetExpression();
+    auto& varExpr = *var.expr;
     auto& lhs = varExpr.args[0];
     auto& rhs = varExpr.args[1];
 
@@ -84,7 +84,7 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
 
   Eigen::VectorXd grad{wrt.rows()};
   for (int row = 0; row < wrt.rows(); ++row) {
-    grad(row) = wrt(row).GetExpression().adjoint;
+    grad(row) = wrt(row).expr->adjoint;
   }
 
   return grad;

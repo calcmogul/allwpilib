@@ -39,7 +39,7 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
   // background on reverse accumulation automatic differentiation.
 
   for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).GetExpression().adjointExpr =
+    wrt(row).expr->adjointExpr =
         wpi::MakeIntrusiveShared<Expression>(0.0);
   }
 
@@ -52,7 +52,7 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
     auto [var, adjoint] = stack.back();
     stack.pop_back();
 
-    auto& varExpr = var.GetExpression();
+    auto& varExpr = *var.expr;
     auto& lhs = varExpr.args[0];
     auto& rhs = varExpr.args[1];
 
@@ -73,7 +73,7 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
 
   VectorXvar grad{wrt.rows()};
   for (int row = 0; row < wrt.rows(); ++row) {
-    grad(row) = Variable{wrt(row).GetExpression().adjointExpr};
+    grad(row) = Variable{wrt(row).expr->adjointExpr};
   }
 
   return grad;

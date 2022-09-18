@@ -25,7 +25,7 @@ Variable& Variable::operator=(double value) {
   if (expr == nullptr) {
     expr = wpi::MakeIntrusiveShared<Expression>(value);
   } else {
-    GetExpression().value = value;
+    expr->value = value;
   }
   return *this;
 }
@@ -34,7 +34,7 @@ Variable& Variable::operator=(int value) {
   if (expr == nullptr) {
     expr = wpi::MakeIntrusiveShared<Expression>(value);
   } else {
-    GetExpression().value = value;
+    expr->value = value;
   }
   return *this;
 }
@@ -217,14 +217,6 @@ double Variable::Value() const {
 
 void Variable::Update() {
   expr->Update();
-}
-
-const Expression& Variable::GetExpression() const {
-  return *expr;
-}
-
-Expression& Variable::GetExpression() {
-  return *expr;
 }
 
 Variable abs(double x) {
