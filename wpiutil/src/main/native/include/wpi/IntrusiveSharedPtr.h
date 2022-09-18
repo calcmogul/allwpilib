@@ -10,11 +10,6 @@
 #include <memory>
 #include <utility>
 
-#if __GNUC__ == 12 && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuse-after-free"
-#endif  // __GNUC__ == 12 && !defined(__clang__)
-
 namespace wpi {
 
 /**
@@ -47,7 +42,6 @@ class IntrusiveSharedPtr {
   }
 
   ~IntrusiveSharedPtr() {
-    // NOLINTNEXTLINE (clang-analyzer-core.UndefinedBinaryOperatorResult)
     if (m_ptr != nullptr) {
       IntrusiveSharedPtrDecRefCount(m_ptr);
     }
@@ -79,9 +73,8 @@ class IntrusiveSharedPtr {
     return *this;
   }
 
-  IntrusiveSharedPtr(IntrusiveSharedPtr<T>&& rhs) noexcept : m_ptr{rhs.m_ptr} {
-    rhs.m_ptr = nullptr;
-  }
+  IntrusiveSharedPtr(IntrusiveSharedPtr<T>&& rhs) noexcept
+      : m_ptr{std::exchange(rhs.m_ptr, nullptr)} {}
 
   IntrusiveSharedPtr<T>& operator=(IntrusiveSharedPtr<T>&& rhs) noexcept {
     if (this == &rhs || m_ptr == rhs.m_ptr) {
@@ -150,7 +143,3 @@ IntrusiveSharedPtr<T> AllocateIntrusiveShared(const Alloc& alloc,
 }
 
 }  // namespace wpi
-
-#if __GNUC__ == 12 && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // __GNUC__ == 12 && !defined(__clang__)
