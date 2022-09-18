@@ -76,5 +76,25 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
     grad(row) = Variable{wrt(row).expr->adjointExpr};
   }
 
+  // Free adjoint storage that's no longer needed
+  stack.emplace_back(variable, nullptr);
+  while (!stack.empty()) {
+    Variable var = std::move(std::get<0>(stack.back()));
+    stack.pop_back();
+
+    auto& lhs = var.expr->args[0];
+    auto& rhs = var.expr->args[1];
+
+    var.expr->adjointExpr = nullptr;
+
+    if (lhs != nullptr) {
+      stack.emplace_back(lhs, nullptr);
+
+      if (rhs != nullptr) {
+        stack.emplace_back(rhs, nullptr);
+      }
+    }
+  }
+
   return grad;
 }
