@@ -21,23 +21,23 @@ double Gradient(Variable var, Variable& wrt) {
 
   stack.emplace_back(var, 1.0);
   while (!stack.empty()) {
-    auto [var, adjoint] = stack.back();
+    Variable var = std::move(std::get<0>(stack.back()));
+    double adjoint = std::move(std::get<1>(stack.back()));
     stack.pop_back();
 
-    auto& varExpr = *var.expr;
-    auto& lhs = varExpr.args[0];
-    auto& rhs = varExpr.args[1];
+    auto& lhs = var.expr->args[0];
+    auto& rhs = var.expr->args[1];
 
-    varExpr.adjoint += adjoint;
+    var.expr->adjoint += adjoint;
 
     if (lhs != nullptr) {
       if (rhs == nullptr) {
         stack.emplace_back(
-            lhs, adjoint * varExpr.gradientValueFuncs[0](lhs->value, 0.0));
+            lhs, adjoint * var.expr->gradientValueFuncs[0](lhs->value, 0.0));
       } else {
-        stack.emplace_back(lhs, adjoint * varExpr.gradientValueFuncs[0](
+        stack.emplace_back(lhs, adjoint * var.expr->gradientValueFuncs[0](
                                               lhs->value, rhs->value));
-        stack.emplace_back(rhs, adjoint * varExpr.gradientValueFuncs[1](
+        stack.emplace_back(rhs, adjoint * var.expr->gradientValueFuncs[1](
                                               lhs->value, rhs->value));
       }
     }
@@ -60,23 +60,23 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
 
   stack.emplace_back(var, 1.0);
   while (!stack.empty()) {
-    auto [var, adjoint] = stack.back();
+    Variable var = std::move(std::get<0>(stack.back()));
+    double adjoint = std::move(std::get<1>(stack.back()));
     stack.pop_back();
 
-    auto& varExpr = *var.expr;
-    auto& lhs = varExpr.args[0];
-    auto& rhs = varExpr.args[1];
+    auto& lhs = var.expr->args[0];
+    auto& rhs = var.expr->args[1];
 
-    varExpr.adjoint += adjoint;
+    var.expr->adjoint += adjoint;
 
     if (lhs != nullptr) {
       if (rhs == nullptr) {
         stack.emplace_back(
-            lhs, adjoint * varExpr.gradientValueFuncs[0](lhs->value, 0.0));
+            lhs, adjoint * var.expr->gradientValueFuncs[0](lhs->value, 0.0));
       } else {
-        stack.emplace_back(lhs, adjoint * varExpr.gradientValueFuncs[0](
+        stack.emplace_back(lhs, adjoint * var.expr->gradientValueFuncs[0](
                                               lhs->value, rhs->value));
-        stack.emplace_back(rhs, adjoint * varExpr.gradientValueFuncs[1](
+        stack.emplace_back(rhs, adjoint * var.expr->gradientValueFuncs[1](
                                               lhs->value, rhs->value));
       }
     }
