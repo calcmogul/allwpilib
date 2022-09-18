@@ -77,7 +77,7 @@ class IntrusiveSharedPtr {
       : m_ptr{std::exchange(rhs.m_ptr, nullptr)} {}
 
   IntrusiveSharedPtr<T>& operator=(IntrusiveSharedPtr<T>&& rhs) noexcept {
-    if (this == &rhs || m_ptr == rhs.m_ptr) {
+    if (m_ptr == rhs.m_ptr) {
       return *this;
     }
 
