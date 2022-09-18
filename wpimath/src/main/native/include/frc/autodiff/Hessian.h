@@ -26,7 +26,7 @@ class WPILIB_DLLEXPORT Hessian {
    * @param variable Variable of which to compute the gradient.
    * @param wrt Variables with respect to which to compute the gradient.
    */
-  Hessian(Variable& variable, VectorXvar& wrt);
+  Hessian(Variable variable, VectorXvar wrt);
 
   /**
    * Calculate the Hessian.
@@ -34,8 +34,8 @@ class WPILIB_DLLEXPORT Hessian {
   Eigen::SparseMatrix<double> Calculate();
 
  private:
-  Variable* m_variable;
-  VectorXvar* m_wrt;
+  Variable m_variable;
+  VectorXvar m_wrt;
 
   VectorXvar m_gradientTree;
 

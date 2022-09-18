@@ -12,15 +12,15 @@
 
 using namespace frc::autodiff;
 
-Hessian::Hessian(Variable& variable, VectorXvar& wrt)
-    : m_variable{&variable},
-      m_wrt{&wrt},
-      m_gradientTree{GenerateGradientTree(*m_variable, *m_wrt)} {}
+Hessian::Hessian(Variable variable, VectorXvar wrt)
+    : m_variable{std::move(variable)},
+      m_wrt{std::move(wrt)},
+      m_gradientTree{GenerateGradientTree(m_variable, m_wrt)} {}
 
 Eigen::SparseMatrix<double> Hessian::Calculate() {
   m_triplets.clear();
   for (int row = 0; row < m_gradientTree.rows(); ++row) {
-    Eigen::RowVectorXd g = Gradient(m_gradientTree(row), *m_wrt).transpose();
+    Eigen::RowVectorXd g = Gradient(m_gradientTree(row), m_wrt).transpose();
     for (int col = 0; col < g.cols(); ++col) {
       if (g(col) != 0.0) {
         m_triplets.emplace_back(row, col, g(col));
@@ -28,7 +28,7 @@ Eigen::SparseMatrix<double> Hessian::Calculate() {
     }
   }
 
-  Eigen::SparseMatrix<double> H{m_wrt->rows(), m_wrt->rows()};
+  Eigen::SparseMatrix<double> H{m_wrt.rows(), m_wrt.rows()};
   H.setFromTriplets(m_triplets.begin(), m_triplets.end());
 
   return H;
