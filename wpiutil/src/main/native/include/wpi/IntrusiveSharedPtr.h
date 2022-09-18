@@ -79,12 +79,7 @@ class IntrusiveSharedPtr {
     return *this;
   }
 
-  IntrusiveSharedPtr(IntrusiveSharedPtr<T>&& rhs) noexcept {
-    if (this == &rhs || m_ptr == rhs.m_ptr) {
-      return;
-    }
-
-    m_ptr = rhs.m_ptr;
+  IntrusiveSharedPtr(IntrusiveSharedPtr<T>&& rhs) noexcept : m_ptr{rhs.m_ptr} {
     rhs.m_ptr = nullptr;
   }
 
@@ -93,8 +88,7 @@ class IntrusiveSharedPtr {
       return *this;
     }
 
-    m_ptr = rhs.m_ptr;
-    rhs.m_ptr = nullptr;
+    std::swap(m_ptr, rhs.m_ptr);
 
     return *this;
   }
