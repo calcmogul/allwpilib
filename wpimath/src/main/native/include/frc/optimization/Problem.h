@@ -150,6 +150,9 @@ class WPILIB_DLLEXPORT Problem {
 
   /**
    * Create a matrix of decision variables in the optimization problem.
+   *
+   * @param rows Number of matrix rows.
+   * @param cols Number of matrix columns.
    */
   VariableMatrix DecisionVariable(int rows = 1, int cols = 1);
 
