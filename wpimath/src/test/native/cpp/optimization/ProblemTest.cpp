@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <cmath>
+#include <fstream>
 
 #include <fmt/core.h>
 #include <wpi/SmallVector.h>
@@ -356,6 +357,30 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve(config));
 
   // TODO: Verify solution
+#if 0
+  std::ofstream states{"Double integrator states.csv"};
+  if (states.is_open()) {
+    states << "Time (s),Position (m),Velocity (m/s)\n";
+
+    for (int k = 0; k < N + 1; ++k) {
+      states << fmt::format("{},{},{}\n", k * dt.value(), X.Value(0, k),
+                            X.Value(1, k));
+    }
+  }
+
+  std::ofstream inputs{"Double integrator inputs.csv"};
+  if (inputs.is_open()) {
+    inputs << "Time (s),Acceleration (m/s²)\n";
+
+    for (int k = 0; k < N + 1; ++k) {
+      if (k < N) {
+        inputs << fmt::format("{},{}\n", k * dt.value(), U.Value(0, k));
+      } else {
+        inputs << fmt::format("{},{}\n", k * dt.value(), 0.0);
+      }
+    }
+  }
+#endif
 }
 
 TEST(ProblemTest, FlywheelDirectTranscription) {
