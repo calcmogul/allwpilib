@@ -203,8 +203,8 @@ class WPILIB_DLLEXPORT Problem {
   SolverStatus Solve(const SolverConfig& config = SolverConfig{});
 
  private:
-  // Leaves of the problem's expression tree
-  autodiff::VectorXvar m_leaves;
+  // Decision variables, which are the root of the problem's expression tree
+  autodiff::VectorXvar m_decisionVariables;
 
   // Cost function: f(x)
   std::optional<autodiff::Variable> m_f;

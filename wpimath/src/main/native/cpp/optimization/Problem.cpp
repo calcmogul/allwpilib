@@ -35,14 +35,14 @@ Problem::Problem(ProblemType problemType) : m_problemType{problemType} {}
 
 VariableMatrix Problem::DecisionVariable(int rows, int cols) {
   VariableMatrix vars{rows, cols};
-  int oldSize = m_leaves.rows();
+  int oldSize = m_decisionVariables.rows();
 
-  GrowAutodiffVector(m_leaves, rows * cols);
+  GrowAutodiffVector(m_decisionVariables, rows * cols);
 
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < cols; ++col) {
-      m_leaves[oldSize + row * cols + col] = autodiff::Variable{0.0};
-      vars.Autodiff(row, col) = m_leaves[oldSize + row * cols + col];
+      m_decisionVariables[oldSize + row * cols + col] = autodiff::Variable{0.0};
+      vars.Autodiff(row, col) = m_decisionVariables[oldSize + row * cols + col];
     }
   }
 
@@ -94,9 +94,9 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   }
 
   // Create the initial value column vector
-  Eigen::VectorXd x{m_leaves.size(), 1};
-  for (int i = 0; i < m_leaves.rows(); ++i) {
-    x(i) = m_leaves(i).Value();
+  Eigen::VectorXd x{m_decisionVariables.size(), 1};
+  for (int i = 0; i < m_decisionVariables.rows(); ++i) {
+    x(i) = m_decisionVariables(i).Value();
   }
 
   // Solve the optimization problem
@@ -113,7 +113,7 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   }
 
   // Assign solution to the original Variable instances
-  SetAD(m_leaves, solution);
+  SetAD(m_decisionVariables, solution);
 
   return status;
 }
@@ -192,7 +192,7 @@ double Problem::FractionToTheBoundaryRule(
 }
 
 double Problem::f(const Eigen::Ref<const Eigen::VectorXd>& x) {
-  SetAD(m_leaves, x);
+  SetAD(m_decisionVariables, x);
   return m_f.value().Value();
 }
 
@@ -382,13 +382,13 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   Eigen::VectorXd step = Eigen::VectorXd::Zero(x.rows(), 1);
 
-  SetAD(m_leaves, x);
+  SetAD(m_decisionVariables, x);
   L.Update();
 
   // Error estimate E_μ
   double E_mu = std::numeric_limits<double>::infinity();
 
-  autodiff::Hessian hessian{L, m_leaves};
+  autodiff::Hessian hessian{L, m_decisionVariables};
 
   int iterations = 0;
 
@@ -439,14 +439,14 @@ Eigen::VectorXd Problem::InteriorPoint(
       //         [    ⋮    ]
       //         [∇ᵀcₑₘ(x)ₖ]
       Eigen::SparseMatrix<double> A_e =
-          autodiff::Jacobian(m_equalityConstraints, m_leaves);
+          autodiff::Jacobian(m_equalityConstraints, m_decisionVariables);
 
       //         [∇ᵀcᵢ₁(x)ₖ]
       // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
       //         [    ⋮    ]
       //         [∇ᵀcᵢₘ(x)ₖ]
       Eigen::SparseMatrix<double> A_i =
-          autodiff::Jacobian(m_inequalityConstraints, m_leaves);
+          autodiff::Jacobian(m_inequalityConstraints, m_decisionVariables);
 
       // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
       //       [    Aₑ       0 ]
@@ -474,7 +474,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       }
       Eigen::VectorXd rhs{x.rows() + y.rows()};
       rhs.topRows(x.rows()) =
-          autodiff::Gradient(m_f.value(), m_leaves) - A_e.transpose() * y +
+          autodiff::Gradient(m_f.value(), m_decisionVariables) -
+          A_e.transpose() * y +
           A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
       rhs.bottomRows(y.rows()) = c_e;
 
@@ -533,7 +534,7 @@ Eigen::VectorXd Problem::InteriorPoint(
                           mu / (kappa_sigma * s(row)));
       }
 
-      SetAD(m_leaves, x);
+      SetAD(m_decisionVariables, x);
       SetAD(sAD, s);
       SetAD(yAD, y);
       SetAD(zAD, z);
@@ -552,8 +553,8 @@ Eigen::VectorXd Problem::InteriorPoint(
           s_max;
 
       // Update variables needed in error estimate
-      A_e = autodiff::Jacobian(m_equalityConstraints, m_leaves);
-      A_i = autodiff::Jacobian(m_inequalityConstraints, m_leaves);
+      A_e = autodiff::Jacobian(m_equalityConstraints, m_decisionVariables);
+      A_i = autodiff::Jacobian(m_inequalityConstraints, m_decisionVariables);
       for (int row = 0; row < m_equalityConstraints.rows(); row++) {
         c_e[row] = m_equalityConstraints(row).Value();
       }
@@ -604,7 +605,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       //   ||Sz − μe||_∞ / s_c
       //   ||cₑ||_∞
       //   ||cᵢ − s||_∞
-      E_mu = Max((autodiff::Gradient(m_f.value(), m_leaves) -
+      E_mu = Max((autodiff::Gradient(m_f.value(), m_decisionVariables) -
                   A_e.transpose() * y - A_i.transpose() * z)
                          .lpNorm<Eigen::Infinity>() /
                      s_d,
