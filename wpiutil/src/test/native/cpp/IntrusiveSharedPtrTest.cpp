@@ -68,93 +68,90 @@ TEST(IntrusiveSharedPtrTest, Traits) {
 }
 
 TEST(IntrusiveSharedPtrTest, DefaultConstruction) {
-  wpi::IntrusiveSharedPtr<Mock> empty;
+  wpi::IntrusiveSharedPtr<Mock> ptr;
 
-  EXPECT_EQ(empty.Get(), nullptr);
-  EXPECT_EQ(empty.operator->(), nullptr);
+  EXPECT_EQ(ptr.Get(), nullptr);
+  EXPECT_FALSE(static_cast<bool>(ptr));
+  EXPECT_EQ(ptr.operator->(), nullptr);
 }
 
 TEST(IntrusiveSharedPtrTest, ConstuctedFromNullptr) {
-  wpi::IntrusiveSharedPtr<Mock> empty{nullptr};
+  wpi::IntrusiveSharedPtr<Mock> ptr{nullptr};
 
-  EXPECT_EQ(empty.Get(), nullptr);
-  EXPECT_EQ(empty.operator->(), nullptr);
+  EXPECT_EQ(ptr.Get(), nullptr);
+  EXPECT_FALSE(static_cast<bool>(ptr));
+  EXPECT_EQ(ptr.operator->(), nullptr);
 }
 
 TEST(IntrusiveSharedPtrTest, CompareToEmptySharedPtr) {
-  wpi::IntrusiveSharedPtr<Mock> empty1;
-  wpi::IntrusiveSharedPtr<Mock> empty2;
+  wpi::IntrusiveSharedPtr<Mock> ptr1;
+  wpi::IntrusiveSharedPtr<Mock> ptr2;
 
-  EXPECT_EQ(empty1, empty2);
-  EXPECT_FALSE(empty1 != empty2);
+  EXPECT_EQ(ptr1, ptr2);
+  EXPECT_FALSE(ptr1 != ptr2);
 }
 
 TEST(IntrusiveSharedPtrTest, CompareToSharedPtrCreatedFromNullptr) {
-  wpi::IntrusiveSharedPtr<Mock> empty1;
-  wpi::IntrusiveSharedPtr<Mock> empty2(nullptr);
+  wpi::IntrusiveSharedPtr<Mock> ptr1;
+  wpi::IntrusiveSharedPtr<Mock> ptr2(nullptr);
 
-  EXPECT_EQ(empty1, empty2);
-  EXPECT_FALSE(empty1 != empty2);
+  EXPECT_EQ(ptr1, ptr2);
+  EXPECT_FALSE(ptr1 != ptr2);
 
-  EXPECT_EQ(empty2, empty1);
-  EXPECT_FALSE(empty2 != empty1);
+  EXPECT_EQ(ptr2, ptr1);
+  EXPECT_FALSE(ptr2 != ptr1);
 }
 
-TEST(IntrusiveSharedPtrTest, Counting) {
-  {
-    auto object = new Mock{};
+TEST(IntrusiveSharedPtrTest, AttachAndRef) {
+  auto object = new Mock{};
 
-    // Attach
-    wpi::IntrusiveSharedPtr<Mock> ptr1{object};
-    EXPECT_EQ(object, ptr1.Get());
-    EXPECT_EQ(object->refCount, 1u);
-    EXPECT_TRUE(static_cast<bool>(ptr1));
-    EXPECT_EQ(ptr1.operator->(), object);
+  // Attach
+  wpi::IntrusiveSharedPtr<Mock> ptr1{object};
+  EXPECT_EQ(object, ptr1.Get());
+  EXPECT_EQ(object->refCount, 1u);
+  EXPECT_TRUE(static_cast<bool>(ptr1));
+  EXPECT_EQ(ptr1.operator->(), object);
 
-    // Ref
-    wpi::IntrusiveSharedPtr<Mock> ptr2{object};
-    EXPECT_EQ(object, ptr2.Get());
-    EXPECT_EQ(object->refCount, 2u);
-    EXPECT_TRUE(static_cast<bool>(ptr2));
-    EXPECT_EQ(ptr2.operator->(), object);
-  }
+  // Ref
+  wpi::IntrusiveSharedPtr<Mock> ptr2{object};
+  EXPECT_EQ(object, ptr2.Get());
+  EXPECT_EQ(object->refCount, 2u);
+  EXPECT_TRUE(static_cast<bool>(ptr2));
+  EXPECT_EQ(ptr2.operator->(), object);
+}
 
-  // Copy and assignment
-  {
-    auto object = new Mock{};
-    wpi::IntrusiveSharedPtr<Mock> ptr1{object};
-    EXPECT_EQ(object->refCount, 1u);
+TEST(IntrusiveSharedPtrTest, CopyAndAssignment) {
+  auto object = new Mock{};
+  wpi::IntrusiveSharedPtr<Mock> ptr1{object};
+  EXPECT_EQ(object->refCount, 1u);
 
-    wpi::IntrusiveSharedPtr<Mock> ptr2{ptr1};
-    EXPECT_EQ(object->refCount, 2u);
+  wpi::IntrusiveSharedPtr<Mock> ptr2{ptr1};
+  EXPECT_EQ(object->refCount, 2u);
 
-    wpi::IntrusiveSharedPtr<Mock> ptr3{object};
-    EXPECT_EQ(object->refCount, 3u);
-  }
+  wpi::IntrusiveSharedPtr<Mock> ptr3{object};
+  EXPECT_EQ(object->refCount, 3u);
+}
 
-  // Move
-  {
-    auto object = new Mock{};
-    wpi::IntrusiveSharedPtr<Mock> ptr1{object};
-    EXPECT_EQ(object->refCount, 1u);
+TEST(IntrusiveSharedPtrTest, Move) {
+  auto object = new Mock{};
+  wpi::IntrusiveSharedPtr<Mock> ptr1{object};
+  EXPECT_EQ(object->refCount, 1u);
 
-    auto ptr2 = std::move(ptr1);
-    EXPECT_EQ(object->refCount, 1u);
-  }
+  auto ptr2 = std::move(ptr1);
+  EXPECT_EQ(object->refCount, 1u);
+}
 
-  // Self-assignment
-  {
-    auto object = new Mock{};
-    wpi::IntrusiveSharedPtr<Mock> ptr1{object};
-    wpi::IntrusiveSharedPtr<Mock> ptr2{object};
+TEST(IntrusiveSharedPtrTest, SelfAssignment) {
+  auto object = new Mock{};
+  wpi::IntrusiveSharedPtr<Mock> ptr1{object};
+  wpi::IntrusiveSharedPtr<Mock> ptr2{object};
 
-    EXPECT_EQ(object->refCount, 2u);
-    ptr1 = ptr2;
-    EXPECT_EQ(object->refCount, 2u);
+  EXPECT_EQ(object->refCount, 2u);
+  ptr1 = ptr2;
+  EXPECT_EQ(object->refCount, 2u);
 
-    ptr1 = std::move(ptr2);
-    EXPECT_EQ(ptr1.Get(), object);
-    EXPECT_EQ(ptr2.Get(), object);
-    EXPECT_EQ(object->refCount, 2u);
-  }
+  ptr1 = std::move(ptr2);
+  EXPECT_EQ(ptr1.Get(), object);
+  EXPECT_EQ(ptr2.Get(), object);
+  EXPECT_EQ(object->refCount, 2u);
 }
