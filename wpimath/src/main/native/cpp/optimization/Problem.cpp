@@ -358,20 +358,21 @@ Eigen::VectorXd Problem::InteriorPoint(
   std::vector<Eigen::Triplet<double>> triplets;
 
   Eigen::VectorXd x = initialGuess;
+  autodiff::MapVectorXvar xAD(m_decisionVariables.data(),
+                              m_decisionVariables.size());
 
   Eigen::VectorXd s = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
-  Eigen::VectorXd y = Eigen::VectorXd::Zero(m_equalityConstraints.size(), 1);
-  Eigen::VectorXd z = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
-
   autodiff::VectorXvar sAD =
       autodiff::VectorXvar::Ones(m_inequalityConstraints.size());
+
+  Eigen::VectorXd y = Eigen::VectorXd::Zero(m_equalityConstraints.size());
   autodiff::VectorXvar yAD =
-      autodiff::VectorXvar::Zero(m_equalityConstraints.size(), 1);
+      autodiff::VectorXvar::Zero(m_equalityConstraints.size());
+
+  Eigen::VectorXd z = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
   autodiff::VectorXvar zAD =
       autodiff::VectorXvar::Ones(m_inequalityConstraints.size());
 
-  autodiff::MapVectorXvar decisionVariablesAD(m_decisionVariables.data(),
-                                              m_decisionVariables.size());
   autodiff::MapVectorXvar c_eAD(m_equalityConstraints.data(),
                                 m_equalityConstraints.size());
   autodiff::MapVectorXvar c_iAD(m_inequalityConstraints.data(),
@@ -388,15 +389,15 @@ Eigen::VectorXd Problem::InteriorPoint(
     L -= zAD.transpose() * (c_iAD - sAD);
   }
 
-  Eigen::VectorXd step = Eigen::VectorXd::Zero(x.rows(), 1);
+  Eigen::VectorXd step = Eigen::VectorXd::Zero(x.rows());
 
-  SetAD(m_decisionVariables, x);
+  SetAD(xAD, x);
   L.Update();
 
   // Error estimate E_μ
   double E_mu = std::numeric_limits<double>::infinity();
 
-  autodiff::Hessian hessian{L, decisionVariablesAD};
+  autodiff::Hessian hessian{L, xAD};
 
   int iterations = 0;
 
@@ -446,15 +447,13 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
       //         [    ⋮    ]
       //         [∇ᵀcₑₘ(x)ₖ]
-      Eigen::SparseMatrix<double> A_e =
-          autodiff::Jacobian(c_eAD, decisionVariablesAD);
+      Eigen::SparseMatrix<double> A_e = autodiff::Jacobian(c_eAD, xAD);
 
       //         [∇ᵀcᵢ₁(x)ₖ]
       // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
       //         [    ⋮    ]
       //         [∇ᵀcᵢₘ(x)ₖ]
-      Eigen::SparseMatrix<double> A_i =
-          autodiff::Jacobian(c_iAD, decisionVariablesAD);
+      Eigen::SparseMatrix<double> A_i = autodiff::Jacobian(c_iAD, xAD);
 
       // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
       //       [    Aₑ       0 ]
@@ -482,8 +481,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       }
       Eigen::VectorXd rhs{x.rows() + y.rows()};
       rhs.topRows(x.rows()) =
-          autodiff::Gradient(m_f.value(), decisionVariablesAD) -
-          A_e.transpose() * y +
+          autodiff::Gradient(m_f.value(), xAD) - A_e.transpose() * y +
           A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
       rhs.bottomRows(y.rows()) = c_e;
 
@@ -542,7 +540,7 @@ Eigen::VectorXd Problem::InteriorPoint(
                           mu / (kappa_sigma * s(row)));
       }
 
-      SetAD(m_decisionVariables, x);
+      SetAD(xAD, x);
       SetAD(sAD, s);
       SetAD(yAD, y);
       SetAD(zAD, z);
@@ -561,8 +559,8 @@ Eigen::VectorXd Problem::InteriorPoint(
           s_max;
 
       // Update variables needed in error estimate
-      A_e = autodiff::Jacobian(c_eAD, decisionVariablesAD);
-      A_i = autodiff::Jacobian(c_iAD, decisionVariablesAD);
+      A_e = autodiff::Jacobian(c_eAD, xAD);
+      A_i = autodiff::Jacobian(c_iAD, xAD);
       for (size_t row = 0; row < m_equalityConstraints.size(); row++) {
         c_e[row] = m_equalityConstraints[row].Value();
       }
@@ -613,8 +611,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       //   ||Sz − μe||_∞ / s_c
       //   ||cₑ||_∞
       //   ||cᵢ − s||_∞
-      E_mu = Max((autodiff::Gradient(m_f.value(), decisionVariablesAD) -
-                  A_e.transpose() * y - A_i.transpose() * z)
+      E_mu = Max((autodiff::Gradient(m_f.value(), xAD) - A_e.transpose() * y -
+                  A_i.transpose() * z)
                          .lpNorm<Eigen::Infinity>() /
                      s_d,
                  (S * z - mu * e).lpNorm<Eigen::Infinity>() / s_c,
