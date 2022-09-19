@@ -41,7 +41,7 @@ VariableMatrix Problem::DecisionVariable(int rows, int cols) {
   VariableMatrix vars{rows, cols};
   int oldSize = m_decisionVariables.size();
 
-  GrowVariableVector(m_decisionVariables, rows * cols);
+  m_decisionVariables.reserve(m_decisionVariables.size() + rows * cols);
 
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < cols; ++col) {
@@ -66,7 +66,7 @@ void Problem::Minimize(VariableMatrix&& cost) {
 void Problem::SubjectTo(EqualityConstraints&& constraint) {
   auto& storage = constraint.constraints;
 
-  GrowVariableVector(m_equalityConstraints, storage.size());
+  m_equalityConstraints.reserve(m_equalityConstraints.size() + storage.size());
 
   for (size_t i = 0; i < storage.size(); ++i) {
     m_equalityConstraints.emplace_back(std::move(storage[i]));
@@ -76,7 +76,8 @@ void Problem::SubjectTo(EqualityConstraints&& constraint) {
 void Problem::SubjectTo(InequalityConstraints&& constraint) {
   auto& storage = constraint.constraints;
 
-  GrowVariableVector(m_inequalityConstraints, storage.size());
+  m_inequalityConstraints.reserve(m_inequalityConstraints.size() +
+                                  storage.size());
 
   for (size_t i = 0; i < storage.size(); ++i) {
     m_inequalityConstraints.emplace_back(std::move(storage[i]));
@@ -118,25 +119,6 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   SetAD(m_decisionVariables, solution);
 
   return status;
-}
-
-void Problem::GrowVariableVector(std::vector<autodiff::Variable>& v,
-                                 int growth) {
-  // If the vector can accomodate the new elements without reallocating, do
-  // nothing
-  if (v.capacity() >= v.size() + growth) {
-    return;
-  }
-
-  // We move the autodiff variables into a temporary during the resize, then
-  // back, because resize() makes all the gradients it contains always return
-  // zero after that
-  std::vector<autodiff::Variable> newStorage;
-  newStorage.reserve(v.size() + growth);
-  for (size_t row = 0; row < v.size(); ++row) {
-    newStorage.emplace_back(std::move(v[row]));
-  }
-  v = std::move(newStorage);
 }
 
 void Problem::SetAD(std::vector<autodiff::Variable>& dest,

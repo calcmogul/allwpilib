@@ -222,17 +222,6 @@ class WPILIB_DLLEXPORT Problem {
   SolverConfig m_config;
 
   /**
-   * Reserves capacity in an autodiff variable vector for future growth to avoid
-   * further reallocations. This is done in such a way that links to old
-   * autodiff variables are preserved.
-   *
-   * @param v Vector to grow.
-   * @param growth Amount by which to grow the vector.
-   */
-  static void GrowVariableVector(std::vector<autodiff::Variable>& v,
-                                 int growth);
-
-  /**
    * Assigns the contents of a double vector to an autodiff vector.
    *
    * @param dest The autodiff vector.
