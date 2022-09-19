@@ -126,7 +126,6 @@ void Problem::GrowAutodiffVector(autodiff::VectorXvar& v, int growth) {
   for (int row = 0; row < v.rows(); ++row) {
     newStorage(row) = std::move(v(row));
   }
-  v.resize(v.rows() + growth);
   v = std::move(newStorage);
 }
 
