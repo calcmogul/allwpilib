@@ -10,8 +10,6 @@
 #include "gtest/gtest.h"
 #include "wpi/IntrusiveSharedPtr.h"
 
-namespace {
-
 struct Mock {
   uint32_t refCount = 0;
 };
@@ -20,13 +18,22 @@ inline void IntrusiveSharedPtrIncRefCount(Mock* obj) {
   ++obj->refCount;
 }
 
+// GCC 12 warns about a use-after-free, but the address sanitizer doesn't see
+// one. The latter is more trustworthy.
+#if __GNUC__ == 12 && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif  // __GNUC__ == 12 && !defined(__clang__)
+
 inline void IntrusiveSharedPtrDecRefCount(Mock* obj) {
   if (--obj->refCount == 0) {
     delete obj;
   }
 }
 
-}  // namespace
+#if __GNUC__ == 12 && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif  // __GNUC__ == 12 && !defined(__clang__)
 
 TEST(IntrusiveSharedPtrTest, Traits) {
   using Ptr = wpi::IntrusiveSharedPtr<Mock>;
@@ -134,20 +141,33 @@ TEST(IntrusiveSharedPtrTest, CopyAndAssignment) {
 
 TEST(IntrusiveSharedPtrTest, Move) {
   auto object = new Mock{};
+
   wpi::IntrusiveSharedPtr<Mock> ptr1{object};
+  EXPECT_EQ(ptr1.Get(), object);
   EXPECT_EQ(object->refCount, 1u);
 
-  auto ptr2 = std::move(ptr1);
+  wpi::IntrusiveSharedPtr<Mock> ptr2;
+  EXPECT_EQ(ptr2.Get(), nullptr);
+
+  ptr2 = std::move(ptr1);
+  EXPECT_EQ(ptr2.Get(), object);
   EXPECT_EQ(object->refCount, 1u);
 }
 
 TEST(IntrusiveSharedPtrTest, SelfAssignment) {
   auto object = new Mock{};
-  wpi::IntrusiveSharedPtr<Mock> ptr1{object};
-  wpi::IntrusiveSharedPtr<Mock> ptr2{object};
 
+  wpi::IntrusiveSharedPtr<Mock> ptr1{object};
+  EXPECT_EQ(ptr1.Get(), object);
+  EXPECT_EQ(object->refCount, 1u);
+
+  wpi::IntrusiveSharedPtr<Mock> ptr2{object};
+  EXPECT_EQ(ptr2.Get(), object);
   EXPECT_EQ(object->refCount, 2u);
+
   ptr1 = ptr2;
+  EXPECT_EQ(ptr1.Get(), object);
+  EXPECT_EQ(ptr2.Get(), object);
   EXPECT_EQ(object->refCount, 2u);
 
   ptr1 = std::move(ptr2);
