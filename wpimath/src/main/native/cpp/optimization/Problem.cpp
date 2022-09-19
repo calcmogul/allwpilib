@@ -343,7 +343,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   constexpr double kappa_sigma = 1e10;
 
   // Fraction-to-the-boundary rule scale factor minimum
-  constexpr double tau_min = 0.995;
+  constexpr double tau_min = 0.99;
 
   // Tuning parameters for μ update
   constexpr double kappa_mu = 0.2;  // (0, 1)
