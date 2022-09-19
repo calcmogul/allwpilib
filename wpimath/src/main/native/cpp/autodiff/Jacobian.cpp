@@ -11,7 +11,8 @@
 
 namespace frc::autodiff {
 
-Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables, VectorXvar& wrt) {
+Eigen::SparseMatrix<double> Jacobian(Eigen::Ref<VectorXvar> variables,
+                                     Eigen::Ref<VectorXvar> wrt) {
   Eigen::SparseMatrix<double> J{variables.rows(), wrt.rows()};
 
   std::vector<Eigen::Triplet<double>> triplets;

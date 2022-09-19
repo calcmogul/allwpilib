@@ -17,7 +17,7 @@ namespace frc::autodiff {
  * @param variables Vector of which to compute the Jacobian.
  * @param wrt Vector with respect to which to compute the Jacobian.
  */
-WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Jacobian(VectorXvar& variables,
-                                                      VectorXvar& wrt);
+WPILIB_DLLEXPORT Eigen::SparseMatrix<double> Jacobian(
+    Eigen::Ref<VectorXvar> variables, Eigen::Ref<VectorXvar> wrt);
 
 }  // namespace frc::autodiff

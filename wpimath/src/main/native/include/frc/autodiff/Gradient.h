@@ -25,6 +25,7 @@ WPILIB_DLLEXPORT double Gradient(Variable variable, Variable& wrt);
  * @param variable Variable of which to compute the gradient.
  * @param wrt Variables with respect to which to compute the gradient.
  */
-WPILIB_DLLEXPORT Eigen::VectorXd Gradient(Variable variable, VectorXvar& wrt);
+WPILIB_DLLEXPORT Eigen::VectorXd Gradient(Variable variable,
+                                          Eigen::Ref<VectorXvar> wrt);
 
 }  // namespace frc::autodiff

@@ -143,6 +143,7 @@ class WPILIB_DLLEXPORT Variable {
 };
 
 using VectorXvar = Eigen::Vector<frc::autodiff::Variable, Eigen::Dynamic>;
+using MapVectorXvar = Eigen::Map<VectorXvar>;
 
 /**
  * std::abs() for Variables.

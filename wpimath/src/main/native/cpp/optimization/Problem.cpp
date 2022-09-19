@@ -31,17 +31,21 @@ constexpr double Max(double a, double b, Args... args) {
   }
 }
 
-Problem::Problem(ProblemType problemType) : m_problemType{problemType} {}
+Problem::Problem(ProblemType problemType) : m_problemType{problemType} {
+  m_decisionVariables.reserve(1024);
+  m_equalityConstraints.reserve(1024);
+  m_inequalityConstraints.reserve(1024);
+}
 
 VariableMatrix Problem::DecisionVariable(int rows, int cols) {
   VariableMatrix vars{rows, cols};
-  int oldSize = m_decisionVariables.rows();
+  int oldSize = m_decisionVariables.size();
 
-  GrowAutodiffVector(m_decisionVariables, rows * cols);
+  GrowVariableVector(m_decisionVariables, rows * cols);
 
   for (int row = 0; row < rows; ++row) {
     for (int col = 0; col < cols; ++col) {
-      m_decisionVariables[oldSize + row * cols + col] = autodiff::Variable{0.0};
+      m_decisionVariables.emplace_back(0.0);
       vars.Autodiff(row, col) = m_decisionVariables[oldSize + row * cols + col];
     }
   }
@@ -60,32 +64,30 @@ void Problem::Minimize(VariableMatrix&& cost) {
 }
 
 void Problem::SubjectTo(EqualityConstraints&& constraint) {
-  int oldSize = m_equalityConstraints.rows();
   auto& storage = constraint.constraints;
 
-  GrowAutodiffVector(m_equalityConstraints, storage.size());
+  GrowVariableVector(m_equalityConstraints, storage.size());
 
   for (size_t i = 0; i < storage.size(); ++i) {
-    m_equalityConstraints(oldSize + i) = std::move(storage[i]);
+    m_equalityConstraints.emplace_back(std::move(storage[i]));
   }
 }
 
 void Problem::SubjectTo(InequalityConstraints&& constraint) {
-  int oldSize = m_inequalityConstraints.rows();
   auto& storage = constraint.constraints;
 
-  GrowAutodiffVector(m_inequalityConstraints, storage.size());
+  GrowVariableVector(m_inequalityConstraints, storage.size());
 
   for (size_t i = 0; i < storage.size(); ++i) {
-    m_inequalityConstraints(oldSize + i) = std::move(storage[i]);
+    m_inequalityConstraints.emplace_back(std::move(storage[i]));
   }
 }
 
 SolverStatus Problem::Solve(const SolverConfig& config) {
   m_config = config;
 
-  if (!m_f.has_value() && m_equalityConstraints.rows() == 0 &&
-      m_inequalityConstraints.rows() == 0) {
+  if (!m_f.has_value() && m_equalityConstraints.size() == 0 &&
+      m_inequalityConstraints.size() == 0) {
     // If there's no cost function or constraints, do nothing
     return SolverStatus::kOk;
   } else if (!m_f.has_value()) {
@@ -95,8 +97,8 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
 
   // Create the initial value column vector
   Eigen::VectorXd x{m_decisionVariables.size(), 1};
-  for (int i = 0; i < m_decisionVariables.rows(); ++i) {
-    x(i) = m_decisionVariables(i).Value();
+  for (size_t i = 0; i < m_decisionVariables.size(); ++i) {
+    x(i) = m_decisionVariables[i].Value();
   }
 
   // Solve the optimization problem
@@ -118,15 +120,32 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   return status;
 }
 
-void Problem::GrowAutodiffVector(autodiff::VectorXvar& v, int growth) {
+void Problem::GrowVariableVector(std::vector<autodiff::Variable>& v,
+                                 int growth) {
+  // If the vector can accomodate the new elements without reallocating, do
+  // nothing
+  if (v.capacity() >= v.size() + growth) {
+    return;
+  }
+
   // We move the autodiff variables into a temporary during the resize, then
   // back, because resize() makes all the gradients it contains always return
   // zero after that
-  autodiff::VectorXvar newStorage{v.rows() + growth, 1};
-  for (int row = 0; row < v.rows(); ++row) {
-    newStorage(row) = std::move(v(row));
+  std::vector<autodiff::Variable> newStorage;
+  newStorage.reserve(v.size() + growth);
+  for (size_t row = 0; row < v.size(); ++row) {
+    newStorage.emplace_back(std::move(v[row]));
   }
   v = std::move(newStorage);
+}
+
+void Problem::SetAD(std::vector<autodiff::Variable>& dest,
+                    const Eigen::Ref<const Eigen::VectorXd>& src) {
+  assert(dest.size() == static_cast<size_t>(src.rows()));
+
+  for (size_t row = 0; row < dest.size(); ++row) {
+    dest[row] = src(row);
+  }
 }
 
 void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
@@ -369,15 +388,22 @@ Eigen::VectorXd Problem::InteriorPoint(
   autodiff::VectorXvar zAD =
       autodiff::VectorXvar::Ones(m_inequalityConstraints.size());
 
+  autodiff::MapVectorXvar decisionVariablesAD(m_decisionVariables.data(),
+                                              m_decisionVariables.size());
+  autodiff::MapVectorXvar c_eAD(m_equalityConstraints.data(),
+                                m_equalityConstraints.size());
+  autodiff::MapVectorXvar c_iAD(m_inequalityConstraints.data(),
+                                m_inequalityConstraints.size());
+
   const Eigen::MatrixXd e = Eigen::VectorXd::Ones(s.rows());
 
   // L(x, s, y, z)ₖ = f(x)ₖ − yₖᵀcₑ(x)ₖ − zₖᵀ(cᵢ(x)ₖ − sₖ)
   autodiff::Variable L = m_f.value();
   if (m_equalityConstraints.size() > 0) {
-    L -= yAD.transpose() * m_equalityConstraints;
+    L -= yAD.transpose() * c_eAD;
   }
   if (m_inequalityConstraints.size() > 0) {
-    L -= zAD.transpose() * (m_inequalityConstraints - sAD);
+    L -= zAD.transpose() * (c_iAD - sAD);
   }
 
   Eigen::VectorXd step = Eigen::VectorXd::Zero(x.rows(), 1);
@@ -388,7 +414,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Error estimate E_μ
   double E_mu = std::numeric_limits<double>::infinity();
 
-  autodiff::Hessian hessian{L, m_decisionVariables};
+  autodiff::Hessian hessian{L, decisionVariablesAD};
 
   int iterations = 0;
 
@@ -439,14 +465,14 @@ Eigen::VectorXd Problem::InteriorPoint(
       //         [    ⋮    ]
       //         [∇ᵀcₑₘ(x)ₖ]
       Eigen::SparseMatrix<double> A_e =
-          autodiff::Jacobian(m_equalityConstraints, m_decisionVariables);
+          autodiff::Jacobian(c_eAD, decisionVariablesAD);
 
       //         [∇ᵀcᵢ₁(x)ₖ]
       // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
       //         [    ⋮    ]
       //         [∇ᵀcᵢₘ(x)ₖ]
       Eigen::SparseMatrix<double> A_i =
-          autodiff::Jacobian(m_inequalityConstraints, m_decisionVariables);
+          autodiff::Jacobian(c_iAD, decisionVariablesAD);
 
       // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
       //       [    Aₑ       0 ]
@@ -464,17 +490,17 @@ Eigen::VectorXd Problem::InteriorPoint(
       //        [               cₑ               ]
       //
       // The outer negative sign is applied in the solve() call.
-      Eigen::VectorXd c_e{m_equalityConstraints.rows()};
-      for (int row = 0; row < m_equalityConstraints.rows(); row++) {
-        c_e[row] = m_equalityConstraints(row).Value();
+      Eigen::VectorXd c_e{m_equalityConstraints.size()};
+      for (size_t row = 0; row < m_equalityConstraints.size(); row++) {
+        c_e[row] = m_equalityConstraints[row].Value();
       }
-      Eigen::VectorXd c_i{m_inequalityConstraints.rows()};
-      for (int row = 0; row < m_inequalityConstraints.rows(); row++) {
-        c_i[row] = m_inequalityConstraints(row).Value();
+      Eigen::VectorXd c_i{m_inequalityConstraints.size()};
+      for (size_t row = 0; row < m_inequalityConstraints.size(); row++) {
+        c_i[row] = m_inequalityConstraints[row].Value();
       }
       Eigen::VectorXd rhs{x.rows() + y.rows()};
       rhs.topRows(x.rows()) =
-          autodiff::Gradient(m_f.value(), m_decisionVariables) -
+          autodiff::Gradient(m_f.value(), decisionVariablesAD) -
           A_e.transpose() * y +
           A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
       rhs.bottomRows(y.rows()) = c_e;
@@ -553,13 +579,13 @@ Eigen::VectorXd Problem::InteriorPoint(
           s_max;
 
       // Update variables needed in error estimate
-      A_e = autodiff::Jacobian(m_equalityConstraints, m_decisionVariables);
-      A_i = autodiff::Jacobian(m_inequalityConstraints, m_decisionVariables);
-      for (int row = 0; row < m_equalityConstraints.rows(); row++) {
-        c_e[row] = m_equalityConstraints(row).Value();
+      A_e = autodiff::Jacobian(c_eAD, decisionVariablesAD);
+      A_i = autodiff::Jacobian(c_iAD, decisionVariablesAD);
+      for (size_t row = 0; row < m_equalityConstraints.size(); row++) {
+        c_e[row] = m_equalityConstraints[row].Value();
       }
-      for (int row = 0; row < m_inequalityConstraints.rows(); row++) {
-        c_i[row] = m_inequalityConstraints(row).Value();
+      for (size_t row = 0; row < m_inequalityConstraints.size(); row++) {
+        c_i[row] = m_inequalityConstraints[row].Value();
       }
       triplets.clear();
       for (int k = 0; k < s.rows(); k++) {
@@ -605,7 +631,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       //   ||Sz − μe||_∞ / s_c
       //   ||cₑ||_∞
       //   ||cᵢ − s||_∞
-      E_mu = Max((autodiff::Gradient(m_f.value(), m_decisionVariables) -
+      E_mu = Max((autodiff::Gradient(m_f.value(), decisionVariablesAD) -
                   A_e.transpose() * y - A_i.transpose() * z)
                          .lpNorm<Eigen::Infinity>() /
                      s_d,

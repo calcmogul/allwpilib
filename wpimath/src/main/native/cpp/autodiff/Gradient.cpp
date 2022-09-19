@@ -9,7 +9,7 @@
 
 namespace frc::autodiff {
 
-double Gradient(Variable var, Variable& wrt) {
+double Gradient(Variable variable, Variable& wrt) {
   // Read wpimath/README.md#Reverse_accumulation_automatic_differentiation for
   // background on reverse accumulation automatic differentiation.
 
@@ -19,7 +19,7 @@ double Gradient(Variable var, Variable& wrt) {
   std::vector<std::tuple<Variable, double>> stack;
   stack.reserve(1024);
 
-  stack.emplace_back(var, 1.0);
+  stack.emplace_back(variable, 1.0);
   while (!stack.empty()) {
     Variable var = std::move(std::get<0>(stack.back()));
     double adjoint = std::move(std::get<1>(stack.back()));
@@ -46,7 +46,7 @@ double Gradient(Variable var, Variable& wrt) {
   return wrt.expr->adjoint;
 }
 
-Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
+Eigen::VectorXd Gradient(Variable variable, Eigen::Ref<VectorXvar> wrt) {
   // Read wpimath/README.md#Reverse_accumulation_automatic_differentiation for
   // background on reverse accumulation automatic differentiation.
 
@@ -58,7 +58,7 @@ Eigen::VectorXd Gradient(Variable var, VectorXvar& wrt) {
   std::vector<std::tuple<Variable, double>> stack;
   stack.reserve(1024);
 
-  stack.emplace_back(var, 1.0);
+  stack.emplace_back(variable, 1.0);
   while (!stack.empty()) {
     Variable var = std::move(std::get<0>(stack.back()));
     double adjoint = std::move(std::get<1>(stack.back()));
