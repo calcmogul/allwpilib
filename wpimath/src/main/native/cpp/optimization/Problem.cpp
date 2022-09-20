@@ -31,6 +31,17 @@ constexpr double Max(double a, double b, Args... args) {
   }
 }
 
+/**
+ * Converts std::chrono::duration to a number of milliseconds rounded to three
+ * decimals.
+ */
+template <typename Rep, typename Period = std::ratio<1>>
+double ToMilliseconds(const std::chrono::duration<Rep, Period>& duration) {
+  using std::chrono::duration_cast;
+  using std::chrono::microseconds;
+  return duration_cast<microseconds>(duration).count() / 1000.0;
+}
+
 Problem::Problem(ProblemType problemType) : m_problemType{problemType} {
   m_decisionVariables.reserve(1024);
   m_equalityConstraints.reserve(1024);
@@ -651,12 +662,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   if (m_config.diagnostics) {
     endTime = std::chrono::system_clock::now();
     fmt::print("Number of iterations: {}\n", iterations);
-
-    using std::chrono::duration_cast;
-    using std::chrono::microseconds;
-    fmt::print(
-        "Solve time: {} ms\n",
-        duration_cast<microseconds>(endTime - startTime).count() / 1000.0);
+    fmt::print("Solve time: {} ms\n", ToMilliseconds(endTime - startTime));
   }
 
   *status = SolverStatus::kOk;
