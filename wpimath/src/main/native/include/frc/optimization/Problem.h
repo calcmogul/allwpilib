@@ -264,14 +264,6 @@ class WPILIB_DLLEXPORT Problem {
                     const Eigen::Ref<const Eigen::VectorXd>& src);
 
   /**
-   * Regularize a matrix (make all its eigenvalues positive) using a modified
-   * Cholesky decomposition.
-   *
-   * @param A The matrix to regularize.
-   */
-  void Regularize(Eigen::SparseMatrix<double>& A);
-
-  /**
    * Applies fraction-to-the-boundary rule to a variable and its iterate, then
    * returns a fraction of the iterate step size within (0, 1].
    *

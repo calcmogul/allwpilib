@@ -160,43 +160,6 @@ void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
   }
 }
 
-void Problem::Regularize(Eigen::SparseMatrix<double>& A) {
-  // See algorithm 3.4 on page 53 of [1].
-  //
-  // [1] Nocedal, J. and Wright, S. Numerical Optimization, 2nd. ed., Ch. 19.
-  //     Springer, 2006.
-
-  constexpr double beta = 0.1;
-  constexpr double delta = 0.01;
-
-  Eigen::SparseMatrix<double> L{A.rows(), A.cols()};
-  Eigen::SparseMatrix<double> D{A.rows(), A.cols()};
-
-  double c_ij = 0.0;
-  double theta_j = 0.0;
-  for (int j = 0; j < A.rows(); ++j) {
-    double c_jj = A.coeff(j, j);
-    for (int s = 0; s < j - 1; ++s) {
-      double l_js = L.coeff(j, s);
-      c_jj -= D.coeff(s, s) * l_js * l_js;
-    }
-
-    theta_j = std::max(theta_j, std::abs(c_ij));
-    D.coeffRef(j, j) = std::max(
-        std::max(std::abs(c_jj), (theta_j / beta) * (theta_j / beta)), delta);
-
-    for (int i = j + 1; i < A.rows(); ++i) {
-      c_ij = A.coeff(i, j);
-      for (int s = 0; s < j - 1; ++s) {
-        c_ij -= D.coeff(s, s) * L.coeff(i, s) * L.coeff(s, j);
-      }
-      L.coeffRef(i, j) = c_ij / D.coeff(j, j);
-    }
-  }
-
-  A = L * D * L.transpose();
-}
-
 double Problem::FractionToTheBoundaryRule(
     const Eigen::Ref<const Eigen::VectorXd>& x,
     const Eigen::Ref<const Eigen::VectorXd>& p, double tau) {
@@ -560,8 +523,6 @@ Eigen::VectorXd Problem::InteriorPoint(
       rhs.bottomRows(y.rows()) = c_e;
 
       // Regularize lhs by adding a multiple of the identity matrix
-      // TODO: Use LDLT regularization instead? Needs tests.
-      // Regularize(lhs);
       Eigen::SparseMatrix<double, Eigen::RowMajor> regularization{lhs.rows(),
                                                                   lhs.cols()};
       regularization.setIdentity();
