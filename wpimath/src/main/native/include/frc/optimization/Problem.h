@@ -180,6 +180,30 @@ class WPILIB_DLLEXPORT Problem {
   void Minimize(VariableMatrix&& cost);
 
   /**
+   * Tells the solver to maximize the output of the given objective function.
+   *
+   * Note that this is optional. If only constraints are specified, the solver
+   * will find the closest solution to the initial conditions that's in the
+   * feasible set.
+   *
+   * @param objective The objective function to minimize. It must return a 1x1
+   *                  matrix.
+   */
+  void Maximize(const VariableMatrix& objective);
+
+  /**
+   * Tells the solver to maximize the output of the given objective function.
+   *
+   * Note that this is optional. If only constraints are specified, the solver
+   * will find the closest solution to the initial conditions that's in the
+   * feasible set.
+   *
+   * @param objective The objective function to maximize. It must return a 1x1
+   *                  matrix.
+   */
+  void Maximize(VariableMatrix&& objective);
+
+  /**
    * Tells the solver to solve the problem while obeying the given equality
    * constraint.
    *

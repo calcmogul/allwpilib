@@ -125,8 +125,29 @@ TEST(ProblemTest, NoCostUnconstrained) {
   }
 }
 
+TEST(ProblemTest, DISABLED_Linear) {
+  frc::Problem problem{frc::ProblemType::kLinear};
+
+  auto x = problem.DecisionVariable();
+  x = 1.0;
+
+  auto y = problem.DecisionVariable();
+  y = 1.0;
+
+  problem.Maximize(2 * x - 3 * y);
+
+  problem.SubjectTo(x + y == 1);
+  problem.SubjectTo(x >= 0);
+  problem.SubjectTo(y >= 0);
+
+  problem.Solve();
+
+  EXPECT_EQ(0.0, x.Value(0));
+  EXPECT_EQ(1.0, y.Value(0));
+}
+
 TEST(ProblemTest, QuadraticUnconstrained1) {
-  frc::Problem problem;
+  frc::Problem problem{frc::ProblemType::kQuadratic};
 
   auto x = problem.DecisionVariable();
   x = 2.0;
@@ -140,7 +161,7 @@ TEST(ProblemTest, QuadraticUnconstrained1) {
 
 TEST(ProblemTest, QuadraticUnconstrained2) {
   {
-    frc::Problem problem;
+    frc::Problem problem{frc::ProblemType::kQuadratic};
 
     auto x = problem.DecisionVariable();
     x = 1.0;
@@ -156,7 +177,7 @@ TEST(ProblemTest, QuadraticUnconstrained2) {
   }
 
   {
-    frc::Problem problem;
+    frc::Problem problem{frc::ProblemType::kQuadratic};
 
     auto x = problem.DecisionVariable(2);
     x(0) = 1.0;
@@ -211,13 +232,12 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
   // [y] = [ 6]
   // [λ]   [ 6]
   {
-    frc::Problem problem;
+    frc::Problem problem{frc::ProblemType::kQuadratic};
 
     auto x = problem.DecisionVariable();
     auto y = problem.DecisionVariable();
 
-    // Maximize xy
-    problem.Minimize(-x * y);
+    problem.Maximize(x * y);
 
     problem.SubjectTo(x + 3 * y == 36);
 
@@ -228,7 +248,7 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
   }
 
   {
-    frc::Problem problem;
+    frc::Problem problem{frc::ProblemType::kQuadratic};
 
     auto x = problem.DecisionVariable(2);
     x(0) = 1.0;
@@ -243,6 +263,21 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
     EXPECT_NEAR(3.0, x.Value(0), 1e-6);
     EXPECT_NEAR(3.0, x.Value(1), 1e-6);
   }
+}
+
+TEST(ProblemTest, Nonlinear) {
+  frc::Problem problem{frc::ProblemType::kNonlinear};
+
+  auto x = problem.DecisionVariable();
+  x = 20.0;
+
+  problem.Minimize(frc::pow(x, 4));
+
+  problem.SubjectTo(x >= 1);
+
+  problem.Solve();
+
+  EXPECT_NEAR(1.0, x.Value(0), 1e-6);
 }
 
 TEST(ProblemTest, DISABLED_RosenbrockConstrainedWithCubicAndLine) {
@@ -303,7 +338,7 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
 
   constexpr double r = 2.0;
 
-  frc::Problem problem;
+  frc::Problem problem{frc::ProblemType::kQuadratic};
 
   // 2x1 state vector with N + 1 timesteps (includes last state)
   auto X = problem.DecisionVariable(2, N + 1);
@@ -399,7 +434,7 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
   frc::Matrixd<1, 1> B;
   frc::DiscretizeAB<1, 1>(system.A(), system.B(), dt, &A, &B);
 
-  frc::Problem problem;
+  frc::Problem problem{frc::ProblemType::kQuadratic};
   auto X = problem.DecisionVariable(1, N + 1);
   auto U = problem.DecisionVariable(1, N);
 

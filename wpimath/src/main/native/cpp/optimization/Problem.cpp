@@ -74,6 +74,16 @@ void Problem::Minimize(VariableMatrix&& cost) {
   m_f = std::move(cost.Autodiff(0, 0));
 }
 
+void Problem::Maximize(const VariableMatrix& objective) {
+  assert(objective.Rows() == 1 && objective.Cols() == 1);
+  m_f = -objective.Autodiff(0, 0);
+}
+
+void Problem::Maximize(VariableMatrix&& objective) {
+  assert(objective.Rows() == 1 && objective.Cols() == 1);
+  m_f = -std::move(objective.Autodiff(0, 0));
+}
+
 void Problem::SubjectTo(EqualityConstraints&& constraint) {
   auto& storage = constraint.constraints;
 
@@ -410,6 +420,57 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   autodiff::Hessian hessian{L, xAD};
 
+  // Hessian of the Lagrangian H
+  //
+  // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
+  Eigen::SparseMatrix<double> H;
+  if (m_problemType != ProblemType::kLinear &&
+      m_problemType != ProblemType::kNonlinear) {
+    // If the problem is linear, use the default initialization of zero.
+    //
+    // If the problem is quadratic, initialize the Hessian once here since it's
+    // constant.
+    //
+    // If the problem is nonlinear, delay initialization until the loop below.
+    H = hessian.Calculate();
+  }
+
+  // Equality constraints cₑ and equality constraint Jacobian Aₑ
+  //
+  //         [∇ᵀcₑ₁(x)ₖ]
+  // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
+  //         [    ⋮    ]
+  //         [∇ᵀcₑₘ(x)ₖ]
+  Eigen::SparseMatrix<double> A_e;
+  if (m_problemType != ProblemType::kNonlinear) {
+    // If the problem is linear or quadratic, initialize Aₑ once here since it's
+    // constant.
+    //
+    // If the problem is nonlinear, delay initialization until the loop below.
+    A_e = autodiff::Jacobian(c_eAD, xAD);
+  }
+
+  // Inequality constraints cᵢ and inequality constraint Jacobian Aᵢ
+  //
+  //         [∇ᵀcᵢ₁(x)ₖ]
+  // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
+  //         [    ⋮    ]
+  //         [∇ᵀcᵢₘ(x)ₖ]
+  Eigen::SparseMatrix<double> A_i;
+  if (m_problemType != ProblemType::kNonlinear) {
+    // If the problem is linear or quadratic, initialize Aᵢ once here since it's
+    // constant.
+    //
+    // If the problem is nonlinear, delay initialization until the loop below.
+    A_i = autodiff::Jacobian(c_iAD, xAD);
+  }
+
+  // Equality constraints cₑ
+  Eigen::VectorXd c_e{m_equalityConstraints.size()};
+
+  // Inequality constraints cᵢ
+  Eigen::VectorXd c_i{m_inequalityConstraints.size()};
+
   int iterations = 0;
 
   auto startTime = std::chrono::system_clock::now();
@@ -451,20 +512,30 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Σ⁻¹ = SZ⁻¹
       Eigen::SparseMatrix<double> inverseSigma = S * inverseZ;
 
-      // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
-      Eigen::SparseMatrix<double> H = hessian.Calculate();
+      if (m_problemType == ProblemType::kNonlinear) {
+        // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
+        H = hessian.Calculate();
 
-      //         [∇ᵀcₑ₁(x)ₖ]
-      // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
-      //         [    ⋮    ]
-      //         [∇ᵀcₑₘ(x)ₖ]
-      Eigen::SparseMatrix<double> A_e = autodiff::Jacobian(c_eAD, xAD);
+        //         [∇ᵀcₑ₁(x)ₖ]
+        // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
+        //         [    ⋮    ]
+        //         [∇ᵀcₑₘ(x)ₖ]
+        A_e = autodiff::Jacobian(c_eAD, xAD);
 
-      //         [∇ᵀcᵢ₁(x)ₖ]
-      // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
-      //         [    ⋮    ]
-      //         [∇ᵀcᵢₘ(x)ₖ]
-      Eigen::SparseMatrix<double> A_i = autodiff::Jacobian(c_iAD, xAD);
+        //         [∇ᵀcᵢ₁(x)ₖ]
+        // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
+        //         [    ⋮    ]
+        //         [∇ᵀcᵢₘ(x)ₖ]
+        A_i = autodiff::Jacobian(c_iAD, xAD);
+      }
+
+      // Update cₑ and cᵢ
+      for (size_t row = 0; row < m_equalityConstraints.size(); row++) {
+        c_e[row] = m_equalityConstraints[row].Value();
+      }
+      for (size_t row = 0; row < m_inequalityConstraints.size(); row++) {
+        c_i[row] = m_inequalityConstraints[row].Value();
+      }
 
       // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
       //       [    Aₑ       0 ]
@@ -482,14 +553,6 @@ Eigen::VectorXd Problem::InteriorPoint(
       //        [               cₑ               ]
       //
       // The outer negative sign is applied in the solve() call.
-      Eigen::VectorXd c_e{m_equalityConstraints.size()};
-      for (size_t row = 0; row < m_equalityConstraints.size(); row++) {
-        c_e[row] = m_equalityConstraints[row].Value();
-      }
-      Eigen::VectorXd c_i{m_inequalityConstraints.size()};
-      for (size_t row = 0; row < m_inequalityConstraints.size(); row++) {
-        c_i[row] = m_inequalityConstraints[row].Value();
-      }
       Eigen::VectorXd rhs{x.rows() + y.rows()};
       rhs.topRows(x.rows()) =
           autodiff::Gradient(m_f.value(), xAD) - A_e.transpose() * y +
