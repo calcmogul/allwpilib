@@ -134,16 +134,18 @@ TEST(ProblemTest, DISABLED_Linear) {
   auto y = problem.DecisionVariable();
   y = 1.0;
 
-  problem.Maximize(2 * x - 3 * y);
+  problem.Maximize(50 * x + 40 * y);
 
-  problem.SubjectTo(x + y == 1);
+  problem.SubjectTo(x + 1.5 * y <= 750);
+  problem.SubjectTo(2 * x + 3 * y <= 1500);
+  problem.SubjectTo(2 * x + y <= 1000);
   problem.SubjectTo(x >= 0);
   problem.SubjectTo(y >= 0);
 
   problem.Solve();
 
-  EXPECT_EQ(0.0, x.Value(0));
-  EXPECT_EQ(1.0, y.Value(0));
+  EXPECT_NEAR(375.0, x.Value(0), 1e-6);
+  EXPECT_NEAR(250.0, y.Value(0), 1e-6);
 }
 
 TEST(ProblemTest, QuadraticUnconstrained1) {
