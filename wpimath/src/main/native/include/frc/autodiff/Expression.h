@@ -75,6 +75,8 @@ struct WPILIB_DLLEXPORT Expression {
    * Constructs a nullary expression (an operator with no arguments).
    *
    * @param value The expression value.
+   * @param type The expression type. It should be either linear (the default)
+   *             or constant.
    */
   explicit Expression(double value,
                       ExpressionType type = ExpressionType::kLinear);
