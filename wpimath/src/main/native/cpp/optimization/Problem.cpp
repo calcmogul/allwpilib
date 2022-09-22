@@ -459,9 +459,8 @@ Eigen::VectorXd Problem::InteriorPoint(
     // If the problem is quadratic, initialize the Hessian once here since it's
     // constant.
     //
-    // If the problem is constant or linear, the default initialization of zero
-    // is used. If the problem is nonlinear, initialization is delayed until the
-    // loop below.
+    // If the problem is linear, the default initialization of zero is used. If
+    // the problem is nonlinear, initialization is delayed until the loop below.
     H = hessian.Calculate();
   }
 
@@ -472,9 +471,10 @@ Eigen::VectorXd Problem::InteriorPoint(
   //         [    ⋮    ]
   //         [∇ᵀcₑₘ(x)ₖ]
   Eigen::SparseMatrix<double> A_e;
-  if (status->problemType != ProblemType::kNonlinear) {
-    // If the problem is constant, linear, or quadratic, initialize Aₑ once here
-    // since it's constant.
+  if (status->problemType == ProblemType::kLinear ||
+      status->problemType == ProblemType::kQuadratic) {
+    // If the problem is linear or quadratic, initialize Aₑ once here since it's
+    // constant.
     //
     // If the problem is nonlinear, initialization is delayed until the loop
     // below.
@@ -488,9 +488,10 @@ Eigen::VectorXd Problem::InteriorPoint(
   //         [    ⋮    ]
   //         [∇ᵀcᵢₘ(x)ₖ]
   Eigen::SparseMatrix<double> A_i;
-  if (status->problemType != ProblemType::kNonlinear) {
-    // If the problem is constant, linear, or quadratic, initialize Aᵢ once here
-    // since it's constant.
+  if (status->problemType == ProblemType::kLinear ||
+      status->problemType == ProblemType::kQuadratic) {
+    // If the problem is linear or quadratic, initialize Aᵢ once here since it's
+    // constant.
     //
     // If the problem is nonlinear, initialization is delayed until the loop
     // below.
