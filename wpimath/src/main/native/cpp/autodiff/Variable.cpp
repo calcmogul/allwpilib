@@ -40,11 +40,11 @@ Variable& Variable::operator=(int value) {
 }
 
 WPILIB_DLLEXPORT Variable operator*(double lhs, const Variable& rhs) {
-  return Variable{lhs} * rhs;
+  return Variable{lhs * rhs.expr};
 }
 
 WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, double rhs) {
-  return lhs * Variable{rhs};
+  return Variable{lhs.expr * rhs};
 }
 
 WPILIB_DLLEXPORT Variable operator*(const Variable& lhs, const Variable& rhs) {
@@ -62,11 +62,11 @@ Variable& Variable::operator*=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator/(double lhs, const Variable& rhs) {
-  return Variable{lhs} / rhs;
+  return Variable{lhs / rhs.expr};
 }
 
 WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, double rhs) {
-  return lhs / Variable{rhs};
+  return Variable{lhs.expr / rhs};
 }
 
 WPILIB_DLLEXPORT Variable operator/(const Variable& lhs, const Variable& rhs) {
@@ -84,11 +84,11 @@ Variable& Variable::operator/=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator+(double lhs, const Variable& rhs) {
-  return Variable{lhs} + rhs;
+  return Variable{lhs + rhs.expr};
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, double rhs) {
-  return lhs + Variable{rhs};
+  return Variable{lhs.expr + rhs};
 }
 
 WPILIB_DLLEXPORT Variable operator+(const Variable& lhs, const Variable& rhs) {
@@ -106,11 +106,11 @@ Variable& Variable::operator+=(const Variable& rhs) {
 }
 
 WPILIB_DLLEXPORT Variable operator-(double lhs, const Variable& rhs) {
-  return Variable{lhs} - rhs;
+  return Variable{lhs - rhs.expr};
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, double rhs) {
-  return lhs - Variable{rhs};
+  return Variable{lhs.expr - rhs};
 }
 
 WPILIB_DLLEXPORT Variable operator-(const Variable& lhs, const Variable& rhs) {
@@ -215,12 +215,16 @@ double Variable::Value() const {
   }
 }
 
+ExpressionType Variable::Type() const {
+  return expr->Type();
+}
+
 void Variable::Update() {
   expr->Update();
 }
 
 Variable abs(double x) {
-  return autodiff::abs(Variable{x});
+  return Variable{autodiff::abs(autodiff::MakeConstant(x))};
 }
 
 Variable abs(const Variable& x) {
@@ -228,7 +232,7 @@ Variable abs(const Variable& x) {
 }
 
 Variable acos(double x) {
-  return autodiff::acos(Variable{x});
+  return Variable{autodiff::acos(autodiff::MakeConstant(x))};
 }
 
 Variable acos(const Variable& x) {
@@ -236,7 +240,7 @@ Variable acos(const Variable& x) {
 }
 
 Variable asin(double x) {
-  return autodiff::asin(Variable{x});
+  return Variable{autodiff::asin(autodiff::MakeConstant(x))};
 }
 
 Variable asin(const Variable& x) {
@@ -244,7 +248,7 @@ Variable asin(const Variable& x) {
 }
 
 Variable atan(double x) {
-  return autodiff::atan(Variable{x});
+  return Variable{autodiff::atan(MakeConstant(x))};
 }
 
 Variable atan(const Variable& x) {
@@ -252,11 +256,11 @@ Variable atan(const Variable& x) {
 }
 
 Variable atan2(double y, const Variable& x) {
-  return autodiff::atan2(Variable{y}, x);
+  return Variable{autodiff::atan2(MakeConstant(y), x.expr)};
 }
 
 Variable atan2(const Variable& y, double x) {
-  return autodiff::atan2(y, Variable{x});
+  return Variable{autodiff::atan2(y.expr, MakeConstant(x))};
 }
 
 Variable atan2(const Variable& y, const Variable& x) {
@@ -264,7 +268,7 @@ Variable atan2(const Variable& y, const Variable& x) {
 }
 
 Variable cos(double x) {
-  return autodiff::cos(Variable{x});
+  return Variable{autodiff::cos(MakeConstant(x))};
 }
 
 Variable cos(const Variable& x) {
@@ -272,7 +276,7 @@ Variable cos(const Variable& x) {
 }
 
 Variable cosh(double x) {
-  return autodiff::cosh(Variable{x});
+  return Variable{autodiff::cosh(MakeConstant(x))};
 }
 
 Variable cosh(const Variable& x) {
@@ -280,7 +284,7 @@ Variable cosh(const Variable& x) {
 }
 
 Variable erf(double x) {
-  return autodiff::erf(Variable{x});
+  return Variable{autodiff::erf(MakeConstant(x))};
 }
 
 Variable erf(const Variable& x) {
@@ -288,7 +292,7 @@ Variable erf(const Variable& x) {
 }
 
 Variable exp(double x) {
-  return autodiff::exp(Variable{x});
+  return Variable{autodiff::exp(MakeConstant(x))};
 }
 
 Variable exp(const Variable& x) {
@@ -296,11 +300,11 @@ Variable exp(const Variable& x) {
 }
 
 Variable hypot(double x, const Variable& y) {
-  return autodiff::hypot(Variable{x}, y);
+  return Variable{autodiff::hypot(MakeConstant(x), y.expr)};
 }
 
 Variable hypot(const Variable& x, double y) {
-  return autodiff::hypot(x, Variable{y});
+  return Variable{autodiff::hypot(x.expr, MakeConstant(y))};
 }
 
 Variable hypot(const Variable& x, const Variable& y) {
@@ -308,7 +312,7 @@ Variable hypot(const Variable& x, const Variable& y) {
 }
 
 Variable log(double x) {
-  return autodiff::log(Variable{x});
+  return Variable{autodiff::log(MakeConstant(x))};
 }
 
 Variable log(const Variable& x) {
@@ -316,7 +320,7 @@ Variable log(const Variable& x) {
 }
 
 Variable log10(double x) {
-  return autodiff::log10(Variable{x});
+  return Variable{autodiff::log10(MakeConstant(x))};
 }
 
 Variable log10(const Variable& x) {
@@ -324,11 +328,11 @@ Variable log10(const Variable& x) {
 }
 
 Variable pow(double base, const Variable& power) {
-  return autodiff::pow(Variable{base}, power);
+  return Variable{autodiff::pow(MakeConstant(base), power.expr)};
 }
 
 Variable pow(const Variable& base, double power) {
-  return autodiff::pow(base, Variable{power});
+  return Variable{autodiff::pow(base.expr, MakeConstant(power))};
 }
 
 Variable pow(const Variable& base, const Variable& power) {
@@ -336,7 +340,7 @@ Variable pow(const Variable& base, const Variable& power) {
 }
 
 Variable sin(double x) {
-  return autodiff::sin(Variable{x});
+  return Variable{autodiff::sin(MakeConstant(x))};
 }
 
 Variable sin(const Variable& x) {
@@ -344,7 +348,7 @@ Variable sin(const Variable& x) {
 }
 
 Variable sinh(double x) {
-  return autodiff::sinh(Variable{x});
+  return Variable{autodiff::sinh(MakeConstant(x))};
 }
 
 Variable sinh(const Variable& x) {
@@ -352,7 +356,7 @@ Variable sinh(const Variable& x) {
 }
 
 Variable sqrt(double x) {
-  return autodiff::sqrt(Variable{x});
+  return Variable{autodiff::sqrt(MakeConstant(x))};
 }
 
 Variable sqrt(const Variable& x) {
@@ -360,7 +364,7 @@ Variable sqrt(const Variable& x) {
 }
 
 Variable tan(double x) {
-  return autodiff::tan(Variable{x});
+  return Variable{autodiff::tan(MakeConstant(x))};
 }
 
 Variable tan(const Variable& x) {
@@ -368,7 +372,7 @@ Variable tan(const Variable& x) {
 }
 
 Variable tanh(double x) {
-  return autodiff::tanh(Variable{x});
+  return Variable{autodiff::tanh(MakeConstant(x))};
 }
 
 Variable tanh(const Variable& x) {

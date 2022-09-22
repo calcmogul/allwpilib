@@ -45,7 +45,7 @@ class WPILIB_DLLEXPORT CurrentManager {
       wpi::span<const units::ampere_t> desiredCurrents);
 
  private:
-  Problem m_problem{frc::ProblemType::kQuadratic};
+  Problem m_problem;
   VariableMatrix m_desiredCurrents;
   VariableMatrix m_allocatedCurrents;
 };

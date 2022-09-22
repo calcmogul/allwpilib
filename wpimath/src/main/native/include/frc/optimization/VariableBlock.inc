@@ -105,7 +105,7 @@ template <typename Mat>
 VariableBlock<Mat>& VariableBlock<Mat>::operator*=(double rhs) {
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      Autodiff(row, col) *= autodiff::Variable{rhs};
+      Autodiff(row, col) *= autodiff::Variable{autodiff::MakeConstant(rhs)};
     }
   }
 
@@ -116,7 +116,7 @@ template <typename Mat>
 VariableBlock<Mat>& VariableBlock<Mat>::operator/=(double rhs) {
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      Autodiff(row, col) /= autodiff::Variable{rhs};
+      Autodiff(row, col) /= autodiff::Variable{autodiff::MakeConstant(rhs)};
     }
   }
 

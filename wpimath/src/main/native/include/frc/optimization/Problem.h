@@ -13,7 +13,6 @@
 #include "Eigen/Core"
 #include "frc/autodiff/Variable.h"
 #include "frc/optimization/Constraints.h"
-#include "frc/optimization/ProblemType.h"
 #include "frc/optimization/SolverConfig.h"
 #include "frc/optimization/SolverStatus.h"
 #include "frc/optimization/VariableMatrix.h"
@@ -141,13 +140,8 @@ class WPILIB_DLLEXPORT Problem {
  public:
   /**
    * Construct the optimization problem.
-   *
-   * @param problemType The type of optimization problem to solve. Nonlinear is
-   *                    assumed by default, but the user can specify their
-   *                    problem is linear or quadratic to use a faster solver
-   *                    for that type of problem.
    */
-  explicit Problem(ProblemType problemType = ProblemType::kNonlinear);
+  Problem() noexcept;
 
   /**
    * Create a matrix of decision variables in the optimization problem.
@@ -239,9 +233,6 @@ class WPILIB_DLLEXPORT Problem {
 
   // Inequality constraints: cᵢ(x) ≥ 0
   std::vector<autodiff::Variable> m_inequalityConstraints;
-
-  // Problem type
-  ProblemType m_problemType;
 
   SolverConfig m_config;
 

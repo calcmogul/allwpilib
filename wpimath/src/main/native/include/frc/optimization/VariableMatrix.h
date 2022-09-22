@@ -182,6 +182,60 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
+  template <int _Rows, int _Cols>
+  friend VariableMatrix operator*(const frc::Matrixd<_Rows, _Cols>& lhs,
+                                  const VariableMatrix& rhs) {
+    assert(lhs.cols() == rhs.Rows());
+
+    VariableMatrix result{static_cast<int>(lhs.rows()), rhs.Cols()};
+
+    for (int i = 0; i < lhs.rows(); ++i) {
+      for (int j = 0; j < rhs.Cols(); ++j) {
+        autodiff::Variable sum = 0.0;
+        for (int k = 0; k < lhs.cols(); ++k) {
+          sum += autodiff::Variable{autodiff::MakeConstant(lhs(i, k))} *
+                 rhs.Autodiff(k, j);
+        }
+        result.Autodiff(i, j) = sum;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Matrix multiplication operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
+  template <int _Rows, int _Cols>
+  friend VariableMatrix operator*(const VariableMatrix& lhs,
+                                  const frc::Matrixd<_Rows, _Cols>& rhs) {
+    assert(lhs.Cols() == rhs.rows());
+
+    VariableMatrix result{lhs.Rows(), static_cast<int>(rhs.cols())};
+
+    for (int i = 0; i < lhs.Rows(); ++i) {
+      for (int j = 0; j < rhs.cols(); ++j) {
+        autodiff::Variable sum = 0.0;
+        for (int k = 0; k < lhs.Cols(); ++k) {
+          sum += lhs.Autodiff(i, k) *
+                 autodiff::Variable{autodiff::MakeConstant(rhs(k, j))};
+        }
+        result.Autodiff(i, j) = sum;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Matrix multiplication operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
   friend WPILIB_DLLEXPORT VariableMatrix operator*(const VariableMatrix& lhs,
                                                    const VariableMatrix& rhs);
 
@@ -241,6 +295,51 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
+  template <int _Rows, int _Cols>
+  friend VariableMatrix operator+(const frc::Matrixd<_Rows, _Cols>& lhs,
+                                  const VariableMatrix& rhs) {
+    VariableMatrix result{static_cast<int>(lhs.rows()),
+                          static_cast<int>(lhs.cols())};
+
+    for (int row = 0; row < result.Rows(); ++row) {
+      for (int col = 0; col < result.Cols(); ++col) {
+        result.Autodiff(row, col) =
+            autodiff::Variable{autodiff::MakeConstant(lhs(row, col))} +
+            rhs.Autodiff(row, col);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary addition operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
+  template <int _Rows, int _Cols>
+  friend VariableMatrix operator+(const VariableMatrix& lhs,
+                                  const frc::Matrixd<_Rows, _Cols>& rhs) {
+    VariableMatrix result{lhs.Rows(), lhs.Cols()};
+
+    for (int row = 0; row < result.Rows(); ++row) {
+      for (int col = 0; col < result.Cols(); ++col) {
+        result.Autodiff(row, col) =
+            lhs.Autodiff(row, col) +
+            autodiff::Variable{autodiff::MakeConstant(rhs(row, col))};
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary addition operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
   friend WPILIB_DLLEXPORT VariableMatrix operator+(const VariableMatrix& lhs,
                                                    const VariableMatrix& rhs);
 
@@ -257,8 +356,53 @@ class WPILIB_DLLEXPORT VariableMatrix {
    * @param lhs Operator left-hand side.
    * @param rhs Operator right-hand side.
    */
+  template <int _Rows, int _Cols>
+  friend VariableMatrix operator-(const frc::Matrixd<_Rows, _Cols>& lhs,
+                                  const VariableMatrix& rhs) {
+    VariableMatrix result{static_cast<int>(lhs.rows()),
+                          static_cast<int>(lhs.cols())};
+
+    for (int row = 0; row < result.Rows(); ++row) {
+      for (int col = 0; col < result.Cols(); ++col) {
+        result.Autodiff(row, col) =
+            autodiff::Variable{autodiff::MakeConstant(lhs(row, col))} -
+            rhs.Autodiff(row, col);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Binary subtraction operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
   friend WPILIB_DLLEXPORT VariableMatrix operator-(const VariableMatrix& lhs,
                                                    const VariableMatrix& rhs);
+
+  /**
+   * Binary subtraction operator.
+   *
+   * @param lhs Operator left-hand side.
+   * @param rhs Operator right-hand side.
+   */
+  template <int _Rows, int _Cols>
+  friend VariableMatrix operator-(const VariableMatrix& lhs,
+                                  const frc::Matrixd<_Rows, _Cols>& rhs) {
+    VariableMatrix result{lhs.Rows(), lhs.Cols()};
+
+    for (int row = 0; row < result.Rows(); ++row) {
+      for (int col = 0; col < result.Cols(); ++col) {
+        result.Autodiff(row, col) =
+            lhs.Autodiff(row, col) -
+            autodiff::Variable{autodiff::MakeConstant(rhs(row, col))};
+      }
+    }
+
+    return result;
+  }
 
   /**
    * Compound subtraction-assignment operator.
@@ -436,6 +580,26 @@ WPILIB_DLLEXPORT VariableMatrix log(const VariableMatrix& x);
  * @param x The argument.
  */
 WPILIB_DLLEXPORT VariableMatrix log10(const VariableMatrix& x);
+
+/**
+ * std::pow() for VariableMatrices.
+ *
+ * The function is applied element-wise to the arguments.
+ *
+ * @param base The base.
+ * @param power The power.
+ */
+WPILIB_DLLEXPORT VariableMatrix pow(double base, const VariableMatrix& power);
+
+/**
+ * std::pow() for VariableMatrices.
+ *
+ * The function is applied element-wise to the arguments.
+ *
+ * @param base The base.
+ * @param power The power.
+ */
+WPILIB_DLLEXPORT VariableMatrix pow(const VariableMatrix& base, double power);
 
 /**
  * std::pow() for VariableMatrices.

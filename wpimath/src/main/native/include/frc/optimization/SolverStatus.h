@@ -4,22 +4,21 @@
 
 #pragma once
 
+#include "frc/optimization/ProblemType.h"
+#include "frc/optimization/SolverExitCondition.h"
+
 namespace frc {
 
 /**
- * Solver return status.
+ * Return value of Problem::Solve() containing the detected problem type and
+ * solver's return status.
  */
-enum class SolverStatus {
-  /// The solver found an optimal solution.
-  kOk,
-  /// The solver determined the problem to be infeasible and gave up.
-  kInfeasible,
-  /// The solver returned its solution so far after exceeding the maximum number
-  /// of iterations.
-  kMaxIterations,
-  /// The solver returned its solution so far after exceeding the maximum
-  /// elapsed wall clock time.
-  kTimeout
+struct SolverStatus {
+  /// The problem type detected by the solver.
+  ProblemType problemType = ProblemType::kConstant;
+
+  /// The solver's exit condition.
+  SolverExitCondition exitCondition = SolverExitCondition::kOk;
 };
 
 }  // namespace frc

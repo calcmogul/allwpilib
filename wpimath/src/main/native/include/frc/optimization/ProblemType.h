@@ -10,6 +10,8 @@ namespace frc {
  * The type of optimization problem to solve.
  */
 enum class ProblemType {
+  /// The optimization problem has a constant cost function and no constraints.
+  kConstant,
   /// The optimization problem has a linear cost function and linear
   /// constraints.
   kLinear,

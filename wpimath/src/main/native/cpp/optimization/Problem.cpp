@@ -4,6 +4,7 @@
 
 #include "frc/optimization/Problem.h"
 
+#include <array>
 #include <cassert>
 #include <chrono>
 #include <cmath>
@@ -14,6 +15,7 @@
 
 #include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
+#include "frc/autodiff/Expression.h"
 #include "frc/autodiff/Gradient.h"
 #include "frc/autodiff/Hessian.h"
 #include "frc/autodiff/Jacobian.h"
@@ -42,7 +44,7 @@ double ToMilliseconds(const std::chrono::duration<Rep, Period>& duration) {
   return duration_cast<microseconds>(duration).count() / 1000.0;
 }
 
-Problem::Problem(ProblemType problemType) : m_problemType{problemType} {
+Problem::Problem() noexcept {
   m_decisionVariables.reserve(1024);
   m_equalityConstraints.reserve(1024);
   m_inequalityConstraints.reserve(1024);
@@ -106,16 +108,10 @@ void Problem::SubjectTo(InequalityConstraints&& constraint) {
 }
 
 SolverStatus Problem::Solve(const SolverConfig& config) {
-  m_config = config;
+  constexpr std::array<const char*, 4> kExprTypeToName = {
+      "constant", "linear", "quadratic", "nonlinear"};
 
-  if (!m_f.has_value() && m_equalityConstraints.size() == 0 &&
-      m_inequalityConstraints.size() == 0) {
-    // If there's no cost function or constraints, do nothing
-    return SolverStatus::kOk;
-  } else if (!m_f.has_value()) {
-    // If there's no cost function, make it zero and continue
-    m_f = 0.0;
-  }
+  m_config = config;
 
   // Create the initial value column vector
   Eigen::VectorXd x{m_decisionVariables.size(), 1};
@@ -123,11 +119,92 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
     x(i) = m_decisionVariables[i].Value();
   }
 
+  // Get f's expression type
+  autodiff::ExpressionType fType;
+  if (m_f.has_value()) {
+    fType = m_f.value().Type();
+  } else {
+    fType = autodiff::ExpressionType::kConstant;
+  }
+
+  // Get the highest order equality constraint expression type
+  autodiff::ExpressionType A_eType = autodiff::ExpressionType::kConstant;
+  for (const auto& constraint : m_equalityConstraints) {
+    auto constraintType = constraint.Type();
+    if (A_eType < constraintType) {
+      A_eType = constraintType;
+    }
+  }
+
+  // Get the highest order inequality constraint expression type
+  autodiff::ExpressionType A_iType = autodiff::ExpressionType::kConstant;
+  for (const auto& constraint : m_inequalityConstraints) {
+    auto constraintType = constraint.Type();
+    if (A_iType < constraintType) {
+      A_iType = constraintType;
+    }
+  }
+
+  SolverStatus status;
+
+  // Determine the problem type
+  if (fType == autodiff::ExpressionType::kConstant &&
+      A_eType == autodiff::ExpressionType::kConstant &&
+      A_iType == autodiff::ExpressionType::kConstant) {
+    status.problemType = frc::ProblemType::kConstant;
+  } else if (fType <= autodiff::ExpressionType::kLinear &&
+             A_eType <= autodiff::ExpressionType::kLinear &&
+             A_iType <= autodiff::ExpressionType::kLinear) {
+    status.problemType = frc::ProblemType::kLinear;
+  } else if (fType == autodiff::ExpressionType::kQuadratic &&
+             A_eType <= autodiff::ExpressionType::kLinear &&
+             A_iType <= autodiff::ExpressionType::kLinear) {
+    status.problemType = frc::ProblemType::kQuadratic;
+  } else {
+    status.problemType = frc::ProblemType::kNonlinear;
+  }
+
+  if (m_config.diagnostics) {
+    fmt::print("\nThe problem is {} because:\n",
+               kExprTypeToName[static_cast<int>(status.problemType)]);
+
+    if (m_f.has_value()) {
+      fmt::print("  * The cost function is {}.\n",
+                 kExprTypeToName[static_cast<int>(fType)]);
+    } else {
+      fmt::print("  * There is no cost function.\n");
+    }
+
+    if (m_equalityConstraints.size() > 0) {
+      fmt::print("  * The equality constraints are {}.\n",
+                 kExprTypeToName[static_cast<int>(A_eType)]);
+    } else {
+      fmt::print("  * There are no equality constraints.\n");
+    }
+
+    if (m_inequalityConstraints.size() > 0) {
+      fmt::print("  * The inequality constraints are {}.\n",
+                 kExprTypeToName[static_cast<int>(A_iType)]);
+    } else {
+      fmt::print("  * There are no inequality constraints.\n");
+    }
+    fmt::print("\n");
+  }
+
+  // If the problem type is constant, there's nothing to do
+  if (status.problemType == ProblemType::kConstant) {
+    return status;
+  }
+
+  // If there's no cost function, make it zero and continue
+  if (!m_f.has_value()) {
+    m_f = 0.0;
+  }
+
   // Solve the optimization problem
-  SolverStatus status = SolverStatus::kOk;
   Eigen::VectorXd solution = InteriorPoint(x, &status);
 
-  // Assign solution to the original Variable instances
+  // Assign the solution to the original Variable instances
   SetAD(m_decisionVariables, solution);
 
   return status;
@@ -377,15 +454,14 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Hessian of the Lagrangian H
   //
   // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
-  Eigen::SparseMatrix<double> H;
-  if (m_problemType != ProblemType::kLinear &&
-      m_problemType != ProblemType::kNonlinear) {
-    // If the problem is linear, use the default initialization of zero.
-    //
+  Eigen::SparseMatrix<double> H{xAD.rows(), xAD.rows()};
+  if (status->problemType == ProblemType::kQuadratic) {
     // If the problem is quadratic, initialize the Hessian once here since it's
     // constant.
     //
-    // If the problem is nonlinear, delay initialization until the loop below.
+    // If the problem is constant or linear, the default initialization of zero
+    // is used. If the problem is nonlinear, initialization is delayed until the
+    // loop below.
     H = hessian.Calculate();
   }
 
@@ -396,11 +472,12 @@ Eigen::VectorXd Problem::InteriorPoint(
   //         [    ⋮    ]
   //         [∇ᵀcₑₘ(x)ₖ]
   Eigen::SparseMatrix<double> A_e;
-  if (m_problemType != ProblemType::kNonlinear) {
-    // If the problem is linear or quadratic, initialize Aₑ once here since it's
-    // constant.
+  if (status->problemType != ProblemType::kNonlinear) {
+    // If the problem is constant, linear, or quadratic, initialize Aₑ once here
+    // since it's constant.
     //
-    // If the problem is nonlinear, delay initialization until the loop below.
+    // If the problem is nonlinear, initialization is delayed until the loop
+    // below.
     A_e = autodiff::Jacobian(c_eAD, xAD);
   }
 
@@ -411,11 +488,12 @@ Eigen::VectorXd Problem::InteriorPoint(
   //         [    ⋮    ]
   //         [∇ᵀcᵢₘ(x)ₖ]
   Eigen::SparseMatrix<double> A_i;
-  if (m_problemType != ProblemType::kNonlinear) {
-    // If the problem is linear or quadratic, initialize Aᵢ once here since it's
-    // constant.
+  if (status->problemType != ProblemType::kNonlinear) {
+    // If the problem is constant, linear, or quadratic, initialize Aᵢ once here
+    // since it's constant.
     //
-    // If the problem is nonlinear, delay initialization until the loop below.
+    // If the problem is nonlinear, initialization is delayed until the loop
+    // below.
     A_i = autodiff::Jacobian(c_iAD, xAD);
   }
 
@@ -466,7 +544,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Σ⁻¹ = SZ⁻¹
       Eigen::SparseMatrix<double> inverseSigma = S * inverseZ;
 
-      if (m_problemType == ProblemType::kNonlinear) {
+      if (status->problemType == ProblemType::kNonlinear) {
         // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
         H = hessian.Calculate();
 
@@ -610,14 +688,14 @@ Eigen::VectorXd Problem::InteriorPoint(
       // See "Infeasibility detection" in section 6 of [3].
       if (m_equalityConstraints.size() > 0 &&
           (A_e.transpose() * c_e).norm() < 1e-2 && c_e.norm() > 1e-2) {
-        *status = SolverStatus::kInfeasible;
+        status->exitCondition = SolverExitCondition::kInfeasible;
         return x;
       }
       if (m_inequalityConstraints.size() > 0) {
         Eigen::VectorXd c_i_minus = (-c_i).cwiseMax(0.0);
         if ((A_i.transpose() * c_i_minus).norm() < 1e-2 &&
             c_i_minus.norm() > 1e-2) {
-          *status = SolverStatus::kInfeasible;
+          status->exitCondition = SolverExitCondition::kInfeasible;
           return x;
         }
       }
@@ -647,13 +725,13 @@ Eigen::VectorXd Problem::InteriorPoint(
 
       ++iterations;
       if (iterations >= m_config.maxIterations) {
-        *status = SolverStatus::kMaxIterations;
+        status->exitCondition = SolverExitCondition::kMaxIterations;
         return x;
       }
 
       endTime = std::chrono::system_clock::now();
       if (units::second_t{endTime - startTime} > m_config.timeout) {
-        *status = SolverStatus::kTimeout;
+        status->exitCondition = SolverExitCondition::kTimeout;
         return x;
       }
     }
@@ -680,6 +758,5 @@ Eigen::VectorXd Problem::InteriorPoint(
     fmt::print("Solve time: {} ms\n", ToMilliseconds(endTime - startTime));
   }
 
-  *status = SolverStatus::kOk;
   return x;
 }

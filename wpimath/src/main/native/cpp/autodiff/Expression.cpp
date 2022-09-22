@@ -9,19 +9,32 @@
 
 namespace frc::autodiff {
 
-Expression::Expression(double value) : value{value} {}
+Expression::Expression(double value, ExpressionType type) : value{value} {
+  if (type == ExpressionType::kConstant) {
+    typeFunc = [](const wpi::IntrusiveSharedPtr<Expression>&,
+                  const wpi::IntrusiveSharedPtr<Expression>&) {
+      return ExpressionType::kConstant;
+    };
+  } else {
+    typeFunc = [](const wpi::IntrusiveSharedPtr<Expression>&,
+                  const wpi::IntrusiveSharedPtr<Expression>&) {
+      return ExpressionType::kLinear;
+    };
+  }
+}
 
-Expression::Expression(BinaryFuncDouble valueFunc,
+Expression::Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
                        BinaryFuncDouble lhsGradientValueFunc,
                        BinaryFuncExpr lhsGradientFunc,
                        wpi::IntrusiveSharedPtr<Expression> lhs)
     : value{valueFunc(lhs->value, 0.0)},
+      typeFunc{typeFunc},
       valueFunc{valueFunc},
       gradientValueFuncs{std::array{lhsGradientValueFunc, BinaryFuncDouble{}}},
       gradientFuncs{std::array{lhsGradientFunc, BinaryFuncExpr{}}},
       args{std::array<wpi::IntrusiveSharedPtr<Expression>, 2>{lhs, nullptr}} {}
 
-Expression::Expression(BinaryFuncDouble valueFunc,
+Expression::Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
                        BinaryFuncDouble lhsGradientValueFunc,
                        BinaryFuncDouble rhsGradientValueFunc,
                        BinaryFuncExpr lhsGradientFunc,
@@ -30,6 +43,7 @@ Expression::Expression(BinaryFuncDouble valueFunc,
                        wpi::IntrusiveSharedPtr<Expression> rhs)
     : value{valueFunc(lhs != nullptr ? lhs->value : 0.0,
                       rhs != nullptr ? rhs->value : 0.0)},
+      typeFunc{typeFunc},
       valueFunc{valueFunc},
       gradientValueFuncs{
           std::array{lhsGradientValueFunc, rhsGradientValueFunc}},
@@ -38,18 +52,32 @@ Expression::Expression(BinaryFuncDouble valueFunc,
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
     double lhs, const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-  return wpi::MakeIntrusiveShared<Expression>(lhs) * rhs;
+  return MakeConstant(lhs) * rhs;
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
     const wpi::IntrusiveSharedPtr<Expression>& lhs, double rhs) {
-  return lhs * wpi::MakeIntrusiveShared<Expression>(rhs);
+  return lhs * MakeConstant(rhs);
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return rhs->Type();
+        }
+        if (rhs->Type() == ExpressionType::kConstant) {
+          return lhs->Type();
+        }
+        if (lhs->Type() == ExpressionType::kLinear &&
+            rhs->Type() == ExpressionType::kLinear) {
+          return ExpressionType::kQuadratic;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double lhs, double rhs) { return lhs * rhs; },
       [](double lhs, double rhs) { return rhs; },
       [](double lhs, double rhs) { return lhs; },
@@ -62,18 +90,25 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
     double lhs, const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-  return wpi::MakeIntrusiveShared<Expression>(lhs) / rhs;
+  return MakeConstant(lhs) / rhs;
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
     const wpi::IntrusiveSharedPtr<Expression>& lhs, double rhs) {
-  return lhs / wpi::MakeIntrusiveShared<Expression>(rhs);
+  return lhs / MakeConstant(rhs);
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+        if (rhs->Type() == ExpressionType::kConstant) {
+          return lhs->Type();
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double lhs, double rhs) { return lhs / rhs; },
       [](double lhs, double rhs) { return 1.0 / rhs; },
       [](double lhs, double rhs) { return -lhs / (rhs * rhs); },
@@ -88,18 +123,23 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     double lhs, const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-  return wpi::MakeIntrusiveShared<Expression>(lhs) + rhs;
+  return MakeConstant(lhs) + rhs;
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     const wpi::IntrusiveSharedPtr<Expression>& lhs, double rhs) {
-  return lhs + wpi::MakeIntrusiveShared<Expression>(rhs);
+  return lhs + MakeConstant(rhs);
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+        return ExpressionType{std::max(static_cast<int>(lhs->Type()),
+                                       static_cast<int>(rhs->Type()))};
+      },
       [](double lhs, double rhs) { return lhs + rhs; },
       [](double lhs, double rhs) { return 1.0; },
       [](double lhs, double rhs) { return 1.0; },
@@ -115,18 +155,23 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
 }
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
     double lhs, const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-  return wpi::MakeIntrusiveShared<Expression>(lhs) - rhs;
+  return MakeConstant(lhs) - rhs;
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
     const wpi::IntrusiveSharedPtr<Expression>& lhs, double rhs) {
-  return lhs - wpi::MakeIntrusiveShared<Expression>(rhs);
+  return lhs - MakeConstant(rhs);
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+        return ExpressionType{std::max(static_cast<int>(lhs->Type()),
+                                       static_cast<int>(rhs->Type()))};
+      },
       [](double lhs, double rhs) { return lhs - rhs; },
       [](double lhs, double rhs) { return 1.0; },
       [](double lhs, double rhs) { return -1.0; },
@@ -144,6 +189,8 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
     const wpi::IntrusiveSharedPtr<Expression>& lhs) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
       [](double lhs, double) { return -lhs; },
       [](double lhs, double rhs) { return -1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
@@ -156,6 +203,8 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     const wpi::IntrusiveSharedPtr<Expression>& lhs) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
       [](double lhs, double) { return lhs; },
       [](double lhs, double rhs) { return 1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
@@ -163,6 +212,10 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
         return wpi::MakeIntrusiveShared<Expression>(1.0);
       },
       lhs);
+}
+
+ExpressionType Expression::Type() const {
+  return typeFunc(args[0], args[1]);
 }
 
 void Expression::Update() {
@@ -181,9 +234,20 @@ void Expression::Update() {
   }
 }
 
+wpi::IntrusiveSharedPtr<Expression> MakeConstant(double x) {
+  return wpi::MakeIntrusiveShared<Expression>(x, ExpressionType::kConstant);
+}
+
 wpi::IntrusiveSharedPtr<Expression> abs(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::abs(x); },
       [](double x, double) {
         if (x < 0.0) {
@@ -210,6 +274,13 @@ wpi::IntrusiveSharedPtr<Expression> abs(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> acos(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::acos(x); },
       [](double x, double) { return -1.0 / std::sqrt(1.0 - x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -222,6 +293,13 @@ wpi::IntrusiveSharedPtr<Expression> acos(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> asin(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::asin(x); },
       [](double x, double) { return 1.0 / std::sqrt(1.0 - x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -234,6 +312,13 @@ wpi::IntrusiveSharedPtr<Expression> asin(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> atan(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::atan(x); },
       [](double x, double) { return 1.0 / (1.0 + x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -247,6 +332,14 @@ wpi::IntrusiveSharedPtr<Expression> atan2(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& y,
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+        if (lhs->Type() == ExpressionType::kConstant &&
+            rhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double y, double x) { return std::atan2(y, x); },
       [](double y, double x) { return x / (y * y + x * x); },
       [](double y, double x) { return -y / (y * y + x * x); },
@@ -264,6 +357,13 @@ wpi::IntrusiveSharedPtr<Expression> atan2(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> cos(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::cos(x); },
       [](double x, double) { return -std::sin(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -276,6 +376,13 @@ wpi::IntrusiveSharedPtr<Expression> cos(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> cosh(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::cosh(x); },
       [](double x, double) { return std::sinh(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -291,6 +398,13 @@ wpi::IntrusiveSharedPtr<Expression> erf(  // NOLINT
       1.7724538509055160272981674833411451872554456638435L;
 
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::erf(x); },
       [](double x, double) { return 2.0 / sqrt_pi * std::exp(-x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -303,6 +417,13 @@ wpi::IntrusiveSharedPtr<Expression> erf(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> exp(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::exp(x); },
       [](double x, double) { return std::exp(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -316,6 +437,14 @@ wpi::IntrusiveSharedPtr<Expression> hypot(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x,
     const wpi::IntrusiveSharedPtr<Expression>& y) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+        if (lhs->Type() == ExpressionType::kConstant &&
+            rhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double y) { return std::hypot(x, y); },
       [](double x, double y) { return x / std::hypot(x, y); },
       [](double x, double y) { return y / std::hypot(x, y); },
@@ -333,6 +462,13 @@ wpi::IntrusiveSharedPtr<Expression> hypot(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> log(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::log(x); },
       [](double x, double) { return 1.0 / x; },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -345,6 +481,13 @@ wpi::IntrusiveSharedPtr<Expression> log10(  // NOLINT
   static constexpr double ln10 = 2.3025850929940456840179914546843L;
 
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::log10(x); },
       [](double x, double) { return 1.0 / (ln10 * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -358,6 +501,29 @@ wpi::IntrusiveSharedPtr<Expression> pow(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& base,
     const wpi::IntrusiveSharedPtr<Expression>& power) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+        if (lhs->Type() == ExpressionType::kConstant &&
+            rhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        if (rhs->Type() == ExpressionType::kConstant && rhs->value == 0.0) {
+          return ExpressionType::kConstant;
+        }
+        if (lhs->Type() == ExpressionType::kLinear &&
+            rhs->Type() == ExpressionType::kConstant && rhs->value == 1.0) {
+          return ExpressionType::kLinear;
+        }
+        if (lhs->Type() == ExpressionType::kLinear &&
+            rhs->Type() == ExpressionType::kConstant && rhs->value == 2.0) {
+          return ExpressionType::kQuadratic;
+        }
+        if (lhs->Type() == ExpressionType::kQuadratic &&
+            rhs->Type() == ExpressionType::kConstant && rhs->value == 1.0) {
+          return ExpressionType::kQuadratic;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double base, double power) { return std::pow(base, power); },
       [](double base, double power) {
         return std::pow(base, power - 1) * power;
@@ -389,6 +555,13 @@ wpi::IntrusiveSharedPtr<Expression> pow(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> sin(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::sin(x); },
       [](double x, double) { return std::cos(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -401,6 +574,13 @@ wpi::IntrusiveSharedPtr<Expression> sin(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> sinh(
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::sinh(x); },
       [](double x, double) { return std::cosh(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -413,6 +593,13 @@ wpi::IntrusiveSharedPtr<Expression> sinh(
 wpi::IntrusiveSharedPtr<Expression> sqrt(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::sqrt(x); },
       [](double x, double) { return 1.0 / (2.0 * std::sqrt(x)); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -425,6 +612,13 @@ wpi::IntrusiveSharedPtr<Expression> sqrt(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> tan(  // NOLINT
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::tan(x); },
       [](double x, double) { return 1.0 / (std::cos(x) * std::cos(x)); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
@@ -437,6 +631,13 @@ wpi::IntrusiveSharedPtr<Expression> tan(  // NOLINT
 wpi::IntrusiveSharedPtr<Expression> tanh(
     const wpi::IntrusiveSharedPtr<Expression>& x) {
   return wpi::MakeIntrusiveShared<Expression>(
+      [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
+         const wpi::IntrusiveSharedPtr<Expression>&) {
+        if (lhs->Type() == ExpressionType::kConstant) {
+          return ExpressionType::kConstant;
+        }
+        return ExpressionType::kNonlinear;
+      },
       [](double x, double) { return std::tanh(x); },
       [](double x, double) { return 1.0 / (std::cosh(x) * std::cosh(x)); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,

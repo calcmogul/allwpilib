@@ -12,6 +12,7 @@
 #include "Eigen/QR"
 #include "frc/EigenCore.h"
 #include "frc/optimization/Problem.h"
+#include "frc/optimization/SolverExitCondition.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "gtest/gtest.h"
@@ -33,7 +34,13 @@ wpi::SmallVector<double> Range(double start, double end, double step) {
 
 TEST(ProblemTest, EmptyProblem) {
   frc::Problem problem;
-  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+
+  frc::SolverConfig config;
+  config.diagnostics = true;
+
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kConstant, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 }
 
 TEST(ProblemTest, SolverStatusInfeasible) {
@@ -49,7 +56,12 @@ TEST(ProblemTest, SolverStatusInfeasible) {
     problem.SubjectTo(y == z + 1);
     problem.SubjectTo(z == x + 1);
 
-    EXPECT_EQ(frc::SolverStatus::kInfeasible, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kInfeasible, status.exitCondition);
   }
 
   // Inequality constraints
@@ -64,7 +76,12 @@ TEST(ProblemTest, SolverStatusInfeasible) {
     problem.SubjectTo(y >= z + 1);
     problem.SubjectTo(z >= x + 1);
 
-    EXPECT_EQ(frc::SolverStatus::kInfeasible, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kInfeasible, status.exitCondition);
   }
 }
 
@@ -76,9 +93,12 @@ TEST(ProblemTest, SolverStatusMaxIterations) {
   problem.Minimize(x);
 
   frc::SolverConfig config;
+  config.diagnostics = true;
   config.maxIterations = 0;
 
-  EXPECT_EQ(frc::SolverStatus::kMaxIterations, problem.Solve(config));
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kMaxIterations, status.exitCondition);
 }
 
 TEST(ProblemTest, SolverStatusTimeout) {
@@ -89,9 +109,12 @@ TEST(ProblemTest, SolverStatusTimeout) {
   problem.Minimize(x);
 
   frc::SolverConfig config;
+  config.diagnostics = true;
   config.timeout = 0_s;
 
-  EXPECT_EQ(frc::SolverStatus::kTimeout, problem.Solve(config));
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kTimeout, status.exitCondition);
 }
 
 TEST(ProblemTest, NoCostUnconstrained) {
@@ -100,7 +123,12 @@ TEST(ProblemTest, NoCostUnconstrained) {
 
     auto X = problem.DecisionVariable(2, 3);
 
-    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kConstant, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     for (int row = 0; row < X.Rows(); ++row) {
       for (int col = 0; col < X.Cols(); ++col) {
@@ -115,7 +143,12 @@ TEST(ProblemTest, NoCostUnconstrained) {
     auto X = problem.DecisionVariable(2, 3);
     X = frc::Matrixd<2, 3>{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
 
-    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kConstant, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     for (int row = 0; row < X.Rows(); ++row) {
       for (int col = 0; col < X.Cols(); ++col) {
@@ -126,7 +159,7 @@ TEST(ProblemTest, NoCostUnconstrained) {
 }
 
 TEST(ProblemTest, DISABLED_Linear) {
-  frc::Problem problem{frc::ProblemType::kLinear};
+  frc::Problem problem;
 
   auto x = problem.DecisionVariable();
   x = 1.0;
@@ -142,28 +175,38 @@ TEST(ProblemTest, DISABLED_Linear) {
   problem.SubjectTo(x >= 0);
   problem.SubjectTo(y >= 0);
 
-  problem.Solve();
+  frc::SolverConfig config;
+  config.diagnostics = true;
+
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   EXPECT_NEAR(375.0, x.Value(0), 1e-6);
   EXPECT_NEAR(250.0, y.Value(0), 1e-6);
 }
 
 TEST(ProblemTest, QuadraticUnconstrained1) {
-  frc::Problem problem{frc::ProblemType::kQuadratic};
+  frc::Problem problem;
 
   auto x = problem.DecisionVariable();
   x = 2.0;
 
   problem.Minimize(x * x - 6.0 * x);
 
-  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+  frc::SolverConfig config;
+  config.diagnostics = true;
+
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   EXPECT_NEAR(3.0, x.Value(0), 1e-6);
 }
 
 TEST(ProblemTest, QuadraticUnconstrained2) {
   {
-    frc::Problem problem{frc::ProblemType::kQuadratic};
+    frc::Problem problem;
 
     auto x = problem.DecisionVariable();
     x = 1.0;
@@ -172,14 +215,19 @@ TEST(ProblemTest, QuadraticUnconstrained2) {
 
     problem.Minimize(x * x + y * y);
 
-    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     EXPECT_NEAR(0.0, x.Value(0), 1e-6);
     EXPECT_NEAR(0.0, y.Value(0), 1e-6);
   }
 
   {
-    frc::Problem problem{frc::ProblemType::kQuadratic};
+    frc::Problem problem;
 
     auto x = problem.DecisionVariable(2);
     x(0) = 1.0;
@@ -187,7 +235,12 @@ TEST(ProblemTest, QuadraticUnconstrained2) {
 
     problem.Minimize(x.Transpose() * x);
 
-    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     EXPECT_NEAR(0.0, x.Value(0), 1e-6);
     EXPECT_NEAR(0.0, x.Value(1), 1e-6);
@@ -234,7 +287,7 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
   // [y] = [ 6]
   // [λ]   [ 6]
   {
-    frc::Problem problem{frc::ProblemType::kQuadratic};
+    frc::Problem problem;
 
     auto x = problem.DecisionVariable();
     auto y = problem.DecisionVariable();
@@ -243,14 +296,19 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
 
     problem.SubjectTo(x + 3 * y == 36);
 
-    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     EXPECT_NEAR(18.0, x.Value(0), 1e-6);
     EXPECT_NEAR(6.0, y.Value(0), 1e-6);
   }
 
   {
-    frc::Problem problem{frc::ProblemType::kQuadratic};
+    frc::Problem problem;
 
     auto x = problem.DecisionVariable(2);
     x(0) = 1.0;
@@ -260,7 +318,12 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
 
     problem.SubjectTo(x == frc::Matrixd<2, 1>{{3.0, 3.0}});
 
-    EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+    frc::SolverConfig config;
+    config.diagnostics = true;
+
+    auto status = problem.Solve(config);
+    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     EXPECT_NEAR(3.0, x.Value(0), 1e-6);
     EXPECT_NEAR(3.0, x.Value(1), 1e-6);
@@ -268,7 +331,7 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
 }
 
 TEST(ProblemTest, Nonlinear) {
-  frc::Problem problem{frc::ProblemType::kNonlinear};
+  frc::Problem problem;
 
   auto x = problem.DecisionVariable();
   x = 20.0;
@@ -277,7 +340,12 @@ TEST(ProblemTest, Nonlinear) {
 
   problem.SubjectTo(x >= 1);
 
-  problem.Solve();
+  frc::SolverConfig config;
+  config.diagnostics = true;
+
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kNonlinear, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   EXPECT_NEAR(1.0, x.Value(0), 1e-6);
 }
@@ -299,7 +367,12 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedWithCubicAndLine) {
       problem.SubjectTo(frc::pow(x - 1, 3) - y + 1 <= 0);
       problem.SubjectTo(x + y - 2 <= 0);
 
-      EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+      frc::SolverConfig config;
+      config.diagnostics = true;
+
+      auto status = problem.Solve(config);
+      EXPECT_EQ(frc::ProblemType::kNonlinear, status.problemType);
+      EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
       EXPECT_NEAR(1.0, x.Value(0), 1e-6);
       EXPECT_NEAR(1.0, y.Value(0), 1e-6);
@@ -323,7 +396,12 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedToDisk) {
 
       problem.SubjectTo(frc::pow(x, 2) + frc::pow(y, 2) <= 2);
 
-      EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve());
+      frc::SolverConfig config;
+      config.diagnostics = true;
+
+      auto status = problem.Solve(config);
+      EXPECT_EQ(frc::ProblemType::kNonlinear, status.problemType);
+      EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
       EXPECT_NEAR(1.0, x.Value(0), 1e-6);
       EXPECT_NEAR(1.0, y.Value(0), 1e-6);
@@ -340,7 +418,7 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
 
   constexpr double r = 2.0;
 
-  frc::Problem problem{frc::ProblemType::kQuadratic};
+  frc::Problem problem;
 
   // 2x1 state vector with N + 1 timesteps (includes last state)
   auto X = problem.DecisionVariable(2, N + 1);
@@ -391,7 +469,10 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
 
   frc::SolverConfig config;
   config.diagnostics = true;
-  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve(config));
+
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   // TODO: Verify solution
 #if 0
@@ -436,7 +517,7 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
   frc::Matrixd<1, 1> B;
   frc::DiscretizeAB<1, 1>(system.A(), system.B(), dt, &A, &B);
 
-  frc::Problem problem{frc::ProblemType::kQuadratic};
+  frc::Problem problem;
   auto X = problem.DecisionVariable(1, N + 1);
   auto U = problem.DecisionVariable(1, N);
 
@@ -466,7 +547,10 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
 
   frc::SolverConfig config;
   config.diagnostics = true;
-  EXPECT_EQ(frc::SolverStatus::kOk, problem.Solve(config));
+
+  auto status = problem.Solve(config);
+  EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+  EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   // Voltage for steady-state velocity:
   //

@@ -4,6 +4,8 @@
 
 #include "frc/optimization/VariableMatrix.h"
 
+#include "frc/autodiff/Expression.h"
+
 namespace frc {
 
 VariableMatrix::VariableMatrix(int rows, int cols)
@@ -126,7 +128,7 @@ WPILIB_DLLEXPORT VariableMatrix operator*(const VariableMatrix& lhs,
                                           double rhs) {
   VariableMatrix result{lhs.Rows(), lhs.Cols()};
 
-  autodiff::Variable rhsVar{rhs};
+  autodiff::Variable rhsVar{autodiff::MakeConstant(rhs)};
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
       result.Autodiff(row, col) = lhs.Autodiff(row, col) * rhsVar;
@@ -140,7 +142,7 @@ WPILIB_DLLEXPORT VariableMatrix operator*(double lhs,
                                           const VariableMatrix& rhs) {
   VariableMatrix result{rhs.Rows(), rhs.Cols()};
 
-  autodiff::Variable lhsVar{lhs};
+  autodiff::Variable lhsVar{autodiff::MakeConstant(lhs)};
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
       result.Autodiff(row, col) = rhs.Autodiff(row, col) * lhsVar;
@@ -169,7 +171,7 @@ VariableMatrix& VariableMatrix::operator*=(const VariableMatrix& rhs) {
 VariableMatrix& VariableMatrix::operator*=(double rhs) {
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      Autodiff(row, col) *= autodiff::Variable{rhs};
+      Autodiff(row, col) *= autodiff::Variable{autodiff::MakeConstant(rhs)};
     }
   }
 
@@ -183,7 +185,8 @@ WPILIB_DLLEXPORT VariableMatrix operator/(const VariableMatrix& lhs,
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
       result.Autodiff(row, col) =
-          lhs.Autodiff(row, col) / autodiff::Variable{rhs};
+          lhs.Autodiff(row, col) /
+          autodiff::Variable{autodiff::MakeConstant(rhs)};
     }
   }
 
@@ -193,7 +196,7 @@ WPILIB_DLLEXPORT VariableMatrix operator/(const VariableMatrix& lhs,
 VariableMatrix& VariableMatrix::operator/=(double rhs) {
   for (int row = 0; row < Rows(); ++row) {
     for (int col = 0; col < Cols(); ++col) {
-      Autodiff(row, col) /= autodiff::Variable{rhs};
+      Autodiff(row, col) /= autodiff::Variable{autodiff::MakeConstant(rhs)};
     }
   }
 
@@ -448,6 +451,34 @@ VariableMatrix log10(const VariableMatrix& x) {
   for (int row = 0; row < result.Rows(); ++row) {
     for (int col = 0; col < result.Cols(); ++col) {
       result.Autodiff(row, col) = autodiff::log10(x.Autodiff(row, col));
+    }
+  }
+
+  return result;
+}
+
+VariableMatrix pow(double base, const VariableMatrix& power) {
+  VariableMatrix result{1, 1};
+
+  for (int row = 0; row < result.Rows(); ++row) {
+    for (int col = 0; col < result.Cols(); ++col) {
+      result.Autodiff(row, col) =
+          autodiff::pow(autodiff::Variable{autodiff::MakeConstant(base)},
+                        power.Autodiff(row, col));
+    }
+  }
+
+  return result;
+}
+
+VariableMatrix pow(const VariableMatrix& base, double power) {
+  VariableMatrix result{base.Rows(), base.Cols()};
+
+  for (int row = 0; row < result.Rows(); ++row) {
+    for (int col = 0; col < result.Cols(); ++col) {
+      result.Autodiff(row, col) =
+          autodiff::pow(base.Autodiff(row, col),
+                        autodiff::Variable{autodiff::MakeConstant(power)});
     }
   }
 

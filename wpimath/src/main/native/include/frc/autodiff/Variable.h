@@ -136,6 +136,12 @@ class WPILIB_DLLEXPORT Variable {
   double Value() const;
 
   /**
+   * Returns the type of this expression (constant, linear, quadratic, or
+   * nonlinear).
+   */
+  ExpressionType Type() const;
+
+  /**
    * Update the value of this variable based on the values of its dependent
    * variables.
    */
