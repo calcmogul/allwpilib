@@ -165,7 +165,7 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   }
 
   if (m_config.diagnostics) {
-    fmt::print("\nThe problem is {} because:\n",
+    fmt::print("The problem is {} because:\n",
                kExprTypeToName[static_cast<int>(status.problemType)]);
 
     if (m_f.has_value()) {
@@ -383,8 +383,10 @@ Eigen::VectorXd Problem::InteriorPoint(
   if (m_config.diagnostics) {
     fmt::print("Number of equality constraints: {}\n",
                m_equalityConstraints.size());
-    fmt::print("Number of inequality constraints: {}\n",
+    fmt::print("Number of inequality constraints: {}\n\n",
                m_inequalityConstraints.size());
+
+    fmt::print("Error tolerance: {}\n\n", m_config.tolerance);
   }
 
   // Barrier parameter scale factor κ_μ for tolerance checks
@@ -506,11 +508,12 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   int iterations = 0;
 
-  auto startTime = std::chrono::system_clock::now();
-  auto endTime = startTime;
+  auto outerStartTime = std::chrono::system_clock::now();
 
   while (E_mu > m_config.tolerance) {
     while (E_mu > kappa_epsilon * mu) {
+      auto innerStartTime = std::chrono::system_clock::now();
+
       //     [s₁ 0 ⋯ 0 ]
       // S = [0  ⋱   ⋮ ]
       //     [⋮    ⋱ 0 ]
@@ -724,14 +727,24 @@ Eigen::VectorXd Problem::InteriorPoint(
                  c_e.lpNorm<Eigen::Infinity>(),
                  (c_i - s).lpNorm<Eigen::Infinity>());
 
+      auto innerEndTime = std::chrono::system_clock::now();
+
+      if (m_config.diagnostics) {
+        if (iterations % 25 == 0) {
+          fmt::print("iter  duration (ms)    error\n");
+          fmt::print("==============================\n");
+        }
+        fmt::print("{:>4}  {:>10}     {:>9.3e}\n", iterations,
+                   ToMilliseconds(innerEndTime - innerStartTime), E_mu);
+      }
+
       ++iterations;
       if (iterations >= m_config.maxIterations) {
         status->exitCondition = SolverExitCondition::kMaxIterations;
         return x;
       }
 
-      endTime = std::chrono::system_clock::now();
-      if (units::second_t{endTime - startTime} > m_config.timeout) {
+      if (units::second_t{innerEndTime - outerStartTime} > m_config.timeout) {
         status->exitCondition = SolverExitCondition::kTimeout;
         return x;
       }
@@ -754,9 +767,10 @@ Eigen::VectorXd Problem::InteriorPoint(
   }
 
   if (m_config.diagnostics) {
-    endTime = std::chrono::system_clock::now();
-    fmt::print("Number of iterations: {}\n", iterations);
-    fmt::print("Solve time: {} ms\n", ToMilliseconds(endTime - startTime));
+    auto outerEndTime = std::chrono::system_clock::now();
+    fmt::print("\nNumber of iterations: {}\n\n", iterations);
+    fmt::print("Solve time: {} ms\n",
+               ToMilliseconds(outerEndTime - outerStartTime));
   }
 
   return x;
