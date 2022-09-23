@@ -707,21 +707,50 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Check for problem infeasibility. The problem is infeasible if
       //
       //   Aₑᵀcₑ → 0
-      //   Aᵢᵀcᵢ⁻ → 0
-      //   ||(cₑ, cᵢ⁻)|| > ε
+      //   Aᵢᵀcᵢ⁺ → 0
+      //   ||(cₑ, cᵢ⁺)|| > ε
       //
-      // where cᵢ⁻ = max(0, −cᵢ).
+      // where cᵢ⁺ = min(cᵢ, 0).
       //
       // See "Infeasibility detection" in section 6 of [3].
+      //
+      // cᵢ⁺ is used instead of cᵢ⁻ from the paper to follow the convention that
+      // feasible inequality constraints are ≥ 0.
       if (m_equalityConstraints.size() > 0 &&
           (A_e.transpose() * c_e).norm() < 1e-2 && c_e.norm() > 1e-2) {
+        if (m_config.diagnostics) {
+          fmt::print(
+              "The problem is infeasible due to violated equality "
+              "constraints.\n");
+          fmt::print(
+              "Violated constraints (cₑ(x) = 0) in order of declaration:\n");
+          for (int row = 0; row < c_e.rows(); ++row) {
+            if (c_e(row) < 0.0) {
+              fmt::print("  {}/{}: {} = 0\n", row + 1, c_e.rows(), c_e(row));
+            }
+          }
+        }
+
         status->exitCondition = SolverExitCondition::kInfeasible;
         return x;
       }
       if (m_inequalityConstraints.size() > 0) {
-        Eigen::VectorXd c_i_minus = (-c_i).cwiseMax(0.0);
-        if ((A_i.transpose() * c_i_minus).norm() < 1e-2 &&
-            c_i_minus.norm() > 1e-2) {
+        Eigen::VectorXd c_i_plus = c_i.cwiseMin(0.0);
+        if ((A_i.transpose() * c_i_plus).norm() < 1e-2 &&
+            c_i_plus.norm() > 1e-2) {
+          if (m_config.diagnostics) {
+            fmt::print(
+                "The problem is infeasible due to violated inequality "
+                "constraints.\n");
+            fmt::print(
+                "Violated constraints (cᵢ(x) ≥ 0) in order of declaration:\n");
+            for (int row = 0; row < c_i.rows(); ++row) {
+              if (c_i(row) < 0.0) {
+                fmt::print("  {}/{}: {} ≥ 0\n", row + 1, c_i.rows(), c_i(row));
+              }
+            }
+          }
+
           status->exitCondition = SolverExitCondition::kInfeasible;
           return x;
         }
