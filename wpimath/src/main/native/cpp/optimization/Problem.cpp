@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <wpi/ScopeExit.h>
 
 #include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
@@ -510,6 +511,28 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   auto outerStartTime = std::chrono::system_clock::now();
 
+  wpi::ScopeExit exit{[&] {
+    if (m_config.diagnostics) {
+      auto outerEndTime = std::chrono::system_clock::now();
+      fmt::print("\nNumber of iterations: {}\n\n", iterations);
+
+      fmt::print("Solve time: {} ms\n\n",
+                 ToMilliseconds(outerEndTime - outerStartTime));
+
+      fmt::print("Exit condition: ");
+      if (status->exitCondition == SolverExitCondition::kOk) {
+        fmt::print("optimal solution found");
+      } else if (status->exitCondition == SolverExitCondition::kInfeasible) {
+        fmt::print("problem is infeasible");
+      } else if (status->exitCondition == SolverExitCondition::kMaxIterations) {
+        fmt::print("maximum iterations exceeded");
+      } else if (status->exitCondition == SolverExitCondition::kTimeout) {
+        fmt::print("solution returned after timeout");
+      }
+      fmt::print("\n");
+    }
+  }};
+
   while (E_mu > m_config.tolerance) {
     while (E_mu > kappa_epsilon * mu) {
       auto innerStartTime = std::chrono::system_clock::now();
@@ -764,13 +787,6 @@ Eigen::VectorXd Problem::InteriorPoint(
     //
     // See equation (8) in [2].
     tau = std::max(tau_min, 1.0 - mu);
-  }
-
-  if (m_config.diagnostics) {
-    auto outerEndTime = std::chrono::system_clock::now();
-    fmt::print("\nNumber of iterations: {}\n\n", iterations);
-    fmt::print("Solve time: {} ms\n",
-               ToMilliseconds(outerEndTime - outerStartTime));
   }
 
   return x;
