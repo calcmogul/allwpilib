@@ -12,7 +12,7 @@
 #include <vector>
 
 #include <fmt/core.h>
-#include <wpi/ScopeExit.h>
+#include <wpi/scope>
 
 #include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
@@ -511,7 +511,7 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   auto outerStartTime = std::chrono::system_clock::now();
 
-  wpi::ScopeExit exit{[&] {
+  wpi::scope_exit exit{[&] {
     if (m_config.diagnostics) {
       auto outerEndTime = std::chrono::system_clock::now();
       fmt::print("\nNumber of iterations: {}\n\n", iterations);
