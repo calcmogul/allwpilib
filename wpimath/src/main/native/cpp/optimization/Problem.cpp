@@ -245,11 +245,6 @@ double Problem::FractionToTheBoundaryRule(
   return alpha;
 }
 
-double Problem::f(const Eigen::Ref<const Eigen::VectorXd>& x) {
-  SetAD(m_decisionVariables, x);
-  return m_f.value().Value();
-}
-
 Eigen::VectorXd Problem::InteriorPoint(
     const Eigen::Ref<const Eigen::VectorXd>& initialGuess,
     SolverStatus* status) {

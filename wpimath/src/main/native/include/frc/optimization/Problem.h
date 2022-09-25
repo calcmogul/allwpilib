@@ -268,13 +268,6 @@ class WPILIB_DLLEXPORT Problem {
       const Eigen::Ref<const Eigen::VectorXd>& p, double tau);
 
   /**
-   * The cost function f(x).
-   *
-   * @param x The input of f(x).
-   */
-  double f(const Eigen::Ref<const Eigen::VectorXd>& x);
-
-  /**
   Find the optimal solution to the nonlinear program using an interior-point
   solver.
 
