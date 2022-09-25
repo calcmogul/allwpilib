@@ -407,6 +407,17 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Error estimate E_μ
   double E_mu = std::numeric_limits<double>::infinity();
 
+  // Gradient of f ∇f
+  Eigen::VectorXd gradientF{xAD.rows()};
+  if (status->costFunctionType == autodiff::ExpressionType::kConstant) {
+    // If the cost function is constant, the gradient is zero.
+    gradientF.setZero();
+  } else if (status->costFunctionType == autodiff::ExpressionType::kLinear) {
+    // If the cost function is linear, initialize the gradient once here since
+    // it's constant. Otherwise, initialization is delayed until the loop below.
+    gradientF = autodiff::Gradient(m_f.value(), xAD);
+  }
+
   autodiff::Hessian hessian{L, xAD};
 
   // Hessian of the Lagrangian H
@@ -586,12 +597,16 @@ Eigen::VectorXd Problem::InteriorPoint(
       lhs.topRows(lhsTop.rows()) = lhsTop;
       lhs.bottomRows(lhsBottom.rows()) = lhsBottom;
 
+      if (status->costFunctionType > autodiff::ExpressionType::kLinear) {
+        gradientF = autodiff::Gradient(m_f.value(), xAD);
+      }
+
       // rhs = −[∇f − Aₑᵀy + Aᵢᵀ(Σcᵢ − μS⁻¹e − z)]
       //        [               cₑ               ]
       //
       // The outer negative sign is applied in the solve() call.
       Eigen::VectorXd rhs{x.rows() + y.rows()};
-      rhs.topRows(x.rows()) = autodiff::Gradient(m_f.value(), xAD);
+      rhs.topRows(x.rows()) = gradientF;
       if (m_equalityConstraints.size() > 0) {
         rhs.topRows(x.rows()) -= A_e.transpose() * y;
       }
@@ -673,6 +688,9 @@ Eigen::VectorXd Problem::InteriorPoint(
           s_max;
 
       // Update variables needed in error estimate
+      if (status->costFunctionType > autodiff::ExpressionType::kLinear) {
+        gradientF = autodiff::Gradient(m_f.value(), xAD);
+      }
       if (status->equalityConstraintType > autodiff::ExpressionType::kLinear) {
         A_e = autodiff::Jacobian(c_eAD, xAD);
       }
@@ -759,7 +777,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       //   ||Sz − μe||_∞ / s_c
       //   ||cₑ||_∞
       //   ||cᵢ − s||_∞
-      Eigen::VectorXd eq1 = autodiff::Gradient(m_f.value(), xAD);
+      Eigen::VectorXd eq1 = gradientF;
       if (m_equalityConstraints.size() > 0) {
         eq1 -= A_e.transpose() * y;
       }
