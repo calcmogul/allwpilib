@@ -70,11 +70,15 @@ void Problem::Minimize(VariableMatrix&& cost) {
 
 void Problem::Maximize(const VariableMatrix& objective) {
   assert(objective.Rows() == 1 && objective.Cols() == 1);
+
+  // Maximizing an objective function is the same as minimizing its negative
   m_f = -objective.Autodiff(0, 0);
 }
 
 void Problem::Maximize(VariableMatrix&& objective) {
   assert(objective.Rows() == 1 && objective.Cols() == 1);
+
+  // Maximizing an objective function is the same as minimizing its negative
   m_f = -std::move(objective.Autodiff(0, 0));
 }
 

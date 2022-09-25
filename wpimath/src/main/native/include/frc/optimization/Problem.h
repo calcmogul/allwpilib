@@ -243,7 +243,7 @@ class WPILIB_DLLEXPORT Problem {
    * will find the closest solution to the initial conditions that's in the
    * feasible set.
    *
-   * @param objective The objective function to minimize. It must return a 1x1
+   * @param objective The objective function to maximize. It must return a 1x1
    *                  matrix.
    */
   void Maximize(const VariableMatrix& objective);
