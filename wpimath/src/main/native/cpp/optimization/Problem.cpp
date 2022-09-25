@@ -25,15 +25,6 @@
 
 using namespace frc;
 
-template <typename... Args>
-constexpr double Max(double a, double b, Args... args) {
-  if constexpr (sizeof...(Args) > 0) {
-    return Max(std::max(a, b), args...);
-  } else {
-    return std::max(a, b);
-  }
-}
-
 /**
  * Converts std::chrono::duration to a number of milliseconds rounded to three
  * decimals.
@@ -109,8 +100,8 @@ void Problem::SubjectTo(InequalityConstraints&& constraint) {
 }
 
 SolverStatus Problem::Solve(const SolverConfig& config) {
-  constexpr std::array<const char*, 4> kExprTypeToName = {
-      "constant", "linear", "quadratic", "nonlinear"};
+  constexpr std::array<const char*, 5> kExprTypeToName = {
+      "empty", "constant", "linear", "quadratic", "nonlinear"};
 
   m_config = config;
 
@@ -120,80 +111,76 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
     x(i) = m_decisionVariables[i].Value();
   }
 
+  SolverStatus status;
+
   // Get f's expression type
-  autodiff::ExpressionType fType;
   if (m_f.has_value()) {
-    fType = m_f.value().Type();
-  } else {
-    fType = autodiff::ExpressionType::kConstant;
+    status.costFunctionType = m_f.value().Type();
   }
 
   // Get the highest order equality constraint expression type
-  autodiff::ExpressionType A_eType = autodiff::ExpressionType::kConstant;
   for (const auto& constraint : m_equalityConstraints) {
     auto constraintType = constraint.Type();
-    if (A_eType < constraintType) {
-      A_eType = constraintType;
+    if (status.equalityConstraintType < constraintType) {
+      status.equalityConstraintType = constraintType;
     }
   }
 
   // Get the highest order inequality constraint expression type
-  autodiff::ExpressionType A_iType = autodiff::ExpressionType::kConstant;
   for (const auto& constraint : m_inequalityConstraints) {
     auto constraintType = constraint.Type();
-    if (A_iType < constraintType) {
-      A_iType = constraintType;
+    if (status.inequalityConstraintType < constraintType) {
+      status.inequalityConstraintType = constraintType;
     }
-  }
-
-  SolverStatus status;
-
-  // Determine the problem type
-  if (fType == autodiff::ExpressionType::kConstant &&
-      A_eType == autodiff::ExpressionType::kConstant &&
-      A_iType == autodiff::ExpressionType::kConstant) {
-    status.problemType = frc::ProblemType::kConstant;
-  } else if (fType <= autodiff::ExpressionType::kLinear &&
-             A_eType <= autodiff::ExpressionType::kLinear &&
-             A_iType <= autodiff::ExpressionType::kLinear) {
-    status.problemType = frc::ProblemType::kLinear;
-  } else if (fType == autodiff::ExpressionType::kQuadratic &&
-             A_eType <= autodiff::ExpressionType::kLinear &&
-             A_iType <= autodiff::ExpressionType::kLinear) {
-    status.problemType = frc::ProblemType::kQuadratic;
-  } else {
-    status.problemType = frc::ProblemType::kNonlinear;
   }
 
   if (m_config.diagnostics) {
+    // Determine the problem type
+    frc::autodiff::ExpressionType problemType;
+    if (status.costFunctionType == autodiff::ExpressionType::kNone &&
+        status.equalityConstraintType == autodiff::ExpressionType::kNone &&
+        status.inequalityConstraintType == autodiff::ExpressionType::kNone) {
+      problemType = autodiff::ExpressionType::kNone;
+    } else if (status.costFunctionType <= autodiff::ExpressionType::kConstant &&
+               status.equalityConstraintType <=
+                   autodiff::ExpressionType::kConstant &&
+               status.inequalityConstraintType <=
+                   autodiff::ExpressionType::kConstant) {
+      problemType = autodiff::ExpressionType::kConstant;
+    } else if (status.costFunctionType <= autodiff::ExpressionType::kLinear &&
+               status.equalityConstraintType <=
+                   autodiff::ExpressionType::kLinear &&
+               status.inequalityConstraintType <=
+                   autodiff::ExpressionType::kLinear) {
+      problemType = autodiff::ExpressionType::kLinear;
+    } else if (status.costFunctionType ==
+                   autodiff::ExpressionType::kQuadratic &&
+               status.equalityConstraintType <=
+                   autodiff::ExpressionType::kLinear &&
+               status.inequalityConstraintType <=
+                   autodiff::ExpressionType::kLinear) {
+      problemType = autodiff::ExpressionType::kQuadratic;
+    } else {
+      problemType = autodiff::ExpressionType::kNonlinear;
+    }
+
     fmt::print("The problem is {} because:\n",
-               kExprTypeToName[static_cast<int>(status.problemType)]);
-
-    if (m_f.has_value()) {
-      fmt::print("  * the cost function is {}\n",
-                 kExprTypeToName[static_cast<int>(fType)]);
-    } else {
-      fmt::print("  * there is no cost function\n");
-    }
-
-    if (m_equalityConstraints.size() > 0) {
-      fmt::print("  * the equality constraints are {}\n",
-                 kExprTypeToName[static_cast<int>(A_eType)]);
-    } else {
-      fmt::print("  * there are no equality constraints\n");
-    }
-
-    if (m_inequalityConstraints.size() > 0) {
-      fmt::print("  * the inequality constraints are {}\n",
-                 kExprTypeToName[static_cast<int>(A_iType)]);
-    } else {
-      fmt::print("  * there are no inequality constraints\n");
-    }
+               kExprTypeToName[static_cast<int>(problemType)]);
+    fmt::print("  * the cost function is {}\n",
+               kExprTypeToName[static_cast<int>(status.costFunctionType)]);
+    fmt::print(
+        "  * the equality constraints are {}\n",
+        kExprTypeToName[static_cast<int>(status.equalityConstraintType)]);
+    fmt::print(
+        "  * the inequality constraints are {}\n",
+        kExprTypeToName[static_cast<int>(status.inequalityConstraintType)]);
     fmt::print("\n");
   }
 
   // If the problem type is constant, there's nothing to do
-  if (status.problemType == ProblemType::kConstant) {
+  if (status.costFunctionType <= autodiff::ExpressionType::kConstant &&
+      status.equalityConstraintType <= autodiff::ExpressionType::kConstant &&
+      status.inequalityConstraintType <= autodiff::ExpressionType::kConstant) {
     return status;
   }
 
@@ -453,12 +440,20 @@ Eigen::VectorXd Problem::InteriorPoint(
   //
   // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
   Eigen::SparseMatrix<double> H{xAD.rows(), xAD.rows()};
-  if (status->problemType == ProblemType::kQuadratic) {
-    // If the problem is quadratic, initialize the Hessian once here since it's
-    // constant.
-    //
-    // If the problem is linear, the default initialization of zero is used. If
-    // the problem is nonlinear, initialization is delayed until the loop below.
+  if (status->costFunctionType < autodiff::ExpressionType::kQuadratic &&
+      status->equalityConstraintType < autodiff::ExpressionType::kQuadratic &&
+      status->inequalityConstraintType < autodiff::ExpressionType::kQuadratic) {
+    // If the cost function and constraints are less than quadratic, the Hessian
+    // is zero.
+    H.setZero();
+  } else if (status->costFunctionType <= autodiff::ExpressionType::kQuadratic &&
+             status->equalityConstraintType <=
+                 autodiff::ExpressionType::kQuadratic &&
+             status->inequalityConstraintType <=
+                 autodiff::ExpressionType::kQuadratic) {
+    // The cost function or constraints are at least quadratic. If none are
+    // above quadratic, initialize the Hessian once here since it's constant.
+    // Otherwise, initialization is delayed until the loop below.
     H = hessian.Calculate();
   }
 
@@ -468,14 +463,16 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
   //         [    ⋮    ]
   //         [∇ᵀcₑₘ(x)ₖ]
-  Eigen::SparseMatrix<double> A_e;
-  if (status->problemType == ProblemType::kLinear ||
-      status->problemType == ProblemType::kQuadratic) {
-    // If the problem is linear or quadratic, initialize Aₑ once here since it's
-    // constant.
-    //
-    // If the problem is nonlinear, initialization is delayed until the loop
-    // below.
+  Eigen::SparseMatrix<double> A_e(m_equalityConstraints.size(),
+                                  m_equalityConstraints.size());
+  if (status->equalityConstraintType < autodiff::ExpressionType::kLinear) {
+    // If the equality constraints are less than linear, the constraint Jacobian
+    // is zero.
+    A_e.setZero();
+  } else if (status->equalityConstraintType ==
+             autodiff::ExpressionType::kLinear) {
+    // If the equality constraints are linear, initialize Aₑ once here since
+    // it's constant. Otherwise, initialization is delayed until the loop below.
     A_e = autodiff::Jacobian(c_eAD, xAD);
   }
 
@@ -485,14 +482,16 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
   //         [    ⋮    ]
   //         [∇ᵀcᵢₘ(x)ₖ]
-  Eigen::SparseMatrix<double> A_i;
-  if (status->problemType == ProblemType::kLinear ||
-      status->problemType == ProblemType::kQuadratic) {
-    // If the problem is linear or quadratic, initialize Aᵢ once here since it's
-    // constant.
-    //
-    // If the problem is nonlinear, initialization is delayed until the loop
-    // below.
+  Eigen::SparseMatrix<double> A_i(m_inequalityConstraints.size(),
+                                  m_inequalityConstraints.size());
+  if (status->inequalityConstraintType < autodiff::ExpressionType::kLinear) {
+    // If the inequality constraints are less than linear, the constraint
+    // Jacobian is zero.
+    A_i.setZero();
+  } else if (status->inequalityConstraintType ==
+             autodiff::ExpressionType::kLinear) {
+    // If the inequality constraints are linear, initialize Aᵢ once here since
+    // it's constant. Otherwise, initialization is delayed until the loop below.
     A_i = autodiff::Jacobian(c_iAD, xAD);
   }
 
@@ -566,16 +565,24 @@ Eigen::VectorXd Problem::InteriorPoint(
       // Σ⁻¹ = SZ⁻¹
       Eigen::SparseMatrix<double> inverseSigma = S * inverseZ;
 
-      if (status->problemType == ProblemType::kNonlinear) {
+      if (status->costFunctionType > autodiff::ExpressionType::kQuadratic ||
+          status->equalityConstraintType > autodiff::ExpressionType::kLinear ||
+          status->inequalityConstraintType >
+              autodiff::ExpressionType::kLinear) {
         // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
         H = hessian.Calculate();
+      }
 
+      if (status->equalityConstraintType > autodiff::ExpressionType::kLinear) {
         //         [∇ᵀcₑ₁(x)ₖ]
         // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
         //         [    ⋮    ]
         //         [∇ᵀcₑₘ(x)ₖ]
         A_e = autodiff::Jacobian(c_eAD, xAD);
+      }
 
+      if (status->inequalityConstraintType >
+          autodiff::ExpressionType::kLinear) {
         //         [∇ᵀcᵢ₁(x)ₖ]
         // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
         //         [    ⋮    ]
@@ -594,7 +601,10 @@ Eigen::VectorXd Problem::InteriorPoint(
       // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
       //       [    Aₑ       0 ]
       Eigen::SparseMatrix<double> lhsTop{H.rows(), H.cols() + A_e.rows()};
-      lhsTop.leftCols(H.cols()) = H + A_i.transpose() * sigma * A_i;
+      lhsTop.leftCols(H.cols()) = H;
+      if (m_inequalityConstraints.size() > 0) {
+        lhsTop.leftCols(H.cols()) += A_i.transpose() * sigma * A_i;
+      }
       lhsTop.rightCols(A_e.rows()) = A_e.transpose();
       Eigen::SparseMatrix<double> lhsBottom{A_e.rows(), H.cols() + A_e.rows()};
       lhsBottom.leftCols(A_e.cols()) = A_e;
@@ -608,9 +618,14 @@ Eigen::VectorXd Problem::InteriorPoint(
       //
       // The outer negative sign is applied in the solve() call.
       Eigen::VectorXd rhs{x.rows() + y.rows()};
-      rhs.topRows(x.rows()) =
-          autodiff::Gradient(m_f.value(), xAD) - A_e.transpose() * y +
-          A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
+      rhs.topRows(x.rows()) = autodiff::Gradient(m_f.value(), xAD);
+      if (m_equalityConstraints.size() > 0) {
+        rhs.topRows(x.rows()) -= A_e.transpose() * y;
+      }
+      if (m_inequalityConstraints.size() > 0) {
+        rhs.topRows(x.rows()) +=
+            A_i.transpose() * (sigma * c_i - mu * inverseS * e - z);
+      }
       rhs.bottomRows(y.rows()) = c_e;
 
       // Regularize lhs by adding a multiple of the identity matrix
@@ -685,8 +700,11 @@ Eigen::VectorXd Problem::InteriorPoint(
           s_max;
 
       // Update variables needed in error estimate
-      if (status->problemType == frc::ProblemType::kNonlinear) {
+      if (status->equalityConstraintType > autodiff::ExpressionType::kLinear) {
         A_e = autodiff::Jacobian(c_eAD, xAD);
+      }
+      if (status->inequalityConstraintType >
+          autodiff::ExpressionType::kLinear) {
         A_i = autodiff::Jacobian(c_iAD, xAD);
       }
       for (size_t row = 0; row < m_equalityConstraints.size(); row++) {
@@ -768,13 +786,21 @@ Eigen::VectorXd Problem::InteriorPoint(
       //   ||Sz − μe||_∞ / s_c
       //   ||cₑ||_∞
       //   ||cᵢ − s||_∞
-      E_mu = Max((autodiff::Gradient(m_f.value(), xAD) - A_e.transpose() * y -
-                  A_i.transpose() * z)
-                         .lpNorm<Eigen::Infinity>() /
-                     s_d,
-                 (S * z - mu * e).lpNorm<Eigen::Infinity>() / s_c,
-                 c_e.lpNorm<Eigen::Infinity>(),
-                 (c_i - s).lpNorm<Eigen::Infinity>());
+      Eigen::VectorXd eq1 = autodiff::Gradient(m_f.value(), xAD);
+      if (m_equalityConstraints.size() > 0) {
+        eq1 -= A_e.transpose() * y;
+      }
+      if (m_inequalityConstraints.size() > 0) {
+        eq1 -= A_i.transpose() * z;
+      }
+      E_mu = std::max(eq1.lpNorm<Eigen::Infinity>() / s_d,
+                      (S * z - mu * e).lpNorm<Eigen::Infinity>() / s_c);
+      if (m_equalityConstraints.size() > 0) {
+        E_mu = std::max(E_mu, c_e.lpNorm<Eigen::Infinity>());
+      }
+      if (m_inequalityConstraints.size() > 0) {
+        E_mu = std::max(E_mu, (c_i - s).lpNorm<Eigen::Infinity>());
+      }
 
       auto innerEndTime = std::chrono::system_clock::now();
 

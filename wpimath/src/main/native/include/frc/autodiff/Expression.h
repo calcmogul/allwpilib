@@ -13,7 +13,7 @@
 
 namespace frc::autodiff {
 
-enum class ExpressionType { kConstant, kLinear, kQuadratic, kNonlinear };
+enum class ExpressionType { kNone, kConstant, kLinear, kQuadratic, kNonlinear };
 
 struct WPILIB_DLLEXPORT Expression {
   using BinaryFuncDouble = double (*)(double, double);

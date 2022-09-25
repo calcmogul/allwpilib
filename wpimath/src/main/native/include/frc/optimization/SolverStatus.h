@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "frc/optimization/ProblemType.h"
+#include "frc/autodiff/Expression.h"
 #include "frc/optimization/SolverExitCondition.h"
 
 namespace frc {
@@ -14,8 +14,16 @@ namespace frc {
  * solver's return status.
  */
 struct SolverStatus {
-  /// The problem type detected by the solver.
-  ProblemType problemType = ProblemType::kConstant;
+  /// The cost function type detected by the solver.
+  autodiff::ExpressionType costFunctionType = autodiff::ExpressionType::kNone;
+
+  /// The equality constraint type detected by the solver.
+  autodiff::ExpressionType equalityConstraintType =
+      autodiff::ExpressionType::kNone;
+
+  /// The inequality constraint type detected by the solver.
+  autodiff::ExpressionType inequalityConstraintType =
+      autodiff::ExpressionType::kNone;
 
   /// The solver's exit condition.
   SolverExitCondition exitCondition = SolverExitCondition::kOk;

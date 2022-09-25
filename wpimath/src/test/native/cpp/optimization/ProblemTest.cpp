@@ -39,7 +39,11 @@ TEST(ProblemTest, EmptyProblem) {
   config.diagnostics = true;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kConstant, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 }
 
@@ -60,7 +64,11 @@ TEST(ProblemTest, SolverStatusInfeasible) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone, status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kInfeasible, status.exitCondition);
   }
 
@@ -80,7 +88,11 @@ TEST(ProblemTest, SolverStatusInfeasible) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone, status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kInfeasible, status.exitCondition);
   }
 }
@@ -97,7 +109,11 @@ TEST(ProblemTest, SolverStatusMaxIterations) {
   config.maxIterations = 0;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kMaxIterations, status.exitCondition);
 }
 
@@ -113,7 +129,11 @@ TEST(ProblemTest, SolverStatusTimeout) {
   config.timeout = 0_s;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kTimeout, status.exitCondition);
 }
 
@@ -127,7 +147,11 @@ TEST(ProblemTest, NoCostUnconstrained) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kConstant, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone, status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     for (int row = 0; row < X.Rows(); ++row) {
@@ -147,7 +171,11 @@ TEST(ProblemTest, NoCostUnconstrained) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kConstant, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone, status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     for (int row = 0; row < X.Rows(); ++row) {
@@ -179,7 +207,11 @@ TEST(ProblemTest, DISABLED_Linear) {
   config.diagnostics = true;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kLinear, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   EXPECT_NEAR(375.0, x.Value(0), 1e-6);
@@ -198,7 +230,11 @@ TEST(ProblemTest, QuadraticUnconstrained1) {
   config.diagnostics = true;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   EXPECT_NEAR(3.0, x.Value(0), 1e-6);
@@ -219,7 +255,12 @@ TEST(ProblemTest, QuadraticUnconstrained2) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic,
+              status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     EXPECT_NEAR(0.0, x.Value(0), 1e-6);
@@ -239,7 +280,12 @@ TEST(ProblemTest, QuadraticUnconstrained2) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic,
+              status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
     EXPECT_NEAR(0.0, x.Value(0), 1e-6);
@@ -300,11 +346,16 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic,
+              status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
-    EXPECT_NEAR(18.0, x.Value(0), 1e-6);
-    EXPECT_NEAR(6.0, y.Value(0), 1e-6);
+    EXPECT_NEAR(18.0, x.Value(0), 1e-5);
+    EXPECT_NEAR(6.0, y.Value(0), 1e-5);
   }
 
   {
@@ -322,11 +373,16 @@ TEST(ProblemTest, QuadraticEqualityConstrained) {
     config.diagnostics = true;
 
     auto status = problem.Solve(config);
-    EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic,
+              status.costFunctionType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+              status.equalityConstraintType);
+    EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+              status.inequalityConstraintType);
     EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
-    EXPECT_NEAR(3.0, x.Value(0), 1e-6);
-    EXPECT_NEAR(3.0, x.Value(1), 1e-6);
+    EXPECT_NEAR(3.0, x.Value(0), 1e-5);
+    EXPECT_NEAR(3.0, x.Value(1), 1e-5);
   }
 }
 
@@ -344,7 +400,11 @@ TEST(ProblemTest, Nonlinear) {
   config.diagnostics = true;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kNonlinear, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNonlinear, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   EXPECT_NEAR(1.0, x.Value(0), 1e-6);
@@ -371,7 +431,12 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedWithCubicAndLine) {
       config.diagnostics = true;
 
       auto status = problem.Solve(config);
-      EXPECT_EQ(frc::ProblemType::kNonlinear, status.problemType);
+      EXPECT_EQ(frc::autodiff::ExpressionType::kNonlinear,
+                status.costFunctionType);
+      EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+                status.equalityConstraintType);
+      EXPECT_EQ(frc::autodiff::ExpressionType::kNonlinear,
+                status.inequalityConstraintType);
       EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
       EXPECT_NEAR(1.0, x.Value(0), 1e-6);
@@ -400,7 +465,12 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedToDisk) {
       config.diagnostics = true;
 
       auto status = problem.Solve(config);
-      EXPECT_EQ(frc::ProblemType::kNonlinear, status.problemType);
+      EXPECT_EQ(frc::autodiff::ExpressionType::kNonlinear,
+                status.costFunctionType);
+      EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
+                status.equalityConstraintType);
+      EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic,
+                status.inequalityConstraintType);
       EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
       EXPECT_NEAR(1.0, x.Value(0), 1e-6);
@@ -471,7 +541,11 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   config.diagnostics = true;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   // TODO: Verify solution
@@ -549,7 +623,11 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
   config.diagnostics = true;
 
   auto status = problem.Solve(config);
-  EXPECT_EQ(frc::ProblemType::kQuadratic, status.problemType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kQuadratic, status.costFunctionType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+            status.equalityConstraintType);
+  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+            status.inequalityConstraintType);
   EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
   // Voltage for steady-state velocity:

@@ -155,7 +155,7 @@ subject to cₑ(x) = 0
  * Cost functions and constraints can have the following orders:
  *
  * <ul>
- *   <li>(none)</li>
+ *   <li>none (i.e., there is no cost function or are no constraints)</li>
  *   <li>constant</li>
  *   <li>linear</li>
  *   <li>quadratic</li>
