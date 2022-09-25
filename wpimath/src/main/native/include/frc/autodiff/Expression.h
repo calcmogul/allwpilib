@@ -24,8 +24,6 @@ struct WPILIB_DLLEXPORT Expression {
       ExpressionType (*)(const wpi::IntrusiveSharedPtr<Expression>&,
                          const wpi::IntrusiveSharedPtr<Expression>&);
 
-  static constexpr int kNumArgs = 2;
-
   double value = 0.0;
 
   double adjoint = 0.0;
@@ -44,11 +42,11 @@ struct WPILIB_DLLEXPORT Expression {
   BinaryFuncDouble valueFunc = [](double, double) { return 0.0; };
 
   // Gradients with respect to each argument
-  std::array<BinaryFuncDouble, kNumArgs> gradientValueFuncs{
+  std::array<BinaryFuncDouble, 2> gradientValueFuncs{
       [](double, double) { return 0.0; }, [](double, double) { return 0.0; }};
 
   // Gradients with respect to each argument
-  std::array<BinaryFuncExpr, kNumArgs> gradientFuncs{
+  std::array<BinaryFuncExpr, 2> gradientFuncs{
       [](const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&) {
         return wpi::MakeIntrusiveShared<Expression>(0.0);
@@ -59,8 +57,7 @@ struct WPILIB_DLLEXPORT Expression {
       }};
 
   // Expression arguments
-  std::array<wpi::IntrusiveSharedPtr<Expression>, kNumArgs> args{nullptr,
-                                                                 nullptr};
+  std::array<wpi::IntrusiveSharedPtr<Expression>, 2> args{nullptr, nullptr};
 
   // Reference count for intrusive shared pointer
   uint32_t refCount = 0;
