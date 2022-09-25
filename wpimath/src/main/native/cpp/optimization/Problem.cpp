@@ -690,8 +690,10 @@ Eigen::VectorXd Problem::InteriorPoint(
           s_max;
 
       // Update variables needed in error estimate
-      A_e = autodiff::Jacobian(c_eAD, xAD);
-      A_i = autodiff::Jacobian(c_iAD, xAD);
+      if (status->problemType == frc::ProblemType::kNonlinear) {
+        A_e = autodiff::Jacobian(c_eAD, xAD);
+        A_i = autodiff::Jacobian(c_iAD, xAD);
+      }
       for (size_t row = 0; row < m_equalityConstraints.size(); row++) {
         c_e[row] = m_equalityConstraints[row].Value();
       }
