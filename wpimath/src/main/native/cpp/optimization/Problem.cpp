@@ -170,24 +170,24 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
                kExprTypeToName[static_cast<int>(status.problemType)]);
 
     if (m_f.has_value()) {
-      fmt::print("  * The cost function is {}.\n",
+      fmt::print("  * the cost function is {}\n",
                  kExprTypeToName[static_cast<int>(fType)]);
     } else {
-      fmt::print("  * There is no cost function.\n");
+      fmt::print("  * there is no cost function\n");
     }
 
     if (m_equalityConstraints.size() > 0) {
-      fmt::print("  * The equality constraints are {}.\n",
+      fmt::print("  * the equality constraints are {}\n",
                  kExprTypeToName[static_cast<int>(A_eType)]);
     } else {
-      fmt::print("  * There are no equality constraints.\n");
+      fmt::print("  * there are no equality constraints\n");
     }
 
     if (m_inequalityConstraints.size() > 0) {
-      fmt::print("  * The inequality constraints are {}.\n",
+      fmt::print("  * the inequality constraints are {}\n",
                  kExprTypeToName[static_cast<int>(A_iType)]);
     } else {
-      fmt::print("  * There are no inequality constraints.\n");
+      fmt::print("  * there are no inequality constraints\n");
     }
     fmt::print("\n");
   }
