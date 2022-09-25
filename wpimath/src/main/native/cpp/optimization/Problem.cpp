@@ -139,49 +139,18 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   }
 
   if (m_config.diagnostics) {
-    // Determine the problem type
-    frc::autodiff::ExpressionType problemType;
-    if (status.costFunctionType == autodiff::ExpressionType::kNone &&
-        status.equalityConstraintType == autodiff::ExpressionType::kNone &&
-        status.inequalityConstraintType == autodiff::ExpressionType::kNone) {
-      problemType = autodiff::ExpressionType::kNone;
-    } else if (status.costFunctionType <= autodiff::ExpressionType::kConstant &&
-               status.equalityConstraintType <=
-                   autodiff::ExpressionType::kConstant &&
-               status.inequalityConstraintType <=
-                   autodiff::ExpressionType::kConstant) {
-      problemType = autodiff::ExpressionType::kConstant;
-    } else if (status.costFunctionType <= autodiff::ExpressionType::kLinear &&
-               status.equalityConstraintType <=
-                   autodiff::ExpressionType::kLinear &&
-               status.inequalityConstraintType <=
-                   autodiff::ExpressionType::kLinear) {
-      problemType = autodiff::ExpressionType::kLinear;
-    } else if (status.costFunctionType ==
-                   autodiff::ExpressionType::kQuadratic &&
-               status.equalityConstraintType <=
-                   autodiff::ExpressionType::kLinear &&
-               status.inequalityConstraintType <=
-                   autodiff::ExpressionType::kLinear) {
-      problemType = autodiff::ExpressionType::kQuadratic;
-    } else {
-      problemType = autodiff::ExpressionType::kNonlinear;
-    }
-
-    fmt::print("The problem is {} because:\n",
-               kExprTypeToName[static_cast<int>(problemType)]);
-    fmt::print("  * the cost function is {}\n",
+    fmt::print("The cost function is {}.\n",
                kExprTypeToName[static_cast<int>(status.costFunctionType)]);
     fmt::print(
-        "  * the equality constraints are {}\n",
+        "The equality constraints are {}.\n",
         kExprTypeToName[static_cast<int>(status.equalityConstraintType)]);
     fmt::print(
-        "  * the inequality constraints are {}\n",
+        "The inequality constraints are {}.\n",
         kExprTypeToName[static_cast<int>(status.inequalityConstraintType)]);
     fmt::print("\n");
   }
 
-  // If the problem type is constant, there's nothing to do
+  // If the problem is empty or constant, there's nothing to do
   if (status.costFunctionType <= autodiff::ExpressionType::kConstant &&
       status.equalityConstraintType <= autodiff::ExpressionType::kConstant &&
       status.inequalityConstraintType <= autodiff::ExpressionType::kConstant) {
