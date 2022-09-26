@@ -36,6 +36,35 @@ double ToMilliseconds(const std::chrono::duration<Rep, Period>& duration) {
   return duration_cast<microseconds>(duration).count() / 1000.0;
 }
 
+namespace {
+/**
+ * Adds a sparse matrix to the list of triplets with the given row and column
+ * offset.
+ *
+ * @param[out] triplets The triplet storage.
+ * @param[in] rowOffset The row offset for each triplet.
+ * @param[in] colOffset The column offset for each triplet.
+ * @param[in] mat The matrix to iterate over.
+ * @param[in] transpose Whether to transpose mat.
+ */
+void AssignSparseBlock(std::vector<Eigen::Triplet<double>>& triplets,
+                       int rowOffset, int colOffset,
+                       const Eigen::SparseMatrix<double>& mat,
+                       bool transpose = false) {
+  for (int k = 0; k < mat.outerSize(); ++k) {
+    for (Eigen::SparseMatrix<double>::InnerIterator it{mat, k}; it; ++it) {
+      if (transpose) {
+        triplets.emplace_back(rowOffset + it.col(), colOffset + it.row(),
+                              it.value());
+      } else {
+        triplets.emplace_back(rowOffset + it.row(), colOffset + it.col(),
+                              it.value());
+      }
+    }
+  }
+}
+}  // namespace
+
 Problem::Problem() noexcept {
   m_decisionVariables.reserve(1024);
   m_equalityConstraints.reserve(1024);
@@ -584,18 +613,23 @@ Eigen::VectorXd Problem::InteriorPoint(
 
       // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
       //       [    Aₑ       0 ]
-      Eigen::SparseMatrix<double> lhsTop{H.rows(), H.cols() + A_e.rows()};
-      lhsTop.leftCols(H.cols()) = H;
+      triplets.clear();
+      Eigen::SparseMatrix<double> tmp = H;
       if (m_inequalityConstraints.size() > 0) {
-        lhsTop.leftCols(H.cols()) += A_i.transpose() * sigma * A_i;
+        tmp += A_i.transpose() * sigma * A_i;
       }
-      lhsTop.rightCols(A_e.rows()) = A_e.transpose();
-      Eigen::SparseMatrix<double> lhsBottom{A_e.rows(), H.cols() + A_e.rows()};
-      lhsBottom.leftCols(A_e.cols()) = A_e;
-      Eigen::SparseMatrix<double, Eigen::RowMajor> lhs{H.rows() + A_e.rows(),
-                                                       H.cols() + A_e.rows()};
-      lhs.topRows(lhsTop.rows()) = lhsTop;
-      lhs.bottomRows(lhsBottom.rows()) = lhsBottom;
+      // Assign top-left quadrant
+      AssignSparseBlock(triplets, 0, 0, tmp);
+      if (m_equalityConstraints.size() > 0) {
+        // Assign bottom-left quadrant
+        AssignSparseBlock(triplets, tmp.rows(), 0, A_e);
+
+        // Assign top-right quadrant
+        AssignSparseBlock(triplets, 0, tmp.rows(), A_e, true);
+      }
+      Eigen::SparseMatrix<double> lhs{H.rows() + A_e.rows(),
+                                      H.cols() + A_e.rows()};
+      lhs.setFromTriplets(triplets.begin(), triplets.end());
 
       if (status->costFunctionType > autodiff::ExpressionType::kLinear) {
         gradientF = autodiff::Gradient(m_f.value(), xAD);
@@ -617,8 +651,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       rhs.bottomRows(y.rows()) = c_e;
 
       // Regularize lhs by adding a multiple of the identity matrix
-      Eigen::SparseMatrix<double, Eigen::RowMajor> regularization{lhs.rows(),
-                                                                  lhs.cols()};
+      Eigen::SparseMatrix<double> regularization{lhs.rows(), lhs.cols()};
       regularization.setIdentity();
       regularization *= 1e-9;
       lhs += regularization;
