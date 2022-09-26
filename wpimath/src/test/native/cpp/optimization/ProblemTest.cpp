@@ -427,10 +427,7 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedWithCubicAndLine) {
       problem.SubjectTo(frc::pow(x - 1, 3) - y + 1 <= 0);
       problem.SubjectTo(x + y - 2 <= 0);
 
-      frc::SolverConfig config;
-      config.diagnostics = true;
-
-      auto status = problem.Solve(config);
+      auto status = problem.Solve();
       EXPECT_EQ(frc::autodiff::ExpressionType::kNonlinear,
                 status.costFunctionType);
       EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
@@ -461,10 +458,7 @@ TEST(ProblemTest, DISABLED_RosenbrockConstrainedToDisk) {
 
       problem.SubjectTo(frc::pow(x, 2) + frc::pow(y, 2) <= 2);
 
-      frc::SolverConfig config;
-      config.diagnostics = true;
-
-      auto status = problem.Solve(config);
+      auto status = problem.Solve();
       EXPECT_EQ(frc::autodiff::ExpressionType::kNonlinear,
                 status.costFunctionType);
       EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
