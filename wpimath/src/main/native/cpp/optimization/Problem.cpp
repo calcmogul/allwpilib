@@ -476,8 +476,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Aₑ(x) = [∇ᵀcₑ₂(x)ₖ]
   //         [    ⋮    ]
   //         [∇ᵀcₑₘ(x)ₖ]
-  Eigen::SparseMatrix<double> A_e(m_equalityConstraints.size(),
-                                  m_equalityConstraints.size());
+  Eigen::SparseMatrix<double> A_e(m_equalityConstraints.size(), xAD.rows());
   if (status->equalityConstraintType < autodiff::ExpressionType::kLinear) {
     // If the equality constraints are less than linear, the constraint Jacobian
     // is zero.
@@ -495,8 +494,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   // Aᵢ(x) = [∇ᵀcᵢ₂(x)ₖ]
   //         [    ⋮    ]
   //         [∇ᵀcᵢₘ(x)ₖ]
-  Eigen::SparseMatrix<double> A_i(m_inequalityConstraints.size(),
-                                  m_inequalityConstraints.size());
+  Eigen::SparseMatrix<double> A_i(m_inequalityConstraints.size(), xAD.rows());
   if (status->inequalityConstraintType < autodiff::ExpressionType::kLinear) {
     // If the inequality constraints are less than linear, the constraint
     // Jacobian is zero.
