@@ -796,7 +796,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       auto innerEndTime = std::chrono::system_clock::now();
 
       if (m_config.diagnostics) {
-        if (iterations % 25 == 0) {
+        if (iterations % 20 == 0) {
           fmt::print("iter  duration (ms)    error\n");
           fmt::print("==============================\n");
         }
