@@ -754,7 +754,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       // cᵢ⁺ is used instead of cᵢ⁻ from the paper to follow the convention that
       // feasible inequality constraints are ≥ 0.
       if (m_equalityConstraints.size() > 0 &&
-          (A_e.transpose() * c_e).norm() < 1e-2 && c_e.norm() > 1e-2) {
+          (A_e.transpose() * c_e).norm() < 1e-6 && c_e.norm() > 1e-6) {
         if (m_config.diagnostics) {
           fmt::print(
               "The problem is infeasible due to violated equality "
@@ -773,8 +773,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       }
       if (m_inequalityConstraints.size() > 0) {
         Eigen::VectorXd c_i_plus = c_i.cwiseMin(0.0);
-        if ((A_i.transpose() * c_i_plus).norm() < 1e-2 &&
-            c_i_plus.norm() > 1e-2) {
+        if ((A_i.transpose() * c_i_plus).norm() < 1e-6 &&
+            c_i_plus.norm() > 1e-6) {
           if (m_config.diagnostics) {
             fmt::print(
                 "The problem is infeasible due to violated inequality "
