@@ -221,7 +221,7 @@ void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
 double Problem::FractionToTheBoundaryRule(
     const Eigen::Ref<const Eigen::VectorXd>& x,
     const Eigen::Ref<const Eigen::VectorXd>& p, double tau) {
-  // αᵐᵃˣ = max{α ∈ (0, 1] : x + αp ≥ (1−τ)x}
+  // αᵐᵃˣ = max(α ∈ (0, 1] : x + αp ≥ (1−τ)x)
   double alpha = 1;
   for (int i = 0; i < x.rows(); ++i) {
     if (p(i) != 0.0) {
@@ -353,8 +353,8 @@ Eigen::VectorXd Problem::InteriorPoint(
   // where αₖᵐᵃˣ and αₖᶻ are computed via the fraction-to-the-boundary rule
   // shown in equations (15a) and (15b) of [2].
   //
-  //   αₖᵐᵃˣ = max{α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ}
-  //   αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
+  //   αₖᵐᵃˣ = max(α ∈ (0, 1] : xₖ + αpₖˣ ≥ (1−τⱼ)xₖ)
+  //   αₖᶻ = max(α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ)
   //
   // [1] Nocedal, J. and Wright, S. "Numerical Optimization", 2nd. ed., Ch. 19.
   //     Springer, 2006.
@@ -673,10 +673,10 @@ Eigen::VectorXd Problem::InteriorPoint(
       // pₖˢ = μZ⁻¹e − s − Σ⁻¹pₖᶻ
       Eigen::VectorXd p_s = mu * inverseZ * e - s - inverseSigma * p_z;
 
-      // αₖᵐᵃˣ = max{α ∈ (0, 1] : sₖ + αpₖˢ ≥ (1−τⱼ)sₖ}
+      // αₖᵐᵃˣ = max(α ∈ (0, 1] : sₖ + αpₖˢ ≥ (1−τⱼ)sₖ)
       double alpha_max = FractionToTheBoundaryRule(s, p_s, tau);
 
-      // αₖᶻ = max{α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ}
+      // αₖᶻ = max(α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ)
       double alpha_z = FractionToTheBoundaryRule(z, p_z, tau);
 
       // xₖ₊₁ = xₖ + αₖᵐᵃˣpₖˣ
@@ -692,7 +692,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       // barrier term Hessian" Σₖ does not deviate arbitrarily much from the
       // "primal Hessian" μⱼSₖ⁻². We ensure this by resetting
       //
-      //   zₖ₊₁⁽ⁱ⁾ = max{min{zₖ₊₁⁽ⁱ⁾, κ_Σ μⱼ/sₖ₊₁⁽ⁱ⁾}, μⱼ/(κ_Σ sₖ₊₁⁽ⁱ⁾)}
+      //   zₖ₊₁⁽ⁱ⁾ = max(min(zₖ₊₁⁽ⁱ⁾, κ_Σ μⱼ/sₖ₊₁⁽ⁱ⁾), μⱼ/(κ_Σ sₖ₊₁⁽ⁱ⁾))
       //
       // for some fixed κ_Σ ≥ 1 after each step. See equation (16) in [2].
       for (int row = 0; row < z.rows(); ++row) {
@@ -706,14 +706,14 @@ Eigen::VectorXd Problem::InteriorPoint(
       SetAD(zAD, z);
       L.Update();
 
-      // s_d = max{sₘₐₓ, (||y||₁ + ||z||₁) / (m + n)} / sₘₐₓ
+      // s_d = max(sₘₐₓ, (||y||₁ + ||z||₁) / (m + n)) / sₘₐₓ
       constexpr double s_max = 100.0;
       double s_d = std::max(s_max, (y.lpNorm<1>() + z.lpNorm<1>()) /
                                        (m_equalityConstraints.size() +
                                         m_inequalityConstraints.size())) /
                    s_max;
 
-      // s_c = max{sₘₐₓ, ||z||₁ / n} / sₘₐₓ
+      // s_c = max(sₘₐₓ, ||z||₁ / n) / sₘₐₓ
       double s_c =
           std::max(s_max, z.lpNorm<1>() / m_inequalityConstraints.size()) /
           s_max;
@@ -849,7 +849,7 @@ Eigen::VectorXd Problem::InteriorPoint(
 
     // Update the barrier parameter.
     //
-    //   μⱼ₊₁ = max{εₜₒₗ/10, min{κ_μ μⱼ, μⱼ^θ_μ}}
+    //   μⱼ₊₁ = max(εₜₒₗ/10, min(κ_μ μⱼ, μⱼ^θ_μ))
     //
     // See equation (7) in [2].
     mu = std::max(m_config.tolerance / 10.0,
@@ -857,7 +857,7 @@ Eigen::VectorXd Problem::InteriorPoint(
 
     // Update the fraction-to-the-boundary rule scaling factor.
     //
-    //   τⱼ = max{τₘᵢₙ, 1 − μⱼ}
+    //   τⱼ = max(τₘᵢₙ, 1 − μⱼ)
     //
     // See equation (8) in [2].
     tau = std::max(tau_min, 1.0 - mu);
