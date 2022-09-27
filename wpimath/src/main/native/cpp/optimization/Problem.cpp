@@ -25,18 +25,62 @@
 
 using namespace frc;
 
+namespace {
 /**
- * Converts std::chrono::duration to a number of milliseconds rounded to three
- * decimals.
+ * Assigns the contents of a double vector to an autodiff vector.
+ *
+ * @param dest The autodiff vector.
+ * @param src The double vector.
  */
-template <typename Rep, typename Period = std::ratio<1>>
-double ToMilliseconds(const std::chrono::duration<Rep, Period>& duration) {
-  using std::chrono::duration_cast;
-  using std::chrono::microseconds;
-  return duration_cast<microseconds>(duration).count() / 1000.0;
+void SetAD(std::vector<autodiff::Variable>& dest,
+           const Eigen::Ref<const Eigen::VectorXd>& src) {
+  assert(dest.size() == static_cast<size_t>(src.rows()));
+
+  for (size_t row = 0; row < dest.size(); ++row) {
+    dest[row] = src(row);
+  }
 }
 
-namespace {
+/**
+ * Assigns the contents of a double vector to an autodiff vector.
+ *
+ * @param dest The autodiff vector.
+ * @param src The double vector.
+ */
+void SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
+           const Eigen::Ref<const Eigen::VectorXd>& src) {
+  assert(dest.rows() == src.rows());
+
+  for (int row = 0; row < dest.rows(); ++row) {
+    dest(row) = src(row);
+  }
+}
+
+/**
+ * Applies fraction-to-the-boundary rule to a variable and its iterate, then
+ * returns a fraction of the iterate step size within (0, 1].
+ *
+ * @param x The variable.
+ * @param p The iterate on the variable.
+ * @param tau Fraction-to-the-boundary rule scaling factor.
+ * @return Fraction of the iterate step size within (0, 1].
+ */
+double FractionToTheBoundaryRule(const Eigen::Ref<const Eigen::VectorXd>& x,
+                                 const Eigen::Ref<const Eigen::VectorXd>& p,
+                                 double tau) {
+  // αᵐᵃˣ = max(α ∈ (0, 1] : x + αp ≥ (1−τ)x)
+  double alpha = 1;
+  for (int i = 0; i < x.rows(); ++i) {
+    if (p(i) != 0.0) {
+      while (alpha * p(i) < -tau * x(i)) {
+        alpha *= 0.999;
+      }
+    }
+  }
+
+  return alpha;
+}
+
 /**
  * Adds a sparse matrix to the list of triplets with the given row and column
  * offset.
@@ -62,6 +106,17 @@ void AssignSparseBlock(std::vector<Eigen::Triplet<double>>& triplets,
       }
     }
   }
+}
+
+/**
+ * Converts std::chrono::duration to a number of milliseconds rounded to three
+ * decimals.
+ */
+template <typename Rep, typename Period = std::ratio<1>>
+double ToMilliseconds(const std::chrono::duration<Rep, Period>& duration) {
+  using std::chrono::duration_cast;
+  using std::chrono::microseconds;
+  return duration_cast<microseconds>(duration).count() / 1000.0;
 }
 }  // namespace
 
@@ -198,40 +253,6 @@ SolverStatus Problem::Solve(const SolverConfig& config) {
   SetAD(m_decisionVariables, solution);
 
   return status;
-}
-
-void Problem::SetAD(std::vector<autodiff::Variable>& dest,
-                    const Eigen::Ref<const Eigen::VectorXd>& src) {
-  assert(dest.size() == static_cast<size_t>(src.rows()));
-
-  for (size_t row = 0; row < dest.size(); ++row) {
-    dest[row] = src(row);
-  }
-}
-
-void Problem::SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
-                    const Eigen::Ref<const Eigen::VectorXd>& src) {
-  assert(dest.rows() == src.rows());
-
-  for (int row = 0; row < dest.rows(); ++row) {
-    dest(row) = src(row);
-  }
-}
-
-double Problem::FractionToTheBoundaryRule(
-    const Eigen::Ref<const Eigen::VectorXd>& x,
-    const Eigen::Ref<const Eigen::VectorXd>& p, double tau) {
-  // αᵐᵃˣ = max(α ∈ (0, 1] : x + αp ≥ (1−τ)x)
-  double alpha = 1;
-  for (int i = 0; i < x.rows(); ++i) {
-    if (p(i) != 0.0) {
-      while (alpha * p(i) < -tau * x(i)) {
-        alpha *= 0.999;
-      }
-    }
-  }
-
-  return alpha;
 }
 
 Eigen::VectorXd Problem::InteriorPoint(
@@ -754,7 +775,7 @@ Eigen::VectorXd Problem::InteriorPoint(
       // cᵢ⁺ is used instead of cᵢ⁻ from the paper to follow the convention that
       // feasible inequality constraints are ≥ 0.
       if (m_equalityConstraints.size() > 0 &&
-          (A_e.transpose() * c_e).norm() < 1e-6 && c_e.norm() > 1e-6) {
+          (A_e.transpose() * c_e).norm() < 1e-6 && c_e.norm() > 1e-2) {
         if (m_config.diagnostics) {
           fmt::print(
               "The problem is infeasible due to violated equality "

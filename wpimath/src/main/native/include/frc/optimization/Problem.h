@@ -300,37 +300,6 @@ class WPILIB_DLLEXPORT Problem {
   SolverConfig m_config;
 
   /**
-   * Assigns the contents of a double vector to an autodiff vector.
-   *
-   * @param dest The autodiff vector.
-   * @param src The double vector.
-   */
-  static void SetAD(std::vector<autodiff::Variable>& dest,
-                    const Eigen::Ref<const Eigen::VectorXd>& src);
-
-  /**
-   * Assigns the contents of a double vector to an autodiff vector.
-   *
-   * @param dest The autodiff vector.
-   * @param src The double vector.
-   */
-  static void SetAD(Eigen::Ref<autodiff::VectorXvar> dest,
-                    const Eigen::Ref<const Eigen::VectorXd>& src);
-
-  /**
-   * Applies fraction-to-the-boundary rule to a variable and its iterate, then
-   * returns a fraction of the iterate step size within (0, 1].
-   *
-   * @param x The variable.
-   * @param p The iterate on the variable.
-   * @param tau Fraction-to-the-boundary rule scaling factor.
-   * @return Fraction of the iterate step size within (0, 1].
-   */
-  static double FractionToTheBoundaryRule(
-      const Eigen::Ref<const Eigen::VectorXd>& x,
-      const Eigen::Ref<const Eigen::VectorXd>& p, double tau);
-
-  /**
   Find the optimal solution to the nonlinear program using an interior-point
   solver.
 
