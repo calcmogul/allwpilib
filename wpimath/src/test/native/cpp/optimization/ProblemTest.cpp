@@ -477,7 +477,7 @@ TEST(ProblemTest, DoubleIntegratorMinimumTime) {
   auto start = std::chrono::system_clock::now();
 
   constexpr auto T = 3.5_s;
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
   constexpr int N = T / dt;
 
   constexpr double r = 2.0;
@@ -573,7 +573,7 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
   auto start = std::chrono::system_clock::now();
 
   constexpr auto T = 5_s;
-  constexpr auto dt = 5_ms;
+  constexpr units::second_t dt = 5_ms;
   constexpr int N = T / dt;
 
   // Flywheel model:
@@ -656,4 +656,29 @@ TEST(ProblemTest, FlywheelDirectTranscription) {
       x = A * x + B * u_ss;
     }
   }
+
+#if 0
+  std::ofstream states{"Flywheel states.csv"};
+  if (states.is_open()) {
+    states << "Time (s),Velocity (rad/s)\n";
+
+    for (int k = 0; k < N + 1; ++k) {
+      states << fmt::format("{},{}\n", k * units::second_t{dt}.value(),
+                            X.Value(0, k));
+    }
+  }
+
+  std::ofstream inputs{"Flywheel inputs.csv"};
+  if (inputs.is_open()) {
+    inputs << "Time (s),Voltage (V)\n";
+
+    for (int k = 0; k < N + 1; ++k) {
+      if (k < N) {
+        inputs << fmt::format("{},{}\n", k * dt.value(), U.Value(0, k));
+      } else {
+        inputs << fmt::format("{},{}\n", k * dt.value(), 0.0);
+      }
+    }
+  }
+#endif
 }
