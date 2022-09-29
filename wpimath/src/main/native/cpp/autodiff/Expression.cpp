@@ -30,9 +30,9 @@ Expression::Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
     : value{valueFunc(lhs->value, 0.0)},
       typeFunc{typeFunc},
       valueFunc{valueFunc},
-      gradientValueFuncs{std::array{lhsGradientValueFunc, BinaryFuncDouble{}}},
-      gradientFuncs{std::array{lhsGradientFunc, BinaryFuncExpr{}}},
-      args{std::array<wpi::IntrusiveSharedPtr<Expression>, 2>{lhs, nullptr}} {}
+      gradientValueFuncs{lhsGradientValueFunc, BinaryFuncDouble{}},
+      gradientFuncs{lhsGradientFunc, BinaryFuncExpr{}},
+      args{lhs, nullptr} {}
 
 Expression::Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
                        BinaryFuncDouble lhsGradientValueFunc,
@@ -45,10 +45,9 @@ Expression::Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
                       rhs != nullptr ? rhs->value : 0.0)},
       typeFunc{typeFunc},
       valueFunc{valueFunc},
-      gradientValueFuncs{
-          std::array{lhsGradientValueFunc, rhsGradientValueFunc}},
-      gradientFuncs{std::array{lhsGradientFunc, rhsGradientFunc}},
-      args{std::array<wpi::IntrusiveSharedPtr<Expression>, 2>{lhs, rhs}} {}
+      gradientValueFuncs{lhsGradientValueFunc, rhsGradientValueFunc},
+      gradientFuncs{lhsGradientFunc, rhsGradientFunc},
+      args{lhs, rhs} {}
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
     double lhs, const wpi::IntrusiveSharedPtr<Expression>& rhs) {
