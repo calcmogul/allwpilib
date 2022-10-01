@@ -14,7 +14,7 @@ using namespace frc::autodiff;
 
 Hessian::Hessian(Variable variable, Eigen::Ref<VectorXvar> wrt)
     : m_variable{std::move(variable)},
-      m_wrt{std::move(wrt)},
+      m_wrt{wrt},
       m_gradientTree{GenerateGradientTree(m_variable, m_wrt)} {}
 
 Eigen::SparseMatrix<double> Hessian::Calculate() {
