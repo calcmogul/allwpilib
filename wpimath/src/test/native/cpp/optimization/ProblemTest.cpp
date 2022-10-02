@@ -186,7 +186,7 @@ TEST(ProblemTest, NoCostUnconstrained) {
   }
 }
 
-TEST(ProblemTest, DISABLED_Linear) {
+TEST(ProblemTest, Linear) {
   frc::Problem problem;
 
   auto x = problem.DecisionVariable();
@@ -208,7 +208,7 @@ TEST(ProblemTest, DISABLED_Linear) {
 
   auto status = problem.Solve(config);
   EXPECT_EQ(frc::autodiff::ExpressionType::kLinear, status.costFunctionType);
-  EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
+  EXPECT_EQ(frc::autodiff::ExpressionType::kNone,
             status.equalityConstraintType);
   EXPECT_EQ(frc::autodiff::ExpressionType::kLinear,
             status.inequalityConstraintType);
