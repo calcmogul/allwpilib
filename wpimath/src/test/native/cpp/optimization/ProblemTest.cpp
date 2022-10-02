@@ -32,6 +32,10 @@ wpi::SmallVector<double> Range(double start, double end, double step) {
   return ret;
 }
 
+bool Near(double expected, double actual, double tolerance) {
+  return std::abs(expected - actual) < tolerance;
+}
+
 TEST(ProblemTest, EmptyProblem) {
   frc::Problem problem;
 
@@ -436,8 +440,14 @@ TEST(ProblemTest, DISABLED_RosenbrockWithCubicAndLineConstraint) {
                 status.inequalityConstraintType);
       EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
-      EXPECT_NEAR(1.0, x.Value(0), 1e-6);
-      EXPECT_NEAR(1.0, y.Value(0), 1e-6);
+      // Local minimum at (0.0, 0.0)
+      // Global minimum at (1.0, 1.0)
+      EXPECT_TRUE(Near(0.0, x.Value(0), 1e-2) || Near(1.0, x.Value(0), 1e-2))
+          << fmt::format("  (x₀, y₀) = ({}, {})\n", x0, y0)
+          << fmt::format("  x.Value(0) = {}", x.Value(0));
+      EXPECT_TRUE(Near(0.0, y.Value(0), 1e-2) || Near(1.0, y.Value(0), 1e-2))
+          << fmt::format("  (x₀, y₀) = ({}, {})\n", x0, y0)
+          << fmt::format("  y.Value(0) = {}", y.Value(0));
     }
   }
 }
