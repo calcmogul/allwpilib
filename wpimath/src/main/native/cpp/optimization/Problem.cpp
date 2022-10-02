@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cmath>
 #include <limits>
+#include <string>
 #include <vector>
 
 #include <fmt/core.h>
@@ -391,8 +392,6 @@ Eigen::VectorXd Problem::InteriorPoint(
                m_equalityConstraints.size());
     fmt::print("Number of inequality constraints: {}\n\n",
                m_inequalityConstraints.size());
-
-    fmt::print("Error tolerance: {}\n\n", m_config.tolerance);
   }
 
   // Barrier parameter scale factor κ_μ for tolerance checks
@@ -526,6 +525,36 @@ Eigen::VectorXd Problem::InteriorPoint(
     // If the inequality constraints are linear, initialize Aᵢ once here since
     // it's constant. Otherwise, initialization is delayed until the loop below.
     A_i = autodiff::Jacobian(c_iAD, xAD);
+  }
+
+  if (m_config.diagnostics) {
+    // Print number of nonzeros in Lagrangian Hessian and constraint Jacobians
+    std::string prints;
+
+    if (status->costFunctionType <= autodiff::ExpressionType::kQuadratic &&
+        status->equalityConstraintType <=
+            autodiff::ExpressionType::kQuadratic &&
+        status->inequalityConstraintType <=
+            autodiff::ExpressionType::kQuadratic) {
+      prints += fmt::format("Number of nonzeros in Lagrangian Hessian: {}\n",
+                            H.nonZeros());
+    }
+    if (status->equalityConstraintType <= autodiff::ExpressionType::kLinear) {
+      prints += fmt::format(
+          "Number of nonzeros in equality constraint Jacobian: {}\n",
+          A_e.nonZeros());
+    }
+    if (status->inequalityConstraintType <= autodiff::ExpressionType::kLinear) {
+      prints += fmt::format(
+          "Number of nonzeros in inequality constraint Jacobian: {}\n",
+          A_i.nonZeros());
+    }
+
+    if (prints.length() > 0) {
+      fmt::print("{}\n", prints);
+    }
+
+    fmt::print("Error tolerance: {}\n\n", m_config.tolerance);
   }
 
   // Equality constraints cₑ
