@@ -442,7 +442,7 @@ TEST(ProblemTest, DISABLED_RosenbrockWithCubicAndLineConstraint) {
   }
 }
 
-TEST(ProblemTest, DISABLED_RosenbrockWithDiskConstraint) {
+TEST(ProblemTest, RosenbrockWithDiskConstraint) {
   // https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_constrained_optimization
   for (auto x0 : Range(-1.5, 1.5, 0.1)) {
     for (auto y0 : Range(-1.5, 1.5, 0.1)) {
@@ -467,8 +467,12 @@ TEST(ProblemTest, DISABLED_RosenbrockWithDiskConstraint) {
                 status.inequalityConstraintType);
       EXPECT_EQ(frc::SolverExitCondition::kOk, status.exitCondition);
 
-      EXPECT_NEAR(1.0, x.Value(0), 1e-6);
-      EXPECT_NEAR(1.0, y.Value(0), 1e-6);
+      EXPECT_NEAR(1.0, x.Value(0), 1e-1)
+          << fmt::format("  (x₀, y₀) = ({}, {})\n", x0, y0)
+          << fmt::format("  x.Value(0) = {}", x.Value(0));
+      EXPECT_NEAR(1.0, y.Value(0), 1e-1)
+          << fmt::format("  (x₀, y₀) = ({}, {})\n", x0, y0)
+          << fmt::format("  x.Value(0) = {}", x.Value(0));
     }
   }
 }
