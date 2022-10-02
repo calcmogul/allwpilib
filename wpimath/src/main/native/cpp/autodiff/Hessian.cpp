@@ -101,3 +101,9 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
 
   return grad;
 }
+
+void Hessian::Update() {
+  for (int row = 0; row < m_gradientTree.rows(); ++row) {
+    m_gradientTree(row).Update();
+  }
+}

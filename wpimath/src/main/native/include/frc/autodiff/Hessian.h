@@ -33,6 +33,11 @@ class WPILIB_DLLEXPORT Hessian {
    */
   Eigen::SparseMatrix<double> Calculate();
 
+  /**
+   * Update the values of the gradient tree.
+   */
+  void Update();
+
  private:
   Variable m_variable;
   VectorXvar m_wrt;

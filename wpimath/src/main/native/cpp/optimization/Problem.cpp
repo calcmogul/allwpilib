@@ -451,8 +451,11 @@ Eigen::VectorXd Problem::InteriorPoint(
 
   Eigen::VectorXd step = Eigen::VectorXd::Zero(x.rows());
 
+  autodiff::Hessian hessian{L, xAD};
+
   SetAD(xAD, x);
   L.Update();
+  hessian.Update();
 
   // Error estimate E_μ
   double E_mu = std::numeric_limits<double>::infinity();
@@ -467,8 +470,6 @@ Eigen::VectorXd Problem::InteriorPoint(
     // it's constant. Otherwise, initialization is delayed until the loop below.
     gradientF = autodiff::Gradient(m_f.value(), xAD);
   }
-
-  autodiff::Hessian hessian{L, xAD};
 
   // Hessian of the Lagrangian H
   //
@@ -602,6 +603,7 @@ Eigen::VectorXd Problem::InteriorPoint(
           status->inequalityConstraintType >
               autodiff::ExpressionType::kLinear) {
         // Hₖ = ∇²ₓₓL(x, s, y, z)ₖ
+        hessian.Update();
         H = hessian.Calculate();
       }
 
