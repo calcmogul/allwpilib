@@ -458,7 +458,7 @@ Eigen::VectorXd Problem::InteriorPoint(
   double E_mu = std::numeric_limits<double>::infinity();
 
   // Gradient of f ∇f
-  Eigen::VectorXd gradientF{xAD.rows()};
+  Eigen::SparseVector<double> gradientF{xAD.rows()};
   if (status->costFunctionType == autodiff::ExpressionType::kConstant) {
     // If the cost function is constant, the gradient is zero.
     gradientF.setZero();

@@ -15,13 +15,14 @@ Eigen::SparseMatrix<double> Jacobian(Eigen::Ref<VectorXvar> variables,
                                      Eigen::Ref<VectorXvar> wrt) {
   Eigen::SparseMatrix<double> J{variables.rows(), wrt.rows()};
 
+  // Reserve triplet space for 1% sparsity
   std::vector<Eigen::Triplet<double>> triplets;
+  triplets.reserve(variables.rows() * wrt.rows() / 100);
+
   for (int row = 0; row < variables.rows(); ++row) {
-    Eigen::RowVectorXd g = Gradient(variables(row), wrt).transpose();
-    for (int col = 0; col < g.cols(); ++col) {
-      if (g(col) != 0.0) {
-        triplets.emplace_back(row, col, g(col));
-      }
+    Eigen::SparseVector<double> g = Gradient(variables(row), wrt);
+    for (decltype(g)::InnerIterator it{g}; it; ++it) {
+      triplets.emplace_back(row, it.index(), it.value());
     }
   }
   J.setFromTriplets(triplets.begin(), triplets.end());

@@ -46,7 +46,8 @@ double Gradient(Variable variable, Variable& wrt) {
   return wrt.expr->adjoint;
 }
 
-Eigen::VectorXd Gradient(Variable variable, Eigen::Ref<VectorXvar> wrt) {
+Eigen::SparseVector<double> Gradient(Variable variable,
+                                     Eigen::Ref<VectorXvar> wrt) {
   // Read wpimath/README.md#Reverse_accumulation_automatic_differentiation for
   // background on reverse accumulation automatic differentiation.
 
@@ -82,9 +83,12 @@ Eigen::VectorXd Gradient(Variable variable, Eigen::Ref<VectorXvar> wrt) {
     }
   }
 
-  Eigen::VectorXd grad{wrt.rows()};
+  Eigen::SparseVector<double> grad{wrt.rows()};
   for (int row = 0; row < wrt.rows(); ++row) {
-    grad(row) = wrt(row).expr->adjoint;
+    double adjoint = wrt(row).expr->adjoint;
+    if (adjoint != 0.0) {
+      grad.insertBack(row) = adjoint;
+    }
   }
 
   return grad;
