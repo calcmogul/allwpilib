@@ -17,12 +17,12 @@
 
 #include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
+#include "SimplicialLDLTPreconditioner.h"
 #include "frc/autodiff/Expression.h"
 #include "frc/autodiff/Gradient.h"
 #include "frc/autodiff/Hessian.h"
 #include "frc/autodiff/Jacobian.h"
 #include "frc/autodiff/Variable.h"
-#include "frc/optimization/SimplicialLDLTPreconditioner.h"
 #include "units/time.h"
 
 using namespace frc;
