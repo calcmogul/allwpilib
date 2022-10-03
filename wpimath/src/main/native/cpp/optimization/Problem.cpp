@@ -15,13 +15,14 @@
 #include <fmt/core.h>
 #include <wpi/scope>
 
-#include "Eigen/SparseCholesky"
+#include "Eigen/IterativeLinearSolvers"
 #include "Eigen/SparseCore"
 #include "frc/autodiff/Expression.h"
 #include "frc/autodiff/Gradient.h"
 #include "frc/autodiff/Hessian.h"
 #include "frc/autodiff/Jacobian.h"
 #include "frc/autodiff/Variable.h"
+#include "frc/optimization/SimplicialLDLTPreconditioner.h"
 #include "units/time.h"
 
 using namespace frc;
@@ -707,8 +708,9 @@ Eigen::VectorXd Problem::InteriorPoint(
       lhs += regularization;
 
       // Solve the Newton-KKT system
-      Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>,
-                            Eigen::Lower | Eigen::Upper>
+      Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
+                               Eigen::Lower | Eigen::Upper,
+                               SimplicialLDLTPreconditioner<double>>
           solver;
       solver.compute(lhs);
       step = solver.solve(-rhs);
