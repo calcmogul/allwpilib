@@ -76,7 +76,7 @@ class SimplicialLDLTPreconditioner {
   Eigen::ComputationInfo info() { return Eigen::Success; }
 
  protected:
-  Eigen::SimplicialLDLT<Matrix, Eigen::Lower | Eigen::Upper> m_decomp;
+  Eigen::SimplicialLDLT<Matrix> m_decomp;
   bool m_isInitialized = false;
 };
 
