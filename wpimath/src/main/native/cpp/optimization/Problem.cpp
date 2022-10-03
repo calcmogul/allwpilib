@@ -708,11 +708,12 @@ Eigen::VectorXd Problem::InteriorPoint(
       lhs += regularization;
 
       // Solve the Newton-KKT system
+      //
+      // https://en.wikipedia.org/wiki/Conjugate_gradient_method#The_preconditioned_conjugate_gradient_method
       Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
                                Eigen::Lower | Eigen::Upper,
                                SimplicialLDLTPreconditioner<double>>
-          solver;
-      solver.compute(lhs);
+          solver{lhs};
       step = solver.solve(-rhs);
 
       // step = [ pₖˣ]
