@@ -15,7 +15,7 @@
 #include <fmt/core.h>
 #include <wpi/scope>
 
-#include "Eigen/IterativeLinearSolvers"
+#include "Eigen/SparseCholesky"
 #include "Eigen/SparseCore"
 #include "frc/autodiff/Expression.h"
 #include "frc/autodiff/Gradient.h"
@@ -707,8 +707,8 @@ Eigen::VectorXd Problem::InteriorPoint(
       lhs += regularization;
 
       // Solve the Newton-KKT system
-      Eigen::ConjugateGradient<Eigen::SparseMatrix<double>,
-                               Eigen::Lower | Eigen::Upper>
+      Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>,
+                            Eigen::Lower | Eigen::Upper>
           solver;
       solver.compute(lhs);
       step = solver.solve(-rhs);
