@@ -69,10 +69,10 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
     }
 
     if (lhs != nullptr) {
-      stack.emplace_back(lhs, adjoint * var.expr->gradientFuncs[0](lhs, rhs));
+      stack.emplace_back(lhs, var.expr->gradientFuncs[0](lhs, rhs, adjoint));
 
       if (rhs != nullptr) {
-        stack.emplace_back(rhs, adjoint * var.expr->gradientFuncs[1](lhs, rhs));
+        stack.emplace_back(rhs, var.expr->gradientFuncs[1](lhs, rhs, adjoint));
       }
     }
   }

@@ -19,6 +19,7 @@ struct WPILIB_DLLEXPORT Expression {
   using BinaryFuncDouble = double (*)(double, double);
   using BinaryFuncExpr = wpi::IntrusiveSharedPtr<Expression> (*)(
       const wpi::IntrusiveSharedPtr<Expression>&,
+      const wpi::IntrusiveSharedPtr<Expression>&,
       const wpi::IntrusiveSharedPtr<Expression>&);
   using BinaryFuncType =
       ExpressionType (*)(const wpi::IntrusiveSharedPtr<Expression>&,
@@ -48,13 +49,16 @@ struct WPILIB_DLLEXPORT Expression {
   // Gradients with respect to each argument
   std::array<BinaryFuncExpr, 2> gradientFuncs{
       [](const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&) {
         return wpi::MakeIntrusiveShared<Expression>(0.0);
       },
       [](const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&) {
         return wpi::MakeIntrusiveShared<Expression>(0.0);
       }};
+
 
   // Expression arguments
   std::array<wpi::IntrusiveSharedPtr<Expression>, 2> args{nullptr, nullptr};

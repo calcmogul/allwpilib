@@ -107,9 +107,11 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
       [](double lhs, double rhs) { return rhs; },
       [](double lhs, double rhs) { return lhs; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) { return rhs; },
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) { return adjoint * rhs; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) { return lhs; },
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) { return adjoint * lhs; },
       lhs, rhs);
 }
 
@@ -146,10 +148,12 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
       [](double lhs, double rhs) { return 1.0 / rhs; },
       [](double lhs, double rhs) { return -lhs / (rhs * rhs); },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) { return 1.0 / rhs; },
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) { return adjoint / rhs; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return -lhs / (rhs * rhs);
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * -lhs / (rhs * rhs);
       },
       lhs, rhs);
 }
@@ -191,12 +195,14 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
       [](double lhs, double rhs) { return 1.0; },
       [](double lhs, double rhs) { return 1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return MakeConstant(1.0);
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint;
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return MakeConstant(1.0);
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint;
       },
       lhs, rhs);
 }
@@ -233,12 +239,14 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
       [](double lhs, double rhs) { return 1.0; },
       [](double lhs, double rhs) { return -1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return MakeConstant(1.0);
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint;
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return MakeConstant(-1.0);
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return -adjoint;
       },
       lhs, rhs);
 }
@@ -255,8 +263,9 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
       [](double lhs, double) { return -lhs; },
       [](double lhs, double rhs) { return -1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return MakeConstant(-1.0);
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return -adjoint;
       },
       lhs);
 }
@@ -273,8 +282,9 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
       [](double lhs, double) { return lhs; },
       [](double lhs, double rhs) { return 1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
-         const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return MakeConstant(1.0);
+         const wpi::IntrusiveSharedPtr<Expression>& rhs,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint;
       },
       lhs);
 }
@@ -324,13 +334,14 @@ wpi::IntrusiveSharedPtr<Expression> abs(  // NOLINT
         }
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
         if (x->value < 0.0) {
-          return wpi::MakeIntrusiveShared<Expression>(-1.0);
+          return adjoint * wpi::MakeIntrusiveShared<Expression>(-1.0);
         } else if (x->value > 0.0) {
-          return wpi::MakeIntrusiveShared<Expression>(1.0);
+          return adjoint * wpi::MakeIntrusiveShared<Expression>(1.0);
         } else {
-          return wpi::MakeIntrusiveShared<Expression>(0.0);
+          return adjoint * wpi::MakeIntrusiveShared<Expression>(0.0);
         }
       },
       x);
@@ -349,8 +360,9 @@ wpi::IntrusiveSharedPtr<Expression> acos(  // NOLINT
       [](double x, double) { return std::acos(x); },
       [](double x, double) { return -1.0 / std::sqrt(1.0 - x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return -1.0 / autodiff::sqrt(1.0 - x * x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return -adjoint / autodiff::sqrt(1.0 - x * x);
       },
       x);
 }
@@ -368,8 +380,9 @@ wpi::IntrusiveSharedPtr<Expression> asin(  // NOLINT
       [](double x, double) { return std::asin(x); },
       [](double x, double) { return 1.0 / std::sqrt(1.0 - x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return 1.0 / autodiff::sqrt(1.0 - x * x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint / autodiff::sqrt(1.0 - x * x);
       },
       x);
 }
@@ -387,8 +400,9 @@ wpi::IntrusiveSharedPtr<Expression> atan(  // NOLINT
       [](double x, double) { return std::atan(x); },
       [](double x, double) { return 1.0 / (1.0 + x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return 1.0 / (1.0 + x * x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint / (1.0 + x * x);
       },
       x);
 }
@@ -409,12 +423,14 @@ wpi::IntrusiveSharedPtr<Expression> atan2(  // NOLINT
       [](double y, double x) { return x / (y * y + x * x); },
       [](double y, double x) { return -y / (y * y + x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& y,
-         const wpi::IntrusiveSharedPtr<Expression>& x) {
-        return x / (y * y + x * x);
+         const wpi::IntrusiveSharedPtr<Expression>& x,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * x / (y * y + x * x);
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& y,
-         const wpi::IntrusiveSharedPtr<Expression>& x) {
-        return -y / (y * y + x * x);
+         const wpi::IntrusiveSharedPtr<Expression>& x,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * -y / (y * y + x * x);
       },
       y, x);
 }
@@ -432,8 +448,9 @@ wpi::IntrusiveSharedPtr<Expression> cos(  // NOLINT
       [](double x, double) { return std::cos(x); },
       [](double x, double) { return -std::sin(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return -autodiff::sin(x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * -autodiff::sin(x);
       },
       x);
 }
@@ -451,8 +468,9 @@ wpi::IntrusiveSharedPtr<Expression> cosh(  // NOLINT
       [](double x, double) { return std::cosh(x); },
       [](double x, double) { return std::sinh(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return autodiff::sinh(x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * autodiff::sinh(x);
       },
       x);
 }
@@ -473,8 +491,9 @@ wpi::IntrusiveSharedPtr<Expression> erf(  // NOLINT
       [](double x, double) { return std::erf(x); },
       [](double x, double) { return 2.0 / sqrt_pi * std::exp(-x * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return 2.0 / sqrt_pi * autodiff::exp(-x * x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * 2.0 / sqrt_pi * autodiff::exp(-x * x);
       },
       x);
 }
@@ -492,8 +511,9 @@ wpi::IntrusiveSharedPtr<Expression> exp(  // NOLINT
       [](double x, double) { return std::exp(x); },
       [](double x, double) { return std::exp(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return autodiff::exp(x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * autodiff::exp(x);
       },
       x);
 }
@@ -514,12 +534,14 @@ wpi::IntrusiveSharedPtr<Expression> hypot(  // NOLINT
       [](double x, double y) { return x / std::hypot(x, y); },
       [](double x, double y) { return y / std::hypot(x, y); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>& y) {
-        return x / autodiff::hypot(x, y);
+         const wpi::IntrusiveSharedPtr<Expression>& y,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * x / autodiff::hypot(x, y);
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>& y) {
-        return y / autodiff::hypot(x, y);
+         const wpi::IntrusiveSharedPtr<Expression>& y,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * y / autodiff::hypot(x, y);
       },
       x, y);
 }
@@ -537,7 +559,8 @@ wpi::IntrusiveSharedPtr<Expression> log(  // NOLINT
       [](double x, double) { return std::log(x); },
       [](double x, double) { return 1.0 / x; },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) { return 1.0 / x; },
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) { return adjoint / x; },
       x);
 }
 
@@ -556,8 +579,9 @@ wpi::IntrusiveSharedPtr<Expression> log10(  // NOLINT
       [](double x, double) { return std::log10(x); },
       [](double x, double) { return 1.0 / (ln10 * x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return 1.0 / (ln10 * x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint / (ln10 * x);
       },
       x);
 }
@@ -602,16 +626,18 @@ wpi::IntrusiveSharedPtr<Expression> pow(  // NOLINT
         }
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& base,
-         const wpi::IntrusiveSharedPtr<Expression>& power) {
-        return autodiff::pow(base, power - 1) * power;
+         const wpi::IntrusiveSharedPtr<Expression>& power,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * autodiff::pow(base, power - 1) * power;
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& base,
-         const wpi::IntrusiveSharedPtr<Expression>& power) {
+         const wpi::IntrusiveSharedPtr<Expression>& power,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
         // Since x * std::log(x) -> 0 as x -> 0
         if (base->value == 0.0) {
           return wpi::MakeIntrusiveShared<Expression>(0.0);
         } else {
-          return autodiff::pow(base, power - 1) * base * autodiff::log(base);
+          return adjoint * autodiff::pow(base, power - 1) * base * autodiff::log(base);
         }
       },
       base, power);
@@ -630,8 +656,9 @@ wpi::IntrusiveSharedPtr<Expression> sin(  // NOLINT
       [](double x, double) { return std::sin(x); },
       [](double x, double) { return std::cos(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return autodiff::cos(x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * autodiff::cos(x);
       },
       x);
 }
@@ -649,8 +676,9 @@ wpi::IntrusiveSharedPtr<Expression> sinh(
       [](double x, double) { return std::sinh(x); },
       [](double x, double) { return std::cosh(x); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return autodiff::cosh(x);
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint * autodiff::cosh(x);
       },
       x);
 }
@@ -668,8 +696,9 @@ wpi::IntrusiveSharedPtr<Expression> sqrt(  // NOLINT
       [](double x, double) { return std::sqrt(x); },
       [](double x, double) { return 1.0 / (2.0 * std::sqrt(x)); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return 1.0 / (2.0 * autodiff::sqrt(x));
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint / (2.0 * autodiff::sqrt(x));
       },
       x);
 }
@@ -687,8 +716,9 @@ wpi::IntrusiveSharedPtr<Expression> tan(  // NOLINT
       [](double x, double) { return std::tan(x); },
       [](double x, double) { return 1.0 / (std::cos(x) * std::cos(x)); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return 1.0 / (autodiff::cos(x) * autodiff::cos(x));
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint / (autodiff::cos(x) * autodiff::cos(x));
       },
       x);
 }
@@ -706,8 +736,9 @@ wpi::IntrusiveSharedPtr<Expression> tanh(
       [](double x, double) { return std::tanh(x); },
       [](double x, double) { return 1.0 / (std::cosh(x) * std::cosh(x)); },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
-         const wpi::IntrusiveSharedPtr<Expression>&) {
-        return 1.0 / (autodiff::cosh(x) * autodiff::cosh(x));
+         const wpi::IntrusiveSharedPtr<Expression>&,
+         const wpi::IntrusiveSharedPtr<Expression>& adjoint) {
+        return adjoint / (autodiff::cosh(x) * autodiff::cosh(x));
       },
       x);
 }
