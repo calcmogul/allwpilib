@@ -25,20 +25,20 @@ Expression::Expression(double value, ExpressionType type) : value{value} {
 
 Expression::Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
                        BinaryFuncDouble lhsGradientValueFunc,
-                       BinaryFuncExpr lhsGradientFunc,
+                       TrinaryFuncExpr lhsGradientFunc,
                        wpi::IntrusiveSharedPtr<Expression> lhs)
     : value{valueFunc(lhs->value, 0.0)},
       typeFunc{typeFunc},
       valueFunc{valueFunc},
       gradientValueFuncs{lhsGradientValueFunc, BinaryFuncDouble{}},
-      gradientFuncs{lhsGradientFunc, BinaryFuncExpr{}},
+      gradientFuncs{lhsGradientFunc, TrinaryFuncExpr{}},
       args{lhs, nullptr} {}
 
 Expression::Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
                        BinaryFuncDouble lhsGradientValueFunc,
                        BinaryFuncDouble rhsGradientValueFunc,
-                       BinaryFuncExpr lhsGradientFunc,
-                       BinaryFuncExpr rhsGradientFunc,
+                       TrinaryFuncExpr lhsGradientFunc,
+                       TrinaryFuncExpr rhsGradientFunc,
                        wpi::IntrusiveSharedPtr<Expression> lhs,
                        wpi::IntrusiveSharedPtr<Expression> rhs)
     : value{valueFunc(lhs != nullptr ? lhs->value : 0.0,

@@ -17,13 +17,13 @@ enum class ExpressionType { kNone, kConstant, kLinear, kQuadratic, kNonlinear };
 
 struct WPILIB_DLLEXPORT Expression {
   using BinaryFuncDouble = double (*)(double, double);
-  using BinaryFuncExpr = wpi::IntrusiveSharedPtr<Expression> (*)(
-      const wpi::IntrusiveSharedPtr<Expression>&,
-      const wpi::IntrusiveSharedPtr<Expression>&,
-      const wpi::IntrusiveSharedPtr<Expression>&);
   using BinaryFuncType =
       ExpressionType (*)(const wpi::IntrusiveSharedPtr<Expression>&,
                          const wpi::IntrusiveSharedPtr<Expression>&);
+  using TrinaryFuncExpr = wpi::IntrusiveSharedPtr<Expression> (*)(
+                        const wpi::IntrusiveSharedPtr<Expression>&,
+                        const wpi::IntrusiveSharedPtr<Expression>&,
+                        const wpi::IntrusiveSharedPtr<Expression>&);
 
   double value = 0.0;
 
@@ -47,18 +47,17 @@ struct WPILIB_DLLEXPORT Expression {
       [](double, double) { return 0.0; }, [](double, double) { return 0.0; }};
 
   // Gradients with respect to each argument
-  std::array<BinaryFuncExpr, 2> gradientFuncs{
+  std::array<TrinaryFuncExpr, 2> gradientFuncs{
       [](const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&) {
-        return wpi::MakeIntrusiveShared<Expression>(0.0);
+        return nullptr;
       },
       [](const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&) {
-        return wpi::MakeIntrusiveShared<Expression>(0.0);
+        return nullptr;
       }};
-
 
   // Expression arguments
   std::array<wpi::IntrusiveSharedPtr<Expression>, 2> args{nullptr, nullptr};
@@ -93,7 +92,7 @@ struct WPILIB_DLLEXPORT Expression {
    */
   Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
              BinaryFuncDouble lhsGradientValueFunc,
-             BinaryFuncExpr lhsGradientFunc,
+             TrinaryFuncExpr lhsGradientFunc,
              wpi::IntrusiveSharedPtr<Expression> lhs);
 
   /**
@@ -111,7 +110,7 @@ struct WPILIB_DLLEXPORT Expression {
   Expression(BinaryFuncType typeFunc, BinaryFuncDouble valueFunc,
              BinaryFuncDouble lhsGradientValueFunc,
              BinaryFuncDouble rhsGradientValueFunc,
-             BinaryFuncExpr lhsGradientFunc, BinaryFuncExpr rhsGradientFunc,
+             TrinaryFuncExpr lhsGradientFunc, TrinaryFuncExpr rhsGradientFunc,
              wpi::IntrusiveSharedPtr<Expression> lhs,
              wpi::IntrusiveSharedPtr<Expression> rhs);
 
