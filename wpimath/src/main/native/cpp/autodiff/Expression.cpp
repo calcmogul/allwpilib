@@ -56,6 +56,12 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
     const wpi::IntrusiveSharedPtr<Expression>& lhs, double rhs) {
+  if (rhs == 0.0) {
+    return nullptr;
+  } else if (rhs == 1.0) {
+    return lhs;
+  }
+
   return lhs * MakeConstant(rhs);
 }
 
@@ -109,6 +115,10 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
     double lhs, const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+  if (lhs == 0.0) {
+    return nullptr;
+  }
+
   return MakeConstant(lhs) / rhs;
 }
 
@@ -146,11 +156,19 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     double lhs, const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+  if (lhs == 0.0) {
+    return rhs;
+  }
+
   return MakeConstant(lhs) + rhs;
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     const wpi::IntrusiveSharedPtr<Expression>& lhs, double rhs) {
+  if (rhs == 0.0) {
+    return lhs;
+  }
+
   return lhs + MakeConstant(rhs);
 }
 
