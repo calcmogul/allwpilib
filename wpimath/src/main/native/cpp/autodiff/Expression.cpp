@@ -62,6 +62,26 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+  if (lhs == nullptr || rhs == nullptr) {
+    return nullptr;
+  }
+
+  if (lhs->Type() == ExpressionType::kConstant) {
+    if (lhs->value == 1.0) {
+      return rhs;
+    } else if (lhs->value == 0.0) {
+      return nullptr;
+    }
+  }
+
+  if (rhs->Type() == ExpressionType::kConstant) {
+    if (rhs->value == 1.0) {
+      return lhs;
+    } else if (rhs->value == 0.0) {
+      return nullptr;
+    }
+  }
+
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
@@ -100,6 +120,10 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+  if (lhs == nullptr) {
+    return nullptr;
+  }
+
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
@@ -133,6 +157,12 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+  if (lhs == nullptr) {
+    return rhs;
+  } else if (rhs == nullptr) {
+    return lhs;
+  }
+
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
@@ -144,11 +174,11 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
       [](double lhs, double rhs) { return 1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return wpi::MakeIntrusiveShared<Expression>(1.0);
+        return MakeConstant(1.0);
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return wpi::MakeIntrusiveShared<Expression>(1.0);
+        return MakeConstant(1.0);
       },
       lhs, rhs);
 }
@@ -165,6 +195,16 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
     const wpi::IntrusiveSharedPtr<Expression>& lhs,
     const wpi::IntrusiveSharedPtr<Expression>& rhs) {
+  if (lhs == nullptr) {
+    if (rhs != nullptr) {
+      return -rhs;
+    } else {
+      return nullptr;
+    }
+  } else if (rhs == nullptr) {
+    return lhs;
+  }
+
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
@@ -176,17 +216,21 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
       [](double lhs, double rhs) { return -1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return wpi::MakeIntrusiveShared<Expression>(1.0);
+        return MakeConstant(1.0);
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return wpi::MakeIntrusiveShared<Expression>(-1.0);
+        return MakeConstant(-1.0);
       },
       lhs, rhs);
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
     const wpi::IntrusiveSharedPtr<Expression>& lhs) {
+  if (lhs == nullptr) {
+    return nullptr;
+  }
+
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
@@ -194,13 +238,17 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
       [](double lhs, double rhs) { return -1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return wpi::MakeIntrusiveShared<Expression>(-1.0);
+        return MakeConstant(-1.0);
       },
       lhs);
 }
 
 WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
     const wpi::IntrusiveSharedPtr<Expression>& lhs) {
+  if (lhs == nullptr) {
+    return nullptr;
+  }
+
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
@@ -208,7 +256,7 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
       [](double lhs, double rhs) { return 1.0; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs) {
-        return wpi::MakeIntrusiveShared<Expression>(1.0);
+        return MakeConstant(1.0);
       },
       lhs);
 }

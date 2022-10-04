@@ -42,7 +42,8 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
   // background on reverse accumulation automatic differentiation.
 
   for (int row = 0; row < wrt.rows(); ++row) {
-    wrt(row).expr->adjointExpr = wpi::MakeIntrusiveShared<Expression>(0.0);
+    // Use nullptr as a sentinel for a constant 0 to avoid a node allocation
+    wrt(row).expr->adjointExpr = nullptr;
   }
 
   // Stack element contains variable and its adjoint
@@ -59,10 +60,12 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
     auto& lhs = var.expr->args[0];
     auto& rhs = var.expr->args[1];
 
-    if (var.expr->adjointExpr == nullptr) {
-      var.expr->adjointExpr = adjoint;
-    } else {
-      var.expr->adjointExpr = var.expr->adjointExpr + adjoint;
+    if (adjoint != nullptr) {
+      if (var.expr->adjointExpr == nullptr) {
+        var.expr->adjointExpr = adjoint;
+      } else {
+        var.expr->adjointExpr = var.expr->adjointExpr + adjoint;
+      }
     }
 
     if (lhs != nullptr) {
@@ -76,7 +79,10 @@ VectorXvar Hessian::GenerateGradientTree(Variable& variable, VectorXvar& wrt) {
 
   VectorXvar grad{wrt.rows()};
   for (int row = 0; row < wrt.rows(); ++row) {
-    grad(row) = Variable{wrt(row).expr->adjointExpr};
+    auto expr = wrt(row).expr;
+    if (expr != nullptr) {
+      grad(row) = Variable{expr->adjointExpr};
+    }
   }
 
   // Free adjoint storage that's no longer needed
