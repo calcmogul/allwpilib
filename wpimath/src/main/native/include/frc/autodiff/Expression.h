@@ -43,11 +43,27 @@ struct WPILIB_DLLEXPORT Expression {
   // used to update the node's value.
   BinaryFuncDouble valueFunc = [](double, double) { return 0.0; };
 
-  // Functions returning double adjoints of the children nodes.
+  
+  /// Functions returning double adjoints of the children nodes.
+  ///
+  /// Parameters:
+  /// <ul>
+  ///   <li>lhs: Left argument to binary operator.</li>
+  ///   <li>rhs: Right argument to binary operator.</li>
+  ///   <li>parentAdjoint: Adjoint of parent expression.</li>
+  /// </ul>
   std::array<TrinaryFuncDouble, 2> gradientValueFuncs{
       [](double, double, double) { return 0.0; }, [](double, double, double) { return 0.0; }};
 
-  // Functions returning Variable adjoints of the children nodes.
+
+  /// Functions returning Variable adjoints of the children nodes.
+  ///
+  /// Parameters:
+  /// <ul>
+  ///   <li>lhs: Left argument to binary operator.</li>
+  ///   <li>rhs: Right argument to binary operator.</li>
+  ///   <li>parentAdjoint: Adjoint of parent expression.</li>
+  /// </ul>
   std::array<TrinaryFuncExpr, 2> gradientFuncs{
       [](const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&,
