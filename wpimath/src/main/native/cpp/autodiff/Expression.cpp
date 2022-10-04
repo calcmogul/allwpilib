@@ -284,7 +284,7 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
       [](double lhs, double) { return -lhs; },
       [](double lhs, double, double parentAdjoint) {
-        return -parentAdjoint * lhs;
+        return -parentAdjoint;
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
@@ -305,7 +305,7 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
       [](double lhs, double) { return lhs; },
       [](double lhs, double, double parentAdjoint) {
-        return parentAdjoint * lhs;
+        return parentAdjoint;
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
@@ -367,7 +367,7 @@ wpi::IntrusiveSharedPtr<Expression> abs(  // NOLINT
         } else if (x->value > 0.0) {
           return parentAdjoint * wpi::MakeIntrusiveShared<Expression>(1.0);
         } else {
-          return MakeConstant(0.0);
+          return wpi::IntrusiveSharedPtr<Expression>{};
         }
       },
       x);
