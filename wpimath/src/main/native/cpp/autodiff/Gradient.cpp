@@ -36,9 +36,9 @@ double Gradient(Variable variable, Variable& wrt) {
             lhs, var.expr->gradientValueFuncs[0](lhs->value, 0.0, adjoint));
       } else {
         stack.emplace_back(lhs, var.expr->gradientValueFuncs[0](
-                                              lhs->value, rhs->value, adjoint));
+                                    lhs->value, rhs->value, adjoint));
         stack.emplace_back(rhs, var.expr->gradientValueFuncs[1](
-                                              lhs->value, rhs->value, adjoint));
+                                    lhs->value, rhs->value, adjoint));
       }
     }
   }
@@ -73,12 +73,12 @@ Eigen::SparseVector<double> Gradient(Variable variable,
     if (lhs != nullptr) {
       if (rhs == nullptr) {
         stack.emplace_back(
-            lhs, adjoint * var.expr->gradientValueFuncs[0](lhs->value, 0.0));
+            lhs, var.expr->gradientValueFuncs[0](lhs->value, 0.0, adjoint));
       } else {
-        stack.emplace_back(lhs, adjoint * var.expr->gradientValueFuncs[0](
-                                              lhs->value, rhs->value));
-        stack.emplace_back(rhs, adjoint * var.expr->gradientValueFuncs[1](
-                                              lhs->value, rhs->value));
+        stack.emplace_back(lhs, var.expr->gradientValueFuncs[0](
+                                    lhs->value, rhs->value, adjoint));
+        stack.emplace_back(rhs, var.expr->gradientValueFuncs[1](
+                                    lhs->value, rhs->value, adjoint));
       }
     }
   }

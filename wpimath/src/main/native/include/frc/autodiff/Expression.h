@@ -22,9 +22,9 @@ struct WPILIB_DLLEXPORT Expression {
   using BinaryFuncDouble = double (*)(double, double);
   using TrinaryFuncDouble = double (*)(double, double, double);
   using TrinaryFuncExpr = wpi::IntrusiveSharedPtr<Expression> (*)(
-                        const wpi::IntrusiveSharedPtr<Expression>&,
-                        const wpi::IntrusiveSharedPtr<Expression>&,
-                        const wpi::IntrusiveSharedPtr<Expression>&);
+      const wpi::IntrusiveSharedPtr<Expression>&,
+      const wpi::IntrusiveSharedPtr<Expression>&,
+      const wpi::IntrusiveSharedPtr<Expression>&);
 
   double value = 0.0;
 
@@ -43,7 +43,6 @@ struct WPILIB_DLLEXPORT Expression {
   // used to update the node's value.
   BinaryFuncDouble valueFunc = [](double, double) { return 0.0; };
 
-  
   /// Functions returning double adjoints of the children expressions.
   ///
   /// Parameters:
@@ -53,8 +52,8 @@ struct WPILIB_DLLEXPORT Expression {
   ///   <li>parentAdjoint: Adjoint of parent expression.</li>
   /// </ul>
   std::array<TrinaryFuncDouble, 2> gradientValueFuncs{
-      [](double, double, double) { return 0.0; }, [](double, double, double) { return 0.0; }};
-
+      [](double, double, double) { return 0.0; },
+      [](double, double, double) { return 0.0; }};
 
   /// Functions returning Variable adjoints of the children expressions.
   ///
@@ -68,12 +67,12 @@ struct WPILIB_DLLEXPORT Expression {
       [](const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&) {
-        return nullptr;
+        return wpi::IntrusiveSharedPtr<Expression>{};
       },
       [](const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>&) {
-        return nullptr;
+        return wpi::IntrusiveSharedPtr<Expression>{};
       }};
 
   // Expression arguments

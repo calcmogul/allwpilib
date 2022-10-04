@@ -104,14 +104,22 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator*(
         return ExpressionType::kNonlinear;
       },
       [](double lhs, double rhs) { return lhs * rhs; },
-      [](double lhs, double rhs, double parentAdjoint) { return parentAdjoint * rhs; },
-      [](double lhs, double rhs, double parentAdjoint) { return parentAdjoint * lhs; },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return parentAdjoint * rhs;
+      },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return parentAdjoint * lhs;
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
-         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) { return parentAdjoint * rhs; },
+         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
+        return parentAdjoint * rhs;
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
-         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) { return parentAdjoint * lhs; },
+         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
+        return parentAdjoint * lhs;
+      },
       lhs, rhs);
 }
 
@@ -145,11 +153,17 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator/(
         return ExpressionType::kNonlinear;
       },
       [](double lhs, double rhs) { return lhs / rhs; },
-      [](double lhs, double rhs, double parentAdjoint) { return parentAdjoint / rhs; },
-      [](double lhs, double rhs, double parentAdjoint) { return parentAdjoint * -lhs / (rhs * rhs); },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return parentAdjoint / rhs;
+      },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return parentAdjoint * -lhs / (rhs * rhs);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
-         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) { return parentAdjoint / rhs; },
+         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
+        return parentAdjoint / rhs;
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -192,8 +206,12 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
                                        static_cast<int>(rhs->Type()))};
       },
       [](double lhs, double rhs) { return lhs + rhs; },
-      [](double lhs, double rhs, double parentAdjoint) { return parentAdjoint; },
-      [](double lhs, double rhs, double parentAdjoint) { return parentAdjoint; },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return parentAdjoint;
+      },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return parentAdjoint;
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -236,8 +254,12 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
                                        static_cast<int>(rhs->Type()))};
       },
       [](double lhs, double rhs) { return lhs - rhs; },
-      [](double lhs, double rhs, double parentAdjoint) { return parentAdjoint; },
-      [](double lhs, double rhs, double parentAdjoint) { return -parentAdjoint; },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return parentAdjoint;
+      },
+      [](double lhs, double rhs, double parentAdjoint) {
+        return -parentAdjoint;
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -260,8 +282,10 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
-      [](double lhs, double, double parentAdjoint) { return -parentAdjoint * lhs; },
-      [](double, double, double parentAdjoint) { return -parentAdjoint; },
+      [](double lhs, double) { return -lhs; },
+      [](double lhs, double, double parentAdjoint) {
+        return -parentAdjoint * lhs;
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -279,8 +303,10 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
   return wpi::MakeIntrusiveShared<Expression>(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
-      [](double lhs, double, double parentAdjoint) { return parentAdjoint * lhs; },
-      [](double, double, double parentAdjoint) { return parentAdjoint; },
+      [](double lhs, double) { return lhs; },
+      [](double lhs, double, double parentAdjoint) {
+        return parentAdjoint * lhs;
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -358,7 +384,9 @@ wpi::IntrusiveSharedPtr<Expression> acos(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::acos(x); },
-      [](double x, double, double parentAdjoint) { return -parentAdjoint / std::sqrt(1.0 - x * x); },
+      [](double x, double, double parentAdjoint) {
+        return -parentAdjoint / std::sqrt(1.0 - x * x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -378,7 +406,9 @@ wpi::IntrusiveSharedPtr<Expression> asin(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::asin(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint / std::sqrt(1.0 - x * x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint / std::sqrt(1.0 - x * x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -398,7 +428,9 @@ wpi::IntrusiveSharedPtr<Expression> atan(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::atan(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint / (1.0 + x * x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint / (1.0 + x * x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -420,8 +452,12 @@ wpi::IntrusiveSharedPtr<Expression> atan2(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double y, double x) { return std::atan2(y, x); },
-      [](double y, double x, double parentAdjoint) { return parentAdjoint * x / (y * y + x * x); },
-      [](double y, double x, double parentAdjoint) { return parentAdjoint * -y / (y * y + x * x); },
+      [](double y, double x, double parentAdjoint) {
+        return parentAdjoint * x / (y * y + x * x);
+      },
+      [](double y, double x, double parentAdjoint) {
+        return parentAdjoint * -y / (y * y + x * x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& y,
          const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -446,7 +482,9 @@ wpi::IntrusiveSharedPtr<Expression> cos(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::cos(x); },
-      [](double x, double, double parentAdjoint) { return -parentAdjoint * std::sin(x); },
+      [](double x, double, double parentAdjoint) {
+        return -parentAdjoint * std::sin(x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -466,7 +504,9 @@ wpi::IntrusiveSharedPtr<Expression> cosh(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::cosh(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint * std::sinh(x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint * std::sinh(x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -489,7 +529,9 @@ wpi::IntrusiveSharedPtr<Expression> erf(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::erf(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint * 2.0 / sqrt_pi * std::exp(-x * x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint * 2.0 / sqrt_pi * std::exp(-x * x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -509,7 +551,9 @@ wpi::IntrusiveSharedPtr<Expression> exp(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::exp(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint * std::exp(x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint * std::exp(x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -531,8 +575,12 @@ wpi::IntrusiveSharedPtr<Expression> hypot(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double y) { return std::hypot(x, y); },
-      [](double x, double y, double parentAdjoint) { return parentAdjoint * x / std::hypot(x, y); },
-      [](double x, double y, double parentAdjoint) { return parentAdjoint * y / std::hypot(x, y); },
+      [](double x, double y, double parentAdjoint) {
+        return parentAdjoint * x / std::hypot(x, y);
+      },
+      [](double x, double y, double parentAdjoint) {
+        return parentAdjoint * y / std::hypot(x, y);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>& y,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -560,7 +608,9 @@ wpi::IntrusiveSharedPtr<Expression> log(  // NOLINT
       [](double x, double, double parentAdjoint) { return parentAdjoint / x; },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
-         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) { return parentAdjoint / x; },
+         const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
+        return parentAdjoint / x;
+      },
       x);
 }
 
@@ -577,7 +627,9 @@ wpi::IntrusiveSharedPtr<Expression> log10(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::log10(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint / (ln10 * x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint / (ln10 * x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -622,7 +674,8 @@ wpi::IntrusiveSharedPtr<Expression> pow(  // NOLINT
         if (base == 0.0) {
           return 0.0;
         } else {
-          return parentAdjoint * std::pow(base, power - 1) * base * std::log(base);
+          return parentAdjoint * std::pow(base, power - 1) * base *
+                 std::log(base);
         }
       },
       [](const wpi::IntrusiveSharedPtr<Expression>& base,
@@ -637,7 +690,8 @@ wpi::IntrusiveSharedPtr<Expression> pow(  // NOLINT
         if (base->value == 0.0) {
           return wpi::MakeIntrusiveShared<Expression>(0.0);
         } else {
-          return parentAdjoint * autodiff::pow(base, power - 1) * base * autodiff::log(base);
+          return parentAdjoint * autodiff::pow(base, power - 1) * base *
+                 autodiff::log(base);
         }
       },
       base, power);
@@ -654,7 +708,9 @@ wpi::IntrusiveSharedPtr<Expression> sin(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::sin(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint * std::cos(x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint * std::cos(x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -674,7 +730,9 @@ wpi::IntrusiveSharedPtr<Expression> sinh(
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::sinh(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint * std::cosh(x); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint * std::cosh(x);
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -694,7 +752,9 @@ wpi::IntrusiveSharedPtr<Expression> sqrt(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::sqrt(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint / (2.0 * std::sqrt(x)); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint / (2.0 * std::sqrt(x));
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -714,7 +774,9 @@ wpi::IntrusiveSharedPtr<Expression> tan(  // NOLINT
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::tan(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint / (std::cos(x) * std::cos(x)); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint / (std::cos(x) * std::cos(x));
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -734,7 +796,9 @@ wpi::IntrusiveSharedPtr<Expression> tanh(
         return ExpressionType::kNonlinear;
       },
       [](double x, double) { return std::tanh(x); },
-      [](double x, double, double parentAdjoint) { return parentAdjoint / (std::cosh(x) * std::cosh(x)); },
+      [](double x, double, double parentAdjoint) {
+        return parentAdjoint / (std::cosh(x) * std::cosh(x));
+      },
       [](const wpi::IntrusiveSharedPtr<Expression>& x,
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
