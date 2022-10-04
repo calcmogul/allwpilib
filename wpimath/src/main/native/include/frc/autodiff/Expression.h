@@ -44,7 +44,7 @@ struct WPILIB_DLLEXPORT Expression {
   BinaryFuncDouble valueFunc = [](double, double) { return 0.0; };
 
   
-  /// Functions returning double adjoints of the children nodes.
+  /// Functions returning double adjoints of the children expressions.
   ///
   /// Parameters:
   /// <ul>
@@ -56,7 +56,7 @@ struct WPILIB_DLLEXPORT Expression {
       [](double, double, double) { return 0.0; }, [](double, double, double) { return 0.0; }};
 
 
-  /// Functions returning Variable adjoints of the children nodes.
+  /// Functions returning Variable adjoints of the children expressions.
   ///
   /// Parameters:
   /// <ul>
