@@ -283,9 +283,7 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator-(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
       [](double lhs, double) { return -lhs; },
-      [](double lhs, double, double parentAdjoint) {
-        return -parentAdjoint;
-      },
+      [](double lhs, double, double parentAdjoint) { return -parentAdjoint; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -304,9 +302,7 @@ WPILIB_DLLEXPORT wpi::IntrusiveSharedPtr<Expression> operator+(
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>&) { return lhs->Type(); },
       [](double lhs, double) { return lhs; },
-      [](double lhs, double, double parentAdjoint) {
-        return parentAdjoint;
-      },
+      [](double lhs, double, double parentAdjoint) { return parentAdjoint; },
       [](const wpi::IntrusiveSharedPtr<Expression>& lhs,
          const wpi::IntrusiveSharedPtr<Expression>& rhs,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
@@ -363,9 +359,9 @@ wpi::IntrusiveSharedPtr<Expression> abs(  // NOLINT
          const wpi::IntrusiveSharedPtr<Expression>&,
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
         if (x->value < 0.0) {
-          return parentAdjoint * wpi::MakeIntrusiveShared<Expression>(-1.0);
+          return -parentAdjoint;
         } else if (x->value > 0.0) {
-          return parentAdjoint * wpi::MakeIntrusiveShared<Expression>(1.0);
+          return parentAdjoint;
         } else {
           return wpi::IntrusiveSharedPtr<Expression>{};
         }
@@ -688,7 +684,7 @@ wpi::IntrusiveSharedPtr<Expression> pow(  // NOLINT
          const wpi::IntrusiveSharedPtr<Expression>& parentAdjoint) {
         // Since x * std::log(x) -> 0 as x -> 0
         if (base->value == 0.0) {
-          return wpi::MakeIntrusiveShared<Expression>(0.0);
+          return wpi::IntrusiveSharedPtr<Expression>{};
         } else {
           return parentAdjoint * autodiff::pow(base, power - 1) * base *
                  autodiff::log(base);
