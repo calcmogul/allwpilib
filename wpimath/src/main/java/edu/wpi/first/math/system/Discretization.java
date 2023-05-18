@@ -66,6 +66,16 @@ public final class Discretization {
   /**
    * Discretizes the given continuous A and Q matrices.
    *
+   * <p>Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which is expensive),
+   * we take advantage of the structure of the block matrix of A and Q.
+   *
+   * <ul>
+   *   <li>eᴬᵀ, which is only N x N, is relatively cheap.
+   *   <li>The upper-right quarter of the 2N x 2N matrix, which we can approximate using a taylor
+   *       series to several terms and still be substantially cheaper than taking the big
+   *       exponential.
+   * </ul>
+   *
    * @param <States> Nat representing the number of states.
    * @param contA Continuous system matrix.
    * @param contQ Continuous process noise covariance matrix.
@@ -75,35 +85,58 @@ public final class Discretization {
   public static <States extends Num>
       Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQ(
           Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
-    int states = contA.getNumRows();
+    //       T
+    // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+    //       0
+    //
+    // M = [−A  Q ]
+    //     [ 0  Aᵀ]
+    // ϕ = eᴹᵀ = [−A_d  A_d⁻¹Q_d]
+    //           [ 0      A_dᵀ  ]
+    // ϕ₁₂ = A_d⁻¹Q_d
+    //
+    // Taylor series of ϕ:
+    //
+    //   ϕ = eᴹᵀ = I + MT + 1/2 M²T² + 1/6 M³T³ + …
+    //   ϕ = eᴹᵀ = I + MT + 1/2 T²M² + 1/6 T³M³ + …
+    //
+    // Taylor series of ϕ expanded for ϕ₁₂:
+    //
+    //   ϕ₁₂ = 0 + TM₁₂ + 1/2 T²M²₁₂ + 1/6 T³M³₁₂ + …
+    //
+    // M = [−A  Q ]
+    //     [ 0  Aᵀ]
+    //
+    // Let B = −A, C = Q, D = Aᵀ.
+    //
+    //   [E  F][B  C] = [EB  EC + FD]
+    //   [0  G][0  D]   [0     GD   ]
+    //                = [−EA  EQ + FAᵀ]
+    //                  [0       GD   ]
 
     // Make continuous Q symmetric if it isn't already
     Matrix<States, States> Q = contQ.plus(contQ.transpose()).div(2.0);
 
-    // M = [−A  Q ]
-    //     [ 0  Aᵀ]
-    final var M = new Matrix<>(new SimpleMatrix(2 * states, 2 * states));
-    M.assignBlock(0, 0, contA.times(-1.0));
-    M.assignBlock(0, states, Q);
-    M.assignBlock(states, 0, new Matrix<>(new SimpleMatrix(states, states)));
-    M.assignBlock(states, states, contA.transpose());
+    Matrix<States, States> F = Q;
+    Matrix<States, States> E = contA.times(-1);
 
-    // ϕ = eᴹᵀ = [−A_d  A_d⁻¹Q_d]
-    //           [ 0      A_dᵀ  ]
-    final var phi = M.times(dtSeconds).exp();
+    double coeff = dtSeconds;
+    Matrix<States, States> phi12 = new Matrix<>(new SimpleMatrix(Q.getNumRows(), Q.getNumCols()));
 
-    // ϕ₁₂ = A_d⁻¹Q_d
-    final Matrix<States, States> phi12 = phi.block(states, states, 0, states);
+    // i = 6 i.e. 5th order should be enough precision
+    for (int i = 1; i < 6; ++i) {
+      phi12 = phi12.plus(F.times(coeff));
 
-    // ϕ₂₂ = A_dᵀ
-    final Matrix<States, States> phi22 = phi.block(states, states, states, states);
+      F = E.times(Q).plus(F.times(contA.transpose()));
+      E = E.times(contA.times(-1));
+      coeff *= dtSeconds / (double) (i + 1);
+    }
 
-    final var discA = phi22.transpose();
-
+    var discA = discretizeA(contA, dtSeconds);
     Q = discA.times(phi12);
 
-    // Make discrete Q symmetric if it isn't already
-    final var discQ = Q.plus(Q.transpose()).div(2.0);
+    // Make Q symmetric if it isn't already
+    var discQ = Q.plus(Q.transpose()).div(2.0);
 
     return new Pair<>(discA, discQ);
   }

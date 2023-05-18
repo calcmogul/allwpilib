@@ -11,6 +11,7 @@
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/RungeKuttaTimeVarying.h"
+#include "unsupported/Eigen/MatrixFunctions"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
@@ -32,22 +33,42 @@ TEST(DiscretizationTest, DiscretizeA) {
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
 TEST(DiscretizationTest, DiscretizeAB) {
-  frc::Matrixd<2, 2> contA{{0, 1}, {0, 0}};
-  frc::Matrixd<2, 1> contB{0, 1};
+  constexpr double T = units::second_t{50_ms}.value();
 
-  frc::Vectord<2> x0{1, 1};
-  frc::Vectord<1> u{1};
-  frc::Matrixd<2, 2> discA;
-  frc::Matrixd<2, 1> discB;
+  {
+    frc::Matrixd<2, 2> contA{{0, 1}, {0, 0}};
+    frc::Matrixd<2, 1> contB{0, 1};
 
-  frc::DiscretizeAB<2, 1>(contA, contB, 1_s, &discA, &discB);
-  frc::Vectord<2> x1Discrete = discA * x0 + discB * u;
+    frc::Matrixd<2, 2> discA;
+    frc::Matrixd<2, 1> discB;
+    frc::DiscretizeAB<2, 1>(contA, contB, units::second_t{T}, &discA, &discB);
 
-  // We now have pos = vel = accel = 1, which should give us:
-  frc::Vectord<2> x1Truth{1.0 * x0(0) + 1.0 * x0(1) + 0.5 * u(0),
-                          0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0)};
+    EXPECT_EQ((frc::Matrixd<2, 2>{{1, T}, {0, 1}}), discA);
+    EXPECT_EQ((frc::Matrixd<2, 1>{{0.5 * T * T}, {T}}), discB);
+  }
 
-  EXPECT_EQ(x1Truth, x1Discrete);
+  {
+    constexpr double Kv = 0.2;
+    constexpr double Ka = 0.3;
+    frc::Matrixd<2, 2> contA{{0, 1}, {0, -Kv / Ka}};
+    frc::Matrixd<2, 1> contB{0, 1 / Ka};
+
+    frc::Matrixd<2, 2> discA;
+    frc::Matrixd<2, 1> discB;
+    frc::DiscretizeAB<2, 1>(contA, contB, units::second_t{T}, &discA, &discB);
+
+    Eigen::Matrix<double, 3, 3> M;
+    M.block<2, 2>(0, 0) = contA;
+    M.block<2, 1>(0, 2) = contB;
+    M.block<1, 3>(2, 0).setZero();
+    Eigen::Matrix<double, 3, 3> phi = M.exp();
+
+    frc::Matrixd<2, 2> expectedDiscA = phi.block<2, 2>(0, 0);
+    EXPECT_EQ(expectedDiscA, discA);
+
+    frc::Matrixd<2, 1> expectedDiscB = phi.block<2, 1>(0, 2);
+    EXPECT_EQ(expectedDiscB, discB);
+  }
 }
 
 //                                               T
@@ -113,6 +134,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
       << discQ << "\ndiscQIntegrated:\n"
       << discQIntegrated;
 }
+
+// TODO: Add state-space elevator example's Q with gear ratio of 16
 
 // Test that DiscretizeR() works
 TEST(DiscretizationTest, DiscretizeR) {
