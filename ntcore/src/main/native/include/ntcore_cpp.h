@@ -17,6 +17,8 @@
 #include <variant>
 #include <vector>
 
+#include <glaze/json.hpp>
+
 #include "networktables/NetworkTableValue.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp_types.h"
@@ -103,7 +105,7 @@ struct TopicInfo {
   std::string properties;
 
   /** Get topic properties as a JSON object. */
-  wpi::json GetProperties() const;
+  glz::json_t GetProperties() const;
 
   friend void swap(TopicInfo& first, TopicInfo& second) {
     using std::swap;
@@ -695,7 +697,7 @@ bool GetTopicExists(NT_Handle handle);
  * @param name property name
  * @return JSON object; null object if the property does not exist.
  */
-wpi::json GetTopicProperty(NT_Topic topic, std::string_view name);
+glz::json_t GetTopicProperty(NT_Topic topic, std::string_view name);
 
 /**
  * Sets a property value.
@@ -705,7 +707,7 @@ wpi::json GetTopicProperty(NT_Topic topic, std::string_view name);
  * @param value property value
  */
 void SetTopicProperty(NT_Topic topic, std::string_view name,
-                      const wpi::json& value);
+                      const glz::json_t& value);
 
 /**
  * Deletes a property.  Has no effect if the property does not exist.
@@ -722,7 +724,7 @@ void DeleteTopicProperty(NT_Topic topic, std::string_view name);
  * @param topic topic handle
  * @return JSON object
  */
-wpi::json GetTopicProperties(NT_Topic topic);
+glz::json_t GetTopicProperties(NT_Topic topic);
 
 /**
  * Updates multiple topic properties.  Each key in the passed-in object is
@@ -734,7 +736,7 @@ wpi::json GetTopicProperties(NT_Topic topic);
  * @param update JSON object with keys to add/update/delete
  * @return False if update is not a JSON object
  */
-bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
+bool SetTopicProperties(NT_Topic topic, const glz::json_t& update);
 
 /**
  * Creates a new subscriber to value changes on a topic.
@@ -778,7 +780,7 @@ NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
  * @return Publisher handle
  */
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                       const wpi::json& properties,
+                       const glz::json_t& properties,
                        const PubSubOptions& options = kDefaultPubSubOptions);
 
 /**

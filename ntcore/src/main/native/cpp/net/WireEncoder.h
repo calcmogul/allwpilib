@@ -27,10 +27,10 @@ struct ServerMessage;
 // encoders for client text messages (avoids need to construct a Message struct)
 void WireEncodePublish(wpi::raw_ostream& os, int64_t pubuid,
                        std::string_view name, std::string_view typeStr,
-                       const wpi::json& properties);
+                       const glz::json_t& properties);
 void WireEncodeUnpublish(wpi::raw_ostream& os, int64_t pubuid);
 void WireEncodeSetProperties(wpi::raw_ostream& os, std::string_view name,
-                             const wpi::json& update);
+                             const glz::json_t& update);
 void WireEncodeSubscribe(wpi::raw_ostream& os, int64_t subuid,
                          std::span<const std::string_view> topicNames,
                          const PubSubOptionsImpl& options);
@@ -41,12 +41,12 @@ void WireEncodeUnsubscribe(wpi::raw_ostream& os, int64_t subuid);
 
 // encoders for server text messages (avoids need to construct a Message struct)
 void WireEncodeAnnounce(wpi::raw_ostream& os, std::string_view name, int64_t id,
-                        std::string_view typeStr, const wpi::json& properties,
+                        std::string_view typeStr, const glz::json_t& properties,
                         std::optional<int64_t> pubuid);
 void WireEncodeUnannounce(wpi::raw_ostream& os, std::string_view name,
                           int64_t id);
 void WireEncodePropertiesUpdate(wpi::raw_ostream& os, std::string_view name,
-                                const wpi::json& update, bool ack);
+                                const glz::json_t& update, bool ack);
 
 // Encode a single message; note text messages must be put into a
 // JSON array "[msg1, msg2]" for transmission.

@@ -5,15 +5,12 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <glaze/json.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -190,10 +187,26 @@ class WPILIB_DLLEXPORT Rotation3d {
   Quaternion m_q;
 };
 
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Rotation3d& rotation);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Rotation3d& rotation);
-
 }  // namespace frc
+
+namespace glz::detail {
+
+template <>
+struct from_json<frc::Rotation3d> {
+  template <auto Opts>
+  static void op(frc::Rotation3d& value, auto&&... args) {
+    frc::Quaternion q;
+    read<json>::op<Opts>(q, args...);
+    value = frc::Rotation3d{q};
+  }
+};
+
+template <>
+struct to_json<frc::Rotation3d> {
+  template <auto Opts>
+  static void op(const frc::Rotation3d& value, auto&&... args) noexcept {
+    write<json>::op<Opts>(value.GetQuaternion(), args...);
+  }
+};
+
+}  // namespace glz::detail

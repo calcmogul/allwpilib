@@ -4,8 +4,6 @@
 
 #include "frc/geometry/Translation3d.h"
 
-#include <wpi/json.h>
-
 #include "units/length.h"
 #include "units/math.h"
 
@@ -39,16 +37,4 @@ bool Translation3d::operator==(const Translation3d& other) const {
   return units::math::abs(m_x - other.m_x) < 1E-9_m &&
          units::math::abs(m_y - other.m_y) < 1E-9_m &&
          units::math::abs(m_z - other.m_z) < 1E-9_m;
-}
-
-void frc::to_json(wpi::json& json, const Translation3d& translation) {
-  json = wpi::json{{"x", translation.X().value()},
-                   {"y", translation.Y().value()},
-                   {"z", translation.Z().value()}};
-}
-
-void frc::from_json(const wpi::json& json, Translation3d& translation) {
-  translation = Translation3d{units::meter_t{json.at("x").get<double>()},
-                              units::meter_t{json.at("y").get<double>()},
-                              units::meter_t{json.at("z").get<double>()}};
 }

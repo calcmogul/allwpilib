@@ -359,7 +359,7 @@ class UnitTopic final : public Topic {
    */
   [[nodiscard]]
   PublisherType PublishEx(std::string_view typeString,
-                          const wpi::json& properties,
+                          const glz::json_t& properties,
                           const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**

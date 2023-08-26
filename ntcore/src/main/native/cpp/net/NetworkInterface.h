@@ -8,6 +8,8 @@
 #include <string>
 #include <string_view>
 
+#include <glaze/json.hpp>
+
 #include "ntcore_cpp.h"
 
 namespace wpi {
@@ -27,11 +29,11 @@ class LocalInterface {
 
   virtual NT_Topic NetworkAnnounce(std::string_view name,
                                    std::string_view typeStr,
-                                   const wpi::json& properties,
+                                   const glz::json_t& properties,
                                    NT_Publisher pubHandle) = 0;
   virtual void NetworkUnannounce(std::string_view name) = 0;
   virtual void NetworkPropertiesUpdate(std::string_view name,
-                                       const wpi::json& update, bool ack) = 0;
+                                       const glz::json_t& update, bool ack) = 0;
   virtual void NetworkSetValue(NT_Topic topicHandle, const Value& value) = 0;
 };
 
@@ -41,11 +43,11 @@ class NetworkInterface {
 
   virtual void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                        std::string_view name, std::string_view typeStr,
-                       const wpi::json& properties,
+                       const glz::json_t& properties,
                        const PubSubOptionsImpl& options) = 0;
   virtual void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) = 0;
   virtual void SetProperties(NT_Topic topicHandle, std::string_view name,
-                             const wpi::json& update) = 0;
+                             const glz::json_t& update) = 0;
   virtual void Subscribe(NT_Subscriber subHandle,
                          std::span<const std::string> topicNames,
                          const PubSubOptionsImpl& options) = 0;

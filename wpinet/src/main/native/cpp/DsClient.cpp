@@ -5,10 +5,11 @@
 #include "wpinet/DsClient.h"
 
 #include <fmt/format.h>
+#include <glaze/json.hpp>
 #include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
-#include <wpi/json.h>
 
+#include "glaze/util/expected.hpp"
 #include "wpinet/uv/Tcp.h"
 #include "wpinet/uv/Timer.h"
 
@@ -48,7 +49,7 @@ void DsClient::Close() {
 void DsClient::Connect() {
   auto connreq = std::make_shared<uv::TcpConnectReq>();
   connreq->connected.connect([this] {
-    m_json.clear();
+    m_jsonBuffer.clear();
     m_tcp->StopRead();
     m_tcp->StartRead();
   });
@@ -67,7 +68,7 @@ void DsClient::HandleIncoming(std::string_view in) {
   // this is very bare-bones, as there are never nested {} in these messages
   while (!in.empty()) {
     // if json is empty, look for the first { (and discard)
-    if (m_json.empty()) {
+    if (m_jsonBuffer.empty()) {
       auto start = in.find('{');
       in = wpi::slice(in, start, std::string_view::npos);
     }
@@ -75,36 +76,36 @@ void DsClient::HandleIncoming(std::string_view in) {
     // look for the terminating } (and save)
     auto end = in.find('}');
     if (end == std::string_view::npos) {
-      m_json.append(in);
+      m_jsonBuffer.append(in);
       return;  // nothing left to read
     }
 
     // have complete json message
     ++end;
-    m_json.append(wpi::slice(in, 0, end));
+    m_jsonBuffer.append(wpi::slice(in, 0, end));
     in = wpi::slice(in, end, std::string_view::npos);
     ParseJson();
-    m_json.clear();
+    m_jsonBuffer.clear();
   }
 }
 
 void DsClient::ParseJson() {
-  WPI_DEBUG4(m_logger, "DsClient JSON: {}", m_json);
-  unsigned int ip = 0;
-  try {
-    ip = wpi::json::parse(m_json).at("robotIP").get<unsigned int>();
-  } catch (wpi::json::exception& e) {
-    WPI_INFO(m_logger, "DsClient JSON error: {}", e.what());
-    return;
-  }
-
-  if (ip == 0) {
-    clearIp();
+  WPI_DEBUG4(m_logger, "DsClient JSON: {}", m_jsonBuffer);
+  if (auto json = glz::read_json<glz::json_t>(m_jsonBuffer); json.has_value()) {
+    uint32_t robotIP = json.value()["robotIP"].get<double>();
+    if (robotIP == 0) {
+      clearIp();
+    } else {
+      // Convert number into dotted quad
+      auto newip = fmt::format("{}.{}.{}.{}", (robotIP >> 24) & 0xff,
+                               (robotIP >> 16) & 0xff, (robotIP >> 8) & 0xff,
+                               robotIP & 0xff);
+      WPI_INFO(m_logger, "DS received server IP: {}", newip);
+      setIp(newip);
+    }
   } else {
-    // Convert number into dotted quad
-    auto newip = fmt::format("{}.{}.{}.{}", (ip >> 24) & 0xff,
-                             (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff);
-    WPI_INFO(m_logger, "DS received server IP: {}", newip);
-    setIp(newip);
+    WPI_INFO(m_logger, "DsClient JSON error: {}",
+             static_cast<uint32_t>(json.error().ec));
+    return;
   }
 }

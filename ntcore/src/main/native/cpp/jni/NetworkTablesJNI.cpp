@@ -7,9 +7,9 @@
 #include <cassert>
 
 #include <fmt/format.h>
+#include <glaze/json.hpp>
 #include <wpi/ConvertUTF.h>
 #include <wpi/jni_util.h>
-#include <wpi/json.h>
 
 #include "edu_wpi_first_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
@@ -717,10 +717,10 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperty
   (JNIEnv* env, jclass, jint topic, jstring name, jstring value)
 {
-  wpi::json j;
+  glz::json_t j;
   try {
-    j = wpi::json::parse(JStringRef{env, value});
-  } catch (wpi::json::parse_error& err) {
+    j = glz::json_t::parse(JStringRef{env, value});
+  } catch (glz::json_t::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse value JSON: {}", err.what()));
     return;
@@ -761,10 +761,10 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
   (JNIEnv* env, jclass, jint topic, jstring properties)
 {
-  wpi::json j;
+  glz::json_t j;
   try {
-    j = wpi::json::parse(JStringRef{env, properties});
-  } catch (wpi::json::parse_error& err) {
+    j = glz::json_t::parse(JStringRef{env, properties});
+  } catch (glz::json_t::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse properties JSON: {}", err.what()));
     return;
@@ -826,10 +826,10 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
   (JNIEnv* env, jclass, jint topic, jint type, jstring typeStr,
    jstring properties, jobject options)
 {
-  wpi::json j;
+  glz::json_t j;
   try {
-    j = wpi::json::parse(JStringRef{env, properties});
-  } catch (wpi::json::parse_error& err) {
+    j = glz::json_t::parse(JStringRef{env, properties});
+  } catch (glz::json_t::parse_error& err) {
     illegalArgEx.Throw(
         env, fmt::format("could not parse properties JSON: {}", err.what()));
     return 0;

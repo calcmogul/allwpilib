@@ -5,11 +5,8 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <glaze/json.hpp>
 #include <wpi/SymbolExports.h>
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -90,10 +87,37 @@ class WPILIB_DLLEXPORT Quaternion {
   Eigen::Vector3d m_v{0.0, 0.0, 0.0};
 };
 
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Quaternion& quaternion);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Quaternion& quaternion);
-
 }  // namespace frc
+
+namespace glz::detail {
+
+template <>
+struct from_json<frc::Quaternion> {
+  template <auto Opts>
+  static void op(frc::Quaternion& value, auto&&... args) {
+    double w;
+    double x;
+    double y;
+    double z;
+
+    read<json>::op<Opts>(w, args...);
+    read<json>::op<Opts>(x, args...);
+    read<json>::op<Opts>(y, args...);
+    read<json>::op<Opts>(z, args...);
+
+    value = frc::Quaternion{w, x, y, z};
+  }
+};
+
+template <>
+struct to_json<frc::Quaternion> {
+  template <auto Opts>
+  static void op(const frc::Quaternion& value, auto&&... args) noexcept {
+    write<json>::op<Opts>(value.W(), args...);
+    write<json>::op<Opts>(value.X(), args...);
+    write<json>::op<Opts>(value.Y(), args...);
+    write<json>::op<Opts>(value.Z(), args...);
+  }
+};
+
+}  // namespace glz::detail

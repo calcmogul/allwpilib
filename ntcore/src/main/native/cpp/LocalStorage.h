@@ -14,10 +14,10 @@
 #include <utility>
 #include <vector>
 
+#include <glaze/json.hpp>
 #include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
 #include <wpi/Synchronization.h>
-#include <wpi/json.h>
 #include <wpi/mutex.h>
 
 #include "Handle.h"
@@ -47,10 +47,10 @@ class LocalStorage final : public net::ILocalStorage {
 
   // network interface functions
   NT_Topic NetworkAnnounce(std::string_view name, std::string_view typeStr,
-                           const wpi::json& properties,
+                           const glz::json_t& properties,
                            NT_Publisher pubHandle) final;
   void NetworkUnannounce(std::string_view name) final;
-  void NetworkPropertiesUpdate(std::string_view name, const wpi::json& update,
+  void NetworkPropertiesUpdate(std::string_view name, const glz::json_t& update,
                                bool ack) final;
   void NetworkSetValue(NT_Topic topicHandle, const Value& value) final;
 
@@ -142,30 +142,30 @@ class LocalStorage final : public net::ILocalStorage {
     return topic && topic->Exists();
   }
 
-  wpi::json GetTopicProperty(NT_Topic topicHandle, std::string_view name) {
+  glz::json_t GetTopicProperty(NT_Topic topicHandle, std::string_view name) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.m_topics.Get(topicHandle)) {
-      return topic->properties.value(name, wpi::json{});
+      return topic->properties.value(name, glz::json_t{});
     } else {
       return {};
     }
   }
 
   void SetTopicProperty(NT_Topic topic, std::string_view name,
-                        const wpi::json& value);
+                        const glz::json_t& value);
 
   void DeleteTopicProperty(NT_Topic topic, std::string_view name);
 
-  wpi::json GetTopicProperties(NT_Topic topicHandle) {
+  glz::json_t GetTopicProperties(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.m_topics.Get(topicHandle)) {
       return topic->properties;
     } else {
-      return wpi::json::object();
+      return glz::object();
     }
   }
 
-  bool SetTopicProperties(NT_Topic topic, const wpi::json& update);
+  bool SetTopicProperties(NT_Topic topic, const glz::json_t& update);
 
   TopicInfo GetTopicInfo(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
@@ -194,7 +194,7 @@ class LocalStorage final : public net::ILocalStorage {
   }
 
   NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                       const wpi::json& properties,
+                       const glz::json_t& properties,
                        const PubSubOptions& options);
 
   void Unpublish(NT_Handle pubentry);
@@ -367,7 +367,7 @@ class LocalStorage final : public net::ILocalStorage {
     std::string typeStr;
     unsigned int flags{0};            // for NT3 APIs
     std::string propertiesStr{"{}"};  // cached string for GetTopicInfo() et al
-    wpi::json properties = wpi::json::object();
+    glz::json_t properties = glz::object();
     NT_Entry entry{0};  // cached entry for GetEntry()
 
     bool onNetwork{false};  // true if there are any remote publishers
@@ -563,23 +563,23 @@ class LocalStorage final : public net::ILocalStorage {
     void SetFlags(TopicData* topic, unsigned int flags);
     void SetPersistent(TopicData* topic, bool value);
     void SetRetained(TopicData* topic, bool value);
-    void SetProperties(TopicData* topic, const wpi::json& update,
+    void SetProperties(TopicData* topic, const glz::json_t& update,
                        bool sendNetwork);
-    void PropertiesUpdated(TopicData* topic, const wpi::json& update,
+    void PropertiesUpdated(TopicData* topic, const glz::json_t& update,
                            unsigned int eventFlags, bool sendNetwork,
                            bool updateFlags = true);
 
     void RefreshPubSubActive(TopicData* topic, bool warnOnSubMismatch);
 
     void NetworkAnnounce(TopicData* topic, std::string_view typeStr,
-                         const wpi::json& properties, NT_Publisher pubHandle);
+                         const glz::json_t& properties, NT_Publisher pubHandle);
     void RemoveNetworkPublisher(TopicData* topic);
-    void NetworkPropertiesUpdate(TopicData* topic, const wpi::json& update,
+    void NetworkPropertiesUpdate(TopicData* topic, const glz::json_t& update,
                                  bool ack);
     void StartNetwork(net::NetworkInterface* network);
 
     PublisherData* AddLocalPublisher(TopicData* topic,
-                                     const wpi::json& properties,
+                                     const glz::json_t& properties,
                                      const PubSubConfig& options);
     std::unique_ptr<PublisherData> RemoveLocalPublisher(NT_Publisher pubHandle);
 

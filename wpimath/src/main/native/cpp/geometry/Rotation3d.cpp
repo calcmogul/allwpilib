@@ -10,7 +10,6 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/QR>
-#include <wpi/json.h>
 
 #include "frc/fmt/Eigen.h"
 #include "units/math.h"
@@ -247,12 +246,4 @@ units::radian_t Rotation3d::Angle() const {
 
 Rotation2d Rotation3d::ToRotation2d() const {
   return Rotation2d{Z()};
-}
-
-void frc::to_json(wpi::json& json, const Rotation3d& rotation) {
-  json = wpi::json{{"quaternion", rotation.GetQuaternion()}};
-}
-
-void frc::from_json(const wpi::json& json, Rotation3d& rotation) {
-  rotation = Rotation3d{json.at("quaternion").get<Quaternion>()};
 }

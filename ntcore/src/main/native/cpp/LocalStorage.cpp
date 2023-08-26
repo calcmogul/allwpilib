@@ -8,7 +8,6 @@
 
 #include <wpi/DataLog.h>
 #include <wpi/StringExtras.h>
-#include <wpi/json.h>
 
 #include "IListenerStorage.h"
 #include "Log.h"
@@ -169,7 +168,7 @@ void LocalStorage::Impl::CheckReset(TopicData* topic) {
   topic->type = NT_UNASSIGNED;
   topic->typeStr.clear();
   topic->flags = 0;
-  topic->properties = wpi::json::object();
+  topic->properties = glz::json_t::object();
   topic->propertiesStr = "{}";
 }
 
@@ -233,20 +232,20 @@ void LocalStorage::Impl::NotifyValue(TopicData* topic, unsigned int eventFlags,
 }
 
 void LocalStorage::Impl::SetFlags(TopicData* topic, unsigned int flags) {
-  wpi::json update = wpi::json::object();
+  glz::json_t update = glz::json_t::object();
   if ((flags & NT_PERSISTENT) != 0) {
     topic->properties["persistent"] = true;
     update["persistent"] = true;
   } else {
     topic->properties.erase("persistent");
-    update["persistent"] = wpi::json();
+    update["persistent"] = glz::json_t();
   }
   if ((flags & NT_RETAINED) != 0) {
     topic->properties["retained"] = true;
     update["retained"] = true;
   } else {
     topic->properties.erase("retained");
-    update["retained"] = wpi::json();
+    update["retained"] = glz::json_t();
   }
   topic->flags = flags;
   if (!update.empty()) {
@@ -255,7 +254,7 @@ void LocalStorage::Impl::SetFlags(TopicData* topic, unsigned int flags) {
 }
 
 void LocalStorage::Impl::SetPersistent(TopicData* topic, bool value) {
-  wpi::json update = wpi::json::object();
+  glz::json_t update = glz::json_t::object();
   if (value) {
     topic->flags |= NT_PERSISTENT;
     topic->properties["persistent"] = true;
@@ -263,13 +262,13 @@ void LocalStorage::Impl::SetPersistent(TopicData* topic, bool value) {
   } else {
     topic->flags &= ~NT_PERSISTENT;
     topic->properties.erase("persistent");
-    update["persistent"] = wpi::json();
+    update["persistent"] = glz::json_t();
   }
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
 void LocalStorage::Impl::SetRetained(TopicData* topic, bool value) {
-  wpi::json update = wpi::json::object();
+  glz::json_t update = glz::json_t::object();
   if (value) {
     topic->flags |= NT_RETAINED;
     topic->properties["retained"] = true;
@@ -277,13 +276,13 @@ void LocalStorage::Impl::SetRetained(TopicData* topic, bool value) {
   } else {
     topic->flags &= ~NT_RETAINED;
     topic->properties.erase("retained");
-    update["retained"] = wpi::json();
+    update["retained"] = glz::json_t();
   }
   PropertiesUpdated(topic, update, NT_EVENT_NONE, true, false);
 }
 
 void LocalStorage::Impl::SetProperties(TopicData* topic,
-                                       const wpi::json& update,
+                                       const glz::json_t& update,
                                        bool sendNetwork) {
   if (!update.is_object()) {
     return;
@@ -300,7 +299,7 @@ void LocalStorage::Impl::SetProperties(TopicData* topic,
 }
 
 void LocalStorage::Impl::PropertiesUpdated(TopicData* topic,
-                                           const wpi::json& update,
+                                           const glz::json_t& update,
                                            unsigned int eventFlags,
                                            bool sendNetwork, bool updateFlags) {
   DEBUG4("PropertiesUpdated({}, {}, {}, {}, {})", topic->name, update.dump(),
@@ -356,7 +355,7 @@ void LocalStorage::Impl::RefreshPubSubActive(TopicData* topic,
 
 void LocalStorage::Impl::NetworkAnnounce(TopicData* topic,
                                          std::string_view typeStr,
-                                         const wpi::json& properties,
+                                         const glz::json_t& properties,
                                          NT_Publisher pubHandle) {
   DEBUG4("LS NetworkAnnounce({}, {}, {}, {})", topic->name, typeStr,
          properties.dump(), pubHandle);
@@ -387,7 +386,7 @@ void LocalStorage::Impl::NetworkAnnounce(TopicData* topic,
 
   // may be properties update, but need to compare to see if it actually
   // changed to determine whether to update string / send event
-  wpi::json update = wpi::json::object();
+  glz::json_t update = glz::json_t::object();
   // added/changed
   for (auto&& prop : properties.items()) {
     auto it = topic->properties.find(prop.key());
@@ -398,7 +397,7 @@ void LocalStorage::Impl::NetworkAnnounce(TopicData* topic,
   // removed
   for (auto&& prop : topic->properties.items()) {
     if (properties.find(prop.key()) == properties.end()) {
-      update[prop.key()] = wpi::json();
+      update[prop.key()] = glz::json_t();
     }
   }
   if (!update.empty()) {
@@ -441,7 +440,7 @@ void LocalStorage::Impl::RemoveNetworkPublisher(TopicData* topic) {
 }
 
 void LocalStorage::Impl::NetworkPropertiesUpdate(TopicData* topic,
-                                                 const wpi::json& update,
+                                                 const glz::json_t& update,
                                                  bool ack) {
   DEBUG4("NetworkPropertiesUpdate({},{})", topic->name, ack);
   if (ack) {
@@ -451,7 +450,8 @@ void LocalStorage::Impl::NetworkPropertiesUpdate(TopicData* topic,
 }
 
 LocalStorage::PublisherData* LocalStorage::Impl::AddLocalPublisher(
-    TopicData* topic, const wpi::json& properties, const PubSubConfig& config) {
+    TopicData* topic, const glz::json_t& properties,
+    const PubSubConfig& config) {
   bool didExist = topic->Exists();
   auto publisher = m_publishers.Add(m_inst, topic, config);
   topic->localPublishers.Add(publisher);
@@ -465,12 +465,12 @@ LocalStorage::PublisherData* LocalStorage::Impl::AddLocalPublisher(
     RefreshPubSubActive(topic, true);
 
     if (properties.is_null()) {
-      topic->properties = wpi::json::object();
+      topic->properties = glz::json_t::object();
     } else if (properties.is_object()) {
       topic->properties = properties;
     } else {
       WARN("ignoring non-object properties when publishing '{}'", topic->name);
-      topic->properties = wpi::json::object();
+      topic->properties = glz::json_t::object();
     }
 
     if (topic->properties.empty()) {
@@ -871,7 +871,7 @@ LocalStorage::PublisherData* LocalStorage::Impl::PublishEntry(EntryData* entry,
     }
   }
   // create publisher
-  entry->publisher = AddLocalPublisher(entry->topic, wpi::json::object(),
+  entry->publisher = AddLocalPublisher(entry->topic, glz::json_t::object(),
                                        entry->subscriber->config);
   // exclude publisher if requested
   if (entry->subscriber->config.excludeSelf) {
@@ -996,7 +996,7 @@ LocalStorage::~LocalStorage() = default;
 
 NT_Topic LocalStorage::NetworkAnnounce(std::string_view name,
                                        std::string_view typeStr,
-                                       const wpi::json& properties,
+                                       const glz::json_t& properties,
                                        NT_Publisher pubHandle) {
   std::scoped_lock lock{m_mutex};
   auto topic = m_impl.GetOrCreateTopic(name);
@@ -1011,7 +1011,8 @@ void LocalStorage::NetworkUnannounce(std::string_view name) {
 }
 
 void LocalStorage::NetworkPropertiesUpdate(std::string_view name,
-                                           const wpi::json& update, bool ack) {
+                                           const glz::json_t& update,
+                                           bool ack) {
   std::scoped_lock lock{m_mutex};
   auto it = m_impl.m_nameTopics.find(name);
   if (it != m_impl.m_nameTopics.end()) {
@@ -1155,7 +1156,7 @@ std::vector<TopicInfo> LocalStorage::GetTopicInfo(
 }
 
 void LocalStorage::SetTopicProperty(NT_Topic topicHandle, std::string_view name,
-                                    const wpi::json& value) {
+                                    const glz::json_t& value) {
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl.m_topics.Get(topicHandle)) {
     if (value.is_null()) {
@@ -1163,7 +1164,7 @@ void LocalStorage::SetTopicProperty(NT_Topic topicHandle, std::string_view name,
     } else {
       topic->properties[name] = value;
     }
-    wpi::json update = wpi::json::object();
+    glz::json_t update = glz::json_t::object();
     update[name] = value;
     m_impl.PropertiesUpdated(topic, update, NT_EVENT_NONE, true);
   }
@@ -1174,14 +1175,14 @@ void LocalStorage::DeleteTopicProperty(NT_Topic topicHandle,
   std::scoped_lock lock{m_mutex};
   if (auto topic = m_impl.m_topics.Get(topicHandle)) {
     topic->properties.erase(name);
-    wpi::json update = wpi::json::object();
-    update[name] = wpi::json();
+    glz::json_t update = glz::json_t::object();
+    update[name] = glz::json_t();
     m_impl.PropertiesUpdated(topic, update, NT_EVENT_NONE, true);
   }
 }
 
 bool LocalStorage::SetTopicProperties(NT_Topic topicHandle,
-                                      const wpi::json& update) {
+                                      const glz::json_t& update) {
   if (!update.is_object()) {
     return false;
   }
@@ -1232,7 +1233,7 @@ NT_MultiSubscriber LocalStorage::SubscribeMultiple(
 
 NT_Publisher LocalStorage::Publish(NT_Topic topicHandle, NT_Type type,
                                    std::string_view typeStr,
-                                   const wpi::json& properties,
+                                   const glz::json_t& properties,
                                    const PubSubOptions& options) {
   std::scoped_lock lock{m_mutex};
 

@@ -4,15 +4,12 @@
 
 #pragma once
 
+#include <glaze/json.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation2d.h"
 #include "units/length.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -178,12 +175,37 @@ class WPILIB_DLLEXPORT Translation3d {
   units::meter_t m_z = 0_m;
 };
 
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Translation3d& state);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Translation3d& state);
-
 }  // namespace frc
+
+namespace glz::detail {
+
+template <>
+struct from_json<frc::Translation3d> {
+  template <auto Opts>
+  static void op(frc::Translation3d& value, auto&&... args) {
+    double x;
+    double y;
+    double z;
+
+    read<json>::op<Opts>(x, args...);
+    read<json>::op<Opts>(y, args...);
+    read<json>::op<Opts>(z, args...);
+
+    value = frc::Translation3d{units::meter_t{x}, units::meter_t{y},
+                               units::meter_t{z}};
+  }
+};
+
+template <>
+struct to_json<frc::Translation3d> {
+  template <auto Opts>
+  static void op(const frc::Translation3d& value, auto&&... args) noexcept {
+    write<json>::op<Opts>(value.X().value(), args...);
+    write<json>::op<Opts>(value.Y().value(), args...);
+    write<json>::op<Opts>(value.Z().value(), args...);
+  }
+};
+
+}  // namespace glz::detail
 
 #include "frc/geometry/Translation3d.inc"

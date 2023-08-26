@@ -26,13 +26,13 @@ ext {
                     srcDirs 'src/main/native/thirdparty/fmtlib/include'
                 }
             }
-            jsonCpp(CppSourceSet) {
+            glazeCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/main/native/thirdparty/json/cpp'
+                    srcDirs 'src/main/native/thirdparty/glaze/cpp'
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/fmtlib/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/glaze/include', 'src/main/native/thirdparty/fmtlib/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -101,12 +101,12 @@ ext {
             it.sources {
                 wpiutilWindowsCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/windows', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/windows', 'src/main/native/llvm/cpp/llvm', 'src/main/native/glaze/cpp'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
-                        include '**/*.h'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/glaze/include', 'src/main/native/thirdparty/mpack/include'
+                        include '**/*.h', '**/*.hpp'
                     }
                 }
             }
@@ -114,12 +114,12 @@ ext {
             it.sources {
                 wpiutilmacOSCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/macOS', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/macOS', 'src/main/native/llvm/cpp/llvm', 'src/main/native/glaze/cpp'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
-                        include '**/*.h'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/glaze/include', 'src/main/native/thirdparty/mpack/include'
+                        include '**/*.h', '**/*.hpp'
                     }
                 }
             }
@@ -127,12 +127,12 @@ ext {
             it.sources {
                 wpiutilLinuxCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/linux', 'src/main/native/llvm/cpp/llvm', 'src/main/native/json/cpp'
+                        srcDirs 'src/main/native/linux', 'src/main/native/llvm/cpp/llvm', 'src/main/native/glaze/cpp'
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include'
-                        include '**/*.h'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/glaze/include', 'src/main/native/thirdparty/mpack/include'
+                        include '**/*.h', '**/*.hpp'
                     }
                 }
             }
@@ -180,7 +180,7 @@ cppHeadersZip {
     from('src/main/native/thirdparty/fmtlib/include') {
         into '/'
     }
-    from('src/main/native/thirdparty/json/include') {
+    from('src/main/native/thirdparty/glaze/include') {
         into '/'
     }
     from('src/main/native/thirdparty/llvm/include') {
@@ -201,7 +201,7 @@ cppSourcesZip {
     from('src/main/native/thirdparty/fmtlib/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/json/cpp') {
+    from('src/main/native/thirdparty/glaze/cpp') {
         into '/'
     }
     from('src/main/native/thirdparty/llvm/cpp') {
@@ -223,7 +223,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/glaze/include', 'src/main/native/thirdparty/memory/include', 'src/main/native/thirdparty/mpack/include'
                 }
             }
         }

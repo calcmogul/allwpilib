@@ -70,15 +70,15 @@ class ClientImpl final : private ServerMessageHandler {
 
   // ServerMessageHandler interface
   void ServerAnnounce(std::string_view name, int64_t id,
-                      std::string_view typeStr, const wpi::json& properties,
+                      std::string_view typeStr, const glz::json_t& properties,
                       std::optional<int64_t> pubuid) final;
   void ServerUnannounce(std::string_view name, int64_t id) final;
-  void ServerPropertiesUpdate(std::string_view name, const wpi::json& update,
+  void ServerPropertiesUpdate(std::string_view name, const glz::json_t& update,
                               bool ack) final;
 
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptionsImpl& options);
+               const glz::json_t& properties, const PubSubOptionsImpl& options);
   bool Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
   void SetValue(NT_Publisher pubHandle, const Value& value);
 

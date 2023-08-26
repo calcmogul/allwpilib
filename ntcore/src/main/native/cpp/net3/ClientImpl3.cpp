@@ -31,7 +31,7 @@ static constexpr uint32_t kMinPeriodMs = 5;
 // transmission before we close the connection
 static constexpr uint32_t kWireMaxNotReadyUs = 1000000;
 
-wpi::json ClientImpl3::Entry::SetFlags(unsigned int flags_) {
+glz::json_t ClientImpl3::Entry::SetFlags(unsigned int flags_) {
   bool wasPersistent = IsPersistent();
   flags = flags_;
   bool isPersistent = IsPersistent();
@@ -40,9 +40,9 @@ wpi::json ClientImpl3::Entry::SetFlags(unsigned int flags_) {
     return {{"persistent", true}};
   } else if (!isPersistent && wasPersistent) {
     properties.erase("persistent");
-    return {{"persistent", wpi::json()}};
+    return {{"persistent", glz::json_t()}};
   } else {
-    return wpi::json::object();
+    return glz::json_t::object();
   }
 }
 
@@ -176,7 +176,7 @@ bool ClientImpl3::CheckNetworkReady(uint64_t curTimeMs) {
 
 void ClientImpl3::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                           std::string_view name, std::string_view typeStr,
-                          const wpi::json& properties,
+                          const glz::json_t& properties,
                           const PubSubOptionsImpl& options) {
   DEBUG4("Publish('{}', '{}')", name, typeStr);
   unsigned int index = Handle{pubHandle}.GetIndex();
@@ -226,7 +226,7 @@ void ClientImpl3::Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle) {
 }
 
 void ClientImpl3::SetProperties(NT_Topic topicHandle, std::string_view name,
-                                const wpi::json& update) {
+                                const glz::json_t& update) {
   DEBUG4("SetProperties({}, {}, {})", topicHandle, name, update.dump());
   auto entry = GetOrNewEntry(name);
   bool updated = false;
@@ -396,7 +396,7 @@ void ClientImpl3::FlagsUpdate(unsigned int id, unsigned int flags) {
     return;
   }
   if (auto entry = LookupId(id)) {
-    wpi::json update = entry->SetFlags(flags);
+    glz::json_t update = entry->SetFlags(flags);
     if (!update.empty() && m_local) {
       m_local->NetworkPropertiesUpdate(entry->name, update, false);
     }

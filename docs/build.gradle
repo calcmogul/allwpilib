@@ -115,13 +115,13 @@ doxygen {
         // fmtlib
         exclude 'fmt/**'
 
+        // glaze
+        exclude 'glaze/**'
+
         // libuv
         exclude 'uv.h'
         exclude 'uv/**'
         exclude 'wpinet/uv/**'
-
-        // json
-        exclude 'wpi/json.h'
 
         // memory
         exclude 'wpi/memory/**'

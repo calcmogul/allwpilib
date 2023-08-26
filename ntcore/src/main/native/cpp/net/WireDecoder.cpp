@@ -10,7 +10,6 @@
 #include <fmt/format.h>
 #include <wpi/Logger.h>
 #include <wpi/SpanExtras.h>
-#include <wpi/json.h>
 #include <wpi/mpack.h>
 
 #include "Message.h"
@@ -19,7 +18,7 @@ using namespace nt;
 using namespace nt::net;
 using namespace mpack;
 
-static bool GetNumber(wpi::json& val, double* num) {
+static bool GetNumber(glz::json_t& val, double* num) {
   if (auto v = val.get_ptr<const int64_t*>()) {
     *num = *v;
   } else if (auto v = val.get_ptr<const uint64_t*>()) {
@@ -32,7 +31,7 @@ static bool GetNumber(wpi::json& val, double* num) {
   return true;
 }
 
-static bool GetNumber(wpi::json& val, int64_t* num) {
+static bool GetNumber(glz::json_t& val, int64_t* num) {
   if (auto v = val.get_ptr<const int64_t*>()) {
     *num = *v;
   } else if (auto v = val.get_ptr<const uint64_t*>()) {
@@ -43,7 +42,7 @@ static bool GetNumber(wpi::json& val, int64_t* num) {
   return true;
 }
 
-static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
+static std::string* ObjGetString(glz::object& obj, std::string_view key,
                                  std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
@@ -57,7 +56,7 @@ static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
   return val;
 }
 
-static bool ObjGetNumber(wpi::json::object_t& obj, std::string_view key,
+static bool ObjGetNumber(glz::object& obj, std::string_view key,
                          std::string* error, int64_t* num) {
   auto it = obj.find(key);
   if (it == obj.end()) {
@@ -71,7 +70,7 @@ static bool ObjGetNumber(wpi::json::object_t& obj, std::string_view key,
   return true;
 }
 
-static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
+static bool ObjGetStringArray(glz::object& obj, std::string_view key,
                               std::string* error,
                               std::vector<std::string>* out) {
   // prefixes
@@ -80,7 +79,7 @@ static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
     *error = fmt::format("no {} key", key);
     return false;
   }
-  auto jarr = it->second.get_ptr<wpi::json::array_t*>();
+  auto jarr = it->second.get_ptr<glz::json_t::array_t*>();
   if (!jarr) {
     *error = fmt::format("{} must be an array", key);
     return false;
@@ -109,10 +108,10 @@ template <typename T>
            std::same_as<T, ServerMessageHandler>)
 static void WireDecodeTextImpl(std::string_view in, T& out,
                                wpi::Logger& logger) {
-  wpi::json j;
+  glz::json_t j;
   try {
-    j = wpi::json::parse(in);
-  } catch (wpi::json::parse_error& err) {
+    j = glz::json_t::parse(in);
+  } catch (glz::json_t::parse_error& err) {
     WPI_WARNING(logger, "could not decode JSON message: {}", err.what());
     return;
   }
@@ -127,7 +126,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
     ++i;
     std::string error;
     {
-      auto obj = jmsg.get_ptr<wpi::json::object_t*>();
+      auto obj = jmsg.get_ptr<glz::object*>();
       if (!obj) {
         error = "expected message to be an object";
         goto err;
@@ -143,7 +142,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
         error = "no params key";
         goto err;
       }
-      auto params = paramsIt->second.get_ptr<wpi::json::object_t*>();
+      auto params = paramsIt->second.get_ptr<glz::object*>();
       if (!params) {
         error = "params must be an object";
         goto err;
@@ -170,7 +169,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
           }
 
           // properties; allow missing (treated as empty)
-          wpi::json* properties = nullptr;
+          glz::json_t* properties = nullptr;
           auto propertiesIt = params->find("properties");
           if (propertiesIt != params->end()) {
             properties = &propertiesIt->second;
@@ -179,9 +178,9 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
               goto err;
             }
           }
-          wpi::json propertiesEmpty;
+          glz::json_t propertiesEmpty;
           if (!properties) {
-            propertiesEmpty = wpi::json::object();
+            propertiesEmpty = glz::json_t::object();
             properties = &propertiesEmpty;
           }
 
@@ -228,7 +227,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
           PubSubOptionsImpl options;
           auto optionsIt = params->find("options");
           if (optionsIt != params->end()) {
-            auto joptions = optionsIt->second.get_ptr<wpi::json::object_t*>();
+            auto joptions = optionsIt->second.get_ptr<glz::object*>();
             if (!joptions) {
               error = "options must be an object";
               goto err;
@@ -342,7 +341,7 @@ static void WireDecodeTextImpl(std::string_view in, T& out,
           auto properties = &propertiesIt->second;
           if (!properties->is_object()) {
             WPI_WARNING(logger, "{}: properties is not an object", *name);
-            *properties = wpi::json::object();
+            *properties = glz::json_t::object();
           }
 
           // complete

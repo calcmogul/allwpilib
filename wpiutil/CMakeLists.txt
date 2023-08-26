@@ -75,7 +75,7 @@ endif()
 generate_resources(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp
-                                     src/main/native/thirdparty/json/cpp/*.cpp
+                                     src/main/native/thirdparty/glaze/cpp/*.cpp
                                      src/main/native/thirdparty/llvm/cpp/*.cpp
                                      src/main/native/thirdparty/mpack/src/*.cpp)
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
@@ -140,9 +140,9 @@ target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 
-install(DIRECTORY src/main/native/thirdparty/json/include/ DESTINATION "${include_dest}/wpiutil")
+install(DIRECTORY src/main/native/thirdparty/glaze/include/ DESTINATION "${include_dest}/wpiutil")
 target_include_directories(wpiutil PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/glaze/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
 
 install(DIRECTORY src/main/native/thirdparty/llvm/include/ DESTINATION "${include_dest}/wpiutil")

@@ -4,13 +4,10 @@
 
 #pragma once
 
+#include <glaze/json.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "units/angle.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -171,12 +168,33 @@ class WPILIB_DLLEXPORT Rotation2d {
   double m_sin = 0;
 };
 
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Rotation2d& rotation);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Rotation2d& rotation);
-
 }  // namespace frc
+
+namespace glz::detail {
+
+template <>
+struct from_json<frc::Rotation2d> {
+  template <auto Opts>
+  static void op(frc::Rotation2d& value, auto&&... args) {
+    double cos;
+    double sin;
+
+    read<json>::op<Opts>(cos, args...);
+    read<json>::op<Opts>(sin, args...);
+
+    value = frc::Rotation2d{cos, sin};
+  }
+};
+
+template <>
+struct to_json<frc::Rotation2d> {
+  template <auto Opts>
+  static void op(const frc::Rotation2d& value, auto&&... args) noexcept {
+    write<json>::op<Opts>(value.Cos(), args...);
+    write<json>::op<Opts>(value.Sin(), args...);
+  }
+};
+
+}  // namespace glz::detail
 
 #include "frc/geometry/Rotation2d.inc"

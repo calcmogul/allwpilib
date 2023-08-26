@@ -33,7 +33,7 @@ inline void NetworkLoopQueue::Publish(NT_Publisher pubHandle,
                                       NT_Topic topicHandle,
                                       std::string_view name,
                                       std::string_view typeStr,
-                                      const wpi::json& properties,
+                                      const glz::json_t& properties,
                                       const PubSubOptionsImpl& options) {
   std::scoped_lock lock{m_mutex};
   m_queue.emplace_back(
@@ -49,7 +49,7 @@ inline void NetworkLoopQueue::Unpublish(NT_Publisher pubHandle,
 
 inline void NetworkLoopQueue::SetProperties(NT_Topic topicHandle,
                                             std::string_view name,
-                                            const wpi::json& update) {
+                                            const glz::json_t& update) {
   std::scoped_lock lock{m_mutex};
   m_queue.emplace_back(
       ClientMessage{SetPropertiesMsg{topicHandle, std::string{name}, update}});

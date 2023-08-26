@@ -4,21 +4,21 @@
 
 #include "networktables/Topic.h"
 
-#include <wpi/json.h>
+#include <glaze/json.hpp>
 
 #include "networktables/GenericEntry.h"
 
 using namespace nt;
 
-wpi::json Topic::GetProperty(std::string_view name) const {
+glz::json_t Topic::GetProperty(std::string_view name) const {
   return ::nt::GetTopicProperty(m_handle, name);
 }
 
-void Topic::SetProperty(std::string_view name, const wpi::json& value) {
+void Topic::SetProperty(std::string_view name, const glz::json_t& value) {
   ::nt::SetTopicProperty(m_handle, name, value);
 }
 
-wpi::json Topic::GetProperties() const {
+glz::json_t Topic::GetProperties() const {
   return ::nt::GetTopicProperties(m_handle);
 }
 
@@ -39,7 +39,7 @@ GenericPublisher Topic::GenericPublish(std::string_view typeString,
 }
 
 GenericPublisher Topic::GenericPublishEx(std::string_view typeString,
-                                         const wpi::json& properties,
+                                         const glz::json_t& properties,
                                          const PubSubOptions& options) {
   return GenericPublisher{::nt::PublishEx(m_handle,
                                           ::nt::GetTypeFromString(typeString),

@@ -117,7 +117,7 @@ class Topic {
    * @param name property name
    * @return JSON object; null object if the property does not exist.
    */
-  wpi::json GetProperty(std::string_view name) const;
+  glz::json_t GetProperty(std::string_view name) const;
 
   /**
    * Sets a property value.
@@ -125,7 +125,7 @@ class Topic {
    * @param name property name
    * @param value property value
    */
-  void SetProperty(std::string_view name, const wpi::json& value);
+  void SetProperty(std::string_view name, const glz::json_t& value);
 
   /**
    * Deletes a property.  Has no effect if the property does not exist.
@@ -140,7 +140,7 @@ class Topic {
    *
    * @return JSON object
    */
-  wpi::json GetProperties() const;
+  glz::json_t GetProperties() const;
 
   /**
    * Updates multiple topic properties.  Each key in the passed-in object is
@@ -151,7 +151,7 @@ class Topic {
    * @param properties JSON object with keys to add/update/delete
    * @return False if properties is not an object
    */
-  bool SetProperties(const wpi::json& properties);
+  bool SetProperties(const glz::json_t& properties);
 
   /**
    * Gets combined information about the topic.
@@ -233,7 +233,7 @@ class Topic {
    */
   [[nodiscard]]
   GenericPublisher GenericPublishEx(
-      std::string_view typeString, const wpi::json& properties,
+      std::string_view typeString, const glz::json_t& properties,
       const PubSubOptions& options = kDefaultPubSubOptions);
 
   /**

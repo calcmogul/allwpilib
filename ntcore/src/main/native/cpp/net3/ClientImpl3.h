@@ -14,8 +14,8 @@
 #include <utility>
 #include <vector>
 
+#include <glaze/json.hpp>
 #include <wpi/StringMap.h>
-#include <wpi/json.h>
 
 #include "PubSubOptions.h"
 #include "net/NetworkInterface.h"
@@ -74,14 +74,14 @@ class ClientImpl3 final : private MessageHandler3 {
   struct Entry {
     explicit Entry(std::string_view name_) : name(name_) {}
     bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
-    wpi::json SetFlags(unsigned int flags_);
+    glz::json_t SetFlags(unsigned int flags_);
 
     std::string name;
 
     std::string typeStr;
     NT_Type type{NT_UNASSIGNED};
 
-    wpi::json properties = wpi::json::object();
+    glz::json_t properties = glz::json_t::object();
 
     // The current value and flags
     Value value;
@@ -108,10 +108,10 @@ class ClientImpl3 final : private MessageHandler3 {
   // Outgoing handlers
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
-               const wpi::json& properties, const PubSubOptionsImpl& options);
+               const glz::json_t& properties, const PubSubOptionsImpl& options);
   void Unpublish(NT_Publisher pubHandle, NT_Topic topicHandle);
   void SetProperties(NT_Topic topicHandle, std::string_view name,
-                     const wpi::json& update);
+                     const glz::json_t& update);
   void SetValue(NT_Publisher pubHandle, const Value& value);
 
   // MessageHandler interface

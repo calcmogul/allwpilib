@@ -10,7 +10,7 @@
 #include <cstdlib>
 
 #include <fmt/format.h>
-#include <wpi/json.h>
+#include <glaze/json.hpp>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -25,11 +25,11 @@ static std::atomic<int64_t> gNowTime;
 
 namespace nt {
 
-wpi::json TopicInfo::GetProperties() const {
+glz::json_t TopicInfo::GetProperties() const {
   try {
-    return wpi::json::parse(properties);
-  } catch (wpi::json::parse_error&) {
-    return wpi::json::object();
+    return glz::json_t::parse(properties);
+  } catch (glz::json_t::parse_error&) {
+    return glz::json_t::object();
   }
 }
 
@@ -270,7 +270,7 @@ bool GetTopicExists(NT_Handle handle) {
   return false;
 }
 
-wpi::json GetTopicProperty(NT_Topic topic, std::string_view name) {
+glz::json_t GetTopicProperty(NT_Topic topic, std::string_view name) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.GetTopicProperty(topic, name);
   } else {
@@ -279,7 +279,7 @@ wpi::json GetTopicProperty(NT_Topic topic, std::string_view name) {
 }
 
 void SetTopicProperty(NT_Topic topic, std::string_view name,
-                      const wpi::json& value) {
+                      const glz::json_t& value) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     ii->localStorage.SetTopicProperty(topic, name, value);
   } else {
@@ -293,7 +293,7 @@ void DeleteTopicProperty(NT_Topic topic, std::string_view name) {
   }
 }
 
-wpi::json GetTopicProperties(NT_Topic topic) {
+glz::json_t GetTopicProperties(NT_Topic topic) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.GetTopicProperties(topic);
   } else {
@@ -301,7 +301,7 @@ wpi::json GetTopicProperties(NT_Topic topic) {
   }
 }
 
-bool SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
+bool SetTopicProperties(NT_Topic topic, const glz::json_t& properties) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.SetTopicProperties(topic, properties);
   } else {
@@ -326,11 +326,11 @@ void Unsubscribe(NT_Subscriber sub) {
 
 NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
                      const PubSubOptions& options) {
-  return PublishEx(topic, type, typeStr, wpi::json::object(), options);
+  return PublishEx(topic, type, typeStr, glz::json_t::object(), options);
 }
 
 NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
-                       const wpi::json& properties,
+                       const glz::json_t& properties,
                        const PubSubOptions& options) {
   if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
     return ii->localStorage.Publish(topic, type, typeStr, properties, options);

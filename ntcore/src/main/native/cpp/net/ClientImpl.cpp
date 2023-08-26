@@ -260,7 +260,7 @@ bool ClientImpl::CheckNetworkReady(uint64_t curTimeMs) {
 
 void ClientImpl::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                          std::string_view name, std::string_view typeStr,
-                         const wpi::json& properties,
+                         const glz::json_t& properties,
                          const PubSubOptionsImpl& options) {
   unsigned int index = Handle{pubHandle}.GetIndex();
   if (index >= m_publishers.size()) {
@@ -342,7 +342,7 @@ void ClientImpl::SetValue(NT_Publisher pubHandle, const Value& value) {
 
 void ClientImpl::ServerAnnounce(std::string_view name, int64_t id,
                                 std::string_view typeStr,
-                                const wpi::json& properties,
+                                const glz::json_t& properties,
                                 std::optional<int64_t> pubuid) {
   DEBUG4("ServerAnnounce({}, {}, {})", name, id, typeStr);
   assert(m_local);
@@ -362,7 +362,7 @@ void ClientImpl::ServerUnannounce(std::string_view name, int64_t id) {
 }
 
 void ClientImpl::ServerPropertiesUpdate(std::string_view name,
-                                        const wpi::json& update, bool ack) {
+                                        const glz::json_t& update, bool ack) {
   DEBUG4("ServerProperties({}, {}, {})", name, update.dump(), ack);
   assert(m_local);
   m_local->NetworkPropertiesUpdate(name, update, ack);

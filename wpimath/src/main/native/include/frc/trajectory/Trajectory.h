@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include <glaze/json.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
@@ -14,10 +15,6 @@
 #include "units/curvature.h"
 #include "units/time.h"
 #include "units/velocity.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 /**
@@ -141,10 +138,44 @@ class WPILIB_DLLEXPORT Trajectory {
   units::second_t m_totalTime = 0_s;
 };
 
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Trajectory::State& state);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Trajectory::State& state);
-
 }  // namespace frc
+
+namespace glz::detail {
+
+template <>
+struct from_json<frc::Trajectory::State> {
+  template <auto Opts>
+  static void op(frc::Trajectory::State& value, auto&&... args) {
+    double t;
+    double velocity;
+    double acceleration;
+    frc::Pose2d pose;
+    double curvature;
+
+    read<json>::op<Opts>(t, args...);
+    read<json>::op<Opts>(velocity, args...);
+    read<json>::op<Opts>(acceleration, args...);
+    read<json>::op<Opts>(pose, args...);
+    read<json>::op<Opts>(curvature, args...);
+
+    value.t = units::second_t{t};
+    value.velocity = units::meters_per_second_t{velocity};
+    value.acceleration = units::meters_per_second_squared_t{acceleration};
+    value.pose = pose;
+    value.curvature = units::curvature_t{curvature};
+  }
+};
+
+template <>
+struct to_json<frc::Trajectory::State> {
+  template <auto Opts>
+  static void op(const frc::Trajectory::State& value, auto&&... args) noexcept {
+    write<json>::op<Opts>(value.t.value(), args...);
+    write<json>::op<Opts>(value.velocity.value(), args...);
+    write<json>::op<Opts>(value.acceleration.value(), args...);
+    write<json>::op<Opts>(value.pose, args...);
+    write<json>::op<Opts>(value.curvature.value(), args...);
+  }
+};
+
+}  // namespace glz::detail

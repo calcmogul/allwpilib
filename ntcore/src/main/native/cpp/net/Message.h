@@ -9,7 +9,7 @@
 #include <variant>
 #include <vector>
 
-#include <wpi/json.h>
+#include <glaze/json.hpp>
 
 #include "PubSubOptions.h"
 #include "networktables/NetworkTableValue.h"
@@ -28,7 +28,7 @@ struct PublishMsg {
   NT_Topic topicHandle{0};  // will be 0 when coming from network
   std::string name;
   std::string typeStr;
-  wpi::json properties;
+  glz::json_t properties;
   PubSubOptionsImpl options;  // will be empty when coming from network
 };
 
@@ -42,7 +42,7 @@ struct SetPropertiesMsg {
   static constexpr std::string_view kMethodStr = "setproperties";
   NT_Topic topicHandle{0};  // will be 0 when coming from network
   std::string name;
-  wpi::json update;
+  glz::json_t update;
 };
 
 struct SubscribeMsg {
@@ -79,7 +79,7 @@ struct AnnounceMsg {
   int64_t id{0};
   std::string typeStr;
   std::optional<int64_t> pubuid;
-  wpi::json properties;
+  glz::json_t properties;
 };
 
 struct UnannounceMsg {
@@ -91,7 +91,7 @@ struct UnannounceMsg {
 struct PropertiesUpdateMsg {
   static constexpr std::string_view kMethodStr = "properties";
   std::string name;
-  wpi::json update;
+  glz::json_t update;
   bool ack;
 };
 

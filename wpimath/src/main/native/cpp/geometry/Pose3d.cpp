@@ -7,7 +7,6 @@
 #include <cmath>
 
 #include <Eigen/Core>
-#include <wpi/json.h>
 
 using namespace frc;
 
@@ -176,14 +175,4 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
 
 Pose2d Pose3d::ToPose2d() const {
   return Pose2d{m_translation.X(), m_translation.Y(), m_rotation.Z()};
-}
-
-void frc::to_json(wpi::json& json, const Pose3d& pose) {
-  json = wpi::json{{"translation", pose.Translation()},
-                   {"rotation", pose.Rotation()}};
-}
-
-void frc::from_json(const wpi::json& json, Pose3d& pose) {
-  pose = Pose3d{json.at("translation").get<Translation3d>(),
-                json.at("rotation").get<Rotation3d>()};
 }

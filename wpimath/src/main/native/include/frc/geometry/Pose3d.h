@@ -4,16 +4,13 @@
 
 #pragma once
 
+#include <glaze/json.hpp>
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/geometry/Twist3d.h"
-
-namespace wpi {
-class json;
-}  // namespace wpi
 
 namespace frc {
 
@@ -209,10 +206,31 @@ class WPILIB_DLLEXPORT Pose3d {
   Rotation3d m_rotation;
 };
 
-WPILIB_DLLEXPORT
-void to_json(wpi::json& json, const Pose3d& pose);
-
-WPILIB_DLLEXPORT
-void from_json(const wpi::json& json, Pose3d& pose);
-
 }  // namespace frc
+
+namespace glz::detail {
+
+template <>
+struct from_json<frc::Pose3d> {
+  template <auto Opts>
+  static void op(frc::Pose3d& value, auto&&... args) {
+    frc::Translation3d translation;
+    frc::Rotation3d rotation;
+
+    read<json>::op<Opts>(translation, args...);
+    read<json>::op<Opts>(rotation, args...);
+
+    value = frc::Pose3d{translation, rotation};
+  }
+};
+
+template <>
+struct to_json<frc::Pose3d> {
+  template <auto Opts>
+  static void op(const frc::Pose3d& value, auto&&... args) noexcept {
+    write<json>::op<Opts>(value.Translation(), args...);
+    write<json>::op<Opts>(value.Rotation(), args...);
+  }
+};
+
+}  // namespace glz::detail

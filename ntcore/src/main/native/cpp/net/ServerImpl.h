@@ -15,10 +15,10 @@
 #include <utility>
 #include <vector>
 
+#include <glaze/json.hpp>
 #include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
 #include <wpi/UidVector.h>
-#include <wpi/json.h>
 
 #include "Message.h"
 #include "NetworkInterface.h"
@@ -116,8 +116,8 @@ class ServerImpl final {
     virtual void SendAnnounce(TopicData* topic,
                               std::optional<int64_t> pubuid) = 0;
     virtual void SendUnannounce(TopicData* topic) = 0;
-    virtual void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
-                                      bool ack) = 0;
+    virtual void SendPropertiesUpdate(TopicData* topic,
+                                      const glz::json_t& update, bool ack) = 0;
     virtual void SendOutgoing(uint64_t curTimeMs) = 0;
     virtual void Flush() = 0;
 
@@ -164,10 +164,10 @@ class ServerImpl final {
     // ClientMessageHandler interface
     void ClientPublish(int64_t pubuid, std::string_view name,
                        std::string_view typeStr,
-                       const wpi::json& properties) final;
+                       const glz::json_t& properties) final;
     void ClientUnpublish(int64_t pubuid) final;
     void ClientSetProperties(std::string_view name,
-                             const wpi::json& update) final;
+                             const glz::json_t& update) final;
     void ClientSubscribe(int64_t subuid,
                          std::span<const std::string> topicNames,
                          const PubSubOptionsImpl& options) final;
@@ -189,7 +189,7 @@ class ServerImpl final {
     void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
-    void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
+    void SendPropertiesUpdate(TopicData* topic, const glz::json_t& update,
                               bool ack) final;
     void SendOutgoing(uint64_t curTimeMs) final {}
     void Flush() final {}
@@ -212,7 +212,7 @@ class ServerImpl final {
     void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
-    void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
+    void SendPropertiesUpdate(TopicData* topic, const glz::json_t& update,
                               bool ack) final;
     void SendOutgoing(uint64_t curTimeMs) final;
 
@@ -268,7 +268,7 @@ class ServerImpl final {
     void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
     void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
     void SendUnannounce(TopicData* topic) final;
-    void SendPropertiesUpdate(TopicData* topic, const wpi::json& update,
+    void SendPropertiesUpdate(TopicData* topic, const glz::json_t& update,
                               bool ack) final;
     void SendOutgoing(uint64_t curTimeMs) final;
 
@@ -327,7 +327,7 @@ class ServerImpl final {
     TopicData(std::string_view name, std::string_view typeStr)
         : name{name}, typeStr{typeStr} {}
     TopicData(std::string_view name, std::string_view typeStr,
-              wpi::json properties)
+              glz::json_t properties)
         : name{name}, typeStr{typeStr}, properties(std::move(properties)) {
       RefreshProperties();
     }
@@ -337,7 +337,7 @@ class ServerImpl final {
     }
 
     // returns true if properties changed
-    bool SetProperties(const wpi::json& update);
+    bool SetProperties(const glz::json_t& update);
     void RefreshProperties();
     bool SetFlags(unsigned int flags_);
 
@@ -346,7 +346,7 @@ class ServerImpl final {
     Value lastValue;
     ClientData* lastValueClient = nullptr;
     std::string typeStr;
-    wpi::json properties = wpi::json::object();
+    glz::json_t properties = glz::object();
     bool persistent{false};
     bool retained{false};
     bool special{false};
@@ -421,12 +421,12 @@ class ServerImpl final {
 
   // helper functions
   TopicData* CreateTopic(ClientData* client, std::string_view name,
-                         std::string_view typeStr, const wpi::json& properties,
-                         bool special = false);
+                         std::string_view typeStr,
+                         const glz::json_t& properties, bool special = false);
   TopicData* CreateMetaTopic(std::string_view name);
   void DeleteTopic(TopicData* topic);
   void SetProperties(ClientData* client, TopicData* topic,
-                     const wpi::json& update);
+                     const glz::json_t& update);
   void SetFlags(ClientData* client, TopicData* topic, unsigned int flags);
   void SetValue(ClientData* client, TopicData* topic, const Value& value);
 
@@ -436,7 +436,7 @@ class ServerImpl final {
   void UpdateMetaTopicSub(TopicData* topic);
 
   void PropertiesChanged(ClientData* client, TopicData* topic,
-                         const wpi::json& update);
+                         const glz::json_t& update);
 };
 
 }  // namespace nt::net

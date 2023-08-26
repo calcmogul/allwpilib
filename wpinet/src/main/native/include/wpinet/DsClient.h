@@ -49,7 +49,7 @@ class DsClient : public std::enable_shared_from_this<DsClient> {
   std::shared_ptr<wpi::uv::Tcp> m_tcp;
   std::shared_ptr<wpi::uv::Timer> m_timer;
 
-  std::string m_json;
+  std::string m_jsonBuffer;
 };
 
 }  // namespace wpi

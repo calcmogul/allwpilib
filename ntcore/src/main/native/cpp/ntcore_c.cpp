@@ -11,9 +11,9 @@
 #include <cstring>
 #include <string_view>
 
+#include <glaze/json.hpp>
 #include <wpi/MemAlloc.h>
 #include <wpi/SmallVector.h>
-#include <wpi/json.h>
 #include <wpi/timestamp.h>
 
 #include "Value_internal.h"
@@ -300,7 +300,7 @@ NT_Bool NT_GetTopicExists(NT_Handle handle) {
 }
 
 char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len) {
-  wpi::json j = nt::GetTopicProperty(topic, name);
+  glz::json_t j = nt::GetTopicProperty(topic, name);
   struct NT_String v;
   nt::ConvertToC(j.dump(), &v);
   *len = v.len;
@@ -309,10 +309,10 @@ char* NT_GetTopicProperty(NT_Topic topic, const char* name, size_t* len) {
 
 NT_Bool NT_SetTopicProperty(NT_Topic topic, const char* name,
                             const char* value) {
-  wpi::json j;
+  glz::json_t j;
   try {
-    j = wpi::json::parse(value);
-  } catch (wpi::json::parse_error&) {
+    j = glz::json_t::parse(value);
+  } catch (glz::json_t::parse_error&) {
     return false;
   }
   nt::SetTopicProperty(topic, name, j);
@@ -324,7 +324,7 @@ void NT_DeleteTopicProperty(NT_Topic topic, const char* name) {
 }
 
 char* NT_GetTopicProperties(NT_Topic topic, size_t* len) {
-  wpi::json j = nt::GetTopicProperties(topic);
+  glz::json_t j = nt::GetTopicProperties(topic);
   struct NT_String v;
   nt::ConvertToC(j.dump(), &v);
   *len = v.len;
@@ -332,10 +332,10 @@ char* NT_GetTopicProperties(NT_Topic topic, size_t* len) {
 }
 
 NT_Bool NT_SetTopicProperties(NT_Topic topic, const char* properties) {
-  wpi::json j;
+  glz::json_t j;
   try {
-    j = wpi::json::parse(properties);
-  } catch (wpi::json::parse_error&) {
+    j = glz::json_t::parse(properties);
+  } catch (glz::json_t::parse_error&) {
     return false;
   }
   return nt::SetTopicProperties(topic, j);
@@ -358,14 +358,14 @@ NT_Publisher NT_Publish(NT_Topic topic, NT_Type type, const char* typeStr,
 NT_Publisher NT_PublishEx(NT_Topic topic, NT_Type type, const char* typeStr,
                           const char* properties,
                           const struct NT_PubSubOptions* options) {
-  wpi::json j;
+  glz::json_t j;
   if (properties[0] == '\0') {
     // gracefully handle empty string
-    j = wpi::json::object();
+    j = glz::json_t::object();
   } else {
     try {
-      j = wpi::json::parse(properties);
-    } catch (wpi::json::parse_error&) {
+      j = glz::json_t::parse(properties);
+    } catch (glz::json_t::parse_error&) {
       return {};
     }
   }

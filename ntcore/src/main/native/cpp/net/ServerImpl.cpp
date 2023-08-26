@@ -13,11 +13,11 @@
 #include <string>
 #include <vector>
 
+#include <glaze/json.hpp>
 #include <wpi/Base64.h>
 #include <wpi/MessagePack.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/json_serializer.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
@@ -142,7 +142,7 @@ std::span<ServerImpl::SubscriberData*> ServerImpl::ClientData::GetSubscribers(
 void ServerImpl::ClientData4Base::ClientPublish(int64_t pubuid,
                                                 std::string_view name,
                                                 std::string_view typeStr,
-                                                const wpi::json& properties) {
+                                                const glz::json_t& properties) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
   auto topic = m_server.CreateTopic(this, name, typeStr, properties);
 
@@ -190,8 +190,8 @@ void ServerImpl::ClientData4Base::ClientUnpublish(int64_t pubuid) {
   }
 }
 
-void ServerImpl::ClientData4Base::ClientSetProperties(std::string_view name,
-                                                      const wpi::json& update) {
+void ServerImpl::ClientData4Base::ClientSetProperties(
+    std::string_view name, const glz::json_t& update) {
   DEBUG4("ClientSetProperties({}, {}, {})", m_id, name, update.dump());
   auto topicIt = m_server.m_nameTopics.find(name);
   if (topicIt == m_server.m_nameTopics.end() ||
@@ -381,9 +381,8 @@ void ServerImpl::ClientDataLocal::SendUnannounce(TopicData* topic) {
   }
 }
 
-void ServerImpl::ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
-                                                       const wpi::json& update,
-                                                       bool ack) {
+void ServerImpl::ClientDataLocal::SendPropertiesUpdate(
+    TopicData* topic, const glz::json_t& update, bool ack) {
   if (m_server.m_local) {
     if (!m_announceSent.lookup(topic)) {
       return;
@@ -525,7 +524,7 @@ void ServerImpl::ClientData4::SendUnannounce(TopicData* topic) {
 }
 
 void ServerImpl::ClientData4::SendPropertiesUpdate(TopicData* topic,
-                                                   const wpi::json& update,
+                                                   const glz::json_t& update,
                                                    bool ack) {
   if (!m_announceSent.lookup(topic)) {
     return;
@@ -695,7 +694,7 @@ void ServerImpl::ClientData3::SendUnannounce(TopicData* topic) {
 }
 
 void ServerImpl::ClientData3::SendPropertiesUpdate(TopicData* topic,
-                                                   const wpi::json& update,
+                                                   const glz::json_t& update,
                                                    bool ack) {
   if (ack) {
     return;  // we don't ack in NT3
@@ -895,7 +894,7 @@ void ServerImpl::ClientData3::EntryAssign(std::string_view name,
 
   // convert from NT3 info
   auto typeStr = TypeToString(value.type());
-  wpi::json properties = wpi::json::object();
+  glz::json_t properties;
   properties["retained"] = true;  // treat all NT3 published topics as retained
   if ((flags & NT_PERSISTENT) != 0) {
     properties["persistent"] = true;
@@ -1053,7 +1052,7 @@ void ServerImpl::ClientData3::EntryDelete(unsigned int id) {
   m_server.SetProperties(this, topic, {{"retained", false}});
 }
 
-bool ServerImpl::TopicData::SetProperties(const wpi::json& update) {
+bool ServerImpl::TopicData::SetProperties(const glz::json_t& update) {
   if (!update.is_object()) {
     return false;
   }
@@ -1239,7 +1238,7 @@ bool ServerImpl::PersistentChanged() {
 }
 
 static void DumpValue(wpi::raw_ostream& os, const Value& value,
-                      wpi::json::serializer& s) {
+                      glz::json_t::serializer& s) {
   switch (value.type()) {
     case NT_BOOLEAN:
       if (value.GetBoolean()) {
@@ -1351,7 +1350,7 @@ static void DumpValue(wpi::raw_ostream& os, const Value& value,
 }
 
 void ServerImpl::DumpPersistent(wpi::raw_ostream& os) {
-  wpi::json::serializer s{os, ' ', 16};
+  glz::json_t::serializer s{os, ' ', 16};
   os << "[\n";
   bool first = true;
   for (const auto& topic : m_topics) {
@@ -1376,7 +1375,7 @@ void ServerImpl::DumpPersistent(wpi::raw_ostream& os) {
   os << "\n]\n";
 }
 
-static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
+static std::string* ObjGetString(glz::object& obj, std::string_view key,
                                  std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
@@ -1395,10 +1394,10 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
     return {};
   }
 
-  wpi::json j;
+  glz::json_t j;
   try {
-    j = wpi::json::parse(in);
-  } catch (wpi::json::parse_error& err) {
+    j = glz::json_t::parse(in);
+  } catch (glz::json_t::parse_error& err) {
     return fmt::format("could not decode JSON: {}", err.what());
   }
 
@@ -1415,7 +1414,7 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
     ++i;
     std::string error;
     {
-      auto obj = jitem.get_ptr<wpi::json::object_t*>();
+      auto obj = jitem.get_ptr<glz::object*>();
       if (!obj) {
         error = "expected item to be an object";
         goto err;
@@ -1506,7 +1505,7 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
           goto err;
         }
       } else if (*typeStr == "boolean[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<glz::json_t::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -1521,7 +1520,7 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeBooleanArray(elems, time);
       } else if (*typeStr == "int[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<glz::json_t::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -1538,7 +1537,7 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeIntegerArray(elems, time);
       } else if (*typeStr == "double[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<glz::json_t::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -1553,7 +1552,7 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeDoubleArray(elems, time);
       } else if (*typeStr == "float[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<glz::json_t::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -1568,7 +1567,7 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
         }
         value = Value::MakeFloatArray(elems, time);
       } else if (*typeStr == "string[]") {
-        auto arr = valueIt->second.get_ptr<wpi::json::array_t*>();
+        auto arr = valueIt->second.get_ptr<glz::json_t::array_t*>();
         if (!arr) {
           error = "value type mismatch, expected array";
           goto err;
@@ -1614,7 +1613,7 @@ std::string ServerImpl::LoadPersistent(std::string_view in) {
 ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
                                                std::string_view name,
                                                std::string_view typeStr,
-                                               const wpi::json& properties,
+                                               const glz::json_t& properties,
                                                bool special) {
   auto& topic = m_nameTopics[name];
   if (topic) {
@@ -1708,7 +1707,7 @@ void ServerImpl::DeleteTopic(TopicData* topic) {
 }
 
 void ServerImpl::SetProperties(ClientData* client, TopicData* topic,
-                               const wpi::json& update) {
+                               const glz::json_t& update) {
   DEBUG4("SetProperties({}, {}, {})", client ? client->GetId() : -1,
          topic->name, update.dump());
   bool wasPersistent = topic->persistent;
@@ -1728,11 +1727,11 @@ void ServerImpl::SetFlags(ClientData* client, TopicData* topic,
     // update persistentChanged flag
     if (topic->persistent != wasPersistent) {
       m_persistentChanged = true;
-      wpi::json update;
+      glz::json_t update;
       if (topic->persistent) {
         update = {{"persistent", true}};
       } else {
-        update = {{"persistent", wpi::json::object()}};
+        update = {{"persistent", glz::json_t::object()}};
       }
       PropertiesChanged(client, topic, update);
     }
@@ -1857,7 +1856,7 @@ void ServerImpl::UpdateMetaTopicSub(TopicData* topic) {
 }
 
 void ServerImpl::PropertiesChanged(ClientData* client, TopicData* topic,
-                                   const wpi::json& update) {
+                                   const glz::json_t& update) {
   // removing some properties can result in the topic being unpublished
   if (!topic->IsPublished()) {
     DeleteTopic(topic);

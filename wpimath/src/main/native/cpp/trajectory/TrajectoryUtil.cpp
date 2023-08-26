@@ -7,8 +7,9 @@
 #include <system_error>
 
 #include <fmt/format.h>
+#include <glaze/json.hpp>
+#include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
-#include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
@@ -23,31 +24,32 @@ void TrajectoryUtil::ToPathweaverJson(const Trajectory& trajectory,
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json = trajectory.States();
+  std::string json = glz::write_json(trajectory.States());
   output << json;
   output.flush();
 }
 
 Trajectory TrajectoryUtil::FromPathweaverJson(std::string_view path) {
-  std::error_code error_code;
+  std::error_code ec;
+  std::unique_ptr<wpi::MemoryBuffer> fileBuffer =
+      wpi::MemoryBuffer::GetFile(path, ec);
 
-  wpi::raw_fd_istream input{path, error_code};
-  if (error_code) {
+  if (fileBuffer == nullptr || ec) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
-  wpi::json json;
-  input >> json;
+  std::string_view fileContents{
+      reinterpret_cast<const char*>(fileBuffer->begin()), fileBuffer->size()};
 
-  return Trajectory{json.get<std::vector<Trajectory::State>>()};
+  return Trajectory{
+      glz::read_json<std::vector<Trajectory::State>>(fileContents).value()};
 }
 
 std::string TrajectoryUtil::SerializeTrajectory(const Trajectory& trajectory) {
-  wpi::json json = trajectory.States();
-  return json.dump();
+  return glz::write_json(trajectory.States());
 }
 
 Trajectory TrajectoryUtil::DeserializeTrajectory(std::string_view jsonStr) {
-  wpi::json json = wpi::json::parse(jsonStr);
-  return Trajectory{json.get<std::vector<Trajectory::State>>()};
+  return Trajectory{
+      glz::read_json<std::vector<Trajectory::State>>(jsonStr).value()};
 }

@@ -114,9 +114,9 @@ inline UnitPublisher<T> UnitTopic<T>::Publish(const PubSubOptions& options) {
 
 template <typename T>
 inline UnitPublisher<T> UnitTopic<T>::PublishEx(std::string_view typeString,
-                                                const wpi::json& properties,
+                                                const glz::json_t& properties,
                                                 const PubSubOptions& options) {
-  wpi::json props = properties;
+  glz::json_t props = properties;
   props["unit"] = T{}.name();
   return UnitPublisher<T>{
       ::nt::PublishEx(m_handle, NT_DOUBLE, typeString, props, options)};

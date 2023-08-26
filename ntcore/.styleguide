@@ -4,6 +4,7 @@ cHeaderFileInclude {
 
 cppHeaderFileInclude {
   (?<!_c)\.h$
+  (?<!_c)\.hpp$
   \.inc$
   \.inl$
 }

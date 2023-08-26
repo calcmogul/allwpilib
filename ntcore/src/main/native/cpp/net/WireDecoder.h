@@ -11,9 +11,10 @@
 #include <string>
 #include <string_view>
 
+#include <glaze/json.hpp>
+
 namespace wpi {
 class Logger;
-class json;
 }  // namespace wpi
 
 namespace nt {
@@ -29,10 +30,10 @@ class ClientMessageHandler {
 
   virtual void ClientPublish(int64_t pubuid, std::string_view name,
                              std::string_view typeStr,
-                             const wpi::json& properties) = 0;
+                             const glz::json_t& properties) = 0;
   virtual void ClientUnpublish(int64_t pubuid) = 0;
   virtual void ClientSetProperties(std::string_view name,
-                                   const wpi::json& update) = 0;
+                                   const glz::json_t& update) = 0;
   virtual void ClientSubscribe(int64_t subuid,
                                std::span<const std::string> topicNames,
                                const PubSubOptionsImpl& options) = 0;
@@ -44,11 +45,11 @@ class ServerMessageHandler {
   virtual ~ServerMessageHandler() = default;
   virtual void ServerAnnounce(std::string_view name, int64_t id,
                               std::string_view typeStr,
-                              const wpi::json& properties,
+                              const glz::json_t& properties,
                               std::optional<int64_t> pubuid) = 0;
   virtual void ServerUnannounce(std::string_view name, int64_t id) = 0;
   virtual void ServerPropertiesUpdate(std::string_view name,
-                                      const wpi::json& update, bool ack) = 0;
+                                      const glz::json_t& update, bool ack) = 0;
 };
 
 void WireDecodeText(std::string_view in, ClientMessageHandler& out,
