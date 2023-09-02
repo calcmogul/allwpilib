@@ -19,6 +19,8 @@ namespace units {
  * @anchor angularJerkContainers
  * @sa See unit_t for more information on unit type containers.
  */
+#if !defined(DISABLE_PREDEFINED_UNITS) || \
+    defined(ENABLE_PREDEFINED_ANGULAR_JERK_UNITS)
 UNIT_ADD(angular_jerk, radians_per_second_cubed, radians_per_second_cubed,
          rad_per_s_cu, unit<std::ratio<1>, units::category::angular_jerk_unit>)
 UNIT_ADD(angular_jerk, degrees_per_second_cubed, degrees_per_second_cubed,
@@ -29,6 +31,7 @@ UNIT_ADD(angular_jerk, turns_per_second_cubed, turns_per_second_cubed,
          compound_unit<angle::turns, inverse<cubed<time::seconds>>>)
 
 UNIT_ADD_CATEGORY_TRAIT(angular_jerk)
+#endif
 
 using namespace angular_jerk;
 }  // namespace units

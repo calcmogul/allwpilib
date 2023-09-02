@@ -19,6 +19,8 @@ namespace units {
  * @anchor angularAccelerationContainers
  * @sa See unit_t for more information on unit type containers.
  */
+#if !defined(DISABLE_PREDEFINED_UNITS) || \
+    defined(ENABLE_PREDEFINED_ANGULAR_ACCELERATION_UNITS)
 UNIT_ADD(angular_acceleration, radians_per_second_squared,
          radians_per_second_squared, rad_per_s_sq,
          unit<std::ratio<1>, units::category::angular_acceleration_unit>)
@@ -37,6 +39,7 @@ UNIT_ADD(angular_acceleration, revolutions_per_minute_per_second,
                                                    inverse<time::seconds>>>)
 
 UNIT_ADD_CATEGORY_TRAIT(angular_acceleration)
+#endif
 
 using namespace angular_acceleration;
 }  // namespace units
