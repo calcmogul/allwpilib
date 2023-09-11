@@ -5,6 +5,7 @@ macro(wpilib_target_warnings target)
             -pedantic
             -Wextra
             -Wno-unused-parameter
+            -fconcepts-diagnostics-depth=3
             ${WPILIB_TARGET_WARNINGS}
         )
         if(NOT NO_WERROR)
