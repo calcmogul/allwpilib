@@ -217,7 +217,7 @@ struct gemm_functor {
 };
 
 template <int StorageOrder, typename LhsScalar, typename RhsScalar, int MaxRows, int MaxCols, int MaxDepth,
-          int KcFactor = 1, bool FiniteAtCompileTime = MaxRows != Dynamic && MaxCols != Dynamic && MaxDepth != Dynamic>
+          int KcFactor = 1, bool FiniteAtCompileTime = MaxRows != Dynamic&& MaxCols != Dynamic&& MaxDepth != Dynamic>
 class gemm_blocking_space;
 
 template <typename LhsScalar_, typename RhsScalar_>

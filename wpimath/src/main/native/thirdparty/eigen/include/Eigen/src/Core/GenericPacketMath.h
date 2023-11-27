@@ -155,7 +155,7 @@ struct is_scalar {
 // 2) the packets differ only in sign.
 // In both of these cases, preinterpret (bit_cast) is equivalent to pcast (static_cast)
 template <typename SrcPacket, typename TgtPacket,
-          bool Scalar = is_scalar<SrcPacket>::value && is_scalar<TgtPacket>::value>
+          bool Scalar = is_scalar<SrcPacket>::value&& is_scalar<TgtPacket>::value>
 struct is_degenerate_helper : is_same<SrcPacket, TgtPacket> {};
 template <>
 struct is_degenerate_helper<int8_t, uint8_t, true> : std::true_type {};
@@ -440,22 +440,22 @@ EIGEN_DEVICE_FUNC inline Packet pcmp_lt_or_nan(const Packet& a, const Packet& b)
 
 template <typename T>
 struct bit_and {
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE T operator()(const T& a, const T& b) const { return a & b; }
+  EIGEN_DEVICE_FUNC constexpr EIGEN_ALWAYS_INLINE T operator()(const T& a, const T& b) const { return a & b; }
 };
 
 template <typename T>
 struct bit_or {
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE T operator()(const T& a, const T& b) const { return a | b; }
+  EIGEN_DEVICE_FUNC constexpr EIGEN_ALWAYS_INLINE T operator()(const T& a, const T& b) const { return a | b; }
 };
 
 template <typename T>
 struct bit_xor {
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE T operator()(const T& a, const T& b) const { return a ^ b; }
+  EIGEN_DEVICE_FUNC constexpr EIGEN_ALWAYS_INLINE T operator()(const T& a, const T& b) const { return a ^ b; }
 };
 
 template <typename T>
 struct bit_not {
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR EIGEN_ALWAYS_INLINE T operator()(const T& a) const { return ~a; }
+  EIGEN_DEVICE_FUNC constexpr EIGEN_ALWAYS_INLINE T operator()(const T& a) const { return ~a; }
 };
 
 // Use operators &, |, ^, ~.

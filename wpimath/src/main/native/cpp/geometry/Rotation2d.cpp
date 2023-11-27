@@ -4,12 +4,9 @@
 
 #include "frc/geometry/Rotation2d.h"
 
-#include <cmath>
-
 #include <wpi/json.h>
 
 #include "geometry2d.pb.h"
-#include "units/math.h"
 
 using namespace frc;
 

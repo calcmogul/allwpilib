@@ -40,7 +40,7 @@ struct WPILIB_DLLEXPORT Twist2d {
    * @param other The other object.
    * @return Whether the two objects are equal.
    */
-  bool operator==(const Twist2d& other) const {
+  constexpr bool operator==(const Twist2d& other) const {
     return units::math::abs(dx - other.dx) < 1E-9_m &&
            units::math::abs(dy - other.dy) < 1E-9_m &&
            units::math::abs(dtheta - other.dtheta) < 1E-9_rad;

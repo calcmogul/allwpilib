@@ -229,7 +229,7 @@ struct gemv_static_vector_if;
 
 template <typename Scalar, int Size, int MaxSize>
 struct gemv_static_vector_if<Scalar, Size, MaxSize, false> {
-  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Scalar* data() {
+  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC constexpr Scalar* data() {
     eigen_internal_assert(false && "should never be called");
     return 0;
   }
@@ -237,7 +237,7 @@ struct gemv_static_vector_if<Scalar, Size, MaxSize, false> {
 
 template <typename Scalar, int Size>
 struct gemv_static_vector_if<Scalar, Size, Dynamic, true> {
-  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Scalar* data() { return 0; }
+  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC constexpr Scalar* data() { return 0; }
 };
 
 template <typename Scalar, int Size, int MaxSize>
@@ -250,14 +250,14 @@ struct gemv_static_vector_if<Scalar, Size, MaxSize, true> {
   internal::plain_array<Scalar, internal::min_size_prefer_fixed(Size, MaxSize), 0,
                         internal::plain_enum_min(AlignedMax, PacketSize)>
       m_data;
-  EIGEN_STRONG_INLINE Scalar* data() { return m_data.array; }
+  EIGEN_STRONG_INLINE constexpr Scalar* data() { return m_data.array; }
 #else
   // Some architectures cannot align on the stack,
   // => let's manually enforce alignment by allocating more data and return the address of the first aligned element.
   internal::plain_array<
       Scalar, internal::min_size_prefer_fixed(Size, MaxSize) + (ForceAlignment ? EIGEN_MAX_ALIGN_BYTES : 0), 0>
       m_data;
-  EIGEN_STRONG_INLINE Scalar* data() {
+  EIGEN_STRONG_INLINE constexpr Scalar* data() {
     return ForceAlignment
                ? reinterpret_cast<Scalar*>((std::uintptr_t(m_data.array) & ~(std::size_t(EIGEN_MAX_ALIGN_BYTES - 1))) +
                                            EIGEN_MAX_ALIGN_BYTES)
@@ -460,7 +460,7 @@ struct gemv_dense_selector<OnTheRight, RowMajor, false> {
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Product<Derived, OtherDerived> MatrixBase<Derived>::operator*(
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const Product<Derived, OtherDerived> MatrixBase<Derived>::operator*(
     const MatrixBase<OtherDerived>& other) const {
   // A note regarding the function declaration: In MSVC, this function will sometimes
   // not be inlined since DenseStorage is an unwindable object for dynamic
@@ -501,7 +501,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Product<Derived, OtherDerived> Matri
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Product<Derived, OtherDerived, LazyProduct>
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const Product<Derived, OtherDerived, LazyProduct>
 MatrixBase<Derived>::lazyProduct(const MatrixBase<OtherDerived>& other) const {
   enum {
     ProductIsValid = Derived::ColsAtCompileTime == Dynamic || OtherDerived::RowsAtCompileTime == Dynamic ||

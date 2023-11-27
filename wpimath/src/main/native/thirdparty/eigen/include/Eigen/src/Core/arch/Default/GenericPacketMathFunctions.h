@@ -59,7 +59,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Packet pfrexp_generic(const Packet& a, Pac
   static constexpr int TotalBits = sizeof(Scalar) * CHAR_BIT, MantissaBits = numext::numeric_limits<Scalar>::digits - 1,
                        ExponentBits = TotalBits - MantissaBits - 1;
 
-  EIGEN_CONSTEXPR ScalarUI scalar_sign_mantissa_mask =
+  constexpr ScalarUI scalar_sign_mantissa_mask =
       ~(((ScalarUI(1) << ExponentBits) - ScalarUI(1)) << MantissaBits);  // ~0x7f800000
   const Packet sign_mantissa_mask = pset1frombits<Packet>(static_cast<ScalarUI>(scalar_sign_mantissa_mask));
   const Packet half = pset1<Packet>(Scalar(0.5));
@@ -68,7 +68,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC Packet pfrexp_generic(const Packet& a, Pac
 
   // To handle denormals, normalize by multiplying by 2^(int(MantissaBits)+1).
   const Packet is_denormal = pcmp_lt(pabs(a), normal_min);
-  EIGEN_CONSTEXPR ScalarUI scalar_normalization_offset = ScalarUI(MantissaBits + 1);  // 24
+  constexpr ScalarUI scalar_normalization_offset = ScalarUI(MantissaBits + 1);  // 24
   // The following cannot be constexpr because bfloat16(uint16_t) is not constexpr.
   const Scalar scalar_normalization_factor = Scalar(ScalarUI(1) << int(scalar_normalization_offset));  // 2^24
   const Packet normalization_factor = pset1<Packet>(scalar_normalization_factor);
@@ -1202,7 +1202,7 @@ EIGEN_STRONG_INLINE void twoprod(const Packet& x, const Packet& y, Packet& p_hi,
 template <typename Packet>
 EIGEN_STRONG_INLINE void veltkamp_splitting(const Packet& x, Packet& x_hi, Packet& x_lo) {
   typedef typename unpacket_traits<Packet>::type Scalar;
-  EIGEN_CONSTEXPR int shift = (NumTraits<Scalar>::digits() + 1) / 2;
+  constexpr int shift = (NumTraits<Scalar>::digits() + 1) / 2;
   const Scalar shift_scale = Scalar(uint64_t(1) << shift);  // Scalar constructor not necessarily constexpr.
   const Packet gamma = pmul(pset1<Packet>(shift_scale + Scalar(1)), x);
   Packet rho = psub(x, gamma);
@@ -1653,7 +1653,7 @@ EIGEN_STRONG_INLINE Packet generic_pow_impl(const Packet& x, const Packet& y) {
   Packet m_x = pfrexp(x, e_x);
 
   // Adjust m_x to lie in [1/sqrt(2):sqrt(2)] to minimize absolute error in log2(m_x).
-  EIGEN_CONSTEXPR Scalar sqrt_half = Scalar(0.70710678118654752440);
+  constexpr Scalar sqrt_half = Scalar(0.70710678118654752440);
   const Packet m_x_scale_mask = pcmp_lt(m_x, pset1<Packet>(sqrt_half));
   m_x = pselect(m_x_scale_mask, pmul(pset1<Packet>(Scalar(2)), m_x), m_x);
   e_x = pselect(m_x_scale_mask, psub(e_x, pset1<Packet>(Scalar(1))), e_x);
@@ -1726,7 +1726,7 @@ EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS Packet generic_pow(const Pac
   const Packet y_is_pos = pandnot(ptrue(y), por(abs_y_is_zero, y_is_neg));
   const Packet y_is_nan = pisnan(y);
   const Packet abs_y_is_inf = pcmp_eq(abs_y, cst_pos_inf);
-  EIGEN_CONSTEXPR Scalar huge_exponent =
+  constexpr Scalar huge_exponent =
       (NumTraits<Scalar>::max_exponent() * Scalar(EIGEN_LN2)) / NumTraits<Scalar>::epsilon();
   const Packet abs_y_is_huge = pcmp_le(pset1<Packet>(huge_exponent), pabs(y));
 

@@ -93,16 +93,16 @@ class Product
   typedef internal::remove_all_t<LhsNested> LhsNestedCleaned;
   typedef internal::remove_all_t<RhsNested> RhsNestedCleaned;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Product(const Lhs& lhs, const Rhs& rhs) : m_lhs(lhs), m_rhs(rhs) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Product(const Lhs& lhs, const Rhs& rhs) : m_lhs(lhs), m_rhs(rhs) {
     eigen_assert(lhs.cols() == rhs.rows() && "invalid matrix product" &&
                  "if you wanted a coeff-wise or a dot product use the respective explicit functions");
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_lhs.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index rows() const EIGEN_NOEXCEPT { return m_lhs.rows(); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const LhsNestedCleaned& lhs() const { return m_lhs; }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const RhsNestedCleaned& rhs() const { return m_rhs; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const LhsNestedCleaned& lhs() const { return m_lhs; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const RhsNestedCleaned& rhs() const { return m_rhs; }
 
  protected:
   LhsNested m_lhs;
@@ -125,7 +125,7 @@ class dense_product_base<Lhs, Rhs, Option, InnerProduct>
   using Base::derived;
   typedef typename Base::Scalar Scalar;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE operator const Scalar() const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr operator const Scalar() const {
     return internal::evaluator<ProductXpr>(derived()).coeff(0, 0);
   }
 };
@@ -154,14 +154,14 @@ class ProductImpl<Lhs, Rhs, Option, Dense> : public internal::dense_product_base
   };
 
  public:
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar coeff(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Scalar coeff(Index row, Index col) const {
     EIGEN_STATIC_ASSERT(EnableCoeff, THIS_METHOD_IS_ONLY_FOR_INNER_OR_LAZY_PRODUCTS);
     eigen_assert((Option == LazyProduct) || (this->rows() == 1 && this->cols() == 1));
 
     return internal::evaluator<Derived>(derived()).coeff(row, col);
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar coeff(Index i) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Scalar coeff(Index i) const {
     EIGEN_STATIC_ASSERT(EnableCoeff, THIS_METHOD_IS_ONLY_FOR_INNER_OR_LAZY_PRODUCTS);
     eigen_assert((Option == LazyProduct) || (this->rows() == 1 && this->cols() == 1));
 

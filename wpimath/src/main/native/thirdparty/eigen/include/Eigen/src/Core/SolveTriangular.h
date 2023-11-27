@@ -171,7 +171,7 @@ struct triangular_solver_selector<Lhs, Rhs, OnTheRight, Mode, CompleteUnrolling,
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 template <typename MatrixType, unsigned int Mode>
 template <int Side, typename OtherDerived>
-EIGEN_DEVICE_FUNC void TriangularViewImpl<MatrixType, Mode, Dense>::solveInPlace(
+EIGEN_DEVICE_FUNC constexpr void TriangularViewImpl<MatrixType, Mode, Dense>::solveInPlace(
     const MatrixBase<OtherDerived>& _other) const {
   OtherDerived& other = _other.const_cast_derived();
   eigen_assert(derived().cols() == derived().rows() && ((Side == OnTheLeft && derived().cols() == other.rows()) ||
@@ -196,7 +196,7 @@ EIGEN_DEVICE_FUNC void TriangularViewImpl<MatrixType, Mode, Dense>::solveInPlace
 
 template <typename Derived, unsigned int Mode>
 template <int Side, typename Other>
-const internal::triangular_solve_retval<Side, TriangularView<Derived, Mode>, Other>
+constexpr const internal::triangular_solve_retval<Side, TriangularView<Derived, Mode>, Other>
 TriangularViewImpl<Derived, Mode, Dense>::solve(const MatrixBase<Other>& other) const {
   return internal::triangular_solve_retval<Side, TriangularViewType, Other>(derived(), other.derived());
 }
@@ -214,13 +214,13 @@ struct triangular_solve_retval : public ReturnByValue<triangular_solve_retval<Si
   typedef remove_all_t<typename Rhs::Nested> RhsNestedCleaned;
   typedef ReturnByValue<triangular_solve_retval> Base;
 
-  triangular_solve_retval(const TriangularType& tri, const Rhs& rhs) : m_triangularMatrix(tri), m_rhs(rhs) {}
+  constexpr triangular_solve_retval(const TriangularType& tri, const Rhs& rhs) : m_triangularMatrix(tri), m_rhs(rhs) {}
 
-  inline EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_rhs.rows(); }
-  inline EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
+  inline constexpr Index rows() const EIGEN_NOEXCEPT { return m_rhs.rows(); }
+  inline constexpr Index cols() const EIGEN_NOEXCEPT { return m_rhs.cols(); }
 
   template <typename Dest>
-  inline void evalTo(Dest& dst) const {
+  inline constexpr void evalTo(Dest& dst) const {
     if (!is_same_dense(dst, m_rhs)) dst = m_rhs;
     m_triangularMatrix.template solveInPlace<Side>(dst);
   }

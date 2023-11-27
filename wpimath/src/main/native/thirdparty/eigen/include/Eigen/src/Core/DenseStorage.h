@@ -246,8 +246,8 @@ class DenseStorage<T, 0, Dynamic, Dynamic, Options_> {
     numext::swap(m_rows, other.m_rows);
     numext::swap(m_cols, other.m_cols);
   }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_rows; }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_cols; }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const EIGEN_NOEXCEPT { return m_rows; }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const EIGEN_NOEXCEPT { return m_cols; }
   EIGEN_DEVICE_FUNC void conservativeResize(Index, Index rows, Index cols) {
     m_rows = rows;
     m_cols = cols;
@@ -278,8 +278,8 @@ class DenseStorage<T, 0, Rows_, Dynamic, Options_> {
     eigen_assert(Rows_ * m_cols == 0 && "The number of rows times columns must equal the storage size.");
   }
   EIGEN_DEVICE_FUNC void swap(DenseStorage& other) { numext::swap(m_cols, other.m_cols); }
-  EIGEN_DEVICE_FUNC static EIGEN_CONSTEXPR Index rows(void) EIGEN_NOEXCEPT { return Rows_; }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols(void) const EIGEN_NOEXCEPT { return m_cols; }
+  EIGEN_DEVICE_FUNC static constexpr Index rows(void) EIGEN_NOEXCEPT { return Rows_; }
+  EIGEN_DEVICE_FUNC constexpr Index cols(void) const EIGEN_NOEXCEPT { return m_cols; }
   EIGEN_DEVICE_FUNC void conservativeResize(Index, Index, Index cols) {
     m_cols = cols;
     eigen_assert(Rows_ * m_cols == 0 && "The number of rows times columns must equal the storage size.");
@@ -308,8 +308,8 @@ class DenseStorage<T, 0, Dynamic, Cols_, Options_> {
     eigen_assert(m_rows * Cols_ == 0 && "The number of rows times columns must equal the storage size.");
   }
   EIGEN_DEVICE_FUNC void swap(DenseStorage& other) { numext::swap(m_rows, other.m_rows); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows(void) const EIGEN_NOEXCEPT { return m_rows; }
-  EIGEN_DEVICE_FUNC static EIGEN_CONSTEXPR Index cols(void) EIGEN_NOEXCEPT { return Cols_; }
+  EIGEN_DEVICE_FUNC constexpr Index rows(void) const EIGEN_NOEXCEPT { return m_rows; }
+  EIGEN_DEVICE_FUNC static constexpr Index cols(void) EIGEN_NOEXCEPT { return Cols_; }
   EIGEN_DEVICE_FUNC void conservativeResize(Index, Index rows, Index) {
     m_rows = rows;
     eigen_assert(m_rows * Cols_ == 0 && "The number of rows times columns must equal the storage size.");

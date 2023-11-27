@@ -200,16 +200,16 @@ class BandMatrix : public BandMatrixBase<BandMatrix<Scalar_, Rows, Cols, Supers,
       : m_coeffs(1 + supers + subs, cols), m_rows(rows), m_supers(supers), m_subs(subs) {}
 
   /** \returns the number of columns */
-  inline EIGEN_CONSTEXPR Index rows() const { return m_rows.value(); }
+  inline constexpr Index rows() const { return m_rows.value(); }
 
   /** \returns the number of rows */
-  inline EIGEN_CONSTEXPR Index cols() const { return m_coeffs.cols(); }
+  inline constexpr Index cols() const { return m_coeffs.cols(); }
 
   /** \returns the number of super diagonals */
-  inline EIGEN_CONSTEXPR Index supers() const { return m_supers.value(); }
+  inline constexpr Index supers() const { return m_supers.value(); }
 
   /** \returns the number of sub diagonals */
-  inline EIGEN_CONSTEXPR Index subs() const { return m_subs.value(); }
+  inline constexpr Index subs() const { return m_subs.value(); }
 
   inline const CoefficientsType& coeffs() const { return m_coeffs; }
   inline CoefficientsType& coeffs() { return m_coeffs; }
@@ -260,16 +260,16 @@ class BandMatrixWrapper
   }
 
   /** \returns the number of columns */
-  inline EIGEN_CONSTEXPR Index rows() const { return m_rows.value(); }
+  inline constexpr Index rows() const { return m_rows.value(); }
 
   /** \returns the number of rows */
-  inline EIGEN_CONSTEXPR Index cols() const { return m_coeffs.cols(); }
+  inline constexpr Index cols() const { return m_coeffs.cols(); }
 
   /** \returns the number of super diagonals */
-  inline EIGEN_CONSTEXPR Index supers() const { return m_supers.value(); }
+  inline constexpr Index supers() const { return m_supers.value(); }
 
   /** \returns the number of sub diagonals */
-  inline EIGEN_CONSTEXPR Index subs() const { return m_subs.value(); }
+  inline constexpr Index subs() const { return m_subs.value(); }
 
   inline const CoefficientsType& coeffs() const { return m_coeffs; }
 

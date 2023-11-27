@@ -69,7 +69,7 @@ struct get_compile_time_incr {
 
 // Analogue of std::get<0>(x), but tailored for our needs.
 template <typename T>
-EIGEN_CONSTEXPR Index first(const T& x) EIGEN_NOEXCEPT {
+constexpr Index first(const T& x) EIGEN_NOEXCEPT {
   return x.first();
 }
 
@@ -93,7 +93,7 @@ struct SingleRange {
   enum { SizeAtCompileTime = 1 };
   SingleRange(Index val) : m_value(val) {}
   Index operator[](Index) const { return m_value; }
-  static EIGEN_CONSTEXPR Index size() EIGEN_NOEXCEPT { return 1; }
+  static constexpr Index size() EIGEN_NOEXCEPT { return 1; }
   Index first() const EIGEN_NOEXCEPT { return m_value; }
   Index m_value;
 };
@@ -137,9 +137,9 @@ template <int XprSize>
 struct AllRange {
   enum { SizeAtCompileTime = XprSize };
   AllRange(Index size = XprSize) : m_size(size) {}
-  EIGEN_CONSTEXPR Index operator[](Index i) const EIGEN_NOEXCEPT { return i; }
-  EIGEN_CONSTEXPR Index size() const EIGEN_NOEXCEPT { return m_size.value(); }
-  EIGEN_CONSTEXPR Index first() const EIGEN_NOEXCEPT { return 0; }
+  constexpr Index operator[](Index i) const EIGEN_NOEXCEPT { return i; }
+  constexpr Index size() const EIGEN_NOEXCEPT { return m_size.value(); }
+  constexpr Index first() const EIGEN_NOEXCEPT { return 0; }
   variable_if_dynamic<Index, XprSize> m_size;
 };
 

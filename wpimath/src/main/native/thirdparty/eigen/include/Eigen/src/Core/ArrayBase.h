@@ -106,40 +106,40 @@ class ArrayBase : public DenseBase<Derived> {
   /** Special case of the template operator=, in order to prevent the compiler
    * from generating a default operator= (issue hit with g++ 4.1)
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const ArrayBase& other) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator=(const ArrayBase& other) {
     internal::call_assignment(derived(), other.derived());
     return derived();
   }
 
   /** Set all the entries to \a value.
    * \sa DenseBase::setConstant(), DenseBase::fill() */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const Scalar& value) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator=(const Scalar& value) {
     Base::setConstant(value);
     return derived();
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator+=(const Scalar& scalar);
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator-=(const Scalar& scalar);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator+=(const Scalar& scalar);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator-=(const Scalar& scalar);
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator+=(const ArrayBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator+=(const ArrayBase<OtherDerived>& other);
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator-=(const ArrayBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator-=(const ArrayBase<OtherDerived>& other);
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const ArrayBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator*=(const ArrayBase<OtherDerived>& other);
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const ArrayBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator/=(const ArrayBase<OtherDerived>& other);
 
  public:
-  EIGEN_DEVICE_FUNC ArrayBase<Derived>& array() { return *this; }
-  EIGEN_DEVICE_FUNC const ArrayBase<Derived>& array() const { return *this; }
+  EIGEN_DEVICE_FUNC constexpr ArrayBase<Derived>& array() { return *this; }
+  EIGEN_DEVICE_FUNC constexpr const ArrayBase<Derived>& array() const { return *this; }
 
   /** \returns an \link Eigen::MatrixBase Matrix \endlink expression of this array
    * \sa MatrixBase::array() */
-  EIGEN_DEVICE_FUNC MatrixWrapper<Derived> matrix() { return MatrixWrapper<Derived>(derived()); }
-  EIGEN_DEVICE_FUNC const MatrixWrapper<const Derived> matrix() const {
+  EIGEN_DEVICE_FUNC constexpr MatrixWrapper<Derived> matrix() { return MatrixWrapper<Derived>(derived()); }
+  EIGEN_DEVICE_FUNC constexpr const MatrixWrapper<const Derived> matrix() const {
     return MatrixWrapper<const Derived>(derived());
   }
 
@@ -151,7 +151,7 @@ class ArrayBase : public DenseBase<Derived> {
   EIGEN_DEFAULT_EMPTY_CONSTRUCTOR_AND_DESTRUCTOR(ArrayBase)
 
  private:
-  explicit ArrayBase(Index);
+  constexpr explicit ArrayBase(Index);
   ArrayBase(Index, Index);
   template <typename OtherDerived>
   explicit ArrayBase(const ArrayBase<OtherDerived>&);
@@ -159,14 +159,14 @@ class ArrayBase : public DenseBase<Derived> {
  protected:
   // mixing arrays and matrices is not legal
   template <typename OtherDerived>
-  Derived& operator+=(const MatrixBase<OtherDerived>&) {
+  constexpr Derived& operator+=(const MatrixBase<OtherDerived>&) {
     EIGEN_STATIC_ASSERT(std::ptrdiff_t(sizeof(typename OtherDerived::Scalar)) == -1,
                         YOU_CANNOT_MIX_ARRAYS_AND_MATRICES);
     return *this;
   }
   // mixing arrays and matrices is not legal
   template <typename OtherDerived>
-  Derived& operator-=(const MatrixBase<OtherDerived>&) {
+  constexpr Derived& operator-=(const MatrixBase<OtherDerived>&) {
     EIGEN_STATIC_ASSERT(std::ptrdiff_t(sizeof(typename OtherDerived::Scalar)) == -1,
                         YOU_CANNOT_MIX_ARRAYS_AND_MATRICES);
     return *this;
@@ -179,7 +179,8 @@ class ArrayBase : public DenseBase<Derived> {
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator-=(const ArrayBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& ArrayBase<Derived>::operator-=(
+    const ArrayBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::sub_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }
@@ -190,7 +191,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator-=(co
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator+=(const ArrayBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& ArrayBase<Derived>::operator+=(
+    const ArrayBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::add_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }
@@ -201,7 +203,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator+=(co
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator*=(const ArrayBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& ArrayBase<Derived>::operator*=(
+    const ArrayBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::mul_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }
@@ -212,7 +215,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator*=(co
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& ArrayBase<Derived>::operator/=(const ArrayBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& ArrayBase<Derived>::operator/=(
+    const ArrayBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::div_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }

@@ -25,14 +25,12 @@ struct visitor_impl;
 template <typename Visitor, bool ShortCircuitEvaluation = false>
 struct short_circuit_eval_impl {
   // if short circuit evaluation is not used, do nothing
-  static EIGEN_CONSTEXPR EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor&) { return false; }
+  static constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor&) { return false; }
 };
 template <typename Visitor>
 struct short_circuit_eval_impl<Visitor, true> {
   // if short circuit evaluation is used, check the visitor
-  static EIGEN_CONSTEXPR EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor& visitor) {
-    return visitor.done();
-  }
+  static constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor& visitor) { return visitor.done(); }
 };
 
 // unrolled inner-outer traversal
@@ -294,23 +292,25 @@ class visitor_evaluator {
   static constexpr int XprAlignment = Evaluator::Alignment;
   static constexpr int CoeffReadCost = Evaluator::CoeffReadCost;
 
-  EIGEN_DEVICE_FUNC explicit visitor_evaluator(const XprType& xpr) : m_evaluator(xpr), m_xpr(xpr) {}
+  EIGEN_DEVICE_FUNC constexpr explicit visitor_evaluator(const XprType& xpr) : m_evaluator(xpr), m_xpr(xpr) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_xpr.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_xpr.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index size() const EIGEN_NOEXCEPT { return m_xpr.size(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const EIGEN_NOEXCEPT { return m_xpr.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const EIGEN_NOEXCEPT { return m_xpr.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index size() const EIGEN_NOEXCEPT { return m_xpr.size(); }
   // outer-inner access
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr CoeffReturnType coeff(Index row, Index col) const {
     return m_evaluator.coeff(row, col);
   }
   template <typename Packet, int Alignment = Unaligned>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet packet(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Packet packet(Index row, Index col) const {
     return m_evaluator.template packet<Alignment, Packet>(row, col);
   }
   // linear access
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index index) const { return m_evaluator.coeff(index); }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr CoeffReturnType coeff(Index index) const {
+    return m_evaluator.coeff(index);
+  }
   template <typename Packet, int Alignment = XprAlignment>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet packet(Index index) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Packet packet(Index index) const {
     return m_evaluator.template packet<Alignment, Packet>(index);
   }
 
@@ -379,7 +379,7 @@ struct visit_impl {
  */
 template <typename Derived>
 template <typename Visitor>
-EIGEN_DEVICE_FUNC void DenseBase<Derived>::visit(Visitor& visitor) const {
+EIGEN_DEVICE_FUNC constexpr void DenseBase<Derived>::visit(Visitor& visitor) const {
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ false>;
   impl::run(derived(), visitor);
 }
@@ -392,11 +392,11 @@ namespace internal {
 template <typename Derived>
 struct coeff_visitor {
   // default initialization to avoid countless invalid maybe-uninitialized warnings by gcc
-  EIGEN_DEVICE_FUNC coeff_visitor() : row(-1), col(-1), res(0) {}
+  EIGEN_DEVICE_FUNC constexpr coeff_visitor() : row(-1), col(-1), res(0) {}
   typedef typename Derived::Scalar Scalar;
   Index row, col;
   Scalar res;
-  EIGEN_DEVICE_FUNC inline void init(const Scalar& value, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void init(const Scalar& value, Index i, Index j) {
     res = value;
     row = i;
     col = j;
@@ -406,15 +406,15 @@ struct coeff_visitor {
 template <typename Scalar, int NaNPropagation, bool is_min = true>
 struct minmax_compare {
   typedef typename packet_traits<Scalar>::type Packet;
-  static EIGEN_DEVICE_FUNC inline bool compare(Scalar a, Scalar b) { return a < b; }
-  static EIGEN_DEVICE_FUNC inline Scalar predux(const Packet& p) { return predux_min<NaNPropagation>(p); }
+  static EIGEN_DEVICE_FUNC inline constexpr bool compare(Scalar a, Scalar b) { return a < b; }
+  static EIGEN_DEVICE_FUNC inline constexpr Scalar predux(const Packet& p) { return predux_min<NaNPropagation>(p); }
 };
 
 template <typename Scalar, int NaNPropagation>
 struct minmax_compare<Scalar, NaNPropagation, false> {
   typedef typename packet_traits<Scalar>::type Packet;
-  static EIGEN_DEVICE_FUNC inline bool compare(Scalar a, Scalar b) { return a > b; }
-  static EIGEN_DEVICE_FUNC inline Scalar predux(const Packet& p) { return predux_max<NaNPropagation>(p); }
+  static EIGEN_DEVICE_FUNC inline constexpr bool compare(Scalar a, Scalar b) { return a > b; }
+  static EIGEN_DEVICE_FUNC inline constexpr Scalar predux(const Packet& p) { return predux_max<NaNPropagation>(p); }
 };
 
 // Default implementation used by non-floating types, where we do not
@@ -427,14 +427,14 @@ struct minmax_coeff_visitor : coeff_visitor<Derived> {
   using Comparator = minmax_compare<Scalar, NaNPropagation, is_min>;
   static constexpr Index PacketSize = packet_traits<Scalar>::size;
 
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index i, Index j) {
     if (Comparator::compare(value, this->res)) {
       this->res = value;
       this->row = i;
       this->col = j;
     }
   }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index i, Index j) {
     Scalar value = Comparator::predux(p);
     if (Comparator::compare(value, this->res)) {
       const Packet range = preverse(plset<Packet>(Scalar(1)));
@@ -445,7 +445,7 @@ struct minmax_coeff_visitor : coeff_visitor<Derived> {
       this->col = Derived::IsRowMajor ? j + max_idx : j;
     }
   }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index i, Index j) {
     Scalar value = Comparator::predux(p);
     const Packet range = preverse(plset<Packet>(Scalar(1)));
     Packet mask = pcmp_eq(pset1<Packet>(value), p);
@@ -464,14 +464,14 @@ struct minmax_coeff_visitor<Derived, is_min, PropagateNumbers, false> : coeff_vi
   using Packet = typename packet_traits<Scalar>::type;
   using Comparator = minmax_compare<Scalar, PropagateNumbers, is_min>;
 
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index i, Index j) {
     if ((!(numext::isnan)(value) && (numext::isnan)(this->res)) || Comparator::compare(value, this->res)) {
       this->res = value;
       this->row = i;
       this->col = j;
     }
   }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index i, Index j) {
     const Index PacketSize = packet_traits<Scalar>::size;
     Scalar value = Comparator::predux(p);
     if ((!(numext::isnan)(value) && (numext::isnan)(this->res)) || Comparator::compare(value, this->res)) {
@@ -484,7 +484,7 @@ struct minmax_coeff_visitor<Derived, is_min, PropagateNumbers, false> : coeff_vi
       this->col = Derived::IsRowMajor ? j + max_idx : j;
     }
   }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index i, Index j) {
     const Index PacketSize = packet_traits<Scalar>::size;
     Scalar value = Comparator::predux(p);
     if ((numext::isnan)(value)) {
@@ -511,7 +511,7 @@ struct minmax_coeff_visitor<Derived, is_min, NaNPropagation, false> : coeff_visi
   using Packet = typename packet_traits<Scalar>::type;
   using Comparator = minmax_compare<Scalar, PropagateNaN, is_min>;
 
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index i, Index j) {
     const bool value_is_nan = (numext::isnan)(value);
     if ((value_is_nan && !(numext::isnan)(this->res)) || Comparator::compare(value, this->res)) {
       this->res = value;
@@ -519,7 +519,7 @@ struct minmax_coeff_visitor<Derived, is_min, NaNPropagation, false> : coeff_visi
       this->col = j;
     }
   }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index i, Index j) {
     const Index PacketSize = packet_traits<Scalar>::size;
     Scalar value = Comparator::predux(p);
     const bool value_is_nan = (numext::isnan)(value);
@@ -533,7 +533,7 @@ struct minmax_coeff_visitor<Derived, is_min, NaNPropagation, false> : coeff_visi
       this->col = Derived::IsRowMajor ? j + max_idx : j;
     }
   }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index i, Index j) {
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index i, Index j) {
     const Index PacketSize = packet_traits<Scalar>::size;
     Scalar value = Comparator::predux(p);
     const bool value_is_nan = (numext::isnan)(value);
@@ -557,16 +557,20 @@ template <typename Scalar>
 struct all_visitor {
   using result_type = bool;
   using Packet = typename packet_traits<Scalar>::type;
-  EIGEN_DEVICE_FUNC inline void init(const Scalar& value, Index, Index) { res = (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline void init(const Scalar& value, Index) { res = (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline bool all_predux(const Packet& p) const { return !predux_any(pcmp_eq(p, pzero(p))); }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index, Index) { res = all_predux(p); }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index) { res = all_predux(p); }
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index, Index) { res = res && (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index) { res = res && (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index, Index) { res = res && all_predux(p); }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index) { res = res && all_predux(p); }
-  EIGEN_DEVICE_FUNC inline bool done() const { return !res; }
+  EIGEN_DEVICE_FUNC inline constexpr void init(const Scalar& value, Index, Index) { res = (value != Scalar(0)); }
+  EIGEN_DEVICE_FUNC inline constexpr void init(const Scalar& value, Index) { res = (value != Scalar(0)); }
+  EIGEN_DEVICE_FUNC inline constexpr bool all_predux(const Packet& p) const {
+    return !predux_any(pcmp_eq(p, pzero(p)));
+  }
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index, Index) { res = all_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index) { res = all_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index, Index) {
+    res = res && (value != Scalar(0));
+  }
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index) { res = res && (value != Scalar(0)); }
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index, Index) { res = res && all_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index) { res = res && all_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr bool done() const { return !res; }
   bool res = true;
 };
 template <typename Scalar>
@@ -578,18 +582,20 @@ template <typename Scalar>
 struct any_visitor {
   using result_type = bool;
   using Packet = typename packet_traits<Scalar>::type;
-  EIGEN_DEVICE_FUNC inline void init(const Scalar& value, Index, Index) { res = (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline void init(const Scalar& value, Index) { res = (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline bool any_predux(const Packet& p) const {
+  EIGEN_DEVICE_FUNC inline constexpr void init(const Scalar& value, Index, Index) { res = (value != Scalar(0)); }
+  EIGEN_DEVICE_FUNC inline constexpr void init(const Scalar& value, Index) { res = (value != Scalar(0)); }
+  EIGEN_DEVICE_FUNC inline constexpr bool any_predux(const Packet& p) const {
     return predux_any(pandnot(ptrue(p), pcmp_eq(p, pzero(p))));
   }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index, Index) { res = any_predux(p); }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index) { res = any_predux(p); }
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index, Index) { res = res || (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index) { res = res || (value != Scalar(0)); }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index, Index) { res = res || any_predux(p); }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index) { res = res || any_predux(p); }
-  EIGEN_DEVICE_FUNC inline bool done() const { return res; }
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index, Index) { res = any_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index) { res = any_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index, Index) {
+    res = res || (value != Scalar(0));
+  }
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index) { res = res || (value != Scalar(0)); }
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index, Index) { res = res || any_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index) { res = res || any_predux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr bool done() const { return res; }
   bool res = false;
 };
 template <typename Scalar>
@@ -601,24 +607,24 @@ template <typename Scalar>
 struct count_visitor {
   using result_type = Index;
   using Packet = typename packet_traits<Scalar>::type;
-  EIGEN_DEVICE_FUNC inline void init(const Scalar& value, Index, Index) { res = value != Scalar(0) ? 1 : 0; }
-  EIGEN_DEVICE_FUNC inline void init(const Scalar& value, Index) { res = value != Scalar(0) ? 1 : 0; }
-  EIGEN_DEVICE_FUNC inline Index count_redux(const Packet& p) const {
+  EIGEN_DEVICE_FUNC inline constexpr void init(const Scalar& value, Index, Index) { res = value != Scalar(0) ? 1 : 0; }
+  EIGEN_DEVICE_FUNC inline constexpr void init(const Scalar& value, Index) { res = value != Scalar(0) ? 1 : 0; }
+  EIGEN_DEVICE_FUNC inline constexpr Index count_redux(const Packet& p) const {
     const Packet cst_one = pset1<Packet>(Scalar(1));
     Packet true_vals = pandnot(cst_one, pcmp_eq(p, pzero(p)));
     Scalar num_true = predux(true_vals);
     return static_cast<Index>(num_true);
   }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index, Index) { res = count_redux(p); }
-  EIGEN_DEVICE_FUNC inline void initpacket(const Packet& p, Index) { res = count_redux(p); }
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index, Index) {
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index, Index) { res = count_redux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void initpacket(const Packet& p, Index) { res = count_redux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index, Index) {
     if (value != Scalar(0)) res++;
   }
-  EIGEN_DEVICE_FUNC inline void operator()(const Scalar& value, Index) {
+  EIGEN_DEVICE_FUNC inline constexpr void operator()(const Scalar& value, Index) {
     if (value != Scalar(0)) res++;
   }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index, Index) { res += count_redux(p); }
-  EIGEN_DEVICE_FUNC inline void packet(const Packet& p, Index) { res += count_redux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index, Index) { res += count_redux(p); }
+  EIGEN_DEVICE_FUNC inline constexpr void packet(const Packet& p, Index) { res += count_redux(p); }
   Index res = 0;
 };
 
@@ -647,8 +653,8 @@ struct functor_traits<count_visitor<Scalar>> {
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(IndexType* rowId,
-                                                                                          IndexType* colId) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(
+    IndexType* rowId, IndexType* colId) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
 
   internal::minmax_coeff_visitor<Derived, true, NaNPropagation> minVisitor;
@@ -671,7 +677,8 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(IndexType* index) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(
+    IndexType* index) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
 
@@ -694,8 +701,8 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(IndexType* rowPtr,
-                                                                                          IndexType* colPtr) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(
+    IndexType* rowPtr, IndexType* colPtr) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
 
   internal::minmax_coeff_visitor<Derived, false, NaNPropagation> maxVisitor;
@@ -718,7 +725,8 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(IndexType* index) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(
+    IndexType* index) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
 
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
@@ -736,7 +744,7 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  * \sa any(), Cwise::operator<()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::all() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::all() const {
   using Visitor = internal::all_visitor<Scalar>;
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ true>;
   Visitor visitor;
@@ -749,7 +757,7 @@ EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::all() const {
  * \sa all()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::any() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::any() const {
   using Visitor = internal::any_visitor<Scalar>;
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ true>;
   Visitor visitor;
@@ -762,7 +770,7 @@ EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::any() const {
  * \sa all(), any()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC Index DenseBase<Derived>::count() const {
+EIGEN_DEVICE_FUNC constexpr Index DenseBase<Derived>::count() const {
   using Visitor = internal::count_visitor<Scalar>;
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ false>;
   Visitor visitor;
@@ -771,7 +779,7 @@ EIGEN_DEVICE_FUNC Index DenseBase<Derived>::count() const {
 }
 
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::hasNaN() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::hasNaN() const {
   return derived().cwiseTypedNotEqual(derived()).any();
 }
 
@@ -780,7 +788,7 @@ EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::hasNaN() const {
  * \sa hasNaN()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::allFinite() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::allFinite() const {
   return derived().array().isFinite().all();
 }
 

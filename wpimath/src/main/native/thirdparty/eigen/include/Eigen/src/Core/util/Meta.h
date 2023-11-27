@@ -341,18 +341,18 @@ struct array_size<std::array<T, N>> {
  */
 #if EIGEN_COMP_CXXVER < 20 || EIGEN_GNUC_STRICT_LESS_THAN(10, 0, 0)
 template <typename T>
-EIGEN_CONSTEXPR auto index_list_size(const T& x) {
+constexpr auto index_list_size(const T& x) {
   using R = std::common_type_t<std::ptrdiff_t, std::make_signed_t<decltype(x.size())>>;
   return static_cast<R>(x.size());
 }
 
 template <typename T, std::ptrdiff_t N>
-EIGEN_CONSTEXPR std::ptrdiff_t index_list_size(const T (&)[N]) {
+constexpr std::ptrdiff_t index_list_size(const T (&)[N]) {
   return N;
 }
 #else
 template <typename T>
-EIGEN_CONSTEXPR auto index_list_size(T&& x) {
+constexpr auto index_list_size(T&& x) {
   using std::ssize;
   return ssize(std::forward<T>(x));
 }

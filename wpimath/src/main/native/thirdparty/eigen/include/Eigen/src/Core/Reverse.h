@@ -83,16 +83,16 @@ class Reverse : public internal::dense_xpr_base<Reverse<MatrixType, Direction> >
   typedef internal::reverse_packet_cond<PacketScalar, ReversePacket> reverse_packet;
 
  public:
-  EIGEN_DEVICE_FUNC explicit inline Reverse(const MatrixType& matrix) : m_matrix(matrix) {}
+  EIGEN_DEVICE_FUNC constexpr explicit inline Reverse(const MatrixType& matrix) : m_matrix(matrix) {}
 
   EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Reverse)
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return m_matrix.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index cols() const EIGEN_NOEXCEPT { return m_matrix.cols(); }
+  EIGEN_DEVICE_FUNC inline constexpr Index rows() const EIGEN_NOEXCEPT { return m_matrix.rows(); }
+  EIGEN_DEVICE_FUNC inline constexpr Index cols() const EIGEN_NOEXCEPT { return m_matrix.cols(); }
 
-  EIGEN_DEVICE_FUNC inline Index innerStride() const { return -m_matrix.innerStride(); }
+  EIGEN_DEVICE_FUNC inline constexpr Index innerStride() const { return -m_matrix.innerStride(); }
 
-  EIGEN_DEVICE_FUNC const internal::remove_all_t<typename MatrixType::Nested>& nestedExpression() const {
+  EIGEN_DEVICE_FUNC constexpr const internal::remove_all_t<typename MatrixType::Nested>& nestedExpression() const {
     return m_matrix;
   }
 
@@ -107,7 +107,7 @@ class Reverse : public internal::dense_xpr_base<Reverse<MatrixType, Direction> >
  *
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline typename DenseBase<Derived>::ReverseReturnType DenseBase<Derived>::reverse() {
+EIGEN_DEVICE_FUNC inline constexpr typename DenseBase<Derived>::ReverseReturnType DenseBase<Derived>::reverse() {
   return ReverseReturnType(derived());
 }
 
@@ -126,7 +126,7 @@ EIGEN_DEVICE_FUNC inline typename DenseBase<Derived>::ReverseReturnType DenseBas
  *
  * \sa VectorwiseOp::reverseInPlace(), reverse() */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline void DenseBase<Derived>::reverseInPlace() {
+EIGEN_DEVICE_FUNC inline constexpr void DenseBase<Derived>::reverseInPlace() {
   if (cols() > rows()) {
     Index half = cols() / 2;
     leftCols(half).swap(rightCols(half).reverse());
@@ -187,7 +187,7 @@ struct vectorwise_reverse_inplace_impl<Horizontal> {
  *
  * \sa DenseBase::reverseInPlace(), reverse() */
 template <typename ExpressionType, int Direction>
-EIGEN_DEVICE_FUNC void VectorwiseOp<ExpressionType, Direction>::reverseInPlace() {
+EIGEN_DEVICE_FUNC constexpr void VectorwiseOp<ExpressionType, Direction>::reverseInPlace() {
   internal::vectorwise_reverse_inplace_impl<Direction>::run(m_matrix);
 }
 

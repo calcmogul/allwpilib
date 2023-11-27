@@ -71,9 +71,9 @@ class Stride {
   EIGEN_DEVICE_FUNC Stride(const Stride& other) : m_outer(other.outer()), m_inner(other.inner()) {}
 
   /** \returns the outer stride */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index outer() const { return m_outer.value(); }
+  EIGEN_DEVICE_FUNC inline constexpr Index outer() const { return m_outer.value(); }
   /** \returns the inner stride */
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index inner() const { return m_inner.value(); }
+  EIGEN_DEVICE_FUNC inline constexpr Index inner() const { return m_inner.value(); }
 
  protected:
   internal::variable_if_dynamic<Index, OuterStrideAtCompileTime> m_outer;

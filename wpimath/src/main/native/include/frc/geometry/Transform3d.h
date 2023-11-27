@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Translation3d.h"
@@ -18,6 +20,11 @@ class WPILIB_DLLEXPORT Pose3d;
 class WPILIB_DLLEXPORT Transform3d {
  public:
   /**
+   * Constructs the identity transform -- maps an initial pose to itself.
+   */
+  constexpr Transform3d() = default;
+
+  /**
    * Constructs the transform that maps the initial pose to the final pose.
    *
    * @param initial The initial pose for the transformation.
@@ -31,7 +38,9 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param translation Translational component of the transform.
    * @param rotation Rotational component of the transform.
    */
-  Transform3d(Translation3d translation, Rotation3d rotation);
+  constexpr Transform3d(Translation3d translation, Rotation3d rotation)
+      : m_translation(std::move(translation)),
+        m_rotation(std::move(rotation)) {}
 
   /**
    * Constructs a transform with x, y, and z translations instead of a separate
@@ -42,55 +51,56 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param z The z component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  Transform3d(units::meter_t x, units::meter_t y, units::meter_t z,
-              Rotation3d rotation);
-
-  /**
-   * Constructs the identity transform -- maps an initial pose to itself.
-   */
-  constexpr Transform3d() = default;
+  constexpr Transform3d(units::meter_t x, units::meter_t y, units::meter_t z,
+                        Rotation3d rotation)
+      : m_translation(x, y, z), m_rotation(std::move(rotation)) {}
 
   /**
    * Returns the translation component of the transformation.
    *
    * @return Reference to the translational component of the transform.
    */
-  const Translation3d& Translation() const { return m_translation; }
+  constexpr const Translation3d& Translation() const { return m_translation; }
 
   /**
    * Returns the X component of the transformation's translation.
    *
    * @return The x component of the transformation's translation.
    */
-  units::meter_t X() const { return m_translation.X(); }
+  constexpr units::meter_t X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the transformation's translation.
    *
    * @return The y component of the transformation's translation.
    */
-  units::meter_t Y() const { return m_translation.Y(); }
+  constexpr units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the transformation's translation.
    *
    * @return The z component of the transformation's translation.
    */
-  units::meter_t Z() const { return m_translation.Z(); }
+  constexpr units::meter_t Z() const { return m_translation.Z(); }
 
   /**
    * Returns the rotational component of the transformation.
    *
    * @return Reference to the rotational component of the transform.
    */
-  const Rotation3d& Rotation() const { return m_rotation; }
+  constexpr const Rotation3d& Rotation() const { return m_rotation; }
 
   /**
    * Invert the transformation. This is useful for undoing a transformation.
    *
    * @return The inverted transformation.
    */
-  Transform3d Inverse() const;
+  constexpr Transform3d Inverse() const {
+    // We are rotating the difference between the translations
+    // using a clockwise rotation matrix. This transforms the global
+    // delta into a local delta (relative to the initial pose).
+    return Transform3d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
+  }
 
   /**
    * Multiplies the transform by the scalar.
@@ -98,7 +108,7 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param scalar The scalar.
    * @return The scaled Transform3d.
    */
-  Transform3d operator*(double scalar) const {
+  constexpr Transform3d operator*(double scalar) const {
     return Transform3d(m_translation * scalar, m_rotation * scalar);
   }
 
@@ -108,7 +118,9 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param scalar The scalar.
    * @return The scaled Transform3d.
    */
-  Transform3d operator/(double scalar) const { return *this * (1.0 / scalar); }
+  constexpr Transform3d operator/(double scalar) const {
+    return *this * (1.0 / scalar);
+  }
 
   /**
    * Composes two transformations. The second transform is applied relative to
@@ -122,7 +134,7 @@ class WPILIB_DLLEXPORT Transform3d {
   /**
    * Checks equality between this Transform3d and another object.
    */
-  bool operator==(const Transform3d&) const = default;
+  constexpr bool operator==(const Transform3d&) const = default;
 
  private:
   Translation3d m_translation;

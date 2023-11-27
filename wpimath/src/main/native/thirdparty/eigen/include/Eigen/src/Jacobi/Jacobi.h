@@ -258,8 +258,8 @@ EIGEN_DEVICE_FUNC void apply_rotation_in_the_plane(DenseBase<VectorX>& xpr_x, De
  */
 template <typename Derived>
 template <typename OtherScalar>
-EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::applyOnTheLeft(Index p, Index q,
-                                                                  const JacobiRotation<OtherScalar>& j) {
+EIGEN_DEVICE_FUNC constexpr inline void MatrixBase<Derived>::applyOnTheLeft(Index p, Index q,
+                                                                            const JacobiRotation<OtherScalar>& j) {
   RowXpr x(this->row(p));
   RowXpr y(this->row(q));
   internal::apply_rotation_in_the_plane(x, y, j);
@@ -273,8 +273,8 @@ EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::applyOnTheLeft(Index p, Index
  */
 template <typename Derived>
 template <typename OtherScalar>
-EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::applyOnTheRight(Index p, Index q,
-                                                                   const JacobiRotation<OtherScalar>& j) {
+EIGEN_DEVICE_FUNC constexpr inline void MatrixBase<Derived>::applyOnTheRight(Index p, Index q,
+                                                                             const JacobiRotation<OtherScalar>& j) {
   ColXpr x(this->col(p));
   ColXpr y(this->col(q));
   internal::apply_rotation_in_the_plane(x, y, j.transpose());

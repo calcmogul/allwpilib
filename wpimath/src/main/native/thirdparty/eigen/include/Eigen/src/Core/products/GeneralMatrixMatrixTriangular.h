@@ -306,8 +306,8 @@ struct general_product_to_triangular_selector<MatrixType, ProductType, UpLo, fal
 
 template <typename MatrixType, unsigned int UpLo>
 template <typename ProductType>
-EIGEN_DEVICE_FUNC TriangularView<MatrixType, UpLo>& TriangularViewImpl<MatrixType, UpLo, Dense>::_assignProduct(
-    const ProductType& prod, const Scalar& alpha, bool beta) {
+EIGEN_DEVICE_FUNC constexpr TriangularView<MatrixType, UpLo>&
+TriangularViewImpl<MatrixType, UpLo, Dense>::_assignProduct(const ProductType& prod, const Scalar& alpha, bool beta) {
   EIGEN_STATIC_ASSERT((UpLo & UnitDiag) == 0, WRITING_TO_TRIANGULAR_PART_WITH_UNIT_DIAGONAL_IS_NOT_SUPPORTED);
   eigen_assert(derived().nestedExpression().rows() == prod.rows() && derived().cols() == prod.cols());
 

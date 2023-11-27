@@ -26,43 +26,45 @@ class WPILIB_DLLEXPORT CoordinateAxis {
    * @param y The y component.
    * @param z The z component.
    */
-  CoordinateAxis(double x, double y, double z);
+  constexpr CoordinateAxis(double x, double y, double z) : m_axis{x, y, z} {
+    m_axis /= m_axis.norm();
+  }
 
-  CoordinateAxis(const CoordinateAxis&) = default;
-  CoordinateAxis& operator=(const CoordinateAxis&) = default;
+  constexpr CoordinateAxis(const CoordinateAxis&) = default;
+  constexpr CoordinateAxis& operator=(const CoordinateAxis&) = default;
 
-  CoordinateAxis(CoordinateAxis&&) = default;
-  CoordinateAxis& operator=(CoordinateAxis&&) = default;
+  constexpr CoordinateAxis(CoordinateAxis&&) = default;
+  constexpr CoordinateAxis& operator=(CoordinateAxis&&) = default;
 
   /**
    * Returns a coordinate axis corresponding to +X in the NWU coordinate system.
    */
-  static const CoordinateAxis& N();
+  static constexpr CoordinateAxis N() { return CoordinateAxis{1.0, 0.0, 0.0}; }
 
   /**
    * Returns a coordinate axis corresponding to -X in the NWU coordinate system.
    */
-  static const CoordinateAxis& S();
+  static constexpr CoordinateAxis S() { return CoordinateAxis{-1.0, 0.0, 0.0}; }
 
   /**
    * Returns a coordinate axis corresponding to -Y in the NWU coordinate system.
    */
-  static const CoordinateAxis& E();
+  static constexpr CoordinateAxis E() { return CoordinateAxis{0.0, -1.0, 0.0}; }
 
   /**
    * Returns a coordinate axis corresponding to +Y in the NWU coordinate system.
    */
-  static const CoordinateAxis& W();
+  static constexpr CoordinateAxis W() { return CoordinateAxis{0.0, 1.0, 0.0}; }
 
   /**
    * Returns a coordinate axis corresponding to +Z in the NWU coordinate system.
    */
-  static const CoordinateAxis& U();
+  static constexpr CoordinateAxis U() { return CoordinateAxis{0.0, 0.0, 1.0}; }
 
   /**
    * Returns a coordinate axis corresponding to -Z in the NWU coordinate system.
    */
-  static const CoordinateAxis& D();
+  static constexpr CoordinateAxis D() { return CoordinateAxis{0.0, 0.0, -1.0}; }
 
  private:
   friend class CoordinateSystem;

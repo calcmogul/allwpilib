@@ -669,7 +669,7 @@ class aligned_stack_memory_handler : noncopyable {
 #ifdef EIGEN_ALLOCA
 
 template <typename Xpr, int NbEvaluations,
-          bool MapExternalBuffer = nested_eval<Xpr, NbEvaluations>::Evaluate && Xpr::MaxSizeAtCompileTime == Dynamic>
+          bool MapExternalBuffer = nested_eval<Xpr, NbEvaluations>::Evaluate&& Xpr::MaxSizeAtCompileTime == Dynamic>
 struct local_nested_eval_wrapper {
   static constexpr bool NeedExternalBuffer = false;
   typedef typename Xpr::Scalar Scalar;
