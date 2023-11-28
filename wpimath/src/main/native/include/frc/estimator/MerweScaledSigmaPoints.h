@@ -47,7 +47,7 @@ class MerweScaledSigmaPoints {
   /**
    * Returns number of sigma points for each variable in the state x.
    */
-  int NumSigmas() { return 2 * States + 1; }
+  int NumSigmas() { return m_Wm.rows(); }
 
   /**
    * Computes the sigma points for an unscented Kalman filter given the mean

@@ -23,7 +23,7 @@ auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
   result.setZero();
 
   // It's more expensive, but +- epsilon will be more accurate
-  for (int i = 0; i < Cols; ++i) {
+  for (int i = 0; i < x.cols(); ++i) {
     Vectord<Cols> dX_plus = x;
     dX_plus(i) += kEpsilon;
     Vectord<Cols> dX_minus = x;
