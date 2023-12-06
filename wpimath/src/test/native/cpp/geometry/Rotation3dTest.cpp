@@ -72,6 +72,9 @@ TEST(Rotation3dTest, InitAxisAngleAndRollPitchYaw) {
 }
 
 TEST(Rotation3dTest, InitRotationMatrix) {
+  constexpr Eigen::Matrix3d R0 = Eigen::Matrix3d::Identity();
+  constexpr Rotation3d rot0{R0};
+
   // No rotation
   const Eigen::Matrix3d R1 = Eigen::Matrix3d::Identity();
   const Rotation3d rot1{R1};
