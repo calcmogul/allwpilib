@@ -13,6 +13,7 @@
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
 #include <wpi/Algorithm.h>
+#include <wpi/SmallVector.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/EigenCore.h"
@@ -262,6 +263,77 @@ template <int States, int Outputs>
 bool IsDetectable(const Matrixd<States, States>& A,
                   const Matrixd<Outputs, States>& C) {
   return IsStabilizable<States, Outputs>(A.transpose(), C.transpose());
+}
+
+/**
+ * Returns the 0-based indices of the uncontrollable states in the given (A, B)
+ * pair.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @param A System matrix.
+ * @param B Input matrix.
+ */
+template <int States, int Inputs>
+wpi::SmallVector<int> GetUncontrollableStates(
+    const Eigen::Matrix<double, States, States>& A,
+    const Eigen::Matrix<double, States, Inputs>& B) {
+  wpi::SmallVector<int> uncontrollableStates;
+
+  Eigen::EigenSolver<Eigen::Matrix<double, States, States>> es{A};
+  for (int i = 0; i < A.rows(); ++i) {
+    if constexpr (States != Eigen::Dynamic && Inputs != Eigen::Dynamic) {
+      Eigen::Matrix<std::complex<double>, States, States + Inputs> E;
+      E << es.eigenvalues()[i] * Eigen::Matrix<std::complex<double>, States,
+                                               States>::Identity() -
+               A,
+          B;
+
+      Eigen::ColPivHouseholderQR<
+          Eigen::Matrix<std::complex<double>, States, States + Inputs>>
+          qr{E};
+      if (qr.rank() < States) {
+        uncontrollableStates.emplace_back(i);
+      }
+    } else {
+      Eigen::MatrixXcd E{A.rows(), A.rows() + B.cols()};
+      E << es.eigenvalues()[i] *
+                   Eigen::MatrixXcd::Identity(A.rows(), A.rows()) -
+               A,
+          B;
+
+      Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
+      if (qr.rank() < A.rows()) {
+        uncontrollableStates.emplace_back(i);
+      }
+    }
+  }
+
+  return uncontrollableStates;
+}
+
+extern template WPILIB_DLLEXPORT wpi::SmallVector<int>
+GetUncontrollableStates<1, 1>(const Matrixd<1, 1>& A, const Matrixd<1, 1>& B);
+extern template WPILIB_DLLEXPORT wpi::SmallVector<int>
+GetUncontrollableStates<2, 1>(const Matrixd<2, 2>& A, const Matrixd<2, 1>& B);
+extern template WPILIB_DLLEXPORT wpi::SmallVector<int>
+GetUncontrollableStates<Eigen::Dynamic, Eigen::Dynamic>(
+    const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
+
+/**
+ * Returns the 0-based indices of the unobservable states in the given (A, C)
+ * pair.
+ *
+ * @tparam States The number of states.
+ * @tparam Outputs The number of outputs.
+ * @param A System matrix.
+ * @param C Output matrix.
+ */
+template <int States, int Outputs>
+wpi::SmallVector<int> GetUnobservableStates(
+    const Eigen::Matrix<double, States, States>& A,
+    const Eigen::Matrix<double, Outputs, States>& C) {
+  return GetUncontrollableStates<States, Outputs>(A.transpose(), C.transpose());
 }
 
 /**

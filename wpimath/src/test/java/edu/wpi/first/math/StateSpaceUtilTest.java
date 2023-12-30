@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -102,6 +103,54 @@ class StateSpaceUtilTest extends UtilityClassTest<StateSpaceUtil> {
     // Second eigenvalue is observable and unstable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
     assertTrue(StateSpaceUtil.isDetectable(A, C));
+  }
+
+  @Test
+  @SuppressWarnings("LocalVariableName")
+  void testGetUncontrollableStates() {
+    Matrix<N2, N2> A;
+    Matrix<N2, N1> B1 = MatBuilder.fill(Nat.N2(), Nat.N1(), 0, 1);
+    Matrix<N2, N1> B2 = MatBuilder.fill(Nat.N2(), Nat.N1(), 1, 0);
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUncontrollableStates(A, B1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUncontrollableStates(A, B2));
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUncontrollableStates(A, B1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUncontrollableStates(A, B2));
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUncontrollableStates(A, B1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUncontrollableStates(A, B2));
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUncontrollableStates(A, B1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUncontrollableStates(A, B2));
+  }
+
+  @Test
+  @SuppressWarnings("LocalVariableName")
+  void testGetUnobservableStates() {
+    Matrix<N2, N2> A;
+    Matrix<N1, N2> C1 = MatBuilder.fill(Nat.N1(), Nat.N2(), 0, 1);
+    Matrix<N1, N2> C2 = MatBuilder.fill(Nat.N1(), Nat.N2(), 1, 0);
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUnobservableStates(A, C1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUnobservableStates(A, C2));
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUnobservableStates(A, C1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUnobservableStates(A, C2));
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUnobservableStates(A, C1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUnobservableStates(A, C2));
+
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
+    assertArrayEquals(new int[] {0}, StateSpaceUtil.getUnobservableStates(A, C1));
+    assertArrayEquals(new int[] {1}, StateSpaceUtil.getUnobservableStates(A, C2));
   }
 
   @Test

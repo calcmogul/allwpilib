@@ -57,6 +57,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param dtSeconds Nominal discretization timestep.
    * @throws IllegalArgumentException If the system is unobservable.
    */
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   public KalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -82,14 +83,27 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var C = plant.getC();
 
     if (!StateSpaceUtil.isDetectable(discA, C)) {
-      var msg =
-          "The system passed to the Kalman filter is unobservable!\n\nA =\n"
-              + discA.getStorage().toString()
-              + "\nC =\n"
-              + C.getStorage().toString()
-              + '\n';
-      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
-      throw new IllegalArgumentException(msg);
+      final var unobservableStates = StateSpaceUtil.getUnobservableStates(discA, C);
+
+      var msg = new StringBuffer();
+      msg.append("The system passed to the Kalman filter is unobservable!\n\nA =\n")
+          .append(discA.getStorage().toString())
+          .append("\nC =\n")
+          .append(C.getStorage().toString())
+          .append('\n');
+      if (unobservableStates.length > 0) {
+        msg.append("\n0-based indices of unobservable states: ");
+        for (int i = 0; i < unobservableStates.length; ++i) {
+          msg.append(unobservableStates[i]);
+          if (i < unobservableStates.length - 1) {
+            msg.append(", ");
+          }
+        }
+        msg.append('\n');
+      }
+
+      MathSharedStore.reportError(msg.toString(), Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg.toString());
     }
 
     m_initP = new Matrix<>(DARE.dare(discA.transpose(), C.transpose(), discQ, discR));

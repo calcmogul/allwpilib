@@ -96,6 +96,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param dtSeconds Discretization timestep.
    * @throws IllegalArgumentException If the system is uncontrollable.
    */
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -107,14 +108,27 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discB = discABPair.getSecond();
 
     if (!StateSpaceUtil.isStabilizable(discA, discB)) {
-      var msg =
-          "The system passed to the LQR is uncontrollable!\n\nA =\n"
-              + discA.getStorage().toString()
-              + "\nB =\n"
-              + discB.getStorage().toString()
-              + '\n';
-      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
-      throw new IllegalArgumentException(msg);
+      final var uncontrollableStates = StateSpaceUtil.getUncontrollableStates(discA, discB);
+
+      var msg = new StringBuffer();
+      msg.append("The system passed to the LQR is uncontrollable!\n\nA =\n")
+          .append(discA.getStorage().toString())
+          .append("\nB =\n")
+          .append(discB.getStorage().toString())
+          .append('\n');
+      if (uncontrollableStates.length > 0) {
+        msg.append("\n0-based indices of uncontrollable states: ");
+        for (int i = 0; i < uncontrollableStates.length; ++i) {
+          msg.append(uncontrollableStates[i]);
+          if (i < uncontrollableStates.length - 1) {
+            msg.append(", ");
+          }
+        }
+        msg.append('\n');
+      }
+
+      MathSharedStore.reportError(msg.toString(), Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg.toString());
     }
 
     var S = DARE.dare(discA, discB, Q, R);

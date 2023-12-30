@@ -38,6 +38,7 @@ includeOtherLibs {
   ^Eigen/
   ^fmt/
   ^gcem/
+  ^gmock/
   ^gtest/
   ^unsupported/
   ^wpi/

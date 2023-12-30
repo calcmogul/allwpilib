@@ -25,6 +25,14 @@ template bool IsStabilizable<2, 1>(const Matrixd<2, 2>& A,
 template bool IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(
     const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
 
+template wpi::SmallVector<int> GetUncontrollableStates<1, 1>(
+    const Matrixd<1, 1>& A, const Matrixd<1, 1>& B);
+template wpi::SmallVector<int> GetUncontrollableStates<2, 1>(
+    const Matrixd<2, 2>& A, const Matrixd<2, 1>& B);
+template wpi::SmallVector<int>
+GetUncontrollableStates<Eigen::Dynamic, Eigen::Dynamic>(
+    const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
+
 Eigen::Vector3d PoseToVector(const Pose2d& pose) {
   return Eigen::Vector3d{pose.X().value(), pose.Y().value(),
                          pose.Rotation().Radians().value()};

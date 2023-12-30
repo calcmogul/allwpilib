@@ -5,6 +5,8 @@
 #include <jni.h>
 
 #include <Eigen/Core>
+#include <Eigen/Eigenvalues>
+#include <Eigen/QR>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_math_WPIMathJNI.h"
@@ -39,6 +41,31 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
       frc::IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(A, B);
 
   return isStabilizable;
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    getUncontrollableStates
+ * Signature: (II[D[D)[I
+ */
+JNIEXPORT jintArray JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_getUncontrollableStates
+  (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc,
+   jdoubleArray bSrc)
+{
+  JSpan<const jdouble> nativeA{env, aSrc};
+  JSpan<const jdouble> nativeB{env, bSrc};
+
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      A{nativeA.data(), states, states};
+
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                 Eigen::RowMajor>>
+      B{nativeB.data(), states, inputs};
+
+  return MakeJIntArray(
+      env, frc::GetUncontrollableStates<Eigen::Dynamic, Eigen::Dynamic>(A, B));
 }
 
 }  // extern "C"

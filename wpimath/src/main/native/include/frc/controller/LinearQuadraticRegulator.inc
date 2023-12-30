@@ -8,6 +8,7 @@
 #include <string>
 
 #include <Eigen/Cholesky>
+#include <fmt/format.h>
 #include <unsupported/Eigen/MatrixFunctions>
 
 #include "frc/DARE.h"
@@ -43,10 +44,17 @@ LinearQuadraticRegulator<States, Inputs>::LinearQuadraticRegulator(
   DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
 
   if (!IsStabilizable<States, Inputs>(discA, discB)) {
+    auto uncontrollableStates =
+        GetUncontrollableStates<States, Inputs>(discA, discB);
+
     std::string msg = fmt::format(
         "The system passed to the LQR is uncontrollable!\n\nA =\n{}\nB "
         "=\n{}\n",
         discA, discB);
+    if (!uncontrollableStates.empty()) {
+      msg += fmt::format("\n0-based indices of uncontrollable states: {}\n",
+                         fmt::join(uncontrollableStates, ", "));
+    }
 
     wpi::math::MathSharedStore::ReportError(msg);
     throw std::invalid_argument(msg);

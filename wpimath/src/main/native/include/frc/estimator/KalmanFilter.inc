@@ -9,6 +9,7 @@
 #include <string>
 
 #include <Eigen/Cholesky>
+#include <fmt/format.h>
 
 #include "frc/DARE.h"
 #include "frc/StateSpaceUtil.h"
@@ -40,10 +41,16 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
   const auto& C = plant.C();
 
   if (!IsDetectable<States, Outputs>(discA, C)) {
+    auto unobservableStates = GetUnobservableStates<States, Outputs>(discA, C);
+
     std::string msg = fmt::format(
         "The system passed to the Kalman filter is "
         "unobservable!\n\nA =\n{}\nC =\n{}\n",
         discA, C);
+    if (!unobservableStates.empty()) {
+      msg += fmt::format("\n0-based indices of unobservable states: {}\n",
+                         fmt::join(unobservableStates, ", "));
+    }
 
     wpi::math::MathSharedStore::ReportError(msg);
     throw std::invalid_argument(msg);
