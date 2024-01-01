@@ -108,6 +108,20 @@ sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
     }
   }
 
+  // If no tests selected, record the robot doing nothing
+  if (!movements.any()) {
+    model.Reset();
+    voltage = 0_V;
+    for (int i = 0; i < (kTestDuration / T).value(); ++i) {
+      fastBackward.emplace_back(sysid::PreparedData{
+          i * T, voltage.value(), model.GetPosition(), model.GetVelocity(), T,
+          model.GetAcceleration(voltage), std::cos(model.GetPosition()),
+          std::sin(model.GetPosition())});
+
+      model.Update(voltage, T);
+    }
+  }
+
   return storage;
 }
 
@@ -239,6 +253,20 @@ TEST(FeedforwardAnalysisTest, Arm) {
                {{8e-3, 8e-3, 8e-3, 8e-3, 5e-2}});
     }
   }
+
+  {
+    constexpr double Ks = 0.0;
+    constexpr double Kv = 3.060;
+    constexpr double Ka = 0.327;
+    constexpr double Kg = 0.211;
+
+    for (const auto& offset : {-2.0, -1.0, 0.0, 1.0, 2.0}) {
+      sysid::ArmSim model{Ks, Kv, Ka, Kg, offset};
+
+      RunTests(model, sysid::analysis::kArm, {{Ks, Kv, Ka, Kg, offset}},
+               {{8e-3, 8e-3, 8e-3, 8e-3, 3e-2}});
+    }
+  }
 }
 
 TEST(FeedforwardAnalysisTest, Elevator) {
@@ -265,6 +293,18 @@ TEST(FeedforwardAnalysisTest, Elevator) {
     RunTests(model, sysid::analysis::kElevator, {{Ks, Kv, Ka, Kg}},
              {{8e-3, 8e-3, 8e-3, 8e-3}});
   }
+
+  {
+    constexpr double Ks = 0.0;
+    constexpr double Kv = 0.0693;
+    constexpr double Ka = 0.1170;
+    constexpr double Kg = -0.122;
+
+    sysid::ElevatorSim model{Ks, Kv, Ka, Kg};
+
+    RunTests(model, sysid::analysis::kElevator, {{Ks, Kv, Ka, Kg}},
+             {{8e-3, 8e-3, 8e-3, 8e-3}});
+  }
 }
 
 TEST(FeedforwardAnalysisTest, Simple) {
@@ -281,6 +321,17 @@ TEST(FeedforwardAnalysisTest, Simple) {
 
   {
     constexpr double Ks = 0.547;
+    constexpr double Kv = 0.0693;
+    constexpr double Ka = 0.1170;
+
+    sysid::SimpleMotorSim model{Ks, Kv, Ka};
+
+    RunTests(model, sysid::analysis::kSimple, {{Ks, Kv, Ka}},
+             {{8e-3, 8e-3, 8e-3}});
+  }
+
+  {
+    constexpr double Ks = 0.0;
     constexpr double Kv = 0.0693;
     constexpr double Ka = 0.1170;
 

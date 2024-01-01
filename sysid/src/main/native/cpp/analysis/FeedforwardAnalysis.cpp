@@ -83,6 +83,10 @@ static void PopulateOLSData(const std::vector<PreparedData>& d,
  */
 static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
                                 const AnalysisType& type) {
+  if (X.rows() == 0) {
+    throw InsufficientSamplesError{"No data to fit.\n"};
+  }
+
   Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigSolver{X.transpose() * X};
   const Eigen::VectorXd& eigvals = eigSolver.eigenvalues();
   const Eigen::MatrixXd& eigvecs = eigSolver.eigenvectors();
