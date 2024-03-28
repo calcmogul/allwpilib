@@ -164,11 +164,15 @@ if(isMultiConfig)
     if(NOT "Ubsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
         list(APPEND CMAKE_CONFIGURATION_TYPES Ubsan)
     endif()
+    if(NOT "Coverage" IN_LIST CMAKE_CONFIGURATION_TYPES)
+        list(APPEND CMAKE_CONFIGURATION_TYPES Coverage)
+    endif()
 else()
     set(allowedBuildTypes
         Asan
         Tsan
         Ubsan
+        Coverage
         Debug
         Release
         RelWithDebInfo
@@ -262,6 +266,34 @@ set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=undefined"
     CACHE STRING
     "Linker flags to be used to create shared libraries for Ubsan build type."
+    FORCE
+)
+
+set(CMAKE_C_FLAGS_COVERAGE
+    "${CMAKE_C_FLAGS_RELWITHDEBINFO} -fprofile-instr-generate -fcoverage-mapping"
+    CACHE STRING
+    "Flags used by the C compiler for Coverage build type or configuration."
+    FORCE
+)
+
+set(CMAKE_CXX_FLAGS_COVERAGE
+    "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -fprofile-instr-generate -fcoverage-mapping"
+    CACHE STRING
+    "Flags used by the C++ compiler for Coverage build type or configuration."
+    FORCE
+)
+
+set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
+    "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}"
+    CACHE STRING
+    "Linker flags to be used to create executables for Coverage build type."
+    FORCE
+)
+
+set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
+    "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}"
+    CACHE STRING
+    "Linker lags to be used to create shared libraries for Coverage build type."
     FORCE
 )
 

@@ -1,0 +1,72 @@
+name: Coverage
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    name: "Coverage"
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu:2024-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # TODO: Remove this once clang 15 is default; clang 14 had a stdlib bug
+      - name: Install clang 15
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y clang-15 llvm-15-dev
+          sudo update-alternatives --install \
+            /usr/bin/clang clang /usr/bin/clang-15 200
+          sudo update-alternatives --install \
+            /usr/bin/clang++ clang++ /usr/bin/clang++-15 200
+          sudo update-alternatives --install \
+            /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-15 200
+          sudo update-alternatives --install \
+            /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-15 200
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java python-is-python3 libprotobuf-dev protobuf-compiler ninja-build
+
+      - name: Install QuickBuffers
+        run: wget https://github.com/HebiRobotics/QuickBuffers/releases/download/1.3.3/protoc-gen-quickbuf_1.3.3_amd64.deb && sudo apt install ./protoc-gen-quickbuf_1.3.3_amd64.deb
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+
+      - name: Install jinja
+        run: python -m pip install jinja2
+
+      - uses: actions/checkout@v4
+
+      - run: cmake -B build-coverage -S . -G "Ninja" -DCMAKE_BUILD_TYPE=Coverage -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ${{ matrix.flags }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+        env:
+          SCCACHE_GHA_ENABLED: "true"
+
+      - run: cmake --build build-coverage --parallel $(nproc) --target wpimath_test
+        env:
+          SCCACHE_GHA_ENABLED: "true"
+
+      - name: Run executable and generate reports
+        run: |
+          cd build-coverage
+          ./bin/wpimath_test
+          llvm-profdata merge -sparse default.profraw -o default.profdata
+          llvm-cov show -ignore-filename-regex=_deps/ ./bin/wpimath_test -instr-profile=default.profdata -format=html > coverage-line-by-line-wpimath_test.html
+          llvm-cov report -ignore-filename-regex=_deps/ ./bin/wpimath_test -instr-profile=default.profdata > coverage-report-wpimath_test.txt
+          cd ..
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Coverage report
+          path: ./build-coverage/coverage-line-by-line-wpimath_test.html
+
+      - name: Write to job summary
+        run: |
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          cat ./build-coverage/coverage-report-wpimath_test.txt >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
