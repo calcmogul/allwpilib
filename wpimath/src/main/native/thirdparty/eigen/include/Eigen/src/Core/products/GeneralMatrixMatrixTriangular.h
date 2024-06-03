@@ -45,7 +45,7 @@ struct general_matrix_matrix_triangular_product<Index, LhsScalar, LhsStorageOrde
                                                 RhsStorageOrder, ConjugateRhs, RowMajor, ResInnerStride, UpLo,
                                                 Version> {
   typedef typename ScalarBinaryOpTraits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-  static EIGEN_STRONG_INLINE void run(Index size, Index depth, const LhsScalar* lhs, Index lhsStride,
+  static EIGEN_STRONG_INLINE constexpr void run(Index size, Index depth, const LhsScalar* lhs, Index lhsStride,
                                       const RhsScalar* rhs, Index rhsStride, ResScalar* res, Index resIncr,
                                       Index resStride, const ResScalar& alpha,
                                       level3_blocking<RhsScalar, LhsScalar>& blocking) {
@@ -64,7 +64,7 @@ struct general_matrix_matrix_triangular_product<Index, LhsScalar, LhsStorageOrde
                                                 RhsStorageOrder, ConjugateRhs, ColMajor, ResInnerStride, UpLo,
                                                 Version> {
   typedef typename ScalarBinaryOpTraits<LhsScalar, RhsScalar>::ReturnType ResScalar;
-  static EIGEN_STRONG_INLINE void run(Index size, Index depth, const LhsScalar* lhs_, Index lhsStride,
+  static EIGEN_STRONG_INLINE constexpr void run(Index size, Index depth, const LhsScalar* lhs_, Index lhsStride,
                                       const RhsScalar* rhs_, Index rhsStride, ResScalar* res_, Index resIncr,
                                       Index resStride, const ResScalar& alpha,
                                       level3_blocking<LhsScalar, RhsScalar>& blocking) {
@@ -149,7 +149,7 @@ struct tribb_kernel {
   typedef typename Traits::ResScalar ResScalar;
 
   enum { BlockSize = meta_least_common_multiple<plain_enum_max(mr, nr), plain_enum_min(mr, nr)>::ret };
-  void operator()(ResScalar* res_, Index resIncr, Index resStride, const LhsScalar* blockA, const RhsScalar* blockB,
+  constexpr void operator()(ResScalar* res_, Index resIncr, Index resStride, const LhsScalar* blockA, const RhsScalar* blockB,
                   Index size, Index depth, const ResScalar& alpha) {
     typedef blas_data_mapper<ResScalar, Index, ColMajor, Unaligned, ResInnerStride> ResMapper;
     typedef blas_data_mapper<ResScalar, Index, ColMajor, Unaligned> BufferMapper;
@@ -202,7 +202,7 @@ struct general_product_to_triangular_selector;
 
 template <typename MatrixType, typename ProductType, int UpLo>
 struct general_product_to_triangular_selector<MatrixType, ProductType, UpLo, true> {
-  static void run(MatrixType& mat, const ProductType& prod, const typename MatrixType::Scalar& alpha, bool beta) {
+  static constexpr void run(MatrixType& mat, const ProductType& prod, const typename MatrixType::Scalar& alpha, bool beta) {
     typedef typename MatrixType::Scalar Scalar;
 
     typedef internal::remove_all_t<typename ProductType::LhsNested> Lhs;
@@ -252,7 +252,7 @@ struct general_product_to_triangular_selector<MatrixType, ProductType, UpLo, tru
 
 template <typename MatrixType, typename ProductType, int UpLo>
 struct general_product_to_triangular_selector<MatrixType, ProductType, UpLo, false> {
-  static void run(MatrixType& mat, const ProductType& prod, const typename MatrixType::Scalar& alpha, bool beta) {
+  static constexpr void run(MatrixType& mat, const ProductType& prod, const typename MatrixType::Scalar& alpha, bool beta) {
     typedef internal::remove_all_t<typename ProductType::LhsNested> Lhs;
     typedef internal::blas_traits<Lhs> LhsBlasTraits;
     typedef typename LhsBlasTraits::DirectLinearAccessType ActualLhs;
@@ -306,7 +306,7 @@ struct general_product_to_triangular_selector<MatrixType, ProductType, UpLo, fal
 
 template <typename MatrixType, unsigned int UpLo>
 template <typename ProductType>
-EIGEN_DEVICE_FUNC TriangularView<MatrixType, UpLo>& TriangularViewImpl<MatrixType, UpLo, Dense>::_assignProduct(
+EIGEN_DEVICE_FUNC constexpr TriangularView<MatrixType, UpLo>& TriangularViewImpl<MatrixType, UpLo, Dense>::_assignProduct(
     const ProductType& prod, const Scalar& alpha, bool beta) {
   EIGEN_STATIC_ASSERT((UpLo & UnitDiag) == 0, WRITING_TO_TRIANGULAR_PART_WITH_UNIT_DIAGONAL_IS_NOT_SUPPORTED);
   eigen_assert(derived().nestedExpression().rows() == prod.rows() && derived().cols() == prod.cols());

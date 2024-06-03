@@ -1109,7 +1109,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
  * \brief Macro to explicitly define the default copy constructor.
  * This is necessary, because the implicit definition is deprecated if the copy-assignment is overridden.
  */
-#define EIGEN_DEFAULT_COPY_CONSTRUCTOR(CLASS) EIGEN_DEVICE_FUNC CLASS(const CLASS&) = default;
+#define EIGEN_DEFAULT_COPY_CONSTRUCTOR(CLASS) EIGEN_DEVICE_FUNC constexpr CLASS(const CLASS&) = default;
 
 /** \internal
  * \brief Macro to manually inherit assignment operators.
@@ -1128,8 +1128,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
  * Hiding the default destructor lead to problems in C++03 mode together with boost::multiprecision
  */
 #define EIGEN_DEFAULT_EMPTY_CONSTRUCTOR_AND_DESTRUCTOR(Derived) \
-  EIGEN_DEVICE_FUNC Derived() = default;                        \
-  EIGEN_DEVICE_FUNC ~Derived() = default;
+  EIGEN_DEVICE_FUNC constexpr Derived() = default;              \
+  EIGEN_DEVICE_FUNC constexpr ~Derived() = default;
 
 /**
  * Just a side note. Commenting within defines works only by documenting
@@ -1184,7 +1184,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void ignore_unused_variable(cons
 
 #define EIGEN_MAKE_CWISE_BINARY_OP(METHOD, OPNAME)                                                                \
   template <typename OtherDerived>                                                                                \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const EIGEN_CWISE_BINARY_RETURN_TYPE(                                     \
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const EIGEN_CWISE_BINARY_RETURN_TYPE(                           \
       Derived, OtherDerived, OPNAME)(METHOD)(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived>& other) const { \
     return EIGEN_CWISE_BINARY_RETURN_TYPE(Derived, OtherDerived, OPNAME)(derived(), other.derived());             \
   }

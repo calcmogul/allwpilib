@@ -61,7 +61,7 @@ class Transpose : public TransposeImpl<MatrixType, typename internal::traits<Mat
   EIGEN_GENERIC_PUBLIC_INTERFACE(Transpose)
   typedef internal::remove_all_t<MatrixType> NestedExpression;
 
-  EIGEN_DEVICE_FUNC explicit EIGEN_STRONG_INLINE Transpose(MatrixType& matrix) : m_matrix(matrix) {}
+  EIGEN_DEVICE_FUNC explicit EIGEN_STRONG_INLINE constexpr Transpose(MatrixType& matrix) : m_matrix(matrix) {}
 
   EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Transpose)
 
@@ -157,7 +157,8 @@ class TransposeImpl<MatrixType, Dense> : public internal::TransposeImpl_base<Mat
  *
  * \sa transposeInPlace(), adjoint() */
 template <typename Derived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename DenseBase<Derived>::TransposeReturnType DenseBase<Derived>::transpose() {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr typename DenseBase<Derived>::TransposeReturnType
+DenseBase<Derived>::transpose() {
   return TransposeReturnType(derived());
 }
 
@@ -167,7 +168,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename DenseBase<Derived>::TransposeRetu
  *
  * \sa transposeInPlace(), adjoint() */
 template <typename Derived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const typename DenseBase<Derived>::ConstTransposeReturnType
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const typename DenseBase<Derived>::ConstTransposeReturnType
 DenseBase<Derived>::transpose() const {
   return ConstTransposeReturnType(derived());
 }
@@ -192,7 +193,8 @@ DenseBase<Derived>::transpose() const {
  *
  * \sa adjointInPlace(), transpose(), conjugate(), class Transpose, class internal::scalar_conjugate_op */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline const typename MatrixBase<Derived>::AdjointReturnType MatrixBase<Derived>::adjoint() const {
+EIGEN_DEVICE_FUNC inline constexpr const typename MatrixBase<Derived>::AdjointReturnType MatrixBase<Derived>::adjoint()
+    const {
   return AdjointReturnType(this->transpose());
 }
 
@@ -212,7 +214,7 @@ struct inplace_transpose_selector;
 
 template <typename MatrixType>
 struct inplace_transpose_selector<MatrixType, true, false> {  // square matrix
-  static void run(MatrixType& m) {
+  static constexpr void run(MatrixType& m) {
     m.matrix().template triangularView<StrictlyUpper>().swap(
         m.matrix().transpose().template triangularView<StrictlyUpper>());
   }
@@ -220,7 +222,7 @@ struct inplace_transpose_selector<MatrixType, true, false> {  // square matrix
 
 template <typename MatrixType>
 struct inplace_transpose_selector<MatrixType, true, true> {  // PacketSize x PacketSize
-  static void run(MatrixType& m) {
+  static constexpr void run(MatrixType& m) {
     typedef typename MatrixType::Scalar Scalar;
     typedef typename internal::packet_traits<typename MatrixType::Scalar>::type Packet;
     const Index PacketSize = internal::packet_traits<Scalar>::size;
@@ -234,7 +236,7 @@ struct inplace_transpose_selector<MatrixType, true, true> {  // PacketSize x Pac
 };
 
 template <typename MatrixType, Index Alignment>
-void BlockedInPlaceTranspose(MatrixType& m) {
+constexpr void BlockedInPlaceTranspose(MatrixType& m) {
   typedef typename MatrixType::Scalar Scalar;
   typedef typename internal::packet_traits<typename MatrixType::Scalar>::type Packet;
   const Index PacketSize = internal::packet_traits<Scalar>::size;
@@ -274,7 +276,7 @@ void BlockedInPlaceTranspose(MatrixType& m) {
 
 template <typename MatrixType, bool MatchPacketSize>
 struct inplace_transpose_selector<MatrixType, false, MatchPacketSize> {  // non square or dynamic matrix
-  static void run(MatrixType& m) {
+  static constexpr void run(MatrixType& m) {
     typedef typename MatrixType::Scalar Scalar;
     if (m.rows() == m.cols()) {
       const Index PacketSize = internal::packet_traits<Scalar>::size;
@@ -315,7 +317,7 @@ struct inplace_transpose_selector<MatrixType, false, MatchPacketSize> {  // non 
  *
  * \sa transpose(), adjoint(), adjointInPlace() */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline void DenseBase<Derived>::transposeInPlace() {
+EIGEN_DEVICE_FUNC inline constexpr void DenseBase<Derived>::transposeInPlace() {
   eigen_assert((rows() == cols() || (RowsAtCompileTime == Dynamic && ColsAtCompileTime == Dynamic)) &&
                "transposeInPlace() called on a non-square non-resizable matrix");
   internal::inplace_transpose_selector<Derived>::run(derived());
@@ -345,7 +347,7 @@ EIGEN_DEVICE_FUNC inline void DenseBase<Derived>::transposeInPlace() {
  *
  * \sa transpose(), adjoint(), transposeInPlace() */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::adjointInPlace() {
+EIGEN_DEVICE_FUNC inline constexpr void MatrixBase<Derived>::adjointInPlace() {
   derived() = adjoint().eval();
 }
 
@@ -370,7 +372,7 @@ struct check_transpose_aliasing_compile_time_selector<DestIsTransposed, CwiseBin
 
 template <typename Scalar, bool DestIsTransposed, typename OtherDerived>
 struct check_transpose_aliasing_run_time_selector {
-  EIGEN_DEVICE_FUNC static bool run(const Scalar* dest, const OtherDerived& src) {
+  EIGEN_DEVICE_FUNC static constexpr bool run(const Scalar* dest, const OtherDerived& src) {
     return (bool(blas_traits<OtherDerived>::IsTransposed) != DestIsTransposed) &&
            (dest != 0 && dest == (const Scalar*)extract_data(src));
   }
@@ -378,7 +380,7 @@ struct check_transpose_aliasing_run_time_selector {
 
 template <typename Scalar, bool DestIsTransposed, typename BinOp, typename DerivedA, typename DerivedB>
 struct check_transpose_aliasing_run_time_selector<Scalar, DestIsTransposed, CwiseBinaryOp<BinOp, DerivedA, DerivedB> > {
-  EIGEN_DEVICE_FUNC static bool run(const Scalar* dest, const CwiseBinaryOp<BinOp, DerivedA, DerivedB>& src) {
+  EIGEN_DEVICE_FUNC static constexpr bool run(const Scalar* dest, const CwiseBinaryOp<BinOp, DerivedA, DerivedB>& src) {
     return ((blas_traits<DerivedA>::IsTransposed != DestIsTransposed) &&
             (dest != 0 && dest == (const Scalar*)extract_data(src.lhs()))) ||
            ((blas_traits<DerivedB>::IsTransposed != DestIsTransposed) &&
@@ -396,7 +398,7 @@ template <typename Derived, typename OtherDerived,
           bool MightHaveTransposeAliasing =
               check_transpose_aliasing_compile_time_selector<blas_traits<Derived>::IsTransposed, OtherDerived>::ret>
 struct checkTransposeAliasing_impl {
-  EIGEN_DEVICE_FUNC static void run(const Derived& dst, const OtherDerived& other) {
+  EIGEN_DEVICE_FUNC static constexpr void run(const Derived& dst, const OtherDerived& other) {
     eigen_assert(
         (!check_transpose_aliasing_run_time_selector<typename Derived::Scalar, blas_traits<Derived>::IsTransposed,
                                                      OtherDerived>::run(extract_data(dst), other)) &&
@@ -407,11 +409,11 @@ struct checkTransposeAliasing_impl {
 
 template <typename Derived, typename OtherDerived>
 struct checkTransposeAliasing_impl<Derived, OtherDerived, false> {
-  EIGEN_DEVICE_FUNC static void run(const Derived&, const OtherDerived&) {}
+  EIGEN_DEVICE_FUNC static constexpr void run(const Derived&, const OtherDerived&) {}
 };
 
 template <typename Dst, typename Src>
-EIGEN_DEVICE_FUNC inline void check_for_aliasing(const Dst& dst, const Src& src) {
+EIGEN_DEVICE_FUNC inline constexpr void check_for_aliasing(const Dst& dst, const Src& src) {
   if ((!Dst::IsVectorAtCompileTime) && dst.rows() > 1 && dst.cols() > 1)
     internal::checkTransposeAliasing_impl<Dst, Src>::run(dst, src);
 }

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <string>
-#include <type_traits>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -79,19 +78,17 @@ class WPILIB_DLLEXPORT Rotation3d {
    */
   constexpr Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle) {
     // double norm = axis.norm();
-    double norm = gcem::sqrt(axis.coeff(0) * axis.coeff(0) +
-                             axis.coeff(1) * axis.coeff(1) +
-                             axis.coeff(2) * axis.coeff(2));
+    double norm =
+        gcem::sqrt(axis(0) * axis(0) + axis(1) * axis(1) + axis(2) * axis(2));
     if (norm == 0.0) {
       return;
     }
 
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
-    Eigen::Vector3d v{{axis.coeff(0) / norm * units::math::sin(angle / 2.0),
-                       axis.coeff(1) / norm * units::math::sin(angle / 2.0),
-                       axis.coeff(2) / norm * units::math::sin(angle / 2.0)}};
-    m_q = Quaternion{units::math::cos(angle / 2.0), v.coeff(0), v.coeff(1),
-                     v.coeff(2)};
+    Eigen::Vector3d v{{axis(0) / norm * units::math::sin(angle / 2.0),
+                       axis(1) / norm * units::math::sin(angle / 2.0),
+                       axis(2) / norm * units::math::sin(angle / 2.0)}};
+    m_q = Quaternion{units::math::cos(angle / 2.0), v(0), v(1), v(2)};
   }
 
   /**
@@ -103,10 +100,9 @@ class WPILIB_DLLEXPORT Rotation3d {
    */
   constexpr explicit Rotation3d(const Eigen::Vector3d& rvec)
       // : Rotation3d{rvec, units::radian_t{rvec.norm()}} {}
-      : Rotation3d{
-            rvec, units::radian_t{gcem::sqrt(rvec.coeff(0) * rvec.coeff(0) +
-                                             rvec.coeff(1) * rvec.coeff(1) +
-                                             rvec.coeff(2) * rvec.coeff(2))}} {}
+      : Rotation3d{rvec, units::radian_t{gcem::sqrt(rvec(0) * rvec(0) +
+                                                    rvec(1) * rvec(1) +
+                                                    rvec(2) * rvec(2))}} {}
 
   /**
    * Constructs a Rotation3d from a rotation matrix.
@@ -119,128 +115,26 @@ class WPILIB_DLLEXPORT Rotation3d {
 
     // Require that the rotation matrix is special orthogonal. This is true if
     // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
-    if (std::is_constant_evaluated()) {
-      auto transpose =
-          []<int Rows, int Cols>(const Eigen::Matrix<double, Rows, Cols>& A)
-          -> Eigen::Matrix<double, Cols, Rows> {
-        Eigen::Matrix<double, Cols, Rows> result;
+    if ((R * R.transpose() - Eigen::Matrix3d::Identity()).norm() > 1e-9) {
+      std::string msg =
+          fmt::format("Rotation matrix isn't orthogonal\n\nR =\n{}\n", R);
 
-        for (int row = 0; row < A.rows(); ++row) {
-          for (int col = 0; col < A.cols(); ++col) {
-            result.coeffRef(col, row) = A.coeff(row, col);
-          }
-        }
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::domain_error(msg);
+    }
+    if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+      std::string msg = fmt::format(
+          "Rotation matrix is orthogonal but not special orthogonal\n\nR "
+          "=\n{}\n",
+          R);
 
-        return result;
-      };
-
-      auto mult = [](const Eigen::Matrix3d& lhs,
-                     const Eigen::Matrix3d& rhs) -> Eigen::Matrix3d {
-        Eigen::Matrix3d result;
-
-        for (int i = 0; i < lhs.rows(); ++i) {
-          for (int j = 0; j < rhs.cols(); ++j) {
-            double sum = 0.0;
-            for (int k = 0; k < lhs.cols(); ++k) {
-              sum += lhs(i, k) * rhs(k, j);
-            }
-            result.coeffRef(i, j) = sum;
-          }
-        }
-
-        return result;
-      };
-
-      auto minus = []<int Rows, int Cols>(
-                       const Eigen::Matrix<double, Rows, Cols>& A,
-                       const Eigen::Matrix<double, Rows, Cols>& B)
-          -> Eigen::Matrix<double, Rows, Cols> {
-        Eigen::Matrix<double, Rows, Cols> result;
-
-        for (int row = 0; row < 3; ++row) {
-          for (int col = 0; col < 3; ++col) {
-            result.coeffRef(row, col) = A.coeff(row, col) - B.coeff(row, col);
-          }
-        }
-
-        return result;
-      };
-
-      auto I = []<int Rows, int Cols>() -> Eigen::Matrix<double, Rows, Cols> {
-        Eigen::Matrix<double, Rows, Cols> result;
-
-        for (int row = 0; row < Rows; ++row) {
-          for (int col = 0; col < Cols; ++col) {
-            if (row == col) {
-              result.coeffRef(row, row) = 1.0;
-            } else {
-              result.coeffRef(row, col) = 0.0;
-            }
-          }
-        }
-
-        return result;
-      };
-
-      auto norm = []<int Rows, int Cols>(
-                      const Eigen::Matrix<double, Rows, Cols>& A) -> double {
-        double sum = 0.0;
-
-        for (int row = 0; row < Rows; ++row) {
-          for (int col = 0; col < Cols; ++col) {
-            sum += A.coeff(row, col) * A.coeff(row, col);
-          }
-        }
-
-        return gcem::sqrt(sum);
-      };
-
-      auto determinant = [](const Eigen::Matrix3d& A) -> double {
-        // |a  b  c|
-        // |d  e  f| = aei + bfg + cgh - ceg - bdi - afh
-        // |g  h  i|
-        double a = A.coeff(0, 0);
-        double b = A.coeff(0, 1);
-        double c = A.coeff(0, 2);
-        double d = A.coeff(1, 0);
-        double e = A.coeff(1, 1);
-        double f = A.coeff(1, 2);
-        double g = A.coeff(2, 0);
-        double h = A.coeff(2, 1);
-        double i = A.coeff(2, 2);
-        return a * e * i + b * f * g + c * g * h - c * e * g - b * d * i -
-               a * f * h;
-      };
-
-      if (norm(minus(mult(R, transpose(R)), I.operator()<3, 3>())) > 1e-9) {
-        throw std::domain_error("Rotation matrix isn't orthogonal");
-      }
-      if (gcem::abs(determinant(R) - 1.0) > 1e-9) {
-        throw std::domain_error(
-            "Rotation matrix is orthogonal but not special orthogonal");
-      }
-    } else {
-      if ((R * R.transpose() - Eigen::Matrix3d::Identity()).norm() > 1e-9) {
-        std::string msg =
-            fmt::format("Rotation matrix isn't orthogonal\n\nR =\n{}\n", R);
-
-        wpi::math::MathSharedStore::ReportError(msg);
-        throw std::domain_error(msg);
-      }
-      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
-        std::string msg = fmt::format(
-            "Rotation matrix is orthogonal but not special orthogonal\n\nR "
-            "=\n{}\n",
-            R);
-
-        wpi::math::MathSharedStore::ReportError(msg);
-        throw std::domain_error(msg);
-      }
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::domain_error(msg);
     }
 
     // Turn rotation matrix into a quaternion
     // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
-    double trace = R.coeff(0, 0) + R.coeff(1, 1) + R.coeff(2, 2);
+    double trace = R(0, 0) + R(1, 1) + R(2, 2);
     double w;
     double x;
     double y;
@@ -249,30 +143,27 @@ class WPILIB_DLLEXPORT Rotation3d {
     if (trace > 0.0) {
       double s = 0.5 / gcem::sqrt(trace + 1.0);
       w = 0.25 / s;
-      x = (R.coeff(2, 1) - R.coeff(1, 2)) * s;
-      y = (R.coeff(0, 2) - R.coeff(2, 0)) * s;
-      z = (R.coeff(1, 0) - R.coeff(0, 1)) * s;
+      x = (R(2, 1) - R(1, 2)) * s;
+      y = (R(0, 2) - R(2, 0)) * s;
+      z = (R(1, 0) - R(0, 1)) * s;
     } else {
-      if (R.coeff(0, 0) > R.coeff(1, 1) && R.coeff(0, 0) > R.coeff(2, 2)) {
-        double s = 2.0 * gcem::sqrt(1.0 + R.coeff(0, 0) - R.coeff(1, 1) -
-                                    R.coeff(2, 2));
-        w = (R.coeff(2, 1) - R.coeff(1, 2)) / s;
+      if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
+        double s = 2.0 * gcem::sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
+        w = (R(2, 1) - R(1, 2)) / s;
         x = 0.25 * s;
-        y = (R.coeff(0, 1) + R.coeff(1, 0)) / s;
-        z = (R.coeff(0, 2) + R.coeff(2, 0)) / s;
-      } else if (R.coeff(1, 1) > R.coeff(2, 2)) {
-        double s = 2.0 * gcem::sqrt(1.0 + R.coeff(1, 1) - R.coeff(0, 0) -
-                                    R.coeff(2, 2));
-        w = (R.coeff(0, 2) - R.coeff(2, 0)) / s;
-        x = (R.coeff(0, 1) + R.coeff(1, 0)) / s;
+        y = (R(0, 1) + R(1, 0)) / s;
+        z = (R(0, 2) + R(2, 0)) / s;
+      } else if (R(1, 1) > R(2, 2)) {
+        double s = 2.0 * gcem::sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
+        w = (R(0, 2) - R(2, 0)) / s;
+        x = (R(0, 1) + R(1, 0)) / s;
         y = 0.25 * s;
-        z = (R.coeff(1, 2) + R.coeff(2, 1)) / s;
+        z = (R(1, 2) + R(2, 1)) / s;
       } else {
-        double s = 2.0 * gcem::sqrt(1.0 + R.coeff(2, 2) - R.coeff(0, 0) -
-                                    R.coeff(1, 1));
-        w = (R.coeff(1, 0) - R.coeff(0, 1)) / s;
-        x = (R.coeff(0, 2) + R.coeff(2, 0)) / s;
-        y = (R.coeff(1, 2) + R.coeff(2, 1)) / s;
+        double s = 2.0 * gcem::sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
+        w = (R(1, 0) - R(0, 1)) / s;
+        x = (R(0, 2) + R(2, 0)) / s;
+        y = (R(1, 2) + R(2, 1)) / s;
         z = 0.25 * s;
       }
     }

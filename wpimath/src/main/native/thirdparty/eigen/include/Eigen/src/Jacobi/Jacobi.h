@@ -246,8 +246,8 @@ namespace internal {
  * \sa MatrixBase::applyOnTheLeft(), MatrixBase::applyOnTheRight()
  */
 template <typename VectorX, typename VectorY, typename OtherScalar>
-EIGEN_DEVICE_FUNC void apply_rotation_in_the_plane(DenseBase<VectorX>& xpr_x, DenseBase<VectorY>& xpr_y,
-                                                   const JacobiRotation<OtherScalar>& j);
+EIGEN_DEVICE_FUNC constexpr void apply_rotation_in_the_plane(DenseBase<VectorX>& xpr_x, DenseBase<VectorY>& xpr_y,
+                                                             const JacobiRotation<OtherScalar>& j);
 }  // namespace internal
 
 /** \jacobi_module
@@ -258,8 +258,8 @@ EIGEN_DEVICE_FUNC void apply_rotation_in_the_plane(DenseBase<VectorX>& xpr_x, De
  */
 template <typename Derived>
 template <typename OtherScalar>
-EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::applyOnTheLeft(Index p, Index q,
-                                                                  const JacobiRotation<OtherScalar>& j) {
+EIGEN_DEVICE_FUNC inline constexpr void MatrixBase<Derived>::applyOnTheLeft(Index p, Index q,
+                                                                            const JacobiRotation<OtherScalar>& j) {
   RowXpr x(this->row(p));
   RowXpr y(this->row(q));
   internal::apply_rotation_in_the_plane(x, y, j);
@@ -273,8 +273,8 @@ EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::applyOnTheLeft(Index p, Index
  */
 template <typename Derived>
 template <typename OtherScalar>
-EIGEN_DEVICE_FUNC inline void MatrixBase<Derived>::applyOnTheRight(Index p, Index q,
-                                                                   const JacobiRotation<OtherScalar>& j) {
+EIGEN_DEVICE_FUNC inline constexpr void MatrixBase<Derived>::applyOnTheRight(Index p, Index q,
+                                                                             const JacobiRotation<OtherScalar>& j) {
   ColXpr x(this->col(p));
   ColXpr y(this->col(q));
   internal::apply_rotation_in_the_plane(x, y, j.transpose());
@@ -284,8 +284,8 @@ namespace internal {
 
 template <typename Scalar, typename OtherScalar, int SizeAtCompileTime, int MinAlignment, bool Vectorizable>
 struct apply_rotation_in_the_plane_selector {
-  static EIGEN_DEVICE_FUNC inline void run(Scalar* x, Index incrx, Scalar* y, Index incry, Index size, OtherScalar c,
-                                           OtherScalar s) {
+  static EIGEN_DEVICE_FUNC inline constexpr void run(Scalar* x, Index incrx, Scalar* y, Index incry, Index size,
+                                                     OtherScalar c, OtherScalar s) {
     for (Index i = 0; i < size; ++i) {
       Scalar xi = *x;
       Scalar yi = *y;
@@ -300,7 +300,8 @@ struct apply_rotation_in_the_plane_selector {
 template <typename Scalar, typename OtherScalar, int SizeAtCompileTime, int MinAlignment>
 struct apply_rotation_in_the_plane_selector<Scalar, OtherScalar, SizeAtCompileTime, MinAlignment,
                                             true /* vectorizable */> {
-  static inline void run(Scalar* x, Index incrx, Scalar* y, Index incry, Index size, OtherScalar c, OtherScalar s) {
+  static inline constexpr void run(Scalar* x, Index incrx, Scalar* y, Index incry, Index size, OtherScalar c,
+                                   OtherScalar s) {
     typedef typename packet_traits<Scalar>::type Packet;
     typedef typename packet_traits<OtherScalar>::type OtherPacket;
 
@@ -397,8 +398,9 @@ struct apply_rotation_in_the_plane_selector<Scalar, OtherScalar, SizeAtCompileTi
 };
 
 template <typename VectorX, typename VectorY, typename OtherScalar>
-EIGEN_DEVICE_FUNC void inline apply_rotation_in_the_plane(DenseBase<VectorX>& xpr_x, DenseBase<VectorY>& xpr_y,
-                                                          const JacobiRotation<OtherScalar>& j) {
+EIGEN_DEVICE_FUNC constexpr void inline apply_rotation_in_the_plane(DenseBase<VectorX>& xpr_x,
+                                                                    DenseBase<VectorY>& xpr_y,
+                                                                    const JacobiRotation<OtherScalar>& j) {
   typedef typename VectorX::Scalar Scalar;
   constexpr bool Vectorizable = (int(evaluator<VectorX>::Flags) & int(evaluator<VectorY>::Flags) & PacketAccessBit) &&
                                 (int(packet_traits<Scalar>::size) == int(packet_traits<OtherScalar>::size));

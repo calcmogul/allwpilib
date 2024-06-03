@@ -11,12 +11,10 @@ using namespace frc;
 
 Rotation3d::Rotation3d(const Eigen::Vector3d& initial,
                        const Eigen::Vector3d& final) {
-  double dot = initial.coeff(0) * final.coeff(0) +
-               initial.coeff(1) * final.coeff(1) +
-               initial.coeff(2) * final.coeff(2);
-  double normProduct =
-      gcem::hypot(initial.coeff(0), initial.coeff(1), initial.coeff(2)) *
-      gcem::hypot(final.coeff(0), final.coeff(1), final.coeff(2));
+  double dot =
+      initial(0) * final(0) + initial(1) * final(1) + initial(2) * final(2);
+  double normProduct = gcem::hypot(initial(0), initial(1), initial(2)) *
+                       gcem::hypot(final(0), final(1), final(2));
   double dotNorm = dot / normProduct;
 
   if (dotNorm > 1.0 - 1E-9) {

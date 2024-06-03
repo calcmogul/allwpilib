@@ -258,30 +258,30 @@ class DenseBase
 
   /** Copies \a other into *this. \returns a reference to *this. */
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const DenseBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator=(const DenseBase<OtherDerived>& other);
 
   /** Special case of the template operator=, in order to prevent the compiler
    * from generating a default operator= (issue hit with g++ 4.1)
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const DenseBase& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator=(const DenseBase& other);
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC Derived& operator=(const EigenBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC constexpr Derived& operator=(const EigenBase<OtherDerived>& other);
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC Derived& operator+=(const EigenBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC constexpr Derived& operator+=(const EigenBase<OtherDerived>& other);
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC Derived& operator-=(const EigenBase<OtherDerived>& other);
+  EIGEN_DEVICE_FUNC constexpr Derived& operator-=(const EigenBase<OtherDerived>& other);
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC Derived& operator=(const ReturnByValue<OtherDerived>& func);
+  EIGEN_DEVICE_FUNC constexpr Derived& operator=(const ReturnByValue<OtherDerived>& func);
 
   /** \internal
    * Copies \a other into *this without evaluating other. \returns a reference to *this. */
   template <typename OtherDerived>
   /** \deprecated */
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC Derived& lazyAssign(const DenseBase<OtherDerived>& other);
+  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC constexpr Derived& lazyAssign(const DenseBase<OtherDerived>& other);
 
   EIGEN_DEVICE_FUNC CommaInitializer<Derived> operator<<(const Scalar& s);
 
@@ -295,77 +295,78 @@ class DenseBase
   EIGEN_DEVICE_FUNC CommaInitializer<Derived> operator<<(const DenseBase<OtherDerived>& other);
 
   typedef Transpose<Derived> TransposeReturnType;
-  EIGEN_DEVICE_FUNC TransposeReturnType transpose();
+  EIGEN_DEVICE_FUNC constexpr TransposeReturnType transpose();
   typedef Transpose<const Derived> ConstTransposeReturnType;
-  EIGEN_DEVICE_FUNC const ConstTransposeReturnType transpose() const;
-  EIGEN_DEVICE_FUNC void transposeInPlace();
+  EIGEN_DEVICE_FUNC constexpr const ConstTransposeReturnType transpose() const;
+  EIGEN_DEVICE_FUNC constexpr void transposeInPlace();
 
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(Index rows, Index cols, const Scalar& value);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(Index size, const Scalar& value);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Constant(const Scalar& value);
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Constant(Index rows, Index cols, const Scalar& value);
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Constant(Index size, const Scalar& value);
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Constant(const Scalar& value);
 
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t, Index size,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
-  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Sequential_t,
-                                                                                            const Scalar& low,
-                                                                                            const Scalar& high);
+  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static constexpr const RandomAccessLinSpacedReturnType LinSpaced(
+      Sequential_t, Index size, const Scalar& low, const Scalar& high);
+  EIGEN_DEPRECATED EIGEN_DEVICE_FUNC static constexpr const RandomAccessLinSpacedReturnType LinSpaced(
+      Sequential_t, const Scalar& low, const Scalar& high);
 
-  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(Index size, const Scalar& low,
-                                                                           const Scalar& high);
-  EIGEN_DEVICE_FUNC static const RandomAccessLinSpacedReturnType LinSpaced(const Scalar& low, const Scalar& high);
+  EIGEN_DEVICE_FUNC static constexpr const RandomAccessLinSpacedReturnType LinSpaced(Index size, const Scalar& low,
+                                                                                     const Scalar& high);
+  EIGEN_DEVICE_FUNC static constexpr const RandomAccessLinSpacedReturnType LinSpaced(const Scalar& low,
+                                                                                     const Scalar& high);
 
-  EIGEN_DEVICE_FUNC static const RandomAccessEqualSpacedReturnType EqualSpaced(Index size, const Scalar& low,
-                                                                               const Scalar& step);
-  EIGEN_DEVICE_FUNC static const RandomAccessEqualSpacedReturnType EqualSpaced(const Scalar& low, const Scalar& step);
+  EIGEN_DEVICE_FUNC static constexpr const RandomAccessEqualSpacedReturnType EqualSpaced(Index size, const Scalar& low,
+                                                                                         const Scalar& step);
+  EIGEN_DEVICE_FUNC static constexpr const RandomAccessEqualSpacedReturnType EqualSpaced(const Scalar& low,
+                                                                                         const Scalar& step);
 
   template <typename CustomNullaryOp>
-  EIGEN_DEVICE_FUNC static const CwiseNullaryOp<CustomNullaryOp, PlainObject> NullaryExpr(Index rows, Index cols,
-                                                                                          const CustomNullaryOp& func);
+  EIGEN_DEVICE_FUNC static constexpr const CwiseNullaryOp<CustomNullaryOp, PlainObject> NullaryExpr(
+      Index rows, Index cols, const CustomNullaryOp& func);
   template <typename CustomNullaryOp>
-  EIGEN_DEVICE_FUNC static const CwiseNullaryOp<CustomNullaryOp, PlainObject> NullaryExpr(Index size,
-                                                                                          const CustomNullaryOp& func);
+  EIGEN_DEVICE_FUNC static constexpr const CwiseNullaryOp<CustomNullaryOp, PlainObject> NullaryExpr(
+      Index size, const CustomNullaryOp& func);
   template <typename CustomNullaryOp>
-  EIGEN_DEVICE_FUNC static const CwiseNullaryOp<CustomNullaryOp, PlainObject> NullaryExpr(const CustomNullaryOp& func);
+  EIGEN_DEVICE_FUNC static constexpr const CwiseNullaryOp<CustomNullaryOp, PlainObject> NullaryExpr(
+      const CustomNullaryOp& func);
 
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Zero(Index rows, Index cols);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Zero(Index size);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Zero();
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Ones(Index rows, Index cols);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Ones(Index size);
-  EIGEN_DEVICE_FUNC static const ConstantReturnType Ones();
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Zero(Index rows, Index cols);
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Zero(Index size);
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Zero();
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Ones(Index rows, Index cols);
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Ones(Index size);
+  EIGEN_DEVICE_FUNC static constexpr const ConstantReturnType Ones();
 
-  EIGEN_DEVICE_FUNC void fill(const Scalar& value);
-  EIGEN_DEVICE_FUNC Derived& setConstant(const Scalar& value);
-  EIGEN_DEVICE_FUNC Derived& setLinSpaced(Index size, const Scalar& low, const Scalar& high);
-  EIGEN_DEVICE_FUNC Derived& setLinSpaced(const Scalar& low, const Scalar& high);
-  EIGEN_DEVICE_FUNC Derived& setEqualSpaced(Index size, const Scalar& low, const Scalar& step);
-  EIGEN_DEVICE_FUNC Derived& setEqualSpaced(const Scalar& low, const Scalar& step);
-  EIGEN_DEVICE_FUNC Derived& setZero();
-  EIGEN_DEVICE_FUNC Derived& setOnes();
+  EIGEN_DEVICE_FUNC constexpr void fill(const Scalar& value);
+  EIGEN_DEVICE_FUNC constexpr Derived& setConstant(const Scalar& value);
+  EIGEN_DEVICE_FUNC constexpr Derived& setLinSpaced(Index size, const Scalar& low, const Scalar& high);
+  EIGEN_DEVICE_FUNC constexpr Derived& setLinSpaced(const Scalar& low, const Scalar& high);
+  EIGEN_DEVICE_FUNC constexpr Derived& setEqualSpaced(Index size, const Scalar& low, const Scalar& step);
+  EIGEN_DEVICE_FUNC constexpr Derived& setEqualSpaced(const Scalar& low, const Scalar& step);
+  EIGEN_DEVICE_FUNC constexpr Derived& setZero();
+  EIGEN_DEVICE_FUNC constexpr Derived& setOnes();
   EIGEN_DEVICE_FUNC Derived& setRandom();
 
   template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC bool isApprox(const DenseBase<OtherDerived>& other,
-                                  const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
-  EIGEN_DEVICE_FUNC bool isMuchSmallerThan(const RealScalar& other,
-                                           const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
-  template <typename OtherDerived>
-  EIGEN_DEVICE_FUNC bool isMuchSmallerThan(const DenseBase<OtherDerived>& other,
-                                           const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
-
-  EIGEN_DEVICE_FUNC bool isApproxToConstant(const Scalar& value,
+  EIGEN_DEVICE_FUNC constexpr bool isApprox(const DenseBase<OtherDerived>& other,
                                             const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
-  EIGEN_DEVICE_FUNC bool isConstant(const Scalar& value,
-                                    const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
-  EIGEN_DEVICE_FUNC bool isZero(const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
-  EIGEN_DEVICE_FUNC bool isOnes(const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
+  EIGEN_DEVICE_FUNC constexpr bool isMuchSmallerThan(
+      const RealScalar& other, const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
+  template <typename OtherDerived>
+  EIGEN_DEVICE_FUNC constexpr bool isMuchSmallerThan(
+      const DenseBase<OtherDerived>& other, const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
 
-  EIGEN_DEVICE_FUNC inline bool hasNaN() const;
-  EIGEN_DEVICE_FUNC inline bool allFinite() const;
+  EIGEN_DEVICE_FUNC constexpr bool isApproxToConstant(
+      const Scalar& value, const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
+  EIGEN_DEVICE_FUNC constexpr bool isConstant(const Scalar& value,
+                                              const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
+  EIGEN_DEVICE_FUNC constexpr bool isZero(const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
+  EIGEN_DEVICE_FUNC constexpr bool isOnes(const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator*=(const Scalar& other);
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator/=(const Scalar& other);
+  EIGEN_DEVICE_FUNC inline constexpr bool hasNaN() const;
+  EIGEN_DEVICE_FUNC inline constexpr bool allFinite() const;
+
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator*=(const Scalar& other);
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& operator/=(const Scalar& other);
 
   typedef internal::add_const_on_value_type_t<typename internal::eval<Derived>::type> EvalReturnType;
   /** \returns the matrix or vector obtained by evaluating this expression.
@@ -376,7 +377,7 @@ class DenseBase
    * \warning Be careful with eval() and the auto C++ keyword, as detailed in this \link TopicPitfalls_auto_keyword page
    * \endlink.
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EvalReturnType eval() const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr EvalReturnType eval() const {
     // Even though MSVC does not honor strong inlining when the return type
     // is a dynamic matrix, we desperately need strong inlining for fixed
     // size types on MSVC.
@@ -411,60 +412,62 @@ class DenseBase
   template <bool Enable>
   EIGEN_DEVICE_FUNC inline std::conditional_t<Enable, ForceAlignedAccess<Derived>, Derived&> forceAlignedAccessIf();
 
-  EIGEN_DEVICE_FUNC Scalar sum() const;
-  EIGEN_DEVICE_FUNC Scalar mean() const;
-  EIGEN_DEVICE_FUNC Scalar trace() const;
+  EIGEN_DEVICE_FUNC constexpr Scalar sum() const;
+  EIGEN_DEVICE_FUNC constexpr Scalar mean() const;
+  EIGEN_DEVICE_FUNC constexpr Scalar trace() const;
 
-  EIGEN_DEVICE_FUNC Scalar prod() const;
+  EIGEN_DEVICE_FUNC constexpr Scalar prod() const;
 
   template <int NaNPropagation>
-  EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar minCoeff() const;
+  EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar minCoeff() const;
   template <int NaNPropagation>
-  EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar maxCoeff() const;
+  EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar maxCoeff() const;
 
   // By default, the fastest version with undefined NaN propagation semantics is
   // used.
   // TODO(rmlarsen): Replace with default template argument when we move to
   // c++11 or beyond.
-  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Scalar minCoeff() const {
+  EIGEN_DEVICE_FUNC inline constexpr typename internal::traits<Derived>::Scalar minCoeff() const {
     return minCoeff<PropagateFast>();
   }
-  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Scalar maxCoeff() const {
+  EIGEN_DEVICE_FUNC inline constexpr typename internal::traits<Derived>::Scalar maxCoeff() const {
     return maxCoeff<PropagateFast>();
   }
 
   template <int NaNPropagation, typename IndexType>
-  EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar minCoeff(IndexType* row, IndexType* col) const;
+  EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar minCoeff(IndexType* row, IndexType* col) const;
   template <int NaNPropagation, typename IndexType>
-  EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar maxCoeff(IndexType* row, IndexType* col) const;
+  EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar maxCoeff(IndexType* row, IndexType* col) const;
   template <int NaNPropagation, typename IndexType>
-  EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar minCoeff(IndexType* index) const;
+  EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar minCoeff(IndexType* index) const;
   template <int NaNPropagation, typename IndexType>
-  EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar maxCoeff(IndexType* index) const;
+  EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar maxCoeff(IndexType* index) const;
 
   // TODO(rmlarsen): Replace these methods with a default template argument.
   template <typename IndexType>
-  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Scalar minCoeff(IndexType* row, IndexType* col) const {
+  EIGEN_DEVICE_FUNC inline constexpr typename internal::traits<Derived>::Scalar minCoeff(IndexType* row,
+                                                                                         IndexType* col) const {
     return minCoeff<PropagateFast>(row, col);
   }
   template <typename IndexType>
-  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Scalar maxCoeff(IndexType* row, IndexType* col) const {
+  EIGEN_DEVICE_FUNC inline constexpr typename internal::traits<Derived>::Scalar maxCoeff(IndexType* row,
+                                                                                         IndexType* col) const {
     return maxCoeff<PropagateFast>(row, col);
   }
   template <typename IndexType>
-  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Scalar minCoeff(IndexType* index) const {
+  EIGEN_DEVICE_FUNC inline constexpr typename internal::traits<Derived>::Scalar minCoeff(IndexType* index) const {
     return minCoeff<PropagateFast>(index);
   }
   template <typename IndexType>
-  EIGEN_DEVICE_FUNC inline typename internal::traits<Derived>::Scalar maxCoeff(IndexType* index) const {
+  EIGEN_DEVICE_FUNC inline constexpr typename internal::traits<Derived>::Scalar maxCoeff(IndexType* index) const {
     return maxCoeff<PropagateFast>(index);
   }
 
   template <typename BinaryOp>
-  EIGEN_DEVICE_FUNC Scalar redux(const BinaryOp& func) const;
+  EIGEN_DEVICE_FUNC constexpr Scalar redux(const BinaryOp& func) const;
 
   template <typename Visitor>
-  EIGEN_DEVICE_FUNC void visit(Visitor& func) const;
+  EIGEN_DEVICE_FUNC constexpr void visit(Visitor& func) const;
 
   /** \returns a WithFormat proxy object allowing to print a matrix the with given
    * format \a fmt.
@@ -476,14 +479,14 @@ class DenseBase
   inline const WithFormat<Derived> format(const IOFormat& fmt) const { return WithFormat<Derived>(derived(), fmt); }
 
   /** \returns the unique coefficient of a 1x1 expression */
-  EIGEN_DEVICE_FUNC CoeffReturnType value() const {
+  EIGEN_DEVICE_FUNC constexpr CoeffReturnType value() const {
     EIGEN_STATIC_ASSERT_SIZE_1x1(Derived) eigen_assert(this->rows() == 1 && this->cols() == 1);
     return derived().coeff(0, 0);
   }
 
-  EIGEN_DEVICE_FUNC bool all() const;
-  EIGEN_DEVICE_FUNC bool any() const;
-  EIGEN_DEVICE_FUNC Index count() const;
+  EIGEN_DEVICE_FUNC constexpr bool all() const;
+  EIGEN_DEVICE_FUNC constexpr bool any() const;
+  EIGEN_DEVICE_FUNC constexpr Index count() const;
 
   typedef VectorwiseOp<Derived, Horizontal> RowwiseReturnType;
   typedef const VectorwiseOp<const Derived, Horizontal> ConstRowwiseReturnType;

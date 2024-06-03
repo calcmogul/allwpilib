@@ -32,7 +32,7 @@ struct evaluator<Product<Lhs, Rhs, Options>> : public product_evaluator<Product<
   typedef Product<Lhs, Rhs, Options> XprType;
   typedef product_evaluator<XprType> Base;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& xpr) : Base(xpr) {}
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr explicit evaluator(const XprType& xpr) : Base(xpr) {}
 };
 
 // Catch "scalar * ( A * B )" and transform it to "(A*scalar) * B"
@@ -64,7 +64,7 @@ struct evaluator<Diagonal<const Product<Lhs, Rhs, DefaultProduct>, DiagIndex>>
   typedef Diagonal<const Product<Lhs, Rhs, DefaultProduct>, DiagIndex> XprType;
   typedef evaluator<Diagonal<const Product<Lhs, Rhs, LazyProduct>, DiagIndex>> Base;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit evaluator(const XprType& xpr)
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr explicit evaluator(const XprType& xpr)
       : Base(Diagonal<const Product<Lhs, Rhs, LazyProduct>, DiagIndex>(
             Product<Lhs, Rhs, LazyProduct>(xpr.nestedExpression().lhs(), xpr.nestedExpression().rhs()), xpr.index())) {}
 };
@@ -92,7 +92,7 @@ struct product_evaluator<Product<Lhs, Rhs, Options>, ProductTag, LhsShape, RhsSh
   typedef evaluator<PlainObject> Base;
   enum { Flags = Base::Flags | EvalBeforeNestingBit };
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit product_evaluator(const XprType& xpr)
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr explicit product_evaluator(const XprType& xpr)
       : m_result(xpr.rows(), xpr.cols()) {
     internal::construct_at<Base>(this, m_result);
 
@@ -394,20 +394,20 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, CoeffBasedProductM
   typedef typename Product<Lhs, Rhs>::Scalar Scalar;
 
   template <typename Dst>
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void evalTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void evalTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
     // Same as: dst.noalias() = lhs.lazyProduct(rhs);
     // but easier on the compiler side
     call_assignment_no_alias(dst, lhs.lazyProduct(rhs), internal::assign_op<typename Dst::Scalar, Scalar>());
   }
 
   template <typename Dst>
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void addTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void addTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
     // dst.noalias() += lhs.lazyProduct(rhs);
     call_assignment_no_alias(dst, lhs.lazyProduct(rhs), internal::add_assign_op<typename Dst::Scalar, Scalar>());
   }
 
   template <typename Dst>
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void subTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void subTo(Dst& dst, const Lhs& lhs, const Rhs& rhs) {
     // dst.noalias() -= lhs.lazyProduct(rhs);
     call_assignment_no_alias(dst, lhs.lazyProduct(rhs), internal::sub_assign_op<typename Dst::Scalar, Scalar>());
   }
@@ -427,8 +427,8 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, CoeffBasedProductM
   // slower, and the behavior depends also a lot on the compiler... This is why this re-writing strategy is currently
   // enabled only when falling back from the main GEMM.
   template <typename Dst, typename Func>
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void eval_dynamic(Dst& dst, const Lhs& lhs, const Rhs& rhs,
-                                                                 const Func& func) {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void eval_dynamic(Dst& dst, const Lhs& lhs, const Rhs& rhs,
+                                                                           const Func& func) {
     enum {
       HasScalarFactor = blas_traits<Lhs>::HasScalarFactor || blas_traits<Rhs>::HasScalarFactor,
       ConjLhs = blas_traits<Lhs>::NeedToConjugate,
@@ -445,17 +445,19 @@ struct generic_product_impl<Lhs, Rhs, DenseShape, DenseShape, CoeffBasedProductM
 
  protected:
   template <typename Dst, typename LhsT, typename RhsT, typename Func, typename Scalar>
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void eval_dynamic_impl(Dst& dst, const LhsT& lhs, const RhsT& rhs,
-                                                                      const Func& func, const Scalar& s /* == 1 */,
-                                                                      false_type) {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void eval_dynamic_impl(Dst& dst, const LhsT& lhs,
+                                                                                const RhsT& rhs, const Func& func,
+                                                                                const Scalar& s /* == 1 */,
+                                                                                false_type) {
     EIGEN_UNUSED_VARIABLE(s);
     eigen_internal_assert(numext::is_exactly_one(s));
     call_restricted_packet_assignment_no_alias(dst, lhs.lazyProduct(rhs), func);
   }
 
   template <typename Dst, typename LhsT, typename RhsT, typename Func, typename Scalar>
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void eval_dynamic_impl(Dst& dst, const LhsT& lhs, const RhsT& rhs,
-                                                                      const Func& func, const Scalar& s, true_type) {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void eval_dynamic_impl(Dst& dst, const LhsT& lhs,
+                                                                                const RhsT& rhs, const Func& func,
+                                                                                const Scalar& s, true_type) {
     call_restricted_packet_assignment_no_alias(dst, s * lhs.lazyProduct(rhs), func);
   }
 };
@@ -484,7 +486,7 @@ struct product_evaluator<Product<Lhs, Rhs, LazyProduct>, ProductTag, DenseShape,
   typedef typename XprType::Scalar Scalar;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit product_evaluator(const XprType& xpr)
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr explicit product_evaluator(const XprType& xpr)
       : m_lhs(xpr.lhs()),
         m_rhs(xpr.rhs()),
         m_lhsImpl(m_lhs),  // FIXME the creation of the evaluator objects should result in a no-op, but check that!
@@ -599,7 +601,7 @@ struct product_evaluator<Product<Lhs, Rhs, LazyProduct>, ProductTag, DenseShape,
                         (int(InnerSize) % packet_traits<Scalar>::size == 0)
   };
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const CoeffReturnType coeff(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const CoeffReturnType coeff(Index row, Index col) const {
     return (m_lhs.row(row).transpose().cwiseProduct(m_rhs.col(col))).sum();
   }
 
@@ -607,7 +609,7 @@ struct product_evaluator<Product<Lhs, Rhs, LazyProduct>, ProductTag, DenseShape,
    * which is why we don't set the LinearAccessBit.
    * TODO: this seems possible when the result is a vector
    */
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const CoeffReturnType coeff(Index index) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const CoeffReturnType coeff(Index index) const {
     const Index row = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime == 1) ? 0 : index;
     const Index col = (RowsAtCompileTime == 1 || MaxRowsAtCompileTime == 1) ? index : 0;
     return (m_lhs.row(row).transpose().cwiseProduct(m_rhs.col(col))).sum();
@@ -648,7 +650,7 @@ struct product_evaluator<Product<Lhs, Rhs, DefaultProduct>, LazyCoeffBasedProduc
   typedef Product<Lhs, Rhs, LazyProduct> BaseProduct;
   typedef product_evaluator<BaseProduct, CoeffBasedProductMode, DenseShape, DenseShape> Base;
   enum { Flags = Base::Flags | EvalBeforeNestingBit };
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE explicit product_evaluator(const XprType& xpr)
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr explicit product_evaluator(const XprType& xpr)
       : Base(BaseProduct(xpr.lhs(), xpr.rhs())) {}
 };
 
@@ -840,7 +842,7 @@ struct diagonal_product_evaluator_base : evaluator_base<Derived> {
     EIGEN_INTERNAL_CHECK_COST_VALUE(CoeffReadCost);
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar coeff(Index idx) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const Scalar coeff(Index idx) const {
     if (AsScalarProduct)
       return m_diagImpl.coeff(0) * m_matImpl.coeff(idx);
     else
@@ -891,7 +893,7 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DiagonalSha
 
   EIGEN_DEVICE_FUNC explicit product_evaluator(const XprType& xpr) : Base(xpr.rhs(), xpr.lhs().diagonal()) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar coeff(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const Scalar coeff(Index row, Index col) const {
     return m_diagImpl.coeff(row) * m_matImpl.coeff(row, col);
   }
 
@@ -932,7 +934,7 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DenseShape,
 
   EIGEN_DEVICE_FUNC explicit product_evaluator(const XprType& xpr) : Base(xpr.lhs(), xpr.rhs().diagonal()) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar coeff(Index row, Index col) const {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr const Scalar coeff(Index row, Index col) const {
     return m_matImpl.coeff(row, col) * m_diagImpl.coeff(col);
   }
 
