@@ -4,12 +4,8 @@
 
 #include "frc/geometry/Pose3d.h"
 
-#include <cmath>
-
 #include <Eigen/Core>
 #include <wpi/json.h>
-
-#include "geometry3d.pb.h"
 
 using namespace frc;
 
@@ -24,58 +20,17 @@ namespace {
  * @param rotation The rotation vector.
  * @return The rotation vector as a 3x3 rotation matrix.
  */
-Eigen::Matrix3d RotationVectorToMatrix(const Eigen::Vector3d& rotation) {
+constexpr Eigen::Matrix3d RotationVectorToMatrix(
+    const Eigen::Vector3d& rotation) {
   // Given a rotation vector <a, b, c>,
   //         [ 0 -c  b]
   // Omega = [ c  0 -a]
   //         [-b  a  0]
-  return Eigen::Matrix3d{{0.0, -rotation(2), rotation(1)},
-                         {rotation(2), 0.0, -rotation(0)},
-                         {-rotation(1), rotation(0), 0.0}};
+  return Eigen::Matrix3d{{0.0, -rotation.coeff(2), rotation.coeff(1)},
+                         {rotation.coeff(2), 0.0, -rotation.coeff(0)},
+                         {-rotation.coeff(1), rotation.coeff(0), 0.0}};
 }
 }  // namespace
-
-Pose3d::Pose3d(Translation3d translation, Rotation3d rotation)
-    : m_translation{std::move(translation)}, m_rotation{std::move(rotation)} {}
-
-Pose3d::Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
-               Rotation3d rotation)
-    : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
-
-Pose3d::Pose3d(const Pose2d& pose)
-    : m_translation{pose.X(), pose.Y(), 0_m},
-      m_rotation{0_rad, 0_rad, pose.Rotation().Radians()} {}
-
-Pose3d Pose3d::operator+(const Transform3d& other) const {
-  return TransformBy(other);
-}
-
-Transform3d Pose3d::operator-(const Pose3d& other) const {
-  const auto pose = this->RelativeTo(other);
-  return Transform3d{pose.Translation(), pose.Rotation()};
-}
-
-Pose3d Pose3d::operator*(double scalar) const {
-  return Pose3d{m_translation * scalar, m_rotation * scalar};
-}
-
-Pose3d Pose3d::operator/(double scalar) const {
-  return *this * (1.0 / scalar);
-}
-
-Pose3d Pose3d::RotateBy(const Rotation3d& other) const {
-  return {m_translation.RotateBy(other), m_rotation.RotateBy(other)};
-}
-
-Pose3d Pose3d::TransformBy(const Transform3d& other) const {
-  return {m_translation + (other.Translation().RotateBy(m_rotation)),
-          other.Rotation() + m_rotation};
-}
-
-Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
-  const Transform3d transform{other, *this};
-  return {transform.Translation(), transform.Rotation()};
-}
 
 Pose3d Pose3d::Exp(const Twist3d& twist) const {
   // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
@@ -83,13 +38,13 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
   Eigen::Vector3d rvec{twist.rx.value(), twist.ry.value(), twist.rz.value()};
   Eigen::Matrix3d omega = RotationVectorToMatrix(rvec);
   Eigen::Matrix3d omegaSq = omega * omega;
-  double theta = rvec.norm();
+  double theta = gcem::hypot(rvec.coeff(0), rvec.coeff(1), rvec.coeff(2));
   double thetaSq = theta * theta;
 
   double A;
   double B;
   double C;
-  if (std::abs(theta) < 1E-7) {
+  if (gcem::abs(theta) < 1E-7) {
     // Taylor Expansions around θ = 0
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
@@ -108,19 +63,19 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
     // A = std::sin(θ)/θ
     // B = (1 - std::cos(θ)) / θ²
     // C = (1 - A) / θ²
-    A = std::sin(theta) / theta;
-    B = (1 - std::cos(theta)) / thetaSq;
+    A = gcem::sin(theta) / theta;
+    B = (1 - gcem::cos(theta)) / thetaSq;
     C = (1 - A) / thetaSq;
   }
 
   Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + A * omega + B * omegaSq;
   Eigen::Matrix3d V = Eigen::Matrix3d::Identity() + B * omega + C * omegaSq;
 
-  auto translation_component = V * u;
+  Eigen::Vector3d translation_component = V * u;
   const Transform3d transform{
-      Translation3d{units::meter_t{translation_component(0)},
-                    units::meter_t{translation_component(1)},
-                    units::meter_t{translation_component(2)}},
+      Translation3d{units::meter_t{translation_component.coeff(0)},
+                    units::meter_t{translation_component.coeff(1)},
+                    units::meter_t{translation_component.coeff(2)}},
       Rotation3d{R}};
 
   return *this + transform;
@@ -137,11 +92,11 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
 
   Eigen::Matrix3d omega = RotationVectorToMatrix(rvec);
   Eigen::Matrix3d omegaSq = omega * omega;
-  double theta = rvec.norm();
+  double theta = gcem::hypot(rvec.coeff(0), rvec.coeff(1), rvec.coeff(2));
   double thetaSq = theta * theta;
 
   double C;
-  if (std::abs(theta) < 1E-7) {
+  if (gcem::abs(theta) < 1E-7) {
     // Taylor Expansions around θ = 0
     // A = 1/1! - θ²/3! + θ⁴/5!
     // B = 1/2! - θ²/4! + θ⁴/6!
@@ -158,8 +113,8 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
     // A = std::sin(θ)/θ
     // B = (1 - std::cos(θ)) / θ²
     // C = (1 - A/(2*B)) / θ²
-    double A = std::sin(theta) / theta;
-    double B = (1 - std::cos(theta)) / thetaSq;
+    double A = gcem::sin(theta) / theta;
+    double B = (1 - gcem::cos(theta)) / thetaSq;
     C = (1 - A / (2 * B)) / thetaSq;
   }
 
@@ -168,16 +123,12 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
 
   Eigen::Vector3d translation_component = V_inv * u;
 
-  return Twist3d{units::meter_t{translation_component(0)},
-                 units::meter_t{translation_component(1)},
-                 units::meter_t{translation_component(2)},
-                 units::radian_t{rvec(0)},
-                 units::radian_t{rvec(1)},
-                 units::radian_t{rvec(2)}};
-}
-
-Pose2d Pose3d::ToPose2d() const {
-  return Pose2d{m_translation.X(), m_translation.Y(), m_rotation.Z()};
+  return Twist3d{units::meter_t{translation_component.coeff(0)},
+                 units::meter_t{translation_component.coeff(1)},
+                 units::meter_t{translation_component.coeff(2)},
+                 units::radian_t{rvec.coeff(0)},
+                 units::radian_t{rvec.coeff(1)},
+                 units::radian_t{rvec.coeff(2)}};
 }
 
 void frc::to_json(wpi::json& json, const Pose3d& pose) {

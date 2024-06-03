@@ -4,13 +4,22 @@
 
 #pragma once
 
+#include <string>
+#include <type_traits>
+
 #include <Eigen/Core>
+#include <Eigen/LU>
+#include <fmt/format.h>
+#include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
+#include "frc/fmt/Eigen.h"
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
+#include "units/math.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -22,14 +31,14 @@ class WPILIB_DLLEXPORT Rotation3d {
   /**
    * Constructs a Rotation3d representing no rotation.
    */
-  Rotation3d() = default;
+  constexpr Rotation3d() = default;
 
   /**
    * Constructs a Rotation3d from a quaternion.
    *
    * @param q The quaternion.
    */
-  explicit Rotation3d(const Quaternion& q);
+  constexpr explicit Rotation3d(const Quaternion& q) { m_q = q.Normalize(); }
 
   /**
    * Constructs a Rotation3d from extrinsic roll, pitch, and yaw.
@@ -45,7 +54,21 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
    */
-  Rotation3d(units::radian_t roll, units::radian_t pitch, units::radian_t yaw);
+  constexpr Rotation3d(units::radian_t roll, units::radian_t pitch,
+                       units::radian_t yaw) {
+    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_angles_to_quaternion_conversion
+    double cr = units::math::cos(roll * 0.5);
+    double sr = units::math::sin(roll * 0.5);
+
+    double cp = units::math::cos(pitch * 0.5);
+    double sp = units::math::sin(pitch * 0.5);
+
+    double cy = units::math::cos(yaw * 0.5);
+    double sy = units::math::sin(yaw * 0.5);
+
+    m_q = Quaternion{cr * cp * cy + sr * sp * sy, sr * cp * cy - cr * sp * sy,
+                     cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy};
+  }
 
   /**
    * Constructs a Rotation3d with the given axis-angle representation. The axis
@@ -54,7 +77,22 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param axis The rotation axis.
    * @param angle The rotation around the axis.
    */
-  Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle);
+  constexpr Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle) {
+    // double norm = axis.norm();
+    double norm = gcem::sqrt(axis.coeff(0) * axis.coeff(0) +
+                             axis.coeff(1) * axis.coeff(1) +
+                             axis.coeff(2) * axis.coeff(2));
+    if (norm == 0.0) {
+      return;
+    }
+
+    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
+    Eigen::Vector3d v{{axis.coeff(0) / norm * units::math::sin(angle / 2.0),
+                       axis.coeff(1) / norm * units::math::sin(angle / 2.0),
+                       axis.coeff(2) / norm * units::math::sin(angle / 2.0)}};
+    m_q = Quaternion{units::math::cos(angle / 2.0), v.coeff(0), v.coeff(1),
+                     v.coeff(2)};
+  }
 
   /**
    * Constructs a Rotation3d with the given rotation vector representation. This
@@ -63,7 +101,12 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @param rvec The rotation vector.
    */
-  explicit Rotation3d(const Eigen::Vector3d& rvec);
+  constexpr explicit Rotation3d(const Eigen::Vector3d& rvec)
+      // : Rotation3d{rvec, units::radian_t{rvec.norm()}} {}
+      : Rotation3d{
+            rvec, units::radian_t{gcem::sqrt(rvec.coeff(0) * rvec.coeff(0) +
+                                             rvec.coeff(1) * rvec.coeff(1) +
+                                             rvec.coeff(2) * rvec.coeff(2))}} {}
 
   /**
    * Constructs a Rotation3d from a rotation matrix.
@@ -71,7 +114,171 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param rotationMatrix The rotation matrix.
    * @throws std::domain_error if the rotation matrix isn't special orthogonal.
    */
-  explicit Rotation3d(const Eigen::Matrix3d& rotationMatrix);
+  constexpr explicit Rotation3d(const Eigen::Matrix3d& rotationMatrix) {
+    const auto& R = rotationMatrix;
+
+    // Require that the rotation matrix is special orthogonal. This is true if
+    // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+    if (std::is_constant_evaluated()) {
+      auto transpose =
+          []<int Rows, int Cols>(const Eigen::Matrix<double, Rows, Cols>& A)
+          -> Eigen::Matrix<double, Cols, Rows> {
+        Eigen::Matrix<double, Cols, Rows> result;
+
+        for (int row = 0; row < A.rows(); ++row) {
+          for (int col = 0; col < A.cols(); ++col) {
+            result.coeffRef(col, row) = A.coeff(row, col);
+          }
+        }
+
+        return result;
+      };
+
+      auto mult = [](const Eigen::Matrix3d& lhs,
+                     const Eigen::Matrix3d& rhs) -> Eigen::Matrix3d {
+        Eigen::Matrix3d result;
+
+        for (int i = 0; i < lhs.rows(); ++i) {
+          for (int j = 0; j < rhs.cols(); ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < lhs.cols(); ++k) {
+              sum += lhs(i, k) * rhs(k, j);
+            }
+            result.coeffRef(i, j) = sum;
+          }
+        }
+
+        return result;
+      };
+
+      auto minus = []<int Rows, int Cols>(
+                       const Eigen::Matrix<double, Rows, Cols>& A,
+                       const Eigen::Matrix<double, Rows, Cols>& B)
+          -> Eigen::Matrix<double, Rows, Cols> {
+        Eigen::Matrix<double, Rows, Cols> result;
+
+        for (int row = 0; row < 3; ++row) {
+          for (int col = 0; col < 3; ++col) {
+            result.coeffRef(row, col) = A.coeff(row, col) - B.coeff(row, col);
+          }
+        }
+
+        return result;
+      };
+
+      auto I = []<int Rows, int Cols>() -> Eigen::Matrix<double, Rows, Cols> {
+        Eigen::Matrix<double, Rows, Cols> result;
+
+        for (int row = 0; row < Rows; ++row) {
+          for (int col = 0; col < Cols; ++col) {
+            if (row == col) {
+              result.coeffRef(row, row) = 1.0;
+            } else {
+              result.coeffRef(row, col) = 0.0;
+            }
+          }
+        }
+
+        return result;
+      };
+
+      auto norm = []<int Rows, int Cols>(
+                      const Eigen::Matrix<double, Rows, Cols>& A) -> double {
+        double sum = 0.0;
+
+        for (int row = 0; row < Rows; ++row) {
+          for (int col = 0; col < Cols; ++col) {
+            sum += A.coeff(row, col) * A.coeff(row, col);
+          }
+        }
+
+        return gcem::sqrt(sum);
+      };
+
+      auto determinant = [](const Eigen::Matrix3d& A) -> double {
+        // |a  b  c|
+        // |d  e  f| = aei + bfg + cgh - ceg - bdi - afh
+        // |g  h  i|
+        double a = A.coeff(0, 0);
+        double b = A.coeff(0, 1);
+        double c = A.coeff(0, 2);
+        double d = A.coeff(1, 0);
+        double e = A.coeff(1, 1);
+        double f = A.coeff(1, 2);
+        double g = A.coeff(2, 0);
+        double h = A.coeff(2, 1);
+        double i = A.coeff(2, 2);
+        return a * e * i + b * f * g + c * g * h - c * e * g - b * d * i -
+               a * f * h;
+      };
+
+      if (norm(minus(mult(R, transpose(R)), I.operator()<3, 3>())) > 1e-9) {
+        throw std::domain_error("Rotation matrix isn't orthogonal");
+      }
+      if (gcem::abs(determinant(R) - 1.0) > 1e-9) {
+        throw std::domain_error(
+            "Rotation matrix is orthogonal but not special orthogonal");
+      }
+    } else {
+      if ((R * R.transpose() - Eigen::Matrix3d::Identity()).norm() > 1e-9) {
+        std::string msg =
+            fmt::format("Rotation matrix isn't orthogonal\n\nR =\n{}\n", R);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::domain_error(msg);
+      }
+      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+        std::string msg = fmt::format(
+            "Rotation matrix is orthogonal but not special orthogonal\n\nR "
+            "=\n{}\n",
+            R);
+
+        wpi::math::MathSharedStore::ReportError(msg);
+        throw std::domain_error(msg);
+      }
+    }
+
+    // Turn rotation matrix into a quaternion
+    // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+    double trace = R.coeff(0, 0) + R.coeff(1, 1) + R.coeff(2, 2);
+    double w;
+    double x;
+    double y;
+    double z;
+
+    if (trace > 0.0) {
+      double s = 0.5 / gcem::sqrt(trace + 1.0);
+      w = 0.25 / s;
+      x = (R.coeff(2, 1) - R.coeff(1, 2)) * s;
+      y = (R.coeff(0, 2) - R.coeff(2, 0)) * s;
+      z = (R.coeff(1, 0) - R.coeff(0, 1)) * s;
+    } else {
+      if (R.coeff(0, 0) > R.coeff(1, 1) && R.coeff(0, 0) > R.coeff(2, 2)) {
+        double s = 2.0 * gcem::sqrt(1.0 + R.coeff(0, 0) - R.coeff(1, 1) -
+                                    R.coeff(2, 2));
+        w = (R.coeff(2, 1) - R.coeff(1, 2)) / s;
+        x = 0.25 * s;
+        y = (R.coeff(0, 1) + R.coeff(1, 0)) / s;
+        z = (R.coeff(0, 2) + R.coeff(2, 0)) / s;
+      } else if (R.coeff(1, 1) > R.coeff(2, 2)) {
+        double s = 2.0 * gcem::sqrt(1.0 + R.coeff(1, 1) - R.coeff(0, 0) -
+                                    R.coeff(2, 2));
+        w = (R.coeff(0, 2) - R.coeff(2, 0)) / s;
+        x = (R.coeff(0, 1) + R.coeff(1, 0)) / s;
+        y = 0.25 * s;
+        z = (R.coeff(1, 2) + R.coeff(2, 1)) / s;
+      } else {
+        double s = 2.0 * gcem::sqrt(1.0 + R.coeff(2, 2) - R.coeff(0, 0) -
+                                    R.coeff(1, 1));
+        w = (R.coeff(1, 0) - R.coeff(0, 1)) / s;
+        x = (R.coeff(0, 2) + R.coeff(2, 0)) / s;
+        y = (R.coeff(1, 2) + R.coeff(2, 1)) / s;
+        z = 0.25 * s;
+      }
+    }
+
+    m_q = Quaternion{w, x, y, z};
+  }
 
   /**
    * Constructs a Rotation3d that rotates the initial vector onto the final
@@ -92,7 +299,9 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The sum of the two rotations.
    */
-  Rotation3d operator+(const Rotation3d& other) const;
+  constexpr Rotation3d operator+(const Rotation3d& other) const {
+    return RotateBy(other);
+  }
 
   /**
    * Subtracts the new rotation from the current rotation and returns the new
@@ -102,14 +311,16 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The difference between the two rotations.
    */
-  Rotation3d operator-(const Rotation3d& other) const;
+  constexpr Rotation3d operator-(const Rotation3d& other) const {
+    return *this + -other;
+  }
 
   /**
    * Takes the inverse of the current rotation.
    *
    * @return The inverse of the current rotation.
    */
-  Rotation3d operator-() const;
+  constexpr Rotation3d operator-() const { return Rotation3d{m_q.Inverse()}; }
 
   /**
    * Multiplies the current rotation by a scalar.
@@ -118,7 +329,16 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The new scaled Rotation3d.
    */
-  Rotation3d operator*(double scalar) const;
+  constexpr Rotation3d operator*(double scalar) const {
+    // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
+    if (m_q.W() >= 0.0) {
+      return Rotation3d{Eigen::Vector3d{{m_q.X(), m_q.Y(), m_q.Z()}},
+                        2.0 * units::radian_t{scalar * gcem::acos(m_q.W())}};
+    } else {
+      return Rotation3d{Eigen::Vector3d{{-m_q.X(), -m_q.Y(), -m_q.Z()}},
+                        2.0 * units::radian_t{scalar * gcem::acos(-m_q.W())}};
+    }
+  }
 
   /**
    * Divides the current rotation by a scalar.
@@ -127,12 +347,17 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The new scaled Rotation3d.
    */
-  Rotation3d operator/(double scalar) const;
+  constexpr Rotation3d operator/(double scalar) const {
+    return *this * (1.0 / scalar);
+  }
 
   /**
    * Checks equality between this Rotation3d and another object.
    */
-  bool operator==(const Rotation3d&) const;
+  constexpr bool operator==(const Rotation3d& other) const {
+    return gcem::abs(gcem::abs(m_q.Dot(other.m_q)) -
+                     m_q.Norm() * other.m_q.Norm()) < 1e-9;
+  }
 
   /**
    * Adds the new rotation to the current rotation. The other rotation is
@@ -145,43 +370,98 @@ class WPILIB_DLLEXPORT Rotation3d {
    *
    * @return The new rotated Rotation3d.
    */
-  Rotation3d RotateBy(const Rotation3d& other) const;
+  constexpr Rotation3d RotateBy(const Rotation3d& other) const {
+    return Rotation3d{other.m_q * m_q};
+  }
 
   /**
    * Returns the quaternion representation of the Rotation3d.
    */
-  const Quaternion& GetQuaternion() const;
+  constexpr const Quaternion& GetQuaternion() const { return m_q; }
 
   /**
    * Returns the counterclockwise rotation angle around the X axis (roll).
    */
-  units::radian_t X() const;
+  constexpr units::radian_t X() const {
+    double w = m_q.W();
+    double x = m_q.X();
+    double y = m_q.Y();
+    double z = m_q.Z();
+
+    // wpimath/algorithms.md
+    double cxcy = 1.0 - 2.0 * (x * x + y * y);
+    double sxcy = 2.0 * (w * x + y * z);
+    double cy_sq = cxcy * cxcy + sxcy * sxcy;
+    if (cy_sq > 1e-20) {
+      return units::radian_t{gcem::atan2(sxcy, cxcy)};
+    } else {
+      return 0_rad;
+    }
+  }
 
   /**
    * Returns the counterclockwise rotation angle around the Y axis (pitch).
    */
-  units::radian_t Y() const;
+  constexpr units::radian_t Y() const {
+    double w = m_q.W();
+    double x = m_q.X();
+    double y = m_q.Y();
+    double z = m_q.Z();
+
+    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
+    double ratio = 2.0 * (w * y - z * x);
+    if (gcem::abs(ratio) >= 1.0) {
+      return units::radian_t{gcem::copysign(std::numbers::pi / 2.0, ratio)};
+    } else {
+      return units::radian_t{gcem::asin(ratio)};
+    }
+  }
 
   /**
    * Returns the counterclockwise rotation angle around the Z axis (yaw).
    */
-  units::radian_t Z() const;
+  constexpr units::radian_t Z() const {
+    double w = m_q.W();
+    double x = m_q.X();
+    double y = m_q.Y();
+    double z = m_q.Z();
+
+    // wpimath/algorithms.md
+    double cycz = 1.0 - 2.0 * (y * y + z * z);
+    double cysz = 2.0 * (w * z + x * y);
+    double cy_sq = cycz * cycz + cysz * cysz;
+    if (cy_sq > 1e-20) {
+      return units::radian_t{gcem::atan2(cysz, cycz)};
+    } else {
+      return units::radian_t{gcem::atan2(2.0 * w * z, w * w - z * z)};
+    }
+  }
 
   /**
    * Returns the axis in the axis-angle representation of this rotation.
    */
-  Eigen::Vector3d Axis() const;
+  constexpr Eigen::Vector3d Axis() const {
+    double norm = gcem::hypot(m_q.X(), m_q.Y(), m_q.Z());
+    if (norm == 0.0) {
+      return Eigen::Vector3d{{0.0, 0.0, 0.0}};
+    } else {
+      return Eigen::Vector3d{{m_q.X() / norm, m_q.Y() / norm, m_q.Z() / norm}};
+    }
+  }
 
   /**
    * Returns the angle in the axis-angle representation of this rotation.
    */
-  units::radian_t Angle() const;
+  constexpr units::radian_t Angle() const {
+    double norm = gcem::hypot(m_q.X(), m_q.Y(), m_q.Z());
+    return units::radian_t{2.0 * gcem::atan2(norm, m_q.W())};
+  }
 
   /**
    * Returns a Rotation2d representing this Rotation3d projected into the X-Y
    * plane.
    */
-  Rotation2d ToRotation2d() const;
+  constexpr Rotation2d ToRotation2d() const { return Rotation2d{Z()}; }
 
  private:
   Quaternion m_q;
