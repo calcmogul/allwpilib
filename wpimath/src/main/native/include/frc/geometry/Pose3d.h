@@ -4,16 +4,19 @@
 
 #pragma once
 
+#include <utility>
+
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation3d.h"
-#include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/geometry/Twist3d.h"
 
 namespace frc {
+
+class Transform3d;
 
 /**
  * Represents a 3D pose containing translational and rotational elements.
@@ -31,7 +34,9 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param translation The translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  Pose3d(Translation3d translation, Rotation3d rotation);
+  constexpr Pose3d(Translation3d translation, Rotation3d rotation)
+      : m_translation{std::move(translation)},
+        m_rotation{std::move(rotation)} {}
 
   /**
    * Constructs a pose with x, y, and z translations instead of a separate
@@ -42,15 +47,18 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param z The z component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
-         Rotation3d rotation);
+  constexpr Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
+                   Rotation3d rotation)
+      : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**
    * Constructs a 3D pose from a 2D pose in the X-Y plane.
    *
    * @param pose The 2D pose.
    */
-  explicit Pose3d(const Pose2d& pose);
+  constexpr explicit Pose3d(const Pose2d& pose)
+      : m_translation{pose.X(), pose.Y(), 0_m},
+        m_rotation{0_rad, 0_rad, pose.Rotation().Radians()} {}
 
   /**
    * Transforms the pose by the given transformation and returns the new
@@ -62,7 +70,9 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The transformed pose.
    */
-  Pose3d operator+(const Transform3d& other) const;
+  constexpr Pose3d operator+(const Transform3d& other) const {
+    return TransformBy(other);
+  }
 
   /**
    * Returns the Transform3d that maps the one pose to another.
@@ -70,47 +80,47 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param other The initial pose of the transformation.
    * @return The transform that maps the other pose to the current pose.
    */
-  Transform3d operator-(const Pose3d& other) const;
+  constexpr Transform3d operator-(const Pose3d& other) const;
 
   /**
    * Checks equality between this Pose3d and another object.
    */
-  bool operator==(const Pose3d&) const = default;
+  constexpr bool operator==(const Pose3d&) const = default;
 
   /**
    * Returns the underlying translation.
    *
    * @return Reference to the translational component of the pose.
    */
-  const Translation3d& Translation() const { return m_translation; }
+  constexpr const Translation3d& Translation() const { return m_translation; }
 
   /**
    * Returns the X component of the pose's translation.
    *
    * @return The x component of the pose's translation.
    */
-  units::meter_t X() const { return m_translation.X(); }
+  constexpr units::meter_t X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  units::meter_t Y() const { return m_translation.Y(); }
+  constexpr units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the pose's translation.
    *
    * @return The z component of the pose's translation.
    */
-  units::meter_t Z() const { return m_translation.Z(); }
+  constexpr units::meter_t Z() const { return m_translation.Z(); }
 
   /**
    * Returns the underlying rotation.
    *
    * @return Reference to the rotational component of the pose.
    */
-  const Rotation3d& Rotation() const { return m_rotation; }
+  constexpr const Rotation3d& Rotation() const { return m_rotation; }
 
   /**
    * Multiplies the current pose by a scalar.
@@ -119,7 +129,9 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The new scaled Pose2d.
    */
-  Pose3d operator*(double scalar) const;
+  constexpr Pose3d operator*(double scalar) const {
+    return Pose3d{m_translation * scalar, m_rotation * scalar};
+  }
 
   /**
    * Divides the current pose by a scalar.
@@ -128,7 +140,9 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The new scaled Pose2d.
    */
-  Pose3d operator/(double scalar) const;
+  constexpr Pose3d operator/(double scalar) const {
+    return *this * (1.0 / scalar);
+  }
 
   /**
    * Rotates the pose around the origin and returns the new pose.
@@ -138,7 +152,9 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The rotated pose.
    */
-  Pose3d RotateBy(const Rotation3d& other) const;
+  constexpr Pose3d RotateBy(const Rotation3d& other) const {
+    return {m_translation.RotateBy(other), m_rotation.RotateBy(other)};
+  }
 
   /**
    * Transforms the pose by the given transformation and returns the new
@@ -150,7 +166,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The transformed pose.
    */
-  Pose3d TransformBy(const Transform3d& other) const;
+  constexpr Pose3d TransformBy(const Transform3d& other) const;
 
   /**
    * Returns the current pose relative to the given pose.
@@ -164,7 +180,7 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The current pose relative to the new origin pose.
    */
-  Pose3d RelativeTo(const Pose3d& other) const;
+  constexpr Pose3d RelativeTo(const Pose3d& other) const;
 
   /**
    * Obtain a new Pose3d from a (constant curvature) velocity.
@@ -200,7 +216,9 @@ class WPILIB_DLLEXPORT Pose3d {
   /**
    * Returns a Pose2d representing this Pose3d projected into the X-Y plane.
    */
-  Pose2d ToPose2d() const;
+  constexpr Pose2d ToPose2d() const {
+    return Pose2d{m_translation.X(), m_translation.Y(), m_rotation.Z()};
+  }
 
  private:
   Translation3d m_translation;
@@ -219,3 +237,24 @@ void from_json(const wpi::json& json, Pose3d& pose);
 #include "frc/geometry/proto/Pose3dProto.h"
 #endif
 #include "frc/geometry/struct/Pose3dStruct.h"
+
+#include "frc/geometry/Transform3d.h"
+
+namespace frc {
+
+constexpr Transform3d Pose3d::operator-(const Pose3d& other) const {
+  const auto pose = this->RelativeTo(other);
+  return Transform3d{pose.Translation(), pose.Rotation()};
+}
+
+constexpr Pose3d Pose3d::TransformBy(const Transform3d& other) const {
+  return {m_translation + (other.Translation().RotateBy(m_rotation)),
+          other.Rotation() + m_rotation};
+}
+
+constexpr Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
+  const Transform3d transform{other, *this};
+  return {transform.Translation(), transform.Rotation()};
+}
+
+}  // namespace frc
