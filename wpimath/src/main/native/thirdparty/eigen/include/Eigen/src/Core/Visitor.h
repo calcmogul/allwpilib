@@ -25,14 +25,12 @@ struct visitor_impl;
 template <typename Visitor, bool ShortCircuitEvaluation = false>
 struct short_circuit_eval_impl {
   // if short circuit evaluation is not used, do nothing
-  static EIGEN_CONSTEXPR EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor&) { return false; }
+  static constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor&) { return false; }
 };
 template <typename Visitor>
 struct short_circuit_eval_impl<Visitor, true> {
   // if short circuit evaluation is used, check the visitor
-  static EIGEN_CONSTEXPR EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor& visitor) {
-    return visitor.done();
-  }
+  static constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool run(const Visitor& visitor) { return visitor.done(); }
 };
 
 // unrolled inner-outer traversal
@@ -296,9 +294,9 @@ class visitor_evaluator {
 
   EIGEN_DEVICE_FUNC explicit visitor_evaluator(const XprType& xpr) : m_evaluator(xpr), m_xpr(xpr) {}
 
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT { return m_xpr.rows(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT { return m_xpr.cols(); }
-  EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR Index size() const EIGEN_NOEXCEPT { return m_xpr.size(); }
+  EIGEN_DEVICE_FUNC constexpr Index rows() const EIGEN_NOEXCEPT { return m_xpr.rows(); }
+  EIGEN_DEVICE_FUNC constexpr Index cols() const EIGEN_NOEXCEPT { return m_xpr.cols(); }
+  EIGEN_DEVICE_FUNC constexpr Index size() const EIGEN_NOEXCEPT { return m_xpr.size(); }
   // outer-inner access
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index row, Index col) const {
     return m_evaluator.coeff(row, col);
@@ -350,7 +348,7 @@ struct visit_impl {
 
   using impl = visitor_impl<Visitor, Evaluator, UnrollCount, Vectorize, LinearAccess, ShortCircuitEvaulation>;
 
-  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void run(const DenseBase<Derived>& mat, Visitor& visitor) {
+  static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr void run(const DenseBase<Derived>& mat, Visitor& visitor) {
     Evaluator evaluator(mat.derived());
     impl::run(evaluator, visitor);
   }
@@ -379,7 +377,7 @@ struct visit_impl {
  */
 template <typename Derived>
 template <typename Visitor>
-EIGEN_DEVICE_FUNC void DenseBase<Derived>::visit(Visitor& visitor) const {
+EIGEN_DEVICE_FUNC constexpr void DenseBase<Derived>::visit(Visitor& visitor) const {
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ false>;
   impl::run(derived(), visitor);
 }
@@ -647,8 +645,8 @@ struct functor_traits<count_visitor<Scalar>> {
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(IndexType* rowId,
-                                                                                          IndexType* colId) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(
+    IndexType* rowId, IndexType* colId) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
 
   internal::minmax_coeff_visitor<Derived, true, NaNPropagation> minVisitor;
@@ -671,7 +669,8 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(IndexType* index) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::minCoeff(
+    IndexType* index) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
 
@@ -694,8 +693,8 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(IndexType* rowPtr,
-                                                                                          IndexType* colPtr) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(
+    IndexType* rowPtr, IndexType* colPtr) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
 
   internal::minmax_coeff_visitor<Derived, false, NaNPropagation> maxVisitor;
@@ -718,7 +717,8 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  */
 template <typename Derived>
 template <int NaNPropagation, typename IndexType>
-EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(IndexType* index) const {
+EIGEN_DEVICE_FUNC constexpr typename internal::traits<Derived>::Scalar DenseBase<Derived>::maxCoeff(
+    IndexType* index) const {
   eigen_assert(this->rows() > 0 && this->cols() > 0 && "you are using an empty matrix");
 
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
@@ -736,7 +736,7 @@ EIGEN_DEVICE_FUNC typename internal::traits<Derived>::Scalar DenseBase<Derived>:
  * \sa any(), Cwise::operator<()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::all() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::all() const {
   using Visitor = internal::all_visitor<Scalar>;
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ true>;
   Visitor visitor;
@@ -749,7 +749,7 @@ EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::all() const {
  * \sa all()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::any() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::any() const {
   using Visitor = internal::any_visitor<Scalar>;
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ true>;
   Visitor visitor;
@@ -762,7 +762,7 @@ EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::any() const {
  * \sa all(), any()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC Index DenseBase<Derived>::count() const {
+EIGEN_DEVICE_FUNC constexpr Index DenseBase<Derived>::count() const {
   using Visitor = internal::count_visitor<Scalar>;
   using impl = internal::visit_impl<Derived, Visitor, /*ShortCircuitEvaulation*/ false>;
   Visitor visitor;
@@ -771,7 +771,7 @@ EIGEN_DEVICE_FUNC Index DenseBase<Derived>::count() const {
 }
 
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::hasNaN() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::hasNaN() const {
   return derived().cwiseTypedNotEqual(derived()).any();
 }
 
@@ -780,7 +780,7 @@ EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::hasNaN() const {
  * \sa hasNaN()
  */
 template <typename Derived>
-EIGEN_DEVICE_FUNC inline bool DenseBase<Derived>::allFinite() const {
+EIGEN_DEVICE_FUNC inline constexpr bool DenseBase<Derived>::allFinite() const {
   return derived().array().isFiniteTyped().all();
 }
 

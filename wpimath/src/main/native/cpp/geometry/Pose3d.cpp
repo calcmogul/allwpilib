@@ -38,7 +38,7 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
   Eigen::Vector3d rvec{twist.rx.value(), twist.ry.value(), twist.rz.value()};
   Eigen::Matrix3d omega = RotationVectorToMatrix(rvec);
   Eigen::Matrix3d omegaSq = omega * omega;
-  double theta = gcem::hypot(rvec.coeff(0), rvec.coeff(1), rvec.coeff(2));
+  double theta = gcem::hypot(rvec(0), rvec(1), rvec(2));
   double thetaSq = theta * theta;
 
   double A;
@@ -92,7 +92,7 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
 
   Eigen::Matrix3d omega = RotationVectorToMatrix(rvec);
   Eigen::Matrix3d omegaSq = omega * omega;
-  double theta = gcem::hypot(rvec.coeff(0), rvec.coeff(1), rvec.coeff(2));
+  double theta = gcem::hypot(rvec(0), rvec(1), rvec(2));
   double thetaSq = theta * theta;
 
   double C;
@@ -123,12 +123,12 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
 
   Eigen::Vector3d translation_component = V_inv * u;
 
-  return Twist3d{units::meter_t{translation_component.coeff(0)},
-                 units::meter_t{translation_component.coeff(1)},
-                 units::meter_t{translation_component.coeff(2)},
-                 units::radian_t{rvec.coeff(0)},
-                 units::radian_t{rvec.coeff(1)},
-                 units::radian_t{rvec.coeff(2)}};
+  return Twist3d{units::meter_t{translation_component(0)},
+                 units::meter_t{translation_component(1)},
+                 units::meter_t{translation_component(2)},
+                 units::radian_t{rvec(0)},
+                 units::radian_t{rvec(1)},
+                 units::radian_t{rvec(2)}};
 }
 
 void frc::to_json(wpi::json& json, const Pose3d& pose) {

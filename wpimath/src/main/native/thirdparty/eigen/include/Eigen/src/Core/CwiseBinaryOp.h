@@ -99,21 +99,21 @@ class CwiseBinaryOp : public CwiseBinaryOpImpl<BinaryOp, LhsType, RhsType,
 
 #if EIGEN_COMP_MSVC
   // Required for Visual Studio or the Copy constructor will probably not get inlined!
-  EIGEN_STRONG_INLINE CwiseBinaryOp(const CwiseBinaryOp<BinaryOp, LhsType, RhsType>&) = default;
+  EIGEN_STRONG_INLINE constexpr CwiseBinaryOp(const CwiseBinaryOp<BinaryOp, LhsType, RhsType>&) = default;
 #endif
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CwiseBinaryOp(const Lhs& aLhs, const Rhs& aRhs,
-                                                      const BinaryOp& func = BinaryOp())
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr CwiseBinaryOp(const Lhs& aLhs, const Rhs& aRhs,
+                                                                const BinaryOp& func = BinaryOp())
       : m_lhs(aLhs), m_rhs(aRhs), m_functor(func) {
     eigen_assert(aLhs.rows() == aRhs.rows() && aLhs.cols() == aRhs.cols());
   }
 
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index rows() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index rows() const EIGEN_NOEXCEPT {
     // return the fixed size type if available to enable compile time optimizations
     return internal::traits<internal::remove_all_t<LhsNested>>::RowsAtCompileTime == Dynamic ? m_rhs.rows()
                                                                                              : m_lhs.rows();
   }
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR Index cols() const EIGEN_NOEXCEPT {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Index cols() const EIGEN_NOEXCEPT {
     // return the fixed size type if available to enable compile time optimizations
     return internal::traits<internal::remove_all_t<LhsNested>>::ColsAtCompileTime == Dynamic ? m_rhs.cols()
                                                                                              : m_lhs.cols();
@@ -145,7 +145,8 @@ class CwiseBinaryOpImpl : public internal::generic_xpr_base<CwiseBinaryOp<Binary
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::operator-=(const MatrixBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& MatrixBase<Derived>::operator-=(
+    const MatrixBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::sub_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }
@@ -156,7 +157,8 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::operator-=(c
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::operator+=(const MatrixBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE constexpr Derived& MatrixBase<Derived>::operator+=(
+    const MatrixBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::add_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }
