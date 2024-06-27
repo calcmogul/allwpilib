@@ -4,37 +4,54 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.ExponentialProfile;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
+@SuppressWarnings({"MemberName", "MissingJavadocMethod"})
 public class Robot extends TimedRobot {
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {}
+  public static final double dt = 0.01;
+  public static final double offset = 0.005;
 
-  /** This function is run once each time the robot enters autonomous mode. */
-  @Override
-  public void autonomousInit() {}
+  public static final double Ks = 0.1;
+  public static final double Kv = 3.0;
+  public static final double Ka = 0.5;
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {}
+  public static final double Kp = 0.1;
+  public static final double Kd = 0.1;
 
-  /** This function is called once each time the robot enters tele-operated mode. */
-  @Override
-  public void teleopInit() {}
+  public Encoder encoder = new Encoder(0, 1);
+  public PWMSparkMax motor = new PWMSparkMax(0);
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {}
+  public ExponentialProfile profile =
+      new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(10.0, Kv, Ka));
 
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
+  public SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Ks, Kv, Ka);
+  public PIDController feedback = new PIDController(Kp, 0.0, Kd, dt);
 
-  /** This function is called periodically during all modes. */
-  @Override
-  public void robotPeriodic() {}
+  public ExponentialProfile.State currentSetpoint = new ExponentialProfile.State();
+  public ExponentialProfile.State goal = new ExponentialProfile.State();
+
+  public Robot() {
+    addPeriodic(this::controller, dt, offset);
+  }
+
+  public void setGoal(double goal) {
+    this.goal.position = goal;
+  }
+
+  public void controller() {
+    if (isDisabled()) {
+      return;
+    }
+
+    var nextSetpoint = profile.calculate(dt, currentSetpoint, goal);
+    motor.setVoltage(
+        feedforward.calculate(currentSetpoint.velocity, nextSetpoint.velocity, dt)
+            + feedback.calculate(encoder.getDistance(), currentSetpoint.position));
+    currentSetpoint = nextSetpoint;
+  }
 }
