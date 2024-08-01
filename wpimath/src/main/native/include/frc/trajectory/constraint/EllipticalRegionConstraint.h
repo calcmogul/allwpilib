@@ -5,7 +5,6 @@
 #pragma once
 
 #include <concepts>
-#include <limits>
 
 #include "frc/geometry/Ellipse2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -52,24 +51,14 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
                                        const Constraint& constraint)
       : m_ellipse{ellipse}, m_constraint{constraint} {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
+  void Apply(slp::Problem& problem, const Pose2d& pose,
+             const slp::Variable& linearVelocity,
+             const slp::Variable& angularVelocity,
+             const slp::Variable& linearAcceleration,
+             const slp::Variable& angularAcceleration) const override {
     if (m_ellipse.Contains(pose.Translation())) {
-      return m_constraint.MaxVelocity(pose, curvature, velocity);
-    } else {
-      return units::meters_per_second_t{
-          std::numeric_limits<double>::infinity()};
-    }
-  }
-
-  constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
-    if (m_ellipse.Contains(pose.Translation())) {
-      return m_constraint.MinMaxAcceleration(pose, curvature, speed);
-    } else {
-      return {};
+      return m_constraint.Apply(problem, pose, linearVelocity, angularVelocity,
+                                linearAcceleration, angularAcceleration);
     }
   }
 

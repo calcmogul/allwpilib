@@ -15,7 +15,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "units/acceleration.h"
-#include "units/curvature.h"
+#include "units/angular_velocity.h"
 #include "units/math.h"
 #include "units/time.h"
 #include "units/velocity.h"
@@ -35,17 +35,17 @@ class WPILIB_DLLEXPORT Trajectory {
     /// The time elapsed since the beginning of the trajectory.
     units::second_t t = 0_s;
 
-    /// The speed at that point of the trajectory.
-    units::meters_per_second_t velocity = 0_mps;
-
-    /// The acceleration at that point of the trajectory.
-    units::meters_per_second_squared_t acceleration = 0_mps_sq;
-
     /// The pose at that point of the trajectory.
     Pose2d pose;
 
-    /// The curvature at that point of the trajectory.
-    units::curvature_t curvature{0.0};
+    /// The linear velocity at that point of the trajectory.
+    units::meters_per_second_t linearVelocity = 0_mps;
+
+    /// The linear acceleration at that point of the trajectory.
+    units::meters_per_second_squared_t linearAcceleration = 0_mps_sq;
+
+    /// The angular velocity at that point of the trajectory.
+    units::radians_per_second_t angularVelocity = 0_rad_per_s;
 
     /**
      * Checks equality between this State and another object.
@@ -74,20 +74,15 @@ class WPILIB_DLLEXPORT Trajectory {
       }
 
       // Check whether the robot is reversing at this stage.
-      const auto reversing =
-          velocity < 0_mps ||
-          (units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
-
-      // Calculate the new velocity.
-      // v = v_0 + at
-      const units::meters_per_second_t newV =
-          velocity + (acceleration * deltaT);
+      const auto reversing = linearVelocity < 0_mps ||
+                             (units::math::abs(linearVelocity) < 1E-9_mps &&
+                              linearAcceleration < 0_mps_sq);
 
       // Calculate the change in position.
-      // delta_s = v_0 t + 0.5at²
-      const units::meter_t newS =
-          (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
-          (reversing ? -1.0 : 1.0);
+      // Δs = v₀t + 0.5at²
+      const units::meter_t newS = (linearVelocity * deltaT +
+                                   0.5 * linearAcceleration * deltaT * deltaT) *
+                                  (reversing ? -1.0 : 1.0);
 
       // Return the new state. To find the new position for the new state, we
       // need to interpolate between the two endpoint poses. The fraction for
@@ -96,9 +91,11 @@ class WPILIB_DLLEXPORT Trajectory {
       const double interpolationFrac =
           newS / endValue.pose.Translation().Distance(pose.Translation());
 
-      return {newT, newV, acceleration,
-              wpi::Lerp(pose, endValue.pose, interpolationFrac),
-              wpi::Lerp(curvature, endValue.curvature, interpolationFrac)};
+      return {newT, wpi::Lerp(pose, endValue.pose, interpolationFrac),
+              // v = v₀ + at
+              linearVelocity + linearAcceleration * deltaT, linearAcceleration,
+              wpi::Lerp(angularVelocity, endValue.angularVelocity,
+                        interpolationFrac)};
     }
   };
 

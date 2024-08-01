@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <memory>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -41,24 +40,24 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     const Trajectory::State point = trajectory.Sample(time);
     time += dt;
 
-    const ChassisSpeeds chassisSpeeds{point.velocity, 0_mps,
-                                      point.velocity * point.curvature};
+    const ChassisSpeeds chassisSpeeds{point.linearVelocity, 0_mps,
+                                      point.angularVelocity};
 
     auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
-    auto acceleration = point.acceleration;
+    auto acceleration = point.linearAcceleration;
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and
     // a reasonable check anyway
-    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) <
-                maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) >
-                -maxVoltage - 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right,
+    EXPECT_LT(feedforward.Calculate(left, left + acceleration * dt),
+              maxVoltage + 0.05_V);
+    EXPECT_GT(feedforward.Calculate(left, left + acceleration * dt),
+              -maxVoltage - 0.05_V);
+    EXPECT_LT(feedforward.Calculate(right,
 
-                                      right + acceleration * dt) <
-                maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right, right + acceleration * dt) >
-                -maxVoltage - 0.05_V);
+                                    right + acceleration * dt),
+              maxVoltage + 0.05_V);
+    EXPECT_GT(feedforward.Calculate(right, right + acceleration * dt),
+              -maxVoltage - 0.05_V);
   }
 }
 

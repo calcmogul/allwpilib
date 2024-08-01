@@ -170,8 +170,8 @@ TEST(SwerveDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](frc::Trajectory::State& state) {
-        return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                  state.velocity * state.curvature};
+        return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                  state.angularVelocity};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       {0_m, 0_m, frc::Rotation2d{45_deg}}, {0_m, 0_m, frc::Rotation2d{45_deg}},
@@ -215,8 +215,8 @@ TEST(SwerveDrivePoseEstimator3dTest, BadInitialPose) {
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](frc::Trajectory::State& state) {
-            return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
+            return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                      state.angularVelocity};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
           initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,

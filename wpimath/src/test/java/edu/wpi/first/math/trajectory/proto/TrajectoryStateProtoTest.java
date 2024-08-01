@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 class TrajectoryStateProtoTest {
   private static final Trajectory.State DATA =
       new Trajectory.State(
-          1.91, 4.4, 17.4, new Pose2d(new Translation2d(1.74, 19.1), new Rotation2d(22.9)), 0.174);
+          1.91, new Pose2d(new Translation2d(1.74, 19.1), new Rotation2d(22.9)), 4.4, 17.4, 0.174);
 
   @Test
   void testRoundtrip() {
@@ -25,9 +25,9 @@ class TrajectoryStateProtoTest {
 
     Trajectory.State data = Trajectory.State.proto.unpack(proto);
     assertEquals(DATA.time, data.time);
-    assertEquals(DATA.velocity, data.velocity);
-    assertEquals(DATA.acceleration, data.acceleration);
     assertEquals(DATA.pose, data.pose);
-    assertEquals(DATA.curvature, data.curvature);
+    assertEquals(DATA.linearVelocity, data.linearVelocity);
+    assertEquals(DATA.linearAcceleration, data.linearAcceleration);
+    assertEquals(DATA.angularVelocity, data.angularVelocity);
   }
 }
