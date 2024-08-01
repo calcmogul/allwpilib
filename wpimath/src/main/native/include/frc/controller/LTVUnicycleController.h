@@ -119,8 +119,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    */
   ChassisSpeeds Calculate(const Pose2d& currentPose,
                           const Trajectory::State& desiredState) {
-    return Calculate(currentPose, desiredState.pose, desiredState.velocity,
-                     desiredState.velocity * desiredState.curvature);
+    return Calculate(currentPose, desiredState.pose,
+                     desiredState.linearVelocity, desiredState.angularVelocity);
   }
 
   /**

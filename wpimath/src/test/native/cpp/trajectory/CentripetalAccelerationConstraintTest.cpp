@@ -2,17 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <memory>
-#include <vector>
-
 #include <gtest/gtest.h>
 
 #include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "trajectory/TestTrajectory.h"
 #include "units/acceleration.h"
 #include "units/angle.h"
-#include "units/math.h"
 #include "units/velocity.h"
 
 using namespace frc;
@@ -35,7 +30,7 @@ TEST(CentripetalAccelerationConstraintTest, Constraint) {
     time += dt;
 
     auto centripetalAcceleration =
-        units::math::pow<2>(point.velocity) * point.curvature / 1_rad;
+        point.linearVelocity * point.angularVelocity / 1_rad;
 
     EXPECT_TRUE(centripetalAcceleration <
                 maxCentripetalAcceleration + 0.05_mps_sq);

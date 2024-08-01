@@ -11,7 +11,6 @@
 #include <gtest/gtest.h>
 #include <wpi/print.h>
 
-#include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator3d.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -173,8 +172,8 @@ TEST(DifferentialDrivePoseEstimator3dTest, Accuracy) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](frc::Trajectory::State& state) {
-        return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                  state.velocity * state.curvature};
+        return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                  state.angularVelocity};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms,
@@ -215,8 +214,8 @@ TEST(DifferentialDrivePoseEstimator3dTest, BadInitialPose) {
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](frc::Trajectory::State& state) {
-            return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
+            return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                      state.angularVelocity};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
           initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,

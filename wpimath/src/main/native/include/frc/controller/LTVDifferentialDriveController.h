@@ -153,10 +153,12 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
     // v_r = v(1 + kr)
     return Calculate(
         currentPose, leftVelocity, rightVelocity, desiredState.pose,
-        desiredState.velocity *
-            (1 - (desiredState.curvature / 1_rad * m_trackwidth / 2.0)),
-        desiredState.velocity *
-            (1 + (desiredState.curvature / 1_rad * m_trackwidth / 2.0)));
+        desiredState.linearVelocity -
+            // NOLINTNEXTLINE(bugprone-integer-division)
+            desiredState.angularVelocity / 1_rad * m_trackwidth / 2.0,
+        desiredState.linearVelocity +
+            // NOLINTNEXTLINE(bugprone-integer-division)
+            desiredState.angularVelocity / 1_rad * m_trackwidth / 2.0);
   }
 
  private:

@@ -103,9 +103,9 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingTrajectory) {
   while (t < trajectory.TotalTime()) {
     Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    auto moduleStates = kinematics.ToSwerveModuleStates(
-        {groundTruthState.velocity, 0_mps,
-         groundTruthState.velocity * groundTruthState.curvature});
+    auto moduleStates =
+        kinematics.ToSwerveModuleStates({groundTruthState.linearVelocity, 0_mps,
+                                         groundTruthState.angularVelocity});
 
     fl.distance += moduleStates[0].speed * dt;
     fr.distance += moduleStates[1].speed * dt;
@@ -168,14 +168,14 @@ TEST_F(SwerveDriveOdometryTest, AccuracyFacingXAxis) {
   while (t < trajectory.TotalTime()) {
     Trajectory::State groundTruthState = trajectory.Sample(t);
 
-    fl.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
-    fr.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
-    bl.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
-    br.distance += groundTruthState.velocity * dt +
-                   0.5 * groundTruthState.acceleration * dt * dt;
+    fl.distance += groundTruthState.linearVelocity * dt +
+                   0.5 * groundTruthState.linearAcceleration * dt * dt;
+    fr.distance += groundTruthState.linearVelocity * dt +
+                   0.5 * groundTruthState.linearAcceleration * dt * dt;
+    bl.distance += groundTruthState.linearVelocity * dt +
+                   0.5 * groundTruthState.linearAcceleration * dt * dt;
+    br.distance += groundTruthState.linearVelocity * dt +
+                   0.5 * groundTruthState.linearAcceleration * dt * dt;
 
     fl.angle = groundTruthState.pose.Rotation();
     fr.angle = groundTruthState.pose.Rotation();
