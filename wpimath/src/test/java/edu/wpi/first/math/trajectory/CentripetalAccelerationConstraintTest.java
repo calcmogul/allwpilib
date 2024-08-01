@@ -27,7 +27,7 @@ class CentripetalAccelerationConstraintTest {
     while (t < duration) {
       var point = trajectory.sample(t);
       var centripetalAcceleration =
-          Math.pow(point.velocityMetersPerSecond, 2) * point.curvatureRadPerMeter;
+          point.linearVelocityMetersPerSecond * point.angularVelocityRadPerSec;
 
       t += dt;
       assertTrue(centripetalAcceleration <= maxCentripetalAcceleration + 0.05);

@@ -39,9 +39,9 @@ public final class TrajectoryUtil {
       states.add(
           new Trajectory.State(
               elements[i],
-              elements[i + 1],
-              elements[i + 2],
-              new Pose2d(elements[i + 3], elements[i + 4], new Rotation2d(elements[i + 5])),
+              new Pose2d(elements[i + 1], elements[i + 2], new Rotation2d(elements[i + 3])),
+              elements[i + 4],
+              elements[i + 5],
               elements[i + 6]));
     }
     return new Trajectory(states);
@@ -60,12 +60,12 @@ public final class TrajectoryUtil {
     for (int i = 0; i < trajectory.getStates().size() * 7; i += 7) {
       var state = trajectory.getStates().get(i / 7);
       elements[i] = state.timeSeconds;
-      elements[i + 1] = state.velocityMetersPerSecond;
-      elements[i + 2] = state.accelerationMetersPerSecondSq;
-      elements[i + 3] = state.poseMeters.getX();
-      elements[i + 4] = state.poseMeters.getY();
-      elements[i + 5] = state.poseMeters.getRotation().getRadians();
-      elements[i + 6] = state.curvatureRadPerMeter;
+      elements[i + 1] = state.poseMeters.getX();
+      elements[i + 2] = state.poseMeters.getY();
+      elements[i + 3] = state.poseMeters.getRotation().getRadians();
+      elements[i + 4] = state.linearVelocityMetersPerSecond;
+      elements[i + 5] = state.linearAccelerationMetersPerSecondSq;
+      elements[i + 6] = state.angularVelocityRadPerSec;
     }
     return elements;
   }

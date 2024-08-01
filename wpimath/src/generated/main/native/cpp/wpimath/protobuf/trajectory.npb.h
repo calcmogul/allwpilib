@@ -22,10 +22,10 @@ typedef struct _wpi_proto_ProtobufTrajectoryState {
     static pb_filedesc_t file_descriptor(void) noexcept;
 
     double time;
-    double velocity;
-    double acceleration;
     pb_callback_t pose;
-    double curvature;
+    double linearVelocity;
+    double linearAcceleration;
+    double angularVelocity;
 } wpi_proto_ProtobufTrajectoryState;
 
 typedef struct _wpi_proto_ProtobufTrajectory {
@@ -38,26 +38,26 @@ typedef struct _wpi_proto_ProtobufTrajectory {
 
 
 /* Initializer values for message structs */
-#define wpi_proto_ProtobufTrajectoryState_init_default {0, 0, 0, {{NULL}, NULL}, 0}
+#define wpi_proto_ProtobufTrajectoryState_init_default {0, {{NULL}, NULL}, 0, 0, 0}
 #define wpi_proto_ProtobufTrajectory_init_default {{{NULL}, NULL}}
-#define wpi_proto_ProtobufTrajectoryState_init_zero {0, 0, 0, {{NULL}, NULL}, 0}
+#define wpi_proto_ProtobufTrajectoryState_init_zero {0, {{NULL}, NULL}, 0, 0, 0}
 #define wpi_proto_ProtobufTrajectory_init_zero   {{{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define wpi_proto_ProtobufTrajectoryState_time_tag 1
-#define wpi_proto_ProtobufTrajectoryState_velocity_tag 2
-#define wpi_proto_ProtobufTrajectoryState_acceleration_tag 3
-#define wpi_proto_ProtobufTrajectoryState_pose_tag 4
-#define wpi_proto_ProtobufTrajectoryState_curvature_tag 5
+#define wpi_proto_ProtobufTrajectoryState_pose_tag 2
+#define wpi_proto_ProtobufTrajectoryState_linearVelocity_tag 3
+#define wpi_proto_ProtobufTrajectoryState_linearAcceleration_tag 4
+#define wpi_proto_ProtobufTrajectoryState_angularVelocity_tag 5
 #define wpi_proto_ProtobufTrajectory_states_tag  2
 
 /* Struct field encoding specification for nanopb */
 #define wpi_proto_ProtobufTrajectoryState_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, DOUBLE,   time,              1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   velocity,          2) \
-X(a, STATIC,   SINGULAR, DOUBLE,   acceleration,      3) \
-X(a, CALLBACK, OPTIONAL, MESSAGE,  pose,              4) \
-X(a, STATIC,   SINGULAR, DOUBLE,   curvature,         5)
+X(a, CALLBACK, OPTIONAL, MESSAGE,  pose,              2) \
+X(a, STATIC,   SINGULAR, DOUBLE,   linearVelocity,    3) \
+X(a, STATIC,   SINGULAR, DOUBLE,   linearAcceleration,   4) \
+X(a, STATIC,   SINGULAR, DOUBLE,   angularVelocity,   5)
 #define wpi_proto_ProtobufTrajectoryState_CALLBACK pb_default_field_callback
 #define wpi_proto_ProtobufTrajectoryState_DEFAULT NULL
 #define wpi_proto_ProtobufTrajectoryState_pose_MSGTYPE wpi_proto_ProtobufPose2d

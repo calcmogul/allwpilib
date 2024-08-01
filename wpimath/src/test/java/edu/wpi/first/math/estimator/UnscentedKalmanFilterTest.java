@@ -166,8 +166,8 @@ class UnscentedKalmanFilterTest {
     double totalTime = trajectory.getTotalTimeSeconds();
     for (int i = 0; i < (totalTime / dtSeconds); i++) {
       var ref = trajectory.sample(dtSeconds * i);
-      double vl = ref.velocityMetersPerSecond * (1 - (ref.curvatureRadPerMeter * rbMeters));
-      double vr = ref.velocityMetersPerSecond * (1 + (ref.curvatureRadPerMeter * rbMeters));
+      double vl = ref.linearVelocityMetersPerSecond - ref.angularVelocityRadPerSec * rbMeters;
+      double vr = ref.linearVelocityMetersPerSecond + ref.angularVelocityRadPerSec * rbMeters;
 
       var nextR =
           VecBuilder.fill(

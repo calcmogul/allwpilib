@@ -281,25 +281,16 @@ public class LTVDifferentialDriveController {
       double leftVelocity,
       double rightVelocity,
       Trajectory.State desiredState) {
-    // v = (v_r + v_l) / 2     (1)
-    // w = (v_r - v_l) / (2r)  (2)
-    // k = w / v               (3)
-    //
-    // v_l = v - wr
-    // v_l = v - (vk)r
-    // v_l = v(1 - kr)
-    //
-    // v_r = v + wr
-    // v_r = v + (vk)r
-    // v_r = v(1 + kr)
+    // v_l = v - ωr
+    // v_r = v + ωr
     return calculate(
         currentPose,
         leftVelocity,
         rightVelocity,
         desiredState.poseMeters,
-        desiredState.velocityMetersPerSecond
-            * (1 - (desiredState.curvatureRadPerMeter * m_trackwidth / 2.0)),
-        desiredState.velocityMetersPerSecond
-            * (1 + (desiredState.curvatureRadPerMeter * m_trackwidth / 2.0)));
+        desiredState.linearVelocityMetersPerSecond
+            - desiredState.angularVelocityRadPerSec * m_trackwidth / 2.0,
+        desiredState.linearVelocityMetersPerSecond
+            + desiredState.angularVelocityRadPerSec * m_trackwidth / 2.0);
   }
 }

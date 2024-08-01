@@ -56,9 +56,8 @@ RamseteCommand::RamseteCommand(
 void RamseteCommand::Initialize() {
   m_prevTime = -1_s;
   auto initialState = m_trajectory.Sample(0_s);
-  m_prevSpeeds = m_kinematics.ToWheelSpeeds(
-      frc::ChassisSpeeds{initialState.velocity, 0_mps,
-                         initialState.velocity * initialState.curvature});
+  m_prevSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds{
+      initialState.linearVelocity, 0_mps, initialState.angularVelocity});
   m_timer.Restart();
   if (m_usePID) {
     m_leftController->Reset();

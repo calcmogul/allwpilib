@@ -148,8 +148,8 @@ ChassisSpeeds LTVUnicycleController::Calculate(
 
 ChassisSpeeds LTVUnicycleController::Calculate(
     const Pose2d& currentPose, const Trajectory::State& desiredState) {
-  return Calculate(currentPose, desiredState.pose, desiredState.velocity,
-                   desiredState.velocity * desiredState.curvature);
+  return Calculate(currentPose, desiredState.pose, desiredState.linearVelocity,
+                   desiredState.angularVelocity);
 }
 
 void LTVUnicycleController::SetEnabled(bool enabled) {

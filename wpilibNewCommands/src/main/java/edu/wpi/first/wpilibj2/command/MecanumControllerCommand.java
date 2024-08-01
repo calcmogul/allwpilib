@@ -463,9 +463,9 @@ public class MecanumControllerCommand extends Command {
     var initialState = m_trajectory.sample(0);
 
     var initialXVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getCos();
+        initialState.linearVelocityMetersPerSecond * initialState.poseMeters.getRotation().getCos();
     var initialYVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
+        initialState.linearVelocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
 
     MecanumDriveWheelSpeeds prevSpeeds =
         m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));

@@ -33,8 +33,8 @@ class EllipticalRegionConstraintTest {
     boolean exceededConstraintOutsideRegion = false;
     for (var point : trajectory.getStates()) {
       if (ellipse.contains(point.poseMeters.getTranslation())) {
-        assertTrue(Math.abs(point.velocityMetersPerSecond) < maxVelocity + 0.05);
-      } else if (Math.abs(point.velocityMetersPerSecond) >= maxVelocity + 0.05) {
+        assertTrue(Math.abs(point.linearVelocityMetersPerSecond) < maxVelocity + 0.05);
+      } else if (Math.abs(point.linearVelocityMetersPerSecond) >= maxVelocity + 0.05) {
         exceededConstraintOutsideRegion = true;
       }
     }

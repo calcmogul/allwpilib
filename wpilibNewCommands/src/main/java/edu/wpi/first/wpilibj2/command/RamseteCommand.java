@@ -148,9 +148,9 @@ public class RamseteCommand extends Command {
     m_prevSpeeds =
         m_kinematics.toWheelSpeeds(
             new ChassisSpeeds(
-                initialState.velocityMetersPerSecond,
+                initialState.linearVelocityMetersPerSecond,
                 0,
-                initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
+                initialState.angularVelocityRadPerSec));
     m_prevLeftSpeedSetpoint = m_prevSpeeds.leftMetersPerSecond;
     m_prevRightSpeedSetpoint = m_prevSpeeds.rightMetersPerSecond;
     m_timer.restart();

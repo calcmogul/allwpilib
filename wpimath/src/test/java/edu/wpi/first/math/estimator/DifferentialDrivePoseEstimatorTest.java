@@ -57,9 +57,7 @@ class DifferentialDrivePoseEstimatorTest {
         trajectory,
         state ->
             new ChassisSpeeds(
-                state.velocityMetersPerSecond,
-                0,
-                state.velocityMetersPerSecond * state.curvatureRadPerMeter),
+                state.linearVelocityMetersPerSecond, 0, state.angularVelocityRadPerSec),
         state -> state.poseMeters,
         trajectory.getInitialPose(),
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -112,9 +110,7 @@ class DifferentialDrivePoseEstimatorTest {
             trajectory,
             state ->
                 new ChassisSpeeds(
-                    state.velocityMetersPerSecond,
-                    0,
-                    state.velocityMetersPerSecond * state.curvatureRadPerMeter),
+                    state.linearVelocityMetersPerSecond, 0, state.angularVelocityRadPerSec),
             state -> state.poseMeters,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
