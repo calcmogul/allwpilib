@@ -204,10 +204,7 @@ public class LTVUnicycleController {
    */
   public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {
     return calculate(
-        currentPose,
-        desiredState.pose,
-        desiredState.velocity,
-        desiredState.velocity * desiredState.curvature);
+        currentPose, desiredState.pose, desiredState.linearVelocity, desiredState.angularVelocity);
   }
 
   /**

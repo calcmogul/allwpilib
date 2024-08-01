@@ -14,15 +14,15 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::Trajectory>;
 
 const Trajectory kExpectedData = Trajectory{std::vector<frc::Trajectory::State>{
-    Trajectory::State{1.1_s, 2.2_mps, 3.3_mps_sq,
+    Trajectory::State{1.1_s,
                       Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{2.1_s, 2.2_mps, 3.3_mps_sq,
+                      2.2_mps, 3.3_mps_sq, 6.6_rad_per_s},
+    Trajectory::State{2.1_s,
                       Pose2d(Translation2d(2.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{3.1_s, 2.2_mps, 3.3_mps_sq,
+                      2.2_mps, 3.3_mps_sq, 6.6_rad_per_s},
+    Trajectory::State{3.1_s,
                       Pose2d(Translation2d(3.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}}}};
+                      2.2_mps, 3.3_mps_sq, 6.6_rad_per_s}}};
 }  // namespace
 
 TEST(TrajectoryProtoTest, Roundtrip) {

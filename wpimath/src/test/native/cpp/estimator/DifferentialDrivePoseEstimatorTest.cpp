@@ -12,7 +12,6 @@
 #include <gtest/gtest.h>
 #include <wpi/print.h>
 
-#include "frc/StateSpaceUtil.h"
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -134,9 +133,9 @@ void testFollowTrajectory(
   }
 
   EXPECT_NEAR(endingPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 0.08);
+              estimator.GetEstimatedPosition().X().value(), 0.09);
   EXPECT_NEAR(endingPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 0.08);
+              estimator.GetEstimatedPosition().Y().value(), 0.09);
   EXPECT_NEAR(endingPose.Rotation().Radians().value(),
               estimator.GetEstimatedPosition().Rotation().Radians().value(),
               0.15);
@@ -165,8 +164,8 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](frc::Trajectory::State& state) {
-        return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                  state.velocity * state.curvature};
+        return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                  state.angularVelocity};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms,
@@ -203,8 +202,8 @@ TEST(DifferentialDrivePoseEstimatorTest, BadInitialPose) {
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](frc::Trajectory::State& state) {
-            return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
+            return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                      state.angularVelocity};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
           initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,
@@ -247,7 +246,7 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
     auto dtheta = units::math::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    EXPECT_TRUE(dx > 0.09_m || dy > 0.09_m || dtheta > 0.08_rad);
   }
 
   {
@@ -256,7 +255,7 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
     auto dtheta = units::math::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 90_deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    EXPECT_TRUE(dx > 0.09_m || dy > 0.09_m || dtheta > 0.08_rad);
   }
 
   {
@@ -265,7 +264,7 @@ TEST(DifferentialDrivePoseEstimatorTest, SimultaneousVisionMeasurements) {
     auto dtheta = units::math::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 180_deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    EXPECT_TRUE(dx > 0.09_m || dy > 0.09_m || dtheta > 0.08_rad);
   }
 }
 

@@ -144,8 +144,8 @@ class ExtendedKalmanFilterTest {
     double totalTime = trajectory.getTotalTime();
     for (int i = 0; i < (totalTime / dt); i++) {
       var ref = trajectory.sample(dt * i);
-      double vl = ref.velocity * (1 - (ref.curvature * rb));
-      double vr = ref.velocity * (1 + (ref.curvature * rb));
+      double vl = ref.linearVelocity - ref.angularVelocity * rb;
+      double vr = ref.linearVelocity + ref.angularVelocity * rb;
 
       nextR.set(0, 0, ref.pose.getTranslation().getX());
       nextR.set(1, 0, ref.pose.getTranslation().getY());

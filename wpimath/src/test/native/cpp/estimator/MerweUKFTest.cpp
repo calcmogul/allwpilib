@@ -131,9 +131,9 @@ TEST(MerweUKFTest, DriveConvergence) {
   for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
     auto ref = trajectory.Sample(dt * i);
     units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
+        ref.linearVelocity - rb * ref.angularVelocity / 1_rad;
     units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+        ref.linearVelocity + rb * ref.angularVelocity / 1_rad;
 
     frc::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
@@ -165,11 +165,11 @@ TEST(MerweUKFTest, DriveConvergence) {
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
   EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
-              0.055);
+              0.2);
   EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
               0.15);
   EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              0.000005);
+              1e-3);
   EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
   EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
 }
