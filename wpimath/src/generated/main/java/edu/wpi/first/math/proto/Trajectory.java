@@ -19,27 +19,28 @@ import us.hebi.quickbuf.RepeatedByte;
 import us.hebi.quickbuf.RepeatedMessage;
 
 public final class Trajectory {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(809,
-    "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8iugEKF1Byb3RvYnVm" + 
-    "VHJhamVjdG9yeVN0YXRlEhIKBHRpbWUYASABKAFSBHRpbWUSGgoIdmVsb2NpdHkYAiABKAFSCHZlbG9j" + 
-    "aXR5EiIKDGFjY2VsZXJhdGlvbhgDIAEoAVIMYWNjZWxlcmF0aW9uEi0KBHBvc2UYBCABKAsyGS53cGku" + 
-    "cHJvdG8uUHJvdG9idWZQb3NlMmRSBHBvc2USHAoJY3VydmF0dXJlGAUgASgBUgljdXJ2YXR1cmUiUAoS" + 
-    "UHJvdG9idWZUcmFqZWN0b3J5EjoKBnN0YXRlcxgCIAMoCzIiLndwaS5wcm90by5Qcm90b2J1ZlRyYWpl" + 
-    "Y3RvcnlTdGF0ZVIGc3RhdGVzQhoKGGVkdS53cGkuZmlyc3QubWF0aC5wcm90b0rEAwoGEgQAABIBCggK" + 
-    "AQwSAwAAEgoICgECEgMCABIKCQoCAwASAwQAGgoICgEIEgMGADEKCQoCCAESAwYAMQoKCgIEABIECAAO" + 
-    "AQoKCgMEAAESAwgIHwoLCgQEAAIAEgMJAhIKDAoFBAACAAUSAwkCCAoMCgUEAAIAARIDCQkNCgwKBQQA" + 
-    "AgADEgMJEBEKCwoEBAACARIDCgIWCgwKBQQAAgEFEgMKAggKDAoFBAACAQESAwoJEQoMCgUEAAIBAxID" + 
-    "ChQVCgsKBAQAAgISAwsCGgoMCgUEAAICBRIDCwIICgwKBQQAAgIBEgMLCRUKDAoFBAACAgMSAwsYGQoL" + 
-    "CgQEAAIDEgMMAhoKDAoFBAACAwYSAwwCEAoMCgUEAAIDARIDDBEVCgwKBQQAAgMDEgMMGBkKCwoEBAAC" + 
-    "BBIDDQIXCgwKBQQAAgQFEgMNAggKDAoFBAACBAESAw0JEgoMCgUEAAIEAxIDDRUWCgoKAgQBEgQQABIB" + 
-    "CgoKAwQBARIDEAgaCgsKBAQBAgASAxECLgoMCgUEAQIABBIDEQIKCgwKBQQBAgAGEgMRCyIKDAoFBAEC" + 
-    "AAESAxEjKQoMCgUEAQIAAxIDESwtYgZwcm90bzM=");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(845,
+    "ChB0cmFqZWN0b3J5LnByb3RvEgl3cGkucHJvdG8aEGdlb21ldHJ5MmQucHJvdG8i3gEKF1Byb3RvYnVm" + 
+    "VHJhamVjdG9yeVN0YXRlEhIKBHRpbWUYASABKAFSBHRpbWUSLQoEcG9zZRgCIAEoCzIZLndwaS5wcm90" + 
+    "by5Qcm90b2J1ZlBvc2UyZFIEcG9zZRImCg5saW5lYXJWZWxvY2l0eRgDIAEoAVIObGluZWFyVmVsb2Np" + 
+    "dHkSLgoSbGluZWFyQWNjZWxlcmF0aW9uGAQgASgBUhJsaW5lYXJBY2NlbGVyYXRpb24SKAoPYW5ndWxh" + 
+    "clZlbG9jaXR5GAUgASgBUg9hbmd1bGFyVmVsb2NpdHkiUAoSUHJvdG9idWZUcmFqZWN0b3J5EjoKBnN0" + 
+    "YXRlcxgCIAMoCzIiLndwaS5wcm90by5Qcm90b2J1ZlRyYWplY3RvcnlTdGF0ZVIGc3RhdGVzQhoKGGVk" + 
+    "dS53cGkuZmlyc3QubWF0aC5wcm90b0rEAwoGEgQAABIBCggKAQwSAwAAEgoICgECEgMCABIKCQoCAwAS" + 
+    "AwQAGgoICgEIEgMGADEKCQoCCAESAwYAMQoKCgIEABIECAAOAQoKCgMEAAESAwgIHwoLCgQEAAIAEgMJ" + 
+    "AhIKDAoFBAACAAUSAwkCCAoMCgUEAAIAARIDCQkNCgwKBQQAAgADEgMJEBEKCwoEBAACARIDCgIaCgwK" + 
+    "BQQAAgEGEgMKAhAKDAoFBAACAQESAwoRFQoMCgUEAAIBAxIDChgZCgsKBAQAAgISAwsCHAoMCgUEAAIC" + 
+    "BRIDCwIICgwKBQQAAgIBEgMLCRcKDAoFBAACAgMSAwsaGwoLCgQEAAIDEgMMAiAKDAoFBAACAwUSAwwC" + 
+    "CAoMCgUEAAIDARIDDAkbCgwKBQQAAgMDEgMMHh8KCwoEBAACBBIDDQIdCgwKBQQAAgQFEgMNAggKDAoF" + 
+    "BAACBAESAw0JGAoMCgUEAAIEAxIDDRscCgoKAgQBEgQQABIBCgoKAwQBARIDEAgaCgsKBAQBAgASAxEC" + 
+    "LgoMCgUEAQIABBIDEQIKCgwKBQQBAgAGEgMRCyIKDAoFBAECAAESAxEjKQoMCgUEAQIAAxIDESwtYgZw" + 
+    "cm90bzM=");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("trajectory.proto", "wpi.proto", descriptorData, Geometry2D.getDescriptor());
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectoryState_descriptor = descriptor.internalContainedType(50, 186, "ProtobufTrajectoryState", "wpi.proto.ProtobufTrajectoryState");
+  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectoryState_descriptor = descriptor.internalContainedType(50, 222, "ProtobufTrajectoryState", "wpi.proto.ProtobufTrajectoryState");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectory_descriptor = descriptor.internalContainedType(238, 80, "ProtobufTrajectory", "wpi.proto.ProtobufTrajectory");
+  static final Descriptors.Descriptor wpi_proto_ProtobufTrajectory_descriptor = descriptor.internalContainedType(274, 80, "ProtobufTrajectory", "wpi.proto.ProtobufTrajectory");
 
   /**
    * @return this proto file's descriptor.
@@ -60,22 +61,22 @@ public final class Trajectory {
     private double time;
 
     /**
-     * <code>optional double velocity = 2;</code>
+     * <code>optional double linearVelocity = 3;</code>
      */
-    private double velocity;
+    private double linearVelocity;
 
     /**
-     * <code>optional double acceleration = 3;</code>
+     * <code>optional double linearAcceleration = 4;</code>
      */
-    private double acceleration;
+    private double linearAcceleration;
 
     /**
-     * <code>optional double curvature = 5;</code>
+     * <code>optional double angularVelocity = 5;</code>
      */
-    private double curvature;
+    private double angularVelocity;
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      */
     private final Geometry2D.ProtobufPose2d pose = Geometry2D.ProtobufPose2d.newInstance();
 
@@ -127,118 +128,118 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional double velocity = 2;</code>
-     * @return whether the velocity field is set
+     * <code>optional double linearVelocity = 3;</code>
+     * @return whether the linearVelocity field is set
      */
-    public boolean hasVelocity() {
+    public boolean hasLinearVelocity() {
       return (bitField0_ & 0x00000002) != 0;
     }
 
     /**
-     * <code>optional double velocity = 2;</code>
+     * <code>optional double linearVelocity = 3;</code>
      * @return this
      */
-    public ProtobufTrajectoryState clearVelocity() {
+    public ProtobufTrajectoryState clearLinearVelocity() {
       bitField0_ &= ~0x00000002;
-      velocity = 0D;
+      linearVelocity = 0D;
       return this;
     }
 
     /**
-     * <code>optional double velocity = 2;</code>
-     * @return the velocity
+     * <code>optional double linearVelocity = 3;</code>
+     * @return the linearVelocity
      */
-    public double getVelocity() {
-      return velocity;
+    public double getLinearVelocity() {
+      return linearVelocity;
     }
 
     /**
-     * <code>optional double velocity = 2;</code>
-     * @param value the velocity to set
+     * <code>optional double linearVelocity = 3;</code>
+     * @param value the linearVelocity to set
      * @return this
      */
-    public ProtobufTrajectoryState setVelocity(final double value) {
+    public ProtobufTrajectoryState setLinearVelocity(final double value) {
       bitField0_ |= 0x00000002;
-      velocity = value;
+      linearVelocity = value;
       return this;
     }
 
     /**
-     * <code>optional double acceleration = 3;</code>
-     * @return whether the acceleration field is set
+     * <code>optional double linearAcceleration = 4;</code>
+     * @return whether the linearAcceleration field is set
      */
-    public boolean hasAcceleration() {
+    public boolean hasLinearAcceleration() {
       return (bitField0_ & 0x00000004) != 0;
     }
 
     /**
-     * <code>optional double acceleration = 3;</code>
+     * <code>optional double linearAcceleration = 4;</code>
      * @return this
      */
-    public ProtobufTrajectoryState clearAcceleration() {
+    public ProtobufTrajectoryState clearLinearAcceleration() {
       bitField0_ &= ~0x00000004;
-      acceleration = 0D;
+      linearAcceleration = 0D;
       return this;
     }
 
     /**
-     * <code>optional double acceleration = 3;</code>
-     * @return the acceleration
+     * <code>optional double linearAcceleration = 4;</code>
+     * @return the linearAcceleration
      */
-    public double getAcceleration() {
-      return acceleration;
+    public double getLinearAcceleration() {
+      return linearAcceleration;
     }
 
     /**
-     * <code>optional double acceleration = 3;</code>
-     * @param value the acceleration to set
+     * <code>optional double linearAcceleration = 4;</code>
+     * @param value the linearAcceleration to set
      * @return this
      */
-    public ProtobufTrajectoryState setAcceleration(final double value) {
+    public ProtobufTrajectoryState setLinearAcceleration(final double value) {
       bitField0_ |= 0x00000004;
-      acceleration = value;
+      linearAcceleration = value;
       return this;
     }
 
     /**
-     * <code>optional double curvature = 5;</code>
-     * @return whether the curvature field is set
+     * <code>optional double angularVelocity = 5;</code>
+     * @return whether the angularVelocity field is set
      */
-    public boolean hasCurvature() {
+    public boolean hasAngularVelocity() {
       return (bitField0_ & 0x00000008) != 0;
     }
 
     /**
-     * <code>optional double curvature = 5;</code>
+     * <code>optional double angularVelocity = 5;</code>
      * @return this
      */
-    public ProtobufTrajectoryState clearCurvature() {
+    public ProtobufTrajectoryState clearAngularVelocity() {
       bitField0_ &= ~0x00000008;
-      curvature = 0D;
+      angularVelocity = 0D;
       return this;
     }
 
     /**
-     * <code>optional double curvature = 5;</code>
-     * @return the curvature
+     * <code>optional double angularVelocity = 5;</code>
+     * @return the angularVelocity
      */
-    public double getCurvature() {
-      return curvature;
+    public double getAngularVelocity() {
+      return angularVelocity;
     }
 
     /**
-     * <code>optional double curvature = 5;</code>
-     * @param value the curvature to set
+     * <code>optional double angularVelocity = 5;</code>
+     * @param value the angularVelocity to set
      * @return this
      */
-    public ProtobufTrajectoryState setCurvature(final double value) {
+    public ProtobufTrajectoryState setAngularVelocity(final double value) {
       bitField0_ |= 0x00000008;
-      curvature = value;
+      angularVelocity = value;
       return this;
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      * @return whether the pose field is set
      */
     public boolean hasPose() {
@@ -246,7 +247,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      * @return this
      */
     public ProtobufTrajectoryState clearPose() {
@@ -256,7 +257,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      *
      * This method returns the internal storage object without modifying any has state.
      * The returned object should not be modified and be treated as read-only.
@@ -270,7 +271,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      *
      * This method returns the internal storage object and sets the corresponding
      * has state. The returned object will become part of this message and its
@@ -284,7 +285,7 @@ public final class Trajectory {
     }
 
     /**
-     * <code>optional .wpi.proto.ProtobufPose2d pose = 4;</code>
+     * <code>optional .wpi.proto.ProtobufPose2d pose = 2;</code>
      * @param value the pose to set
      * @return this
      */
@@ -300,9 +301,9 @@ public final class Trajectory {
       if ((bitField0_ | other.bitField0_) != 0) {
         bitField0_ = other.bitField0_;
         time = other.time;
-        velocity = other.velocity;
-        acceleration = other.acceleration;
-        curvature = other.curvature;
+        linearVelocity = other.linearVelocity;
+        linearAcceleration = other.linearAcceleration;
+        angularVelocity = other.angularVelocity;
         pose.copyFrom(other.pose);
       }
       return this;
@@ -317,14 +318,14 @@ public final class Trajectory {
       if (other.hasTime()) {
         setTime(other.time);
       }
-      if (other.hasVelocity()) {
-        setVelocity(other.velocity);
+      if (other.hasLinearVelocity()) {
+        setLinearVelocity(other.linearVelocity);
       }
-      if (other.hasAcceleration()) {
-        setAcceleration(other.acceleration);
+      if (other.hasLinearAcceleration()) {
+        setLinearAcceleration(other.linearAcceleration);
       }
-      if (other.hasCurvature()) {
-        setCurvature(other.curvature);
+      if (other.hasAngularVelocity()) {
+        setAngularVelocity(other.angularVelocity);
       }
       if (other.hasPose()) {
         getMutablePose().mergeFrom(other.pose);
@@ -340,9 +341,9 @@ public final class Trajectory {
       cachedSize = -1;
       bitField0_ = 0;
       time = 0D;
-      velocity = 0D;
-      acceleration = 0D;
-      curvature = 0D;
+      linearVelocity = 0D;
+      linearAcceleration = 0D;
+      angularVelocity = 0D;
       pose.clear();
       return this;
     }
@@ -369,9 +370,9 @@ public final class Trajectory {
       ProtobufTrajectoryState other = (ProtobufTrajectoryState) o;
       return bitField0_ == other.bitField0_
         && (!hasTime() || ProtoUtil.isEqual(time, other.time))
-        && (!hasVelocity() || ProtoUtil.isEqual(velocity, other.velocity))
-        && (!hasAcceleration() || ProtoUtil.isEqual(acceleration, other.acceleration))
-        && (!hasCurvature() || ProtoUtil.isEqual(curvature, other.curvature))
+        && (!hasLinearVelocity() || ProtoUtil.isEqual(linearVelocity, other.linearVelocity))
+        && (!hasLinearAcceleration() || ProtoUtil.isEqual(linearAcceleration, other.linearAcceleration))
+        && (!hasAngularVelocity() || ProtoUtil.isEqual(angularVelocity, other.angularVelocity))
         && (!hasPose() || pose.equals(other.pose));
     }
 
@@ -382,19 +383,19 @@ public final class Trajectory {
         output.writeDoubleNoTag(time);
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        output.writeRawByte((byte) 17);
-        output.writeDoubleNoTag(velocity);
+        output.writeRawByte((byte) 25);
+        output.writeDoubleNoTag(linearVelocity);
       }
       if ((bitField0_ & 0x00000004) != 0) {
-        output.writeRawByte((byte) 25);
-        output.writeDoubleNoTag(acceleration);
+        output.writeRawByte((byte) 33);
+        output.writeDoubleNoTag(linearAcceleration);
       }
       if ((bitField0_ & 0x00000008) != 0) {
         output.writeRawByte((byte) 41);
-        output.writeDoubleNoTag(curvature);
+        output.writeDoubleNoTag(angularVelocity);
       }
       if ((bitField0_ & 0x00000010) != 0) {
-        output.writeRawByte((byte) 34);
+        output.writeRawByte((byte) 18);
         output.writeMessageNoTag(pose);
       }
     }
@@ -432,22 +433,22 @@ public final class Trajectory {
             time = input.readDouble();
             bitField0_ |= 0x00000001;
             tag = input.readTag();
-            if (tag != 17) {
-              break;
-            }
-          }
-          case 17: {
-            // velocity
-            velocity = input.readDouble();
-            bitField0_ |= 0x00000002;
-            tag = input.readTag();
             if (tag != 25) {
               break;
             }
           }
           case 25: {
-            // acceleration
-            acceleration = input.readDouble();
+            // linearVelocity
+            linearVelocity = input.readDouble();
+            bitField0_ |= 0x00000002;
+            tag = input.readTag();
+            if (tag != 33) {
+              break;
+            }
+          }
+          case 33: {
+            // linearAcceleration
+            linearAcceleration = input.readDouble();
             bitField0_ |= 0x00000004;
             tag = input.readTag();
             if (tag != 41) {
@@ -455,15 +456,15 @@ public final class Trajectory {
             }
           }
           case 41: {
-            // curvature
-            curvature = input.readDouble();
+            // angularVelocity
+            angularVelocity = input.readDouble();
             bitField0_ |= 0x00000008;
             tag = input.readTag();
-            if (tag != 34) {
+            if (tag != 18) {
               break;
             }
           }
-          case 34: {
+          case 18: {
             // pose
             input.readMessage(pose);
             bitField0_ |= 0x00000010;
@@ -493,13 +494,13 @@ public final class Trajectory {
         output.writeDouble(FieldNames.time, time);
       }
       if ((bitField0_ & 0x00000002) != 0) {
-        output.writeDouble(FieldNames.velocity, velocity);
+        output.writeDouble(FieldNames.linearVelocity, linearVelocity);
       }
       if ((bitField0_ & 0x00000004) != 0) {
-        output.writeDouble(FieldNames.acceleration, acceleration);
+        output.writeDouble(FieldNames.linearAcceleration, linearAcceleration);
       }
       if ((bitField0_ & 0x00000008) != 0) {
-        output.writeDouble(FieldNames.curvature, curvature);
+        output.writeDouble(FieldNames.angularVelocity, angularVelocity);
       }
       if ((bitField0_ & 0x00000010) != 0) {
         output.writeMessage(FieldNames.pose, pose);
@@ -525,10 +526,10 @@ public final class Trajectory {
             }
             break;
           }
-          case 2134260957: {
-            if (input.isAtField(FieldNames.velocity)) {
+          case 1128020770: {
+            if (input.isAtField(FieldNames.linearVelocity)) {
               if (!input.trySkipNullValue()) {
-                velocity = input.readDouble();
+                linearVelocity = input.readDouble();
                 bitField0_ |= 0x00000002;
               }
             } else {
@@ -536,10 +537,10 @@ public final class Trajectory {
             }
             break;
           }
-          case -267299712: {
-            if (input.isAtField(FieldNames.acceleration)) {
+          case 682928197: {
+            if (input.isAtField(FieldNames.linearAcceleration)) {
               if (!input.trySkipNullValue()) {
-                acceleration = input.readDouble();
+                linearAcceleration = input.readDouble();
                 bitField0_ |= 0x00000004;
               }
             } else {
@@ -547,10 +548,10 @@ public final class Trajectory {
             }
             break;
           }
-          case 768611295: {
-            if (input.isAtField(FieldNames.curvature)) {
+          case 2117168351: {
+            if (input.isAtField(FieldNames.angularVelocity)) {
               if (!input.trySkipNullValue()) {
-                curvature = input.readDouble();
+                angularVelocity = input.readDouble();
                 bitField0_ |= 0x00000008;
               }
             } else {
@@ -631,11 +632,11 @@ public final class Trajectory {
     static class FieldNames {
       static final FieldName time = FieldName.forField("time");
 
-      static final FieldName velocity = FieldName.forField("velocity");
+      static final FieldName linearVelocity = FieldName.forField("linearVelocity");
 
-      static final FieldName acceleration = FieldName.forField("acceleration");
+      static final FieldName linearAcceleration = FieldName.forField("linearAcceleration");
 
-      static final FieldName curvature = FieldName.forField("curvature");
+      static final FieldName angularVelocity = FieldName.forField("angularVelocity");
 
       static final FieldName pose = FieldName.forField("pose");
     }

@@ -228,7 +228,7 @@ public final class TrajectoryParameterizer {
       // Calculate dt
       double dt = 0.0;
       if (i > 0) {
-        states.get(i - 1).accelerationMetersPerSecondSq = reversed ? -accel : accel;
+        states.get(i - 1).linearAccelerationMetersPerSecondSq = reversed ? -accel : accel;
         if (Math.abs(accel) > 1E-6) {
           // v_f = v_0 + a * t
           dt = (state.maxVelocityMetersPerSecond - velocityMetersPerSecond) / accel;
@@ -249,9 +249,9 @@ public final class TrajectoryParameterizer {
       states.add(
           new Trajectory.State(
               timeSeconds,
+              state.pose.poseMeters,
               reversed ? -velocityMetersPerSecond : velocityMetersPerSecond,
               reversed ? -accel : accel,
-              state.pose.poseMeters,
               state.pose.curvatureRadPerMeter));
     }
 

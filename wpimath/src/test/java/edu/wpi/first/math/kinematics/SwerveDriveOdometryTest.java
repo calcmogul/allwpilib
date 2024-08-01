@@ -141,10 +141,9 @@ class SwerveDriveOdometryTest {
       var moduleStates =
           kinematics.toSwerveModuleStates(
               new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond,
+                  groundTruthState.linearVelocityMetersPerSecond,
                   0.0,
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.curvatureRadPerMeter));
+                  groundTruthState.angularVelocityRadPerSec));
       for (var moduleState : moduleStates) {
         moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
         moduleState.speedMetersPerSecond += rand.nextGaussian() * 0.1;
@@ -229,17 +228,17 @@ class SwerveDriveOdometryTest {
       var groundTruthState = trajectory.sample(t);
 
       fl.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.linearVelocityMetersPerSecond * dt
+              + 0.5 * groundTruthState.linearAccelerationMetersPerSecondSq * dt * dt;
       fr.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.linearVelocityMetersPerSecond * dt
+              + 0.5 * groundTruthState.linearAccelerationMetersPerSecondSq * dt * dt;
       bl.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.linearVelocityMetersPerSecond * dt
+              + 0.5 * groundTruthState.linearAccelerationMetersPerSecondSq * dt * dt;
       br.distanceMeters +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.linearVelocityMetersPerSecond * dt
+              + 0.5 * groundTruthState.linearAccelerationMetersPerSecondSq * dt * dt;
 
       fl.angle = groundTruthState.poseMeters.getRotation();
       fr.angle = groundTruthState.poseMeters.getRotation();

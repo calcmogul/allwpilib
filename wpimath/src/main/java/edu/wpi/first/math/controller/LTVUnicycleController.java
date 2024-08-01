@@ -257,8 +257,8 @@ public class LTVUnicycleController {
     return calculate(
         currentPose,
         desiredState.poseMeters,
-        desiredState.velocityMetersPerSecond,
-        desiredState.velocityMetersPerSecond * desiredState.curvatureRadPerMeter);
+        desiredState.linearVelocityMetersPerSecond,
+        desiredState.angularVelocityRadPerSec);
   }
 
   /**

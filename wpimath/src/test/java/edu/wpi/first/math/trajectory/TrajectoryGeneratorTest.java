@@ -59,10 +59,11 @@ class TrajectoryGeneratorTest {
       var point = trajectory.sample(t);
       t += dt;
       assertAll(
-          () -> assertTrue(Math.abs(point.velocityMetersPerSecond) < feetToMeters(12.0) + 0.05),
+          () ->
+              assertTrue(Math.abs(point.linearVelocityMetersPerSecond) < feetToMeters(12.0) + 0.05),
           () ->
               assertTrue(
-                  Math.abs(point.accelerationMetersPerSecondSq) < feetToMeters(12.0) + 0.05));
+                  Math.abs(point.linearAccelerationMetersPerSecondSq) < feetToMeters(12.0) + 0.05));
     }
   }
 
@@ -90,7 +91,8 @@ class TrajectoryGeneratorTest {
             new TrajectoryConfig(2, 2));
 
     for (int i = 1; i < t.getStates().size() - 1; ++i) {
-      assertNotEquals(0, t.getStates().get(i).curvatureRadPerMeter);
+      var state = t.getStates().get(i);
+      assertNotEquals(0, state.angularVelocityRadPerSec / state.linearVelocityMetersPerSecond);
     }
   }
 }

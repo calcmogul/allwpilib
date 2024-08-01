@@ -22,12 +22,12 @@ std::vector<double> GetElementsFromTrajectory(
 
   for (auto&& state : trajectory.States()) {
     elements.push_back(state.t.value());
-    elements.push_back(state.velocity.value());
-    elements.push_back(state.acceleration.value());
     elements.push_back(state.pose.X().value());
     elements.push_back(state.pose.Y().value());
     elements.push_back(state.pose.Rotation().Radians().value());
-    elements.push_back(state.curvature.value());
+    elements.push_back(state.linearVelocity.value());
+    elements.push_back(state.linearAcceleration.value());
+    elements.push_back(state.angularVelocity.value());
   }
 
   return elements;
@@ -44,12 +44,12 @@ frc::Trajectory CreateTrajectoryFromElements(std::span<const double> elements) {
   for (size_t i = 0; i < elements.size(); i += 7) {
     states.emplace_back(frc::Trajectory::State{
         units::second_t{elements[i]},
-        units::meters_per_second_t{elements[i + 1]},
-        units::meters_per_second_squared_t{elements[i + 2]},
-        frc::Pose2d{units::meter_t{elements[i + 3]},
-                    units::meter_t{elements[i + 4]},
-                    units::radian_t{elements[i + 5]}},
-        units::curvature_t{elements[i + 6]}});
+        frc::Pose2d{units::meter_t{elements[i + 1]},
+                    units::meter_t{elements[i + 2]},
+                    units::radian_t{elements[i + 3]}},
+        units::meters_per_second_t{elements[i + 4]},
+        units::meters_per_second_squared_t{elements[i + 5]},
+        units::radians_per_second_t{elements[i + 6]}});
   }
 
   return frc::Trajectory(states);

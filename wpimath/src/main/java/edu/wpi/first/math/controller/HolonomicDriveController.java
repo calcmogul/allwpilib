@@ -127,7 +127,10 @@ public class HolonomicDriveController {
   public ChassisSpeeds calculate(
       Pose2d currentPose, Trajectory.State desiredState, Rotation2d desiredHeading) {
     return calculate(
-        currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond, desiredHeading);
+        currentPose,
+        desiredState.poseMeters,
+        desiredState.linearVelocityMetersPerSecond,
+        desiredHeading);
   }
 
   /**

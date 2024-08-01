@@ -8,10 +8,10 @@ option java_package = "edu.wpi.first.math.proto";
 
 message ProtobufTrajectoryState {
   double time = 1;
-  double velocity = 2;
-  double acceleration = 3;
-  ProtobufPose2d pose = 4;
-  double curvature = 5;
+  ProtobufPose2d pose = 2;
+  double linearVelocity = 3;
+  double linearAcceleration = 4;
+  double angularVelocity = 5;
 }
 
 message ProtobufTrajectory {

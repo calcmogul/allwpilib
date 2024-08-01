@@ -169,9 +169,9 @@ class KalmanFilterTest {
 
       var velocity =
           VecBuilder.fill(
-              sample.velocityMetersPerSecond * sample.poseMeters.getRotation().getCos(),
-              sample.velocityMetersPerSecond * sample.poseMeters.getRotation().getSin(),
-              sample.curvatureRadPerMeter * sample.velocityMetersPerSecond);
+              sample.linearVelocityMetersPerSecond * sample.poseMeters.getRotation().getCos(),
+              sample.linearVelocityMetersPerSecond * sample.poseMeters.getRotation().getSin(),
+              sample.angularVelocityRadPerSec);
       var u = (velocity.minus(lastVelocity)).div(0.020);
       lastVelocity = velocity;
 

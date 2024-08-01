@@ -128,16 +128,15 @@ class MecanumDriveOdometryTest {
       var groundTruthState = trajectory.sample(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.linearVelocityMetersPerSecond * dt
+              + 0.5 * groundTruthState.linearAccelerationMetersPerSecondSq * dt * dt;
 
       var wheelSpeeds =
           kinematics.toWheelSpeeds(
               new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond,
+                  groundTruthState.linearVelocityMetersPerSecond,
                   0,
-                  groundTruthState.velocityMetersPerSecond
-                      * groundTruthState.curvatureRadPerMeter));
+                  groundTruthState.angularVelocityRadPerSec));
 
       wheelSpeeds.frontLeftMetersPerSecond += rand.nextGaussian() * 0.1;
       wheelSpeeds.frontRightMetersPerSecond += rand.nextGaussian() * 0.1;
@@ -217,15 +216,15 @@ class MecanumDriveOdometryTest {
       var groundTruthState = trajectory.sample(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.velocityMetersPerSecond * dt
-              + 0.5 * groundTruthState.accelerationMetersPerSecondSq * dt * dt;
+          groundTruthState.linearVelocityMetersPerSecond * dt
+              + 0.5 * groundTruthState.linearAccelerationMetersPerSecondSq * dt * dt;
 
       var wheelSpeeds =
           kinematics.toWheelSpeeds(
               new ChassisSpeeds(
-                  groundTruthState.velocityMetersPerSecond
+                  groundTruthState.linearVelocityMetersPerSecond
                       * groundTruthState.poseMeters.getRotation().getCos(),
-                  groundTruthState.velocityMetersPerSecond
+                  groundTruthState.linearVelocityMetersPerSecond
                       * groundTruthState.poseMeters.getRotation().getSin(),
                   0));
 

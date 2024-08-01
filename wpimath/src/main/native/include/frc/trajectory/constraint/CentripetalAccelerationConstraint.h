@@ -8,9 +8,6 @@
 
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/math.h"
-#include "units/velocity.h"
 
 namespace frc {
 
@@ -28,34 +25,47 @@ class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
  public:
   constexpr explicit CentripetalAccelerationConstraint(
       units::meters_per_second_squared_t maxCentripetalAcceleration)
-      : m_maxCentripetalAcceleration(maxCentripetalAcceleration) {}
+      : m_maxCentripetalAcceleration{maxCentripetalAcceleration} {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
-    // ac = v²/r
-    // k (curvature) = 1/r
-
-    // therefore, ac = v²k
-    // ac/k = v²
-    // v = √(ac/k)
-
-    // We have to multiply by 1_rad here to get the units to cancel out nicely.
-    // The units library defines a unit for radians although it is technically
-    // unitless.
-    return units::math::sqrt(m_maxCentripetalAcceleration /
-                             units::math::abs(curvature) * 1_rad);
-  }
-
-  constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
-    // The acceleration of the robot has no impact on the centripetal
-    // acceleration of the robot.
-    return {};
+  void Apply(sleipnir::OptimizationProblem& problem, const Pose2d& pose,
+             const sleipnir::Variable& linearVelocity,
+             const sleipnir::Variable& angularVelocity,
+             const sleipnir::Variable& linearAcceleration,
+             const sleipnir::Variable& angularAcceleration) const override {
+    // Find max linear velocity for max centripetal acceleration.
+    //
+    //   a_c = v²/r   (1)
+    //   v = rω       (2)
+    //
+    // Solve (2) for r.
+    //
+    //   r = v/ω
+    //
+    // Substitute r into (1).
+    //
+    //   a_c = v²/r
+    //   a_c = v²/(v/ω)
+    //   a_c = vω
+    //
+    // Solve for v.
+    //
+    //   v = a_c/ω
+    //
+    // Write out the constraints.
+    //
+    //   v ≥ -a_c/ω
+    //   v ≤ a_c/ω
+    //
+    //   vω ≥ -a_c
+    //   vω ≤ a_c
+    problem.SubjectTo(linearVelocity * angularVelocity >=
+                      -m_maxCentripetalAcceleration.value());
+    problem.SubjectTo(linearVelocity * angularVelocity <=
+                      m_maxCentripetalAcceleration.value());
   }
 
  private:
   units::meters_per_second_squared_t m_maxCentripetalAcceleration;
 };
+
 }  // namespace frc
