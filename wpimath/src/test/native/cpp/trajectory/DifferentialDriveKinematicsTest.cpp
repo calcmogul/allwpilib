@@ -32,8 +32,8 @@ TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
     const Trajectory::State point = trajectory.Sample(time);
     time += dt;
 
-    const ChassisSpeeds chassisSpeeds{point.velocity, 0_mps,
-                                      point.velocity * point.curvature};
+    const ChassisSpeeds chassisSpeeds{point.linearVelocity, 0_mps,
+                                      point.angularVelocity};
 
     auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
 

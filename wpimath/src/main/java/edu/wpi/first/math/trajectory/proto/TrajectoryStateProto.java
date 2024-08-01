@@ -30,18 +30,18 @@ public class TrajectoryStateProto implements Protobuf<Trajectory.State, Protobuf
   public Trajectory.State unpack(ProtobufTrajectoryState msg) {
     return new Trajectory.State(
         msg.getTime(),
-        msg.getVelocity(),
-        msg.getAcceleration(),
         Pose2d.proto.unpack(msg.getPose()),
-        msg.getCurvature());
+        msg.getLinearVelocity(),
+        msg.getLinearAcceleration(),
+        msg.getAngularVelocity());
   }
 
   @Override
   public void pack(ProtobufTrajectoryState msg, Trajectory.State value) {
     msg.setTime(value.time);
-    msg.setVelocity(value.velocity);
-    msg.setAcceleration(value.acceleration);
     Pose2d.proto.pack(msg.getMutablePose(), value.pose);
-    msg.setCurvature(value.curvature);
+    msg.setLinearVelocity(value.linearVelocity);
+    msg.setLinearAcceleration(value.linearAcceleration);
+    msg.setAngularVelocity(value.angularVelocity);
   }
 }

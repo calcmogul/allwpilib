@@ -10,9 +10,9 @@
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/velocity.h"
 
 namespace frc {
+
 /**
  * A class that enforces constraints on the differential drive kinematics.
  * This can be used to ensure that the trajectory is constructed so that the
@@ -25,26 +25,29 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematicsConstraint
   constexpr DifferentialDriveKinematicsConstraint(
       DifferentialDriveKinematics kinematics,
       units::meters_per_second_t maxSpeed)
-      : m_kinematics(std::move(kinematics)), m_maxSpeed(maxSpeed) {}
+      : m_kinematics{std::move(kinematics)}, m_maxSpeed{maxSpeed} {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
-    auto wheelSpeeds =
-        m_kinematics.ToWheelSpeeds({velocity, 0_mps, velocity * curvature});
-    wheelSpeeds.Desaturate(m_maxSpeed);
+  void Apply(slp::Problem& problem, const Pose2d& pose,
+             const slp::Variable& linearVelocity,
+             const slp::Variable& angularVelocity,
+             const slp::Variable& linearAcceleration,
+             const slp::Variable& angularAcceleration) const override {
+    auto leftWheelVelocity =
+        linearVelocity -
+        angularVelocity * m_kinematics.trackwidth.value() / 2.0;
+    problem.subject_to(leftWheelVelocity >= -m_maxSpeed.value());
+    problem.subject_to(leftWheelVelocity <= m_maxSpeed.value());
 
-    return m_kinematics.ToChassisSpeeds(wheelSpeeds).vx;
-  }
-
-  constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
-    return {};
+    auto rightWheelVelocity =
+        linearVelocity +
+        angularVelocity * m_kinematics.trackwidth.value() / 2.0;
+    problem.subject_to(rightWheelVelocity >= -m_maxSpeed.value());
+    problem.subject_to(rightWheelVelocity <= m_maxSpeed.value());
   }
 
  private:
   DifferentialDriveKinematics m_kinematics;
   units::meters_per_second_t m_maxSpeed;
 };
+
 }  // namespace frc

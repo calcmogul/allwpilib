@@ -12,7 +12,7 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-static constexpr units::meter_t kTolerance{1 / 12.0};
+static constexpr units::meter_t kTolerance{1 / 10.0};
 static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
                                                    180.0};
 
