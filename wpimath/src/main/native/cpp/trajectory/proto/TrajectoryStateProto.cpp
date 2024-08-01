@@ -18,10 +18,10 @@ frc::Trajectory::State wpi::Protobuf<frc::Trajectory::State>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufTrajectoryState*>(&msg);
   return frc::Trajectory::State{
       units::second_t{m->time()},
-      units::meters_per_second_t{m->velocity()},
-      units::meters_per_second_squared_t{m->acceleration()},
       wpi::UnpackProtobuf<frc::Pose2d>(m->pose()),
-      units::curvature_t{m->curvature()},
+      units::meters_per_second_t{m->linearvelocity()},
+      units::meters_per_second_squared_t{m->linearacceleration()},
+      units::radians_per_second_t{m->angularvelocity()},
   };
 }
 
@@ -29,8 +29,8 @@ void wpi::Protobuf<frc::Trajectory::State>::Pack(
     google::protobuf::Message* msg, const frc::Trajectory::State& value) {
   auto m = static_cast<wpi::proto::ProtobufTrajectoryState*>(msg);
   m->set_time(value.t.value());
-  m->set_velocity(value.velocity.value());
-  m->set_acceleration(value.acceleration.value());
   wpi::PackProtobuf(m->mutable_pose(), value.pose);
-  m->set_curvature(value.curvature.value());
+  m->set_linearvelocity(value.linearVelocity.value());
+  m->set_linearacceleration(value.linearAcceleration.value());
+  m->set_angularvelocity(value.angularVelocity.value());
 }

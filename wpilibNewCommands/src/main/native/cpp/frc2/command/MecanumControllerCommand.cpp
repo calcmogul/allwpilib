@@ -141,9 +141,9 @@ void MecanumControllerCommand::Initialize() {
   auto initialState = m_trajectory.Sample(0_s);
 
   auto initialXVelocity =
-      initialState.velocity * initialState.pose.Rotation().Cos();
+      initialState.linearVelocity * initialState.pose.Rotation().Cos();
   auto initialYVelocity =
-      initialState.velocity * initialState.pose.Rotation().Sin();
+      initialState.linearVelocity * initialState.pose.Rotation().Sin();
 
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(
       frc::ChassisSpeeds{initialXVelocity, initialYVelocity, 0_rad_per_s});

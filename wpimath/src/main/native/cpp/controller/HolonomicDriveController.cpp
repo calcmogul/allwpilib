@@ -72,7 +72,7 @@ ChassisSpeeds HolonomicDriveController::Calculate(
 ChassisSpeeds HolonomicDriveController::Calculate(
     const Pose2d& currentPose, const Trajectory::State& desiredState,
     const Rotation2d& desiredHeading) {
-  return Calculate(currentPose, desiredState.pose, desiredState.velocity,
+  return Calculate(currentPose, desiredState.pose, desiredState.linearVelocity,
                    desiredHeading);
 }
 

@@ -29,17 +29,13 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
 
   // Check whether the robot is reversing at this stage.
   const auto reversing =
-      velocity < 0_mps ||
-      (units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
-
-  // Calculate the new velocity.
-  // v = v_0 + at
-  const units::meters_per_second_t newV = velocity + (acceleration * deltaT);
+      linearVelocity < 0_mps || (units::math::abs(linearVelocity) < 1E-9_mps &&
+                                 linearAcceleration < 0_mps_sq);
 
   // Calculate the change in position.
-  // delta_s = v_0 t + 0.5at²
+  // Δs = v₀t + 0.5at²
   const units::meter_t newS =
-      (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
+      (linearVelocity * deltaT + 0.5 * linearAcceleration * deltaT * deltaT) *
       (reversing ? -1.0 : 1.0);
 
   // Return the new state. To find the new position for the new state, we need
@@ -49,9 +45,11 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
   const double interpolationFrac =
       newS / endValue.pose.Translation().Distance(pose.Translation());
 
-  return {newT, newV, acceleration,
-          wpi::Lerp(pose, endValue.pose, interpolationFrac),
-          wpi::Lerp(curvature, endValue.curvature, interpolationFrac)};
+  return {
+      newT, wpi::Lerp(pose, endValue.pose, interpolationFrac),
+      // v = v₀ + at
+      linearVelocity + linearAcceleration * deltaT, linearAcceleration,
+      wpi::Lerp(angularVelocity, endValue.angularVelocity, interpolationFrac)};
 }
 
 Trajectory::Trajectory(const std::vector<State>& states) : m_states(states) {
@@ -149,18 +147,19 @@ Trajectory Trajectory::operator+(const Trajectory& other) const {
 
 void frc::to_json(wpi::json& json, const Trajectory::State& state) {
   json = wpi::json{{"time", state.t.value()},
-                   {"velocity", state.velocity.value()},
-                   {"acceleration", state.acceleration.value()},
                    {"pose", state.pose},
-                   {"curvature", state.curvature.value()}};
+                   {"linearVelocity", state.linearVelocity.value()},
+                   {"linearAcceleration", state.linearAcceleration.value()},
+                   {"angularVelocity", state.angularVelocity.value()}};
 }
 
 void frc::from_json(const wpi::json& json, Trajectory::State& state) {
-  state.pose = json.at("pose").get<Pose2d>();
   state.t = units::second_t{json.at("time").get<double>()};
-  state.velocity =
-      units::meters_per_second_t{json.at("velocity").get<double>()};
-  state.acceleration =
-      units::meters_per_second_squared_t{json.at("acceleration").get<double>()};
-  state.curvature = units::curvature_t{json.at("curvature").get<double>()};
+  state.pose = json.at("pose").get<Pose2d>();
+  state.linearVelocity =
+      units::meters_per_second_t{json.at("linearVelocity").get<double>()};
+  state.linearAcceleration = units::meters_per_second_squared_t{
+      json.at("linearAcceleration").get<double>()};
+  state.angularVelocity =
+      units::radians_per_second_t{json.at("angularVelocity").get<double>()};
 }

@@ -123,9 +123,9 @@ void testFollowTrajectory(
   }
 
   EXPECT_NEAR(endingPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 0.08);
+              estimator.GetEstimatedPosition().X().value(), 0.09);
   EXPECT_NEAR(endingPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 0.08);
+              estimator.GetEstimatedPosition().Y().value(), 0.09);
   EXPECT_NEAR(endingPose.Rotation().Radians().value(),
               estimator.GetEstimatedPosition().Rotation().Radians().value(),
               0.15);
@@ -158,8 +158,8 @@ TEST(MecanumDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](frc::Trajectory::State& state) {
-        return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                  state.velocity * state.curvature};
+        return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                  state.angularVelocity};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
       trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s,
@@ -200,8 +200,8 @@ TEST(MecanumDrivePoseEstimatorTest, BadInitialPose) {
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](frc::Trajectory::State& state) {
-            return frc::ChassisSpeeds{state.velocity, 0_mps,
-                                      state.velocity * state.curvature};
+            return frc::ChassisSpeeds{state.linearVelocity, 0_mps,
+                                      state.angularVelocity};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
           initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 0.02_s, 0.1_s,

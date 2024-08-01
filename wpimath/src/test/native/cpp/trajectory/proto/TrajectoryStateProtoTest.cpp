@@ -14,9 +14,9 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::Trajectory::State>;
 
 const Trajectory::State kExpectedData = Trajectory::State{
-    1.91_s, 4.4_mps, 17.4_mps_sq,
-    Pose2d{Translation2d{1.74_m, 19.1_m}, Rotation2d{22.9_rad}},
-    units::curvature_t{0.174}};
+    1.91_s, Pose2d{Translation2d{1.74_m, 19.1_m}, Rotation2d{22.9_rad}},
+    4.4_mps, 17.4_mps_sq, 0.174_rad_per_s};
+
 }  // namespace
 
 TEST(TrajectoryStateProtoTest, Roundtrip) {
@@ -26,9 +26,11 @@ TEST(TrajectoryStateProtoTest, Roundtrip) {
 
   Trajectory::State unpacked_data = ProtoType::Unpack(*proto);
   EXPECT_EQ(kExpectedData.t.value(), unpacked_data.t.value());
-  EXPECT_EQ(kExpectedData.velocity.value(), unpacked_data.velocity.value());
-  EXPECT_EQ(kExpectedData.acceleration.value(),
-            unpacked_data.acceleration.value());
   EXPECT_EQ(kExpectedData.pose, unpacked_data.pose);
-  EXPECT_EQ(kExpectedData.curvature.value(), unpacked_data.curvature.value());
+  EXPECT_EQ(kExpectedData.linearVelocity.value(),
+            unpacked_data.linearVelocity.value());
+  EXPECT_EQ(kExpectedData.linearAcceleration.value(),
+            unpacked_data.linearAcceleration.value());
+  EXPECT_EQ(kExpectedData.angularVelocity.value(),
+            unpacked_data.angularVelocity.value());
 }

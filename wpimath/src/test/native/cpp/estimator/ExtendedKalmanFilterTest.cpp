@@ -110,9 +110,9 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
     auto ref = trajectory.Sample(dt * i);
     units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
+        ref.linearVelocity - rb * ref.angularVelocity / 1_rad;
     units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+        ref.linearVelocity + rb * ref.angularVelocity / 1_rad;
 
     frc::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
@@ -137,12 +137,12 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
+  EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+              0.2);
+  EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+              0.15);
+  EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
+              1e-3);
+  ASSERT_NEAR(0.0, observer.Xhat(3), 0.1);
+  ASSERT_NEAR(0.0, observer.Xhat(4), 0.1);
 }

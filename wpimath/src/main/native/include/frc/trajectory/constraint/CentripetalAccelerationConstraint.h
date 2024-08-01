@@ -8,8 +8,6 @@
 
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/velocity.h"
 
 namespace frc {
 
@@ -26,16 +24,48 @@ class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
     : public TrajectoryConstraint {
  public:
   explicit CentripetalAccelerationConstraint(
-      units::meters_per_second_squared_t maxCentripetalAcceleration);
+      units::meters_per_second_squared_t maxCentripetalAcceleration)
+      : m_maxCentripetalAcceleration{maxCentripetalAcceleration} {}
 
-  units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override;
-
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override;
+  void Apply(sleipnir::OptimizationProblem& problem, const Pose2d& pose,
+             const sleipnir::Variable& linearVelocity,
+             const sleipnir::Variable& angularVelocity,
+             const sleipnir::Variable& linearAcceleration,
+             const sleipnir::Variable& angularAcceleration) const override {
+    // Find max linear velocity for max centripetal acceleration.
+    //
+    //   a_c = v²/r   (1)
+    //   v = rω       (2)
+    //
+    // Solve (2) for r.
+    //
+    //   r = v/ω
+    //
+    // Substitute r into (1).
+    //
+    //   a_c = v²/r
+    //   a_c = v²/(v/ω)
+    //   a_c = vω
+    //
+    // Solve for v.
+    //
+    //   v = a_c/ω
+    //
+    // Write out the constraints.
+    //
+    //   v ≥ -a_c/ω
+    //   v ≤ a_c/ω
+    //
+    //   vω ≥ -a_c
+    //   vω ≤ a_c
+    problem.SubjectTo(linearVelocity * angularVelocity >=
+                      -m_maxCentripetalAcceleration.value());
+    problem.SubjectTo(linearVelocity * angularVelocity <=
+                      m_maxCentripetalAcceleration.value());
+  }
 
  private:
   units::meters_per_second_squared_t m_maxCentripetalAcceleration;
 };
+
 }  // namespace frc

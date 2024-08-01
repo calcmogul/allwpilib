@@ -12,7 +12,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "units/acceleration.h"
-#include "units/curvature.h"
+#include "units/angular_velocity.h"
 #include "units/time.h"
 #include "units/velocity.h"
 
@@ -31,17 +31,17 @@ class WPILIB_DLLEXPORT Trajectory {
     /// The time elapsed since the beginning of the trajectory.
     units::second_t t = 0_s;
 
-    /// The speed at that point of the trajectory.
-    units::meters_per_second_t velocity = 0_mps;
-
-    /// The acceleration at that point of the trajectory.
-    units::meters_per_second_squared_t acceleration = 0_mps_sq;
-
     /// The pose at that point of the trajectory.
     Pose2d pose;
 
-    /// The curvature at that point of the trajectory.
-    units::curvature_t curvature{0.0};
+    /// The linear velocity at that point of the trajectory.
+    units::meters_per_second_t linearVelocity = 0_mps;
+
+    /// The linear acceleration at that point of the trajectory.
+    units::meters_per_second_squared_t linearAcceleration = 0_mps_sq;
+
+    /// The angular velocity at that point of the trajectory.
+    units::radians_per_second_t angularVelocity = 0_rad_per_s;
 
     /**
      * Checks equality between this State and another object.

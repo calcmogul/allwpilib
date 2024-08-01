@@ -6,17 +6,12 @@
 
 #include <concepts>
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include <wpi/SymbolExports.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/kinematics/MecanumDriveKinematics.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
-#include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
-#include "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/acceleration.h"
 #include "units/velocity.h"
@@ -89,27 +84,6 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
   void SetKinematics(const DifferentialDriveKinematics& kinematics) {
     AddConstraint(
         DifferentialDriveKinematicsConstraint(kinematics, m_maxVelocity));
-  }
-
-  /**
-   * Adds a mecanum drive kinematics constraint to ensure that
-   * no wheel velocity of a mecanum drive goes above the max velocity.
-   *
-   * @param kinematics The mecanum drive kinematics.
-   */
-  void SetKinematics(MecanumDriveKinematics kinematics) {
-    AddConstraint(MecanumDriveKinematicsConstraint(kinematics, m_maxVelocity));
-  }
-
-  /**
-   * Adds a swerve drive kinematics constraint to ensure that
-   * no wheel velocity of a swerve drive goes above the max velocity.
-   *
-   * @param kinematics The swerve drive kinematics.
-   */
-  template <size_t NumModules>
-  void SetKinematics(SwerveDriveKinematics<NumModules>& kinematics) {
-    AddConstraint(SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }
 
   /**
