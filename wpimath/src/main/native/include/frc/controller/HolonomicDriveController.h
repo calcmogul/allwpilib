@@ -143,8 +143,8 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
   constexpr ChassisSpeeds Calculate(const Pose2d& currentPose,
                                     const Trajectory::State& desiredState,
                                     const Rotation2d& desiredHeading) {
-    return Calculate(currentPose, desiredState.pose, desiredState.velocity,
-                     desiredHeading);
+    return Calculate(currentPose, desiredState.pose,
+                     desiredState.linearVelocity, desiredHeading);
   }
 
   /**

@@ -177,10 +177,10 @@ public class Trajectory implements ProtobufSerializable {
     newStates.add(
         new State(
             firstState.time,
-            firstState.velocity,
-            firstState.acceleration,
             newFirstPose,
-            firstState.curvature));
+            firstState.linearVelocity,
+            firstState.linearAcceleration,
+            firstState.angularVelocity));
 
     for (int i = 1; i < m_states.size(); i++) {
       var state = m_states.get(i);
@@ -188,10 +188,10 @@ public class Trajectory implements ProtobufSerializable {
       newStates.add(
           new State(
               state.time,
-              state.velocity,
-              state.acceleration,
               newFirstPose.plus(state.pose.minus(firstPose)),
-              state.curvature));
+              state.linearVelocity,
+              state.linearAcceleration,
+              state.angularVelocity));
     }
 
     return new Trajectory(newStates);
@@ -212,10 +212,10 @@ public class Trajectory implements ProtobufSerializable {
                 state ->
                     new State(
                         state.time,
-                        state.velocity,
-                        state.acceleration,
                         state.pose.relativeTo(pose),
-                        state.curvature))
+                        state.linearVelocity,
+                        state.linearAcceleration,
+                        state.angularVelocity))
             .collect(Collectors.toList()));
   }
 
@@ -241,10 +241,10 @@ public class Trajectory implements ProtobufSerializable {
                 state ->
                     new State(
                         state.time,
-                        state.velocity,
-                        state.acceleration,
                         state.pose,
-                        state.curvature))
+                        state.linearVelocity,
+                        state.linearAcceleration,
+                        state.angularVelocity))
             .collect(Collectors.toList());
 
     // Here we omit the first state of the other trajectory because we don't want
@@ -253,7 +253,13 @@ public class Trajectory implements ProtobufSerializable {
     // other trajectory.
     for (int i = 1; i < other.getStates().size(); ++i) {
       var s = other.getStates().get(i);
-      states.add(new State(s.time + m_totalTime, s.velocity, s.acceleration, s.pose, s.curvature));
+      states.add(
+          new State(
+              s.time + m_totalTime,
+              s.pose,
+              s.linearVelocity,
+              s.linearAcceleration,
+              s.angularVelocity));
     }
     return new Trajectory(states);
   }
@@ -270,21 +276,21 @@ public class Trajectory implements ProtobufSerializable {
     @JsonProperty("time")
     public double time;
 
-    /** The speed at that point of the trajectory in meters per second. */
-    @JsonProperty("velocity")
-    public double velocity;
-
-    /** The acceleration at that point of the trajectory in m/s². */
-    @JsonProperty("acceleration")
-    public double acceleration;
-
     /** The pose at that point of the trajectory. */
     @JsonProperty("pose")
     public Pose2d pose;
 
-    /** The curvature at that point of the trajectory in rad/m. */
-    @JsonProperty("curvature")
-    public double curvature;
+    /** The linear velocity at that point of the trajectory in meters per second. */
+    @JsonProperty("linearVelocity")
+    public double linearVelocity;
+
+    /** The linear acceleration at that point of the trajectory in meters per second squared. */
+    @JsonProperty("linearAcceleration")
+    public double linearAcceleration;
+
+    /** The angular velocity at that point of the trajectory in radians per second. */
+    @JsonProperty("angularVelocity")
+    public double angularVelocity;
 
     /** Default constructor. */
     public State() {
@@ -295,17 +301,22 @@ public class Trajectory implements ProtobufSerializable {
      * Constructs a State with the specified parameters.
      *
      * @param time The time elapsed since the beginning of the trajectory in seconds.
-     * @param velocity The speed at that point of the trajectory in m/s.
-     * @param acceleration The acceleration at that point of the trajectory in m/s².
      * @param pose The pose at that point of the trajectory.
-     * @param curvature The curvature at that point of the trajectory in rad/m.
+     * @param linearVelocity The linear velocity at that point of the trajectory in m/s.
+     * @param linearAcceleration The linear acceleration at that point of the trajectory in m/s².
+     * @param angularVelocity The angular velocity at that point of the trajectory in rad/s.
      */
-    public State(double time, double velocity, double acceleration, Pose2d pose, double curvature) {
+    public State(
+        double time,
+        Pose2d pose,
+        double linearVelocity,
+        double linearAcceleration,
+        double angularVelocity) {
       this.time = time;
-      this.velocity = velocity;
-      this.acceleration = acceleration;
       this.pose = pose;
-      this.curvature = curvature;
+      this.linearVelocity = linearVelocity;
+      this.linearAcceleration = linearAcceleration;
+      this.angularVelocity = angularVelocity;
     }
 
     /**
@@ -328,16 +339,18 @@ public class Trajectory implements ProtobufSerializable {
       }
 
       // Check whether the robot is reversing at this stage.
-      final boolean reversing = velocity < 0 || Math.abs(velocity) < 1E-9 && acceleration < 0;
+      final boolean reversing =
+          linearVelocity < 0 || Math.abs(linearVelocity) < 1E-9 && linearAcceleration < 0;
 
       // Calculate the new velocity
       // v_f = v_0 + at
-      final double newV = velocity + (acceleration * deltaT);
+      final double newV = linearVelocity + (linearAcceleration * deltaT);
 
       // Calculate the change in position.
       // delta_s = v_0 t + 0.5at²
       final double newS =
-          (velocity * deltaT + 0.5 * acceleration * Math.pow(deltaT, 2)) * (reversing ? -1.0 : 1.0);
+          (linearVelocity * deltaT + 0.5 * linearAcceleration * Math.pow(deltaT, 2))
+              * (reversing ? -1.0 : 1.0);
 
       // Return the new state. To find the new position for the new state, we need
       // to interpolate between the two endpoint poses. The fraction for
@@ -348,32 +361,33 @@ public class Trajectory implements ProtobufSerializable {
 
       return new State(
           newT,
-          newV,
-          acceleration,
           lerp(pose, endValue.pose, interpolationFrac),
-          lerp(curvature, endValue.curvature, interpolationFrac));
+          newV,
+          linearAcceleration,
+          lerp(angularVelocity, endValue.angularVelocity, interpolationFrac));
     }
 
     @Override
     public String toString() {
       return String.format(
-          "State(Sec: %.2f, Vel m/s: %.2f, Accel m/s/s: %.2f, Pose: %s, Curvature: %.2f)",
-          time, velocity, acceleration, pose, curvature);
+          "State(Sec: %.2f, Pose: %s, Linear Vel m/s: %.2f, "
+              + "Linear accel m/s/s: %.2f, Angular vel: %.2f)",
+          time, pose, linearVelocity, linearAcceleration, angularVelocity);
     }
 
     @Override
     public boolean equals(Object obj) {
       return obj instanceof State state
           && Double.compare(state.time, time) == 0
-          && Double.compare(state.velocity, velocity) == 0
-          && Double.compare(state.acceleration, acceleration) == 0
-          && Double.compare(state.curvature, curvature) == 0
-          && Objects.equals(pose, state.pose);
+          && Objects.equals(pose, state.pose)
+          && Double.compare(state.linearVelocity, linearVelocity) == 0
+          && Double.compare(state.linearAcceleration, linearAcceleration) == 0
+          && Double.compare(state.angularVelocity, angularVelocity) == 0;
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(time, velocity, acceleration, pose, curvature);
+      return Objects.hash(time, pose, linearVelocity, linearAcceleration, angularVelocity);
     }
   }
 
