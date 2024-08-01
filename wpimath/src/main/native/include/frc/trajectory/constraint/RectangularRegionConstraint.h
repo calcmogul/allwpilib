@@ -5,7 +5,6 @@
 #pragma once
 
 #include <concepts>
-#include <limits>
 
 #include "frc/geometry/Rectangle2d.h"
 #include "frc/geometry/Translation2d.h"
@@ -47,24 +46,14 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
                                         const Constraint& constraint)
       : m_rectangle{rectangle}, m_constraint{constraint} {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
+  void Apply(sleipnir::OptimizationProblem& problem, const Pose2d& pose,
+             const sleipnir::Variable& linearVelocity,
+             const sleipnir::Variable& angularVelocity,
+             const sleipnir::Variable& linearAcceleration,
+             const sleipnir::Variable& angularAcceleration) const override {
     if (m_rectangle.Contains(pose.Translation())) {
-      return m_constraint.MaxVelocity(pose, curvature, velocity);
-    } else {
-      return units::meters_per_second_t{
-          std::numeric_limits<double>::infinity()};
-    }
-  }
-
-  constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
-    if (m_rectangle.Contains(pose.Translation())) {
-      return m_constraint.MinMaxAcceleration(pose, curvature, speed);
-    } else {
-      return {};
+      return m_constraint.Apply(problem, pose, linearVelocity, angularVelocity,
+                                linearAcceleration, angularAcceleration);
     }
   }
 

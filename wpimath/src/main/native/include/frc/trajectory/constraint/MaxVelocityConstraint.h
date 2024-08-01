@@ -26,18 +26,15 @@ class WPILIB_DLLEXPORT MaxVelocityConstraint : public TrajectoryConstraint {
    */
   constexpr explicit MaxVelocityConstraint(
       units::meters_per_second_t maxVelocity)
-      : m_maxVelocity(units::math::abs(maxVelocity)) {}
+      : m_maxVelocity{units::math::abs(maxVelocity)} {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
-    return m_maxVelocity;
-  }
-
-  constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
-    return {};
+  void Apply(sleipnir::OptimizationProblem& problem, const Pose2d& pose,
+             const sleipnir::Variable& linearVelocity,
+             const sleipnir::Variable& angularVelocity,
+             const sleipnir::Variable& linearAcceleration,
+             const sleipnir::Variable& angularAcceleration) const override {
+    problem.SubjectTo(linearVelocity >= -m_maxVelocity.value());
+    problem.SubjectTo(linearVelocity <= m_maxVelocity.value());
   }
 
  private:
