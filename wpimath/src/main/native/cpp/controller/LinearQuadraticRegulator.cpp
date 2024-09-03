@@ -12,5 +12,7 @@ template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     LinearQuadraticRegulator<2, 1>;
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
     LinearQuadraticRegulator<2, 2>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT)
+    LinearQuadraticRegulator<Eigen::Dynamic, Eigen::Dynamic>;
 
 }  // namespace frc
