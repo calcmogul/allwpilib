@@ -38,8 +38,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @param value The value of the angle.
    */
   constexpr Rotation2d(units::angle_unit auto value)  // NOLINT
-      : m_value{value},
-        m_cos{gcem::cos(value.template convert<units::radian>().value())},
+      : m_cos{gcem::cos(value.template convert<units::radian>().value())},
         m_sin{gcem::sin(value.template convert<units::radian>().value())} {}
 
   /**
@@ -63,7 +62,6 @@ class WPILIB_DLLEXPORT Rotation2d {
             wpi::GetStackTrace(1));
       }
     }
-    m_value = units::radian_t{gcem::atan2(m_sin, m_cos)};
   }
 
   /**
@@ -102,7 +100,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The inverse of the current rotation.
    */
-  constexpr Rotation2d operator-() const { return Rotation2d{-m_value}; }
+  constexpr Rotation2d operator-() const { return Rotation2d{m_cos, -m_sin}; }
 
   /**
    * Multiplies the current rotation by a scalar.
@@ -112,7 +110,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @return The new scaled Rotation2d.
    */
   constexpr Rotation2d operator*(double scalar) const {
-    return Rotation2d{m_value * scalar};
+    return Rotation2d{Radians() * scalar};
   }
 
   /**
@@ -160,7 +158,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @return The radian value of the rotation.
    * @see AngleModulus to constrain the angle within (-pi, pi]
    */
-  constexpr units::radian_t Radians() const { return m_value; }
+  constexpr units::radian_t Radians() const {
+    return units::radian_t{gcem::atan2(m_sin, m_cos)};
+  }
 
   /**
    * Returns the degree value of the rotation.
@@ -168,7 +168,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @return The degree value of the rotation.
    * @see InputModulus to constrain the angle within (-180, 180]
    */
-  constexpr units::degree_t Degrees() const { return m_value; }
+  constexpr units::degree_t Degrees() const { return Radians(); }
 
   /**
    * Returns the cosine of the rotation.
@@ -192,7 +192,6 @@ class WPILIB_DLLEXPORT Rotation2d {
   constexpr double Tan() const { return Sin() / Cos(); }
 
  private:
-  units::radian_t m_value = 0_rad;
   double m_cos = 1;
   double m_sin = 0;
 };
