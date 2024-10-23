@@ -16,8 +16,7 @@
 #include <cstring>
 #include <string_view>
 
-#include "wpi/SmallVector.h"
-#include "wpi/fs.h"
+#include "wpi/small_vector.h"
 
 #if defined(_MSC_VER)
 #ifndef STDIN_FILENO
@@ -33,7 +32,7 @@
 
 using namespace wpi;
 
-std::string_view raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
+std::string_view raw_istream::getline(small_vectorImpl<char>& buf, int maxLen) {
   buf.clear();
   for (int i = 0; i < maxLen; ++i) {
     char c;

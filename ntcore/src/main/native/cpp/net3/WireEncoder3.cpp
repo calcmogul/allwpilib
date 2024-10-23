@@ -5,9 +5,9 @@
 #include "WireEncoder3.h"
 
 #include <wpi/MathExtras.h>
-#include <wpi/SmallVector.h>
 #include <wpi/leb128.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 
 #include "Message3.h"
 

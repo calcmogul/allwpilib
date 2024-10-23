@@ -5,12 +5,11 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <vector>
 
 #include <glass/View.h>
 #include <implot.h>
@@ -18,7 +17,6 @@
 #include <units/time.h>
 #include <units/voltage.h>
 #include <wpi/Logger.h>
-#include <wpi/StringMap.h>
 
 #include "sysid/analysis/AnalysisManager.h"
 #include "sysid/analysis/AnalysisType.h"
@@ -211,7 +209,7 @@ class Analyzer : public glass::View {
 
   // Everything related to feedback controller calculations.
   AnalysisManager::Settings m_settings;
-  wpi::StringMap<FeedbackControllerPreset> m_presets;
+  std::map<std::string, FeedbackControllerPreset, std::less<>> m_presets;
 
   int m_selectedLoopType = 1;
   int m_selectedPreset = 0;

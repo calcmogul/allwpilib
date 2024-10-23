@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <string>
 #include <vector>
 
 #include <units/time.h>
 #include <units/voltage.h>
-#include <wpi/StringMap.h>
 
 #include "sysid/analysis/AnalysisType.h"
 
@@ -41,7 +42,7 @@ struct MotorData {
 struct TestData {
   std::string distanceUnit;
   AnalysisType mechanismType;
-  wpi::StringMap<MotorData> motorData;
+  std::map<std::string, MotorData, std::less<>> motorData;
 };
 
 /**

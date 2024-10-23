@@ -5,12 +5,12 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <string>
 #include <string_view>
-
-#include <wpi/StringMap.h>
 
 #include "WSBaseProvider.h"
 
@@ -52,7 +52,8 @@ class ProviderContainer {
 
  private:
   std::shared_mutex m_mutex;
-  wpi::StringMap<std::shared_ptr<HALSimWSBaseProvider>> m_providers;
+  std::map<std::string, std::shared_ptr<HALSimWSBaseProvider>, std::less<>>
+      m_providers;
 };
 
 }  // namespace wpilibws

@@ -74,7 +74,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransactionB
     return 0;
   }
 
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::small_vector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue =
       HAL_TransactionI2C(static_cast<HAL_I2CPort>(port), address,
@@ -157,7 +157,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CReadB
     return 0;
   }
 
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::small_vector<uint8_t, 128> recvBuf;
   recvBuf.resize(receiveSize);
   jint returnValue = HAL_ReadI2C(static_cast<HAL_I2CPort>(port), address,
                                  recvBuf.data(), receiveSize);

@@ -32,7 +32,7 @@ class WebSocketClientTest : public WebSocketTest {
     });
     req.headersComplete.connect([this](bool) {
       // send response
-      SmallVector<uv::Buffer, 4> bufs;
+      small_vector<uv::Buffer, 4> bufs;
       raw_uv_ostream os{bufs, 4096};
       os << "HTTP/1.1 101 Switching Protocols\r\n";
       os << "Upgrade: websocket\r\n";

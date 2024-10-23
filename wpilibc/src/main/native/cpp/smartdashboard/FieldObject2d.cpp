@@ -70,7 +70,7 @@ std::vector<Pose2d> FieldObject2d::GetPoses() const {
 }
 
 std::span<const Pose2d> FieldObject2d::GetPoses(
-    wpi::SmallVectorImpl<Pose2d>& out) const {
+    wpi::small_vectorImpl<Pose2d>& out) const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();
   out.assign(m_poses.begin(), m_poses.end());
@@ -81,7 +81,7 @@ void FieldObject2d::UpdateEntry(bool setDefault) {
   if (!m_entry) {
     return;
   }
-  wpi::SmallVector<double, 9> arr;
+  wpi::small_vector<double, 9> arr;
   for (auto&& pose : m_poses) {
     auto& translation = pose.Translation();
     arr.push_back(translation.X().value());

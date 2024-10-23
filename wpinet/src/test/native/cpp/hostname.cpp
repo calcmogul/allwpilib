@@ -6,18 +6,18 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 namespace wpi {
 TEST(HostNameTest, HostNameNotEmpty) {
   ASSERT_NE(GetHostname(), "");
 }
-TEST(HostNameTest, HostNameNotEmptySmallVector) {
-  SmallVector<char, 256> name;
+TEST(HostNameTest, HostNameNotEmptysmall_vector) {
+  small_vector<char, 256> name;
   ASSERT_NE(GetHostname(name), "");
 }
 TEST(HostNameTest, HostNameEq) {
-  SmallVector<char, 256> nameBuf;
+  small_vector<char, 256> nameBuf;
   ASSERT_EQ(GetHostname(nameBuf), GetHostname());
 }
 }  // namespace wpi

@@ -13,7 +13,7 @@
 namespace wpi {
 
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 class raw_istream;
 class raw_ostream;
 
@@ -40,7 +40,7 @@ uint64_t SizeUleb128(uint64_t val);
  * @param dest The address where the ULEB128 data is to be stored.
  * @param val Value to be stored.
  */
-uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val);
+uint64_t WriteUleb128(small_vectorImpl<char>& dest, uint64_t val);
 
 /**
  * Write unsigned LEB128 data.

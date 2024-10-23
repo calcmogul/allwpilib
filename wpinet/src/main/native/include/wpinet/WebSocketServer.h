@@ -15,7 +15,7 @@
 
 #include <wpi/Signal.h>
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/HttpParser.h"
 #include "wpinet/WebSocket.h"
@@ -91,7 +91,7 @@ class WebSocketServerHelper {
  private:
   bool m_gotHost = false;
   bool m_websocket = false;
-  SmallVector<std::string, 2> m_protocols;
+  small_vector<std::string, 2> m_protocols;
   SmallString<64> m_key;
   SmallString<16> m_version;
 };
@@ -164,7 +164,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   uv::Stream& m_stream;
   HttpParser m_req{HttpParser::kRequest};
   WebSocketServerHelper m_helper;
-  SmallVector<std::string, 2> m_protocols;
+  small_vector<std::string, 2> m_protocols;
   ServerOptions m_options;
   bool m_aborted = false;
   sig::ScopedConnection m_dataConn;

@@ -10,8 +10,8 @@
 #include <utility>
 
 #include <wpi/Logger.h>
-#include <wpi/SmallVector.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 
 using namespace wpi;
 using namespace wpi::uv;
@@ -27,7 +27,7 @@ class CallbackWriteReq : public WriteReq {
   }
 
  private:
-  SmallVector<Buffer, 4> m_bufs;
+  small_vector<Buffer, 4> m_bufs;
 };
 }  // namespace
 

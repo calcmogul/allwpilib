@@ -13,10 +13,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 #include <wpi/protobuf/Protobuf.h>
+#include <wpi/small_vector.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
@@ -99,7 +99,7 @@ class ProtobufSubscriber : public Subscriber {
    * @return true if successful
    */
   bool GetInto(T* out) {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.empty()) {
       return false;
@@ -127,7 +127,7 @@ class ProtobufSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(const T& defaultValue) const {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (!view.value.empty()) {
       std::scoped_lock lock{m_mutex};
@@ -225,7 +225,7 @@ class ProtobufPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(const T& value, int64_t time = 0) {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
       if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {
@@ -244,7 +244,7 @@ class ProtobufPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(const T& value) {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
       if (!m_schemaPublished.exchange(true, std::memory_order_relaxed)) {

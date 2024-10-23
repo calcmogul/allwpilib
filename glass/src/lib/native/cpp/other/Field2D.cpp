@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -28,7 +30,6 @@
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
 #include <wpi/print.h>
@@ -235,7 +236,7 @@ class FieldInfo {
   FieldFrameData GetFrameData(ImVec2 min, ImVec2 max) const;
   void Draw(ImDrawList* drawList, const FieldFrameData& frameData) const;
 
-  wpi::StringMap<std::unique_ptr<ObjectInfo>> m_objects;
+  std::map<std::string, std::unique_ptr<ObjectInfo>, std::less<>> m_objects;
 
  private:
   void Reset();

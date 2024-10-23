@@ -15,11 +15,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"

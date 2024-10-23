@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <span>
@@ -15,7 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
 #include <wpi/json.h>
 
 #include "PubSubOptions.h"
@@ -160,7 +160,7 @@ class ClientImpl3 final : private MessageHandler3 {
 
   std::vector<std::pair<unsigned int, unsigned int>> m_outgoingFlags;
 
-  using NameMap = wpi::StringMap<std::unique_ptr<Entry>>;
+  using NameMap = std::map<std::string, std::unique_ptr<Entry>, std::less<>>;
   using IdMap = std::vector<Entry*>;
 
   NameMap m_nameMap;

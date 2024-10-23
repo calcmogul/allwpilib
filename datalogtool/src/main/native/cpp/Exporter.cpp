@@ -25,16 +25,16 @@
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
-#include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
-#include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
+#include <wpi/flat_map.h>
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
 #include <wpi/print.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 
 #include "App.h"
 
@@ -92,7 +92,7 @@ std::atomic_int gExportCount{0};
 // must be called with gEntriesMutex held
 static void RebuildEntryTree() {
   gEntryTree.clear();
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::small_vector<std::string_view, 16> parts;
   for (auto& kv : gEntries) {
     parts.clear();
     // split on first : if one is present
@@ -555,7 +555,7 @@ static void ExportCsvFile(InputFile& f, wpi::raw_ostream& os, int style) {
     os << '\n';
   }
 
-  wpi::DenseMap<int, Entry*> nameMap;
+  wpi::flat_map<int, Entry*> nameMap;
   for (auto&& record : f.datalog->GetReader()) {
     if (record.IsStart()) {
       wpi::log::StartRecordData data;

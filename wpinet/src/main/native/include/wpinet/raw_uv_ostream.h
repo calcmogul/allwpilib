@@ -9,17 +9,17 @@
 #include <span>
 #include <utility>
 
-#include <wpi/SmallVector.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/uv/Buffer.h"
 
 namespace wpi {
 
 /**
- * raw_ostream style output to a SmallVector of uv::Buffer buffers.  Fixed-size
+ * raw_ostream style output to a small_vector of uv::Buffer buffers.  Fixed-size
  * buffers are allocated and appended as necessary to fit the data being output.
- * The SmallVector need not be empty at start.
+ * The small_vector need not be empty at start.
  */
 class raw_uv_ostream : public raw_ostream {
  public:
@@ -29,7 +29,7 @@ class raw_uv_ostream : public raw_ostream {
    * @param allocSize Size to allocate for each buffer; allocation will be
    *                  performed using Buffer::Allocate().
    */
-  raw_uv_ostream(SmallVectorImpl<uv::Buffer>& bufs, size_t allocSize)
+  raw_uv_ostream(small_vectorImpl<uv::Buffer>& bufs, size_t allocSize)
       : m_bufs(bufs), m_alloc([=] { return uv::Buffer::Allocate(allocSize); }) {
     SetUnbuffered();
   }
@@ -39,7 +39,7 @@ class raw_uv_ostream : public raw_ostream {
    * @param bufs Buffers vector.  NOT cleared on construction.
    * @param alloc Allocator.
    */
-  raw_uv_ostream(SmallVectorImpl<uv::Buffer>& bufs,
+  raw_uv_ostream(small_vectorImpl<uv::Buffer>& bufs,
                  std::function<uv::Buffer()> alloc)
       : m_bufs(bufs), m_alloc(std::move(alloc)) {
     SetUnbuffered();
@@ -63,7 +63,7 @@ class raw_uv_ostream : public raw_ostream {
   void write_impl(const char* data, size_t len) override;
   uint64_t current_pos() const override;
 
-  SmallVectorImpl<uv::Buffer>& m_bufs;
+  small_vectorImpl<uv::Buffer>& m_bufs;
   std::function<uv::Buffer()> m_alloc;
 
   // How much allocated space is left in the current buffer.

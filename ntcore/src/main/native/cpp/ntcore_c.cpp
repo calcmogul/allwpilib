@@ -14,8 +14,8 @@
 #include <vector>
 
 #include <wpi/MemAlloc.h>
-#include <wpi/SmallVector.h>
 #include <wpi/json.h>
+#include <wpi/small_vector.h>
 #include <wpi/timestamp.h>
 
 #include "Value_internal.h"
@@ -226,7 +226,7 @@ NT_Topic* NT_GetTopics(NT_Inst inst, const struct WPI_String* prefix,
 NT_Topic* NT_GetTopicsStr(NT_Inst inst, const struct WPI_String* prefix,
                           const struct WPI_String* types, size_t types_len,
                           size_t* count) {
-  wpi::SmallVector<std::string_view, 4> typesCpp;
+  wpi::small_vector<std::string_view, 4> typesCpp;
   typesCpp.reserve(types_len);
   for (size_t i = 0; i < types_len; ++i) {
     typesCpp.emplace_back(wpi::to_string_view(&types[i]));
@@ -246,7 +246,7 @@ struct NT_TopicInfo* NT_GetTopicInfosStr(NT_Inst inst,
                                          const struct WPI_String* prefix,
                                          const struct WPI_String* types,
                                          size_t types_len, size_t* count) {
-  wpi::SmallVector<std::string_view, 4> typesCpp;
+  wpi::small_vector<std::string_view, 4> typesCpp;
   typesCpp.reserve(types_len);
   for (size_t i = 0; i < types_len; ++i) {
     typesCpp.emplace_back(wpi::to_string_view(&types[i]));
@@ -410,7 +410,7 @@ NT_Topic NT_GetTopicFromHandle(NT_Handle pubsubentry) {
 NT_MultiSubscriber NT_SubscribeMultiple(
     NT_Inst inst, const struct WPI_String* prefixes, size_t prefixes_len,
     const struct NT_PubSubOptions* options) {
-  wpi::SmallVector<std::string_view, 8> p;
+  wpi::small_vector<std::string_view, 8> p;
   p.resize_for_overwrite(prefixes_len);
   for (size_t i = 0; i < prefixes_len; ++i) {
     p[i] = wpi::to_string_view(&prefixes[i]);
@@ -463,7 +463,7 @@ NT_Listener NT_AddListenerMultiple(NT_Inst inst,
                                    const struct WPI_String* prefixes,
                                    size_t prefixes_len, unsigned int mask,
                                    void* data, NT_ListenerCallback callback) {
-  wpi::SmallVector<std::string_view, 8> p;
+  wpi::small_vector<std::string_view, 8> p;
   p.reserve(prefixes_len);
   for (size_t i = 0; i < prefixes_len; ++i) {
     p.emplace_back(prefixes[i].str, prefixes[i].len);
@@ -497,7 +497,7 @@ NT_Listener NT_AddPolledListenerMultiple(NT_ListenerPoller poller,
                                          const struct WPI_String* prefixes,
                                          size_t prefixes_len,
                                          unsigned int mask) {
-  wpi::SmallVector<std::string_view, 8> p;
+  wpi::small_vector<std::string_view, 8> p;
   p.reserve(prefixes_len);
   for (size_t i = 0; i < prefixes_len; ++i) {
     p.emplace_back(prefixes[i].str, prefixes[i].len);

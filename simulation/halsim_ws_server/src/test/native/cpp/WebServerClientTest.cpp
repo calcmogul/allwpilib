@@ -131,7 +131,7 @@ void WebServerClientTest::SendMessage(const wpi::json& msg) {
     return;
   }
 
-  wpi::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::small_vector<uv::Buffer, 4> sendBufs;
 
   wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
                            std::lock_guard lock(m_buffers_mutex);

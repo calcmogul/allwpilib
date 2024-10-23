@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include "wpi/SmallVector.h"
 #include "wpi/Synchronization.h"
 #include "wpi/mutex.h"
+#include "wpi/small_vector.h"
 
 namespace wpi {
 struct EventVector {
   wpi::mutex mutex;
-  wpi::SmallVector<WPI_EventHandle, 4> events;
+  wpi::small_vector<WPI_EventHandle, 4> events;
 
   /**
    * Adds an event to the event vector.

@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/StringMap.h>
 
 #include "frc/shuffleboard/ShuffleboardValue.h"
 
@@ -35,7 +36,7 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
   const std::string& GetType() const;
 
  protected:
-  wpi::StringMap<nt::Value> m_properties;
+  std::map<std::string, nt::Value, std::less<>> m_properties;
   bool m_metadataDirty = true;
   int m_column = -1;
   int m_row = -1;
@@ -49,7 +50,7 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
   /**
    * Gets the custom properties for this component. May be null.
    */
-  const wpi::StringMap<nt::Value>& GetProperties() const;
+  const std::map<std::string, nt::Value, std::less<>>& GetProperties() const;
 };
 
 }  // namespace frc

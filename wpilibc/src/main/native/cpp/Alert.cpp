@@ -5,6 +5,8 @@
 #include "frc/Alert.h"
 
 #include <algorithm>
+#include <functional>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -18,7 +20,7 @@ using namespace frc;
 Alert::Alert(std::string_view text, AlertType type)
     : Alert("Alerts", text, type) {}
 
-wpi::StringMap<Alert::SendableAlerts> Alert::groups;
+std::map<std::string, Alert::SendableAlerts, std::less<>> Alert::groups;
 
 Alert::Alert(std::string_view group, std::string_view text, AlertType type)
     : m_type(type), m_text(text) {
@@ -53,7 +55,7 @@ void Alert::SendableAlerts::InitSendable(nt::NTSendableBuilder& builder) {
 
 std::vector<std::string> Alert::SendableAlerts::GetStrings(
     AlertType type) const {
-  wpi::SmallVector<std::shared_ptr<Alert>> alerts;
+  wpi::small_vector<std::shared_ptr<Alert>> alerts;
   alerts.reserve(m_alerts.size());
   for (auto alert : m_alerts) {
     if (alert->m_active && alert->m_type == type) {

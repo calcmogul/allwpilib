@@ -86,7 +86,7 @@ bool HALSimWeb::Initialize() {
 
     std::string_view filters(msgFilters);
     filters = wpi::trim(filters);
-    wpi::SmallVector<std::string_view, 16> filtersSplit;
+    wpi::small_vector<std::string_view, 16> filtersSplit;
 
     wpi::split(filters, filtersSplit, ',', -1, false);
     for (auto val : filtersSplit) {

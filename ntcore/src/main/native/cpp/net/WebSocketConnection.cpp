@@ -244,7 +244,7 @@ int WebSocketConnection::Flush() {
 
 void WebSocketConnection::Send(
     uint8_t opcode, wpi::function_ref<void(wpi::raw_ostream& os)> writer) {
-  wpi::SmallVector<wpi::uv::Buffer, 4> bufs;
+  wpi::small_vector<wpi::uv::Buffer, 4> bufs;
   wpi::raw_uv_ostream os{bufs, [this] { return AllocBuf(); }};
   if (opcode == wpi::WebSocket::Frame::kText) {
     os << '[';

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -12,7 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/struct/Struct.h>
@@ -60,7 +60,7 @@ class NetworkTable final {
   NT_Inst m_inst;
   std::string m_path;
   mutable wpi::mutex m_mutex;
-  mutable wpi::StringMap<NT_Entry> m_entries;
+  mutable std::map<std::string, NT_Entry, std::less<>> m_entries;
 
   struct private_init {};
   friend class NetworkTableInstance;
@@ -95,7 +95,7 @@ class NetworkTable final {
                                   bool withLeadingSlash = true);
 
   static std::string_view NormalizeKey(std::string_view key,
-                                       wpi::SmallVectorImpl<char>& buf,
+                                       wpi::small_vectorImpl<char>& buf,
                                        bool withLeadingSlash = true);
 
   /**

@@ -8,7 +8,9 @@
 
 #include <algorithm>
 #include <concepts>
+#include <functional>
 #include <initializer_list>
+#include <map>
 #include <optional>
 #include <ranges>
 #include <span>
@@ -20,11 +22,10 @@
 #include <version>
 
 #include "wpi/DataLog_c.h"
-#include "wpi/DenseMap.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringMap.h"
+#include "wpi/flat_map.h"
 #include "wpi/mutex.h"
 #include "wpi/protobuf/Protobuf.h"
+#include "wpi/small_vector.h"
 #include "wpi/string.h"
 #include "wpi/struct/Struct.h"
 #include "wpi/timestamp.h"
@@ -517,12 +518,12 @@ class DataLog {
     std::vector<uint8_t> schemaData;  // only set for schema entries
     int id{0};
   };
-  wpi::StringMap<EntryInfo> m_entries;
+  std::map<std::string, EntryInfo, std::less<>> m_entries;
   struct EntryInfo2 {
     std::string metadata;
     unsigned int count;
   };
-  wpi::DenseMap<int, EntryInfo2> m_entryIds;
+  wpi::flat_map<int, EntryInfo2> m_entryIds;
   int m_lastId = 0;
 };
 
@@ -1341,7 +1342,7 @@ class StructLogEntry : public DataLogEntry {
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
     m_log->AppendRaw(m_entry, buf, timestamp);
@@ -1372,7 +1373,7 @@ class StructLogEntry : public DataLogEntry {
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
     std::scoped_lock lock{m_mutex};
@@ -1602,7 +1603,7 @@ class ProtobufLogEntry : public DataLogEntry {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   void Append(const T& data, int64_t timestamp = 0) {
-    SmallVector<uint8_t, 128> buf;
+    small_vector<uint8_t, 128> buf;
     {
       std::scoped_lock lock{m_mutex};
       m_msg.Pack(buf, data);
@@ -1622,7 +1623,7 @@ class ProtobufLogEntry : public DataLogEntry {
    */
   void Update(const T& data, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     m_msg.Pack(buf, data);
     if (!m_lastValue.has_value()) {
       m_lastValue = std::vector(buf.begin(), buf.end());

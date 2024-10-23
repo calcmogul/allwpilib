@@ -4,6 +4,8 @@
 
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -60,7 +62,7 @@ const std::string& ShuffleboardComponentBase::GetType() const {
   return m_type;
 }
 
-const wpi::StringMap<nt::Value>& ShuffleboardComponentBase::GetProperties()
-    const {
+const std::map<std::string, nt::Value, std::less<>>&
+ShuffleboardComponentBase::GetProperties() const {
   return m_properties;
 }

@@ -5,13 +5,13 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
 
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/StringMap.h>
 #include <wpi/json_fwd.h>
 #include <wpinet/uv/Async.h>
 #include <wpinet/uv/Loop.h>
@@ -70,7 +70,7 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
   int m_port;
 
   bool m_useMsgFiltering;
-  wpi::StringMap<bool> m_msgFilters;
+  std::map<std::string, bool, std::less<>> m_msgFilters;
 };
 
 }  // namespace wpilibws

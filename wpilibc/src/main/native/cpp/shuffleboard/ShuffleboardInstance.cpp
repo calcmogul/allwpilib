@@ -4,21 +4,22 @@
 
 #include "frc/shuffleboard/ShuffleboardInstance.h"
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
+#include <wpi/small_vector.h>
 
 #include "frc/shuffleboard/Shuffleboard.h"
 
 using namespace frc::detail;
 
 struct ShuffleboardInstance::Impl {
-  wpi::StringMap<std::unique_ptr<ShuffleboardTab>> tabs;
+  std::map<std::string, std::unique_ptr<ShuffleboardTab>, std::less<>> tabs;
 
   bool tabsChanged = false;
   std::shared_ptr<nt::NetworkTable> rootTable;
@@ -54,7 +55,7 @@ frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
 
 void ShuffleboardInstance::Update() {
   if (m_impl->tabsChanged) {
-    wpi::SmallVector<std::string, 16> tabTitles;
+    wpi::small_vector<std::string, 16> tabTitles;
     for (auto& entry : m_impl->tabs) {
       tabTitles.emplace_back(entry.second->GetTitle());
     }

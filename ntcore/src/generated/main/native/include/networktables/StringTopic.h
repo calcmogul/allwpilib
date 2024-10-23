@@ -23,7 +23,7 @@
 
 namespace wpi {
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 }  // namespace wpi
 
 namespace nt {
@@ -86,7 +86,7 @@ class StringSubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+  SmallRetType Get(wpi::small_vectorImpl<SmallElemType>& buf) const {
     return Get(buf, m_defaultValue);
   }
 
@@ -98,7 +98,7 @@ class StringSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+  SmallRetType Get(wpi::small_vectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
     return nt::GetString(m_subHandle, buf, defaultValue);
   }
 
@@ -134,7 +134,7 @@ class StringSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+      wpi::small_vectorImpl<SmallElemType>& buf) const {
     return GetAtomic(buf, m_defaultValue);
   }
 
@@ -148,7 +148,7 @@ class StringSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf,
+      wpi::small_vectorImpl<SmallElemType>& buf,
       ParamType defaultValue) const {
     return nt::GetAtomicString(m_subHandle, buf, defaultValue);
   }

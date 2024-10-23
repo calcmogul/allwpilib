@@ -41,7 +41,7 @@ static std::atomic<bool> gDSConnected = false;
 
 namespace {
 struct DataStore {
-  wpi::SmallVector<uint8_t, 128> m_frame;
+  wpi::small_vector<uint8_t, 128> m_frame;
   size_t m_frameSize = (std::numeric_limits<size_t>::max)();
   halsim::DSCommPacket* dsPacket;
 };
@@ -151,7 +151,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
         outAddr.sin_family = PF_INET;
         outAddr.sin_port = htons(1150);
 
-        wpi::SmallVector<wpi::uv::Buffer, 4> sendBufs;
+        wpi::small_vector<wpi::uv::Buffer, 4> sendBufs;
         wpi::raw_uv_ostream stream{sendBufs,
                                    [] { return GetBufferPool().Allocate(); }};
         ds->SetupSendBuffer(stream);

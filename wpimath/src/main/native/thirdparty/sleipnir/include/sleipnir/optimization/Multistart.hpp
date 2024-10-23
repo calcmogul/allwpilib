@@ -6,7 +6,7 @@
 #include <future>
 #include <span>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/optimization/SolverStatus.hpp"
 #include "sleipnir/util/FunctionRef.hpp"
@@ -45,14 +45,14 @@ MultistartResult<DecisionVariables> Multistart(
         const DecisionVariables& initialGuess)>
         solve,
     std::span<const DecisionVariables> initialGuesses) {
-  wpi::SmallVector<std::future<MultistartResult<DecisionVariables>>> futures;
+  wpi::small_vector<std::future<MultistartResult<DecisionVariables>>> futures;
   futures.reserve(initialGuesses.size());
 
   for (const auto& initialGuess : initialGuesses) {
     futures.emplace_back(std::async(std::launch::async, solve, initialGuess));
   }
 
-  wpi::SmallVector<MultistartResult<DecisionVariables>> results;
+  wpi::small_vector<MultistartResult<DecisionVariables>> results;
   results.reserve(futures.size());
 
   for (auto& future : futures) {

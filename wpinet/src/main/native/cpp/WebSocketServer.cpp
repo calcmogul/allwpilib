@@ -31,7 +31,7 @@ WebSocketServerHelper::WebSocketServerHelper(HttpParser& req) {
       m_version = value;
     } else if (equals_lower(name, "sec-websocket-protocol")) {
       // Protocols are comma delimited, repeated headers add to list
-      SmallVector<std::string_view, 2> protocols;
+      small_vector<std::string_view, 2> protocols;
       split(value, protocols, ",", -1, false);
       for (auto protocol : protocols) {
         protocol = trim(protocol);
@@ -101,8 +101,8 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
     }
 
     // Negotiate sub-protocol
-    SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
-                                               m_protocols.end()};
+    small_vector<std::string_view, 2> protocols{m_protocols.begin(),
+                                                m_protocols.end()};
     std::string_view protocol = m_helper.MatchProtocol(protocols).second;
 
     // Disconnect our header reader
@@ -156,7 +156,7 @@ void WebSocketServer::Abort(uint16_t code, std::string_view reason) {
   m_aborted = true;
 
   // Build response
-  SmallVector<uv::Buffer, 4> bufs;
+  small_vector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, 1024};
 
   // Handle unsupported version

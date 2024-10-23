@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "ResolverThread.h"
 #include "dns_sd.h"
@@ -197,14 +197,14 @@ void MulticastServiceResolver::Stop() {
   if (!pImpl->serviceRef) {
     return;
   }
-  wpi::SmallVector<WPI_EventHandle, 8> cleanupEvents;
+  wpi::small_vector<WPI_EventHandle, 8> cleanupEvents;
   for (auto&& i : pImpl->ResolveStates) {
     cleanupEvents.push_back(
         pImpl->thread->RemoveServiceRefOutsideThread(i->ResolveRef));
   }
   cleanupEvents.push_back(
       pImpl->thread->RemoveServiceRefOutsideThread(pImpl->serviceRef));
-  wpi::SmallVector<WPI_Handle, 8> signaledBuf;
+  wpi::small_vector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(cleanupEvents.size());
   while (!cleanupEvents.empty()) {
     auto signaled = wpi::WaitForObjects(cleanupEvents, signaledBuf);

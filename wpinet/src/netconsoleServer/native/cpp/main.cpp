@@ -14,10 +14,10 @@
 
 #include <fmt/format.h>
 #include <wpi/MathExtras.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/bit.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 #include <wpi/timestamp.h>
 
 #include "wpinet/raw_uv_ostream.h"
@@ -35,7 +35,7 @@ namespace uv = wpi::uv;
 static uint64_t startTime = wpi::Now();
 
 static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
-                          wpi::SmallVectorImpl<uv::Buffer>& bufs, bool tcp,
+                          wpi::small_vectorImpl<uv::Buffer>& bufs, bool tcp,
                           uint16_t tcpSeq) {
   // scan for last newline
   std::string_view str(buf.base, len);
@@ -90,7 +90,7 @@ static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
       [rem = std::make_shared<std::string>(), outPtr = out.get(), addr](
           uv::Buffer& buf, size_t len) {
         // build buffers
-        wpi::SmallVector<uv::Buffer, 4> bufs;
+        wpi::small_vector<uv::Buffer, 4> bufs;
         if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) {
           return;
         }
@@ -114,7 +114,7 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
       [data = std::make_shared<StreamData>(), outPtr = out.get()](
           uv::Buffer& buf, size_t len) {
         // build buffers
-        wpi::SmallVector<uv::Buffer, 4> bufs;
+        wpi::small_vector<uv::Buffer, 4> bufs;
         if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++)) {
           return;
         }
@@ -236,7 +236,7 @@ int main(int argc, char* argv[]) {
   }
 
   // build process options
-  wpi::SmallVector<uv::Process::Option, 8> options;
+  wpi::small_vector<uv::Process::Option, 8> options;
 
   // hook up pipes to child
   options.emplace_back(

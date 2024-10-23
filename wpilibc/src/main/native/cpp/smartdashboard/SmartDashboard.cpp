@@ -4,6 +4,8 @@
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -12,7 +14,6 @@
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -27,7 +28,7 @@ struct Instance {
   detail::ListenerExecutor listenerExecutor;
   std::shared_ptr<nt::NetworkTable> table =
       nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
-  wpi::StringMap<wpi::SendableRegistry::UID> tablesToData;
+  std::map<std::string, wpi::SendableRegistry::UID, std::less<>> tablesToData;
   wpi::mutex tablesToDataMutex;
 };
 }  // namespace

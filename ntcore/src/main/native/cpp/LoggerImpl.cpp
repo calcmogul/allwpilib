@@ -7,9 +7,9 @@
 #include <string>
 
 #include <wpi/Logger.h>
-#include <wpi/SmallVector.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 
 #include "IListenerStorage.h"
 

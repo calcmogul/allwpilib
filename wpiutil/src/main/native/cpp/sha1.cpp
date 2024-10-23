@@ -21,10 +21,10 @@
 
 #include <string>
 
-#include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/small_vector.h"
 
 using namespace wpi;
 
@@ -295,7 +295,7 @@ std::string SHA1::Final() {
   return os.str();
 }
 
-std::string_view SHA1::Final(SmallVectorImpl<char>& buf) {
+std::string_view SHA1::Final(small_vectorImpl<char>& buf) {
   raw_svector_ostream os(buf);
 
   finalize(digest, buffer, buf_size, transforms, os, true);
@@ -303,7 +303,7 @@ std::string_view SHA1::Final(SmallVectorImpl<char>& buf) {
   return os.str();
 }
 
-std::string_view SHA1::RawFinal(SmallVectorImpl<char>& buf) {
+std::string_view SHA1::RawFinal(small_vectorImpl<char>& buf) {
   raw_svector_ostream os(buf);
 
   finalize(digest, buffer, buf_size, transforms, os, false);

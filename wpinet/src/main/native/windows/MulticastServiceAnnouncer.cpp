@@ -15,8 +15,8 @@
 
 #include <wpi/ConvertUTF.h>
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/small_vector.h>
 
 #include "DynamicDns.h"
 #include "wpinet/hostname.h"
@@ -54,7 +54,7 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
 
   this->port = port;
 
-  wpi::SmallVector<wchar_t, 128> wideStorage;
+  wpi::small_vector<wchar_t, 128> wideStorage;
   std::string hostName = wpi::GetHostname() + ".local";
 
   for (auto&& i : txt) {

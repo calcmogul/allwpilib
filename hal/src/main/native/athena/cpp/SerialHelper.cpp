@@ -137,8 +137,8 @@ void SerialHelper::SortHubPathVector() {
   m_sortedHubPath.clear();
   m_sortedHubPath = m_unsortedHubPath;
   std::sort(m_sortedHubPath.begin(), m_sortedHubPath.end(),
-            [](const wpi::SmallVectorImpl<char>& lhs,
-               const wpi::SmallVectorImpl<char>& rhs) -> int {
+            [](const wpi::small_vectorImpl<char>& lhs,
+               const wpi::small_vectorImpl<char>& rhs) -> int {
               std::string_view lhsRef(lhs.begin(), lhs.size());
               std::string_view rhsRef(rhs.begin(), rhs.size());
               return lhsRef.compare(rhsRef);
@@ -146,8 +146,8 @@ void SerialHelper::SortHubPathVector() {
 }
 
 void SerialHelper::CoiteratedSort(
-    wpi::SmallVectorImpl<wpi::SmallString<16>>& vec) {
-  wpi::SmallVector<wpi::SmallString<16>, 4> sortedVec;
+    wpi::small_vectorImpl<wpi::SmallString<16>>& vec) {
+  wpi::small_vector<wpi::SmallString<16>, 4> sortedVec;
   for (auto& str : m_sortedHubPath) {
     for (size_t i = 0; i < m_unsortedHubPath.size(); i++) {
       if (wpi::equals(std::string_view{m_unsortedHubPath[i].begin(),
@@ -243,7 +243,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
         continue;
       }
 
-      wpi::SmallVector<std::string_view, 16> pathSplitVec;
+      wpi::small_vector<std::string_view, 16> pathSplitVec;
       // Split path into individual directories
       wpi::split(path, pathSplitVec, '/', -1, false);
 
@@ -299,7 +299,7 @@ int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
 
   std::string portString = m_usbNames[port - 2];
 
-  wpi::SmallVector<int32_t, 4> indices;
+  wpi::small_vector<int32_t, 4> indices;
 
   // If port has not been assigned, find the one to assign
   if (portString.empty()) {

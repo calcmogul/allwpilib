@@ -19,7 +19,7 @@ uint64_t SizeUleb128(uint64_t val) {
   return count;
 }
 
-uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val) {
+uint64_t WriteUleb128(small_vectorImpl<char>& dest, uint64_t val) {
   size_t count = 0;
 
   do {

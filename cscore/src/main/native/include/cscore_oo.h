@@ -192,7 +192,7 @@ class VideoProperty {
    * @param buf The backing storage to which to write the property value.
    * @return The string property value as a reference to the given buffer.
    */
-  std::string_view GetString(wpi::SmallVectorImpl<char>& buf) const {
+  std::string_view GetString(wpi::small_vectorImpl<char>& buf) const {
     m_status = 0;
     return GetStringProperty(m_handle, buf, &m_status);
   }

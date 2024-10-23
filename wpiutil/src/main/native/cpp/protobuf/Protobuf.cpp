@@ -14,7 +14,7 @@
 #include <google/protobuf/message.h>
 
 #include "wpi/ProtoHelper.h"
-#include "wpi/SmallVector.h"
+#include "wpi/small_vector.h"
 
 using namespace wpi;
 
@@ -52,7 +52,7 @@ class VectorOutputStream final
   std::vector<uint8_t>& target_;
 };
 
-class SmallVectorOutputStream final
+class small_vectorOutputStream final
     : public google::protobuf::io::ZeroCopyOutputStream {
  public:
   // Create a StringOutputStream which appends bytes to the given string.
@@ -64,14 +64,14 @@ class SmallVectorOutputStream final
   // Hint:  If you call target->reserve(n) before creating the stream,
   //   the first call to Next() will return at least n bytes of buffer
   //   space.
-  explicit SmallVectorOutputStream(wpi::SmallVectorImpl<uint8_t>& target)
+  explicit small_vectorOutputStream(wpi::small_vectorImpl<uint8_t>& target)
       : target_{target} {
     target.resize(0);
   }
-  SmallVectorOutputStream(const SmallVectorOutputStream&) = delete;
-  ~SmallVectorOutputStream() override = default;
+  small_vectorOutputStream(const small_vectorOutputStream&) = delete;
+  ~small_vectorOutputStream() override = default;
 
-  SmallVectorOutputStream& operator=(const SmallVectorOutputStream&) = delete;
+  small_vectorOutputStream& operator=(const small_vectorOutputStream&) = delete;
 
   // implements ZeroCopyOutputStream ---------------------------------
   bool Next(void** data, int* size) override;
@@ -81,7 +81,7 @@ class SmallVectorOutputStream final
  private:
   static constexpr size_t kMinimumSize = 16;
 
-  wpi::SmallVectorImpl<uint8_t>& target_;
+  wpi::small_vectorImpl<uint8_t>& target_;
 };
 }  // namespace
 
@@ -108,7 +108,7 @@ bool VectorOutputStream::Next(void** data, int* size) {
   return true;
 }
 
-bool SmallVectorOutputStream::Next(void** data, int* size) {
+bool small_vectorOutputStream::Next(void** data, int* size) {
   size_t old_size = target_.size();
 
   // Grow the string.
@@ -142,9 +142,9 @@ bool detail::ParseProtobuf(google::protobuf::Message* msg,
   return msg->ParseFromArray(data.data(), data.size());
 }
 
-bool detail::SerializeProtobuf(wpi::SmallVectorImpl<uint8_t>& out,
+bool detail::SerializeProtobuf(wpi::small_vectorImpl<uint8_t>& out,
                                const google::protobuf::Message& msg) {
-  SmallVectorOutputStream stream{out};
+  small_vectorOutputStream stream{out};
   return msg.SerializeToZeroCopyStream(&stream);
 }
 
@@ -178,7 +178,7 @@ static void ForEachProtobufDescriptorImpl(
   }
   (*descproto)->Clear();
   desc->CopyTo(*descproto);
-  SmallVector<uint8_t, 128> buf;
+  small_vector<uint8_t, 128> buf;
   detail::SerializeProtobuf(buf, **descproto);
   fn(name, buf);
 }

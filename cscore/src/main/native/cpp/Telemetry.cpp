@@ -7,7 +7,7 @@
 #include <chrono>
 #include <utility>
 
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -24,8 +24,8 @@ class Telemetry::Thread : public wpi::SafeThread {
   void Main() override;
 
   Notifier& m_notifier;
-  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
-  wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
+  wpi::flat_map<std::pair<CS_Handle, int>, int64_t> m_user;
+  wpi::flat_map<std::pair<CS_Handle, int>, int64_t> m_current;
   double m_period = 0.0;
   double m_elapsed = 0.0;
   bool m_updated = false;

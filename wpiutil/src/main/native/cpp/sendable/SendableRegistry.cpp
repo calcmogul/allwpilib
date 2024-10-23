@@ -10,12 +10,12 @@
 
 #include <fmt/format.h>
 
-#include "wpi/DenseMap.h"
-#include "wpi/SmallVector.h"
 #include "wpi/UidVector.h"
+#include "wpi/flat_map.h"
 #include "wpi/mutex.h"
 #include "wpi/sendable/Sendable.h"
 #include "wpi/sendable/SendableBuilder.h"
+#include "wpi/small_vector.h"
 
 using namespace wpi;
 
@@ -27,7 +27,7 @@ struct Component {
   std::string subsystem = "Ungrouped";
   Sendable* parent = nullptr;
   bool liveWindow = false;
-  wpi::SmallVector<std::shared_ptr<void>, 2> data;
+  wpi::small_vector<std::shared_ptr<void>, 2> data;
 
   void SetName(std::string_view moduleType, int channel) {
     name = fmt::format("{}[{}]", moduleType, channel);
@@ -43,7 +43,7 @@ struct SendableRegistryInst {
 
   std::function<std::unique_ptr<SendableBuilder>()> liveWindowFactory;
   wpi::UidVector<std::unique_ptr<Component>, 32> components;
-  wpi::DenseMap<void*, SendableRegistry::UID> componentMap;
+  wpi::flat_map<void*, SendableRegistry::UID> componentMap;
   int nextDataHandle = 0;
 
   Component& GetOrAdd(void* sendable, SendableRegistry::UID* uid = nullptr);
@@ -432,7 +432,7 @@ void SendableRegistry::ForeachLiveWindow(
   auto& inst = GetInstance();
   assert(dataHandle >= 0);
   std::scoped_lock lock(inst.mutex);
-  wpi::SmallVector<Component*, 128> components;
+  wpi::small_vector<Component*, 128> components;
   for (auto&& comp : inst.components) {
     components.emplace_back(comp.get());
   }

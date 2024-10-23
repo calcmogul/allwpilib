@@ -5,10 +5,12 @@
 #pragma once
 
 #include <chrono>
+#include <functional>
+#include <map>
+#include <string>
 #include <string_view>
 
 #include <hal/cpp/fpga_clock.h>
-#include <wpi/StringMap.h>
 
 namespace wpi {
 class raw_ostream;
@@ -68,6 +70,6 @@ class Tracer {
   hal::fpga_clock::time_point m_startTime;
   hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
 
-  wpi::StringMap<std::chrono::nanoseconds> m_epochs;
+  std::map<std::string, std::chrono::nanoseconds, std::less<>> m_epochs;
 };
 }  // namespace frc

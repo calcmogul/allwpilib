@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <hal/Relay.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "CrossConnects.h"
 #include "LifetimeWrappers.h"
@@ -67,7 +67,7 @@ TEST_P(RelayDigitalTest, RelayCross) {
 }
 
 TEST(RelayDigitalTest, AllocateAll) {
-  wpi::SmallVector<RelayHandle, 32> relayHandles;
+  wpi::small_vector<RelayHandle, 32> relayHandles;
   for (int i = 0; i < HAL_GetNumRelayChannels(); i++) {
     int32_t status = 0;
     relayHandles.emplace_back(i / 2, i % 2, &status);

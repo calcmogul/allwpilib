@@ -24,8 +24,8 @@
 #include <hal/simulation/MockHooks.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/small_vector.h>
 #include <wpigui.h>
 
 #include "HALDataSource.h"
@@ -225,7 +225,7 @@ class FMSSimModel : public glass::FMSModel {
   glass::DataSource* GetTestData() override { return &m_test; }
   glass::DataSource* GetAutonomousData() override { return &m_autonomous; }
   std::string_view GetGameSpecificMessage(
-      wpi::SmallVectorImpl<char>& buf) override {
+      wpi::small_vectorImpl<char>& buf) override {
     return m_gameMessage;
   }
 
@@ -1362,7 +1362,7 @@ static void DisplayJoysticks() {
 
       // show buttons as multiple lines of LED indicators, 8 per line
       static const ImU32 color = IM_COL32(255, 255, 102, 255);
-      wpi::SmallVector<int, 64> buttons;
+      wpi::small_vector<int, 64> buttons;
       buttons.resize(joy.data.buttons.count);
       for (int j = 0; j < joy.data.buttons.count; ++j) {
         buttons[j] = joy.IsButtonPressed(j) ? 1 : -1;

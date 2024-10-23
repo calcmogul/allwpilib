@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include <wpi/DenseMap.h>
 #include <wpi/UidVector.h>
+#include <wpi/flat_map.h>
 
 #include "wpinet/MulticastServiceAnnouncer.h"
 #include "wpinet/MulticastServiceResolver.h"
@@ -16,9 +16,9 @@ namespace wpi {
 struct MulticastHandleManager {
   wpi::mutex mutex;
   wpi::UidVector<int, 8> handleIds;
-  wpi::DenseMap<size_t, std::unique_ptr<wpi::MulticastServiceResolver>>
+  wpi::flat_map<size_t, std::unique_ptr<wpi::MulticastServiceResolver>>
       resolvers;
-  wpi::DenseMap<size_t, std::unique_ptr<wpi::MulticastServiceAnnouncer>>
+  wpi::flat_map<size_t, std::unique_ptr<wpi::MulticastServiceAnnouncer>>
       announcers;
 #ifdef _WIN32
   ~MulticastHandleManager();

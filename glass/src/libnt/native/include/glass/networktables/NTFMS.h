@@ -36,7 +36,7 @@ class NTFMSModel : public FMSModel {
   DataSource* GetTestData() override { return &m_test; }
   DataSource* GetAutonomousData() override { return &m_autonomous; }
   std::string_view GetGameSpecificMessage(
-      wpi::SmallVectorImpl<char>& buf) override;
+      wpi::small_vectorImpl<char>& buf) override;
 
   // NT is read-only (it's continually set by robot code)
   void SetFmsAttached(bool val) override {}

@@ -7,9 +7,9 @@
 #include <memory>
 #include <utility>
 
-#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/uv/AsyncFunction.h"
 #include "wpinet/uv/Loop.h"

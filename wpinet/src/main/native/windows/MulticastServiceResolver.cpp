@@ -14,8 +14,8 @@
 
 #include <wpi/ConvertUTF.h>
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/small_vector.h>
 
 #include "DynamicDns.h"
 
@@ -44,7 +44,7 @@ MulticastServiceResolver::MulticastServiceResolver(
     return;
   }
 
-  wpi::SmallVector<wchar_t, 128> wideStorage;
+  wpi::small_vector<wchar_t, 128> wideStorage;
 
   if (wpi::ends_with_lower(serviceType, ".local")) {
     wpi::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
@@ -71,10 +71,10 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
   MulticastServiceResolver::Impl* impl =
       reinterpret_cast<MulticastServiceResolver::Impl*>(pQueryContext);
 
-  wpi::SmallVector<DNS_RECORDW*, 4> PtrRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> SrvRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> TxtRecords;
-  wpi::SmallVector<DNS_RECORDW*, 4> ARecords;
+  wpi::small_vector<DNS_RECORDW*, 4> PtrRecords;
+  wpi::small_vector<DNS_RECORDW*, 4> SrvRecords;
+  wpi::small_vector<DNS_RECORDW*, 4> TxtRecords;
+  wpi::small_vector<DNS_RECORDW*, 4> ARecords;
 
   {
     DNS_RECORDW* current = pQueryResults->pQueryRecords;

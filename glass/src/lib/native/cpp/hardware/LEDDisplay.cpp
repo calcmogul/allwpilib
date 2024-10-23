@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
@@ -22,7 +22,7 @@ struct IndicatorData {
 }  // namespace
 
 void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
-  wpi::SmallVector<LEDDisplayModel::Data, 64> dataBuf;
+  wpi::small_vector<LEDDisplayModel::Data, 64> dataBuf;
   auto data = model->GetData(dataBuf);
   int length = data.size();
   bool running = model->IsRunning();

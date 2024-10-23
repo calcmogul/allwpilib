@@ -10,7 +10,7 @@
 #include <utility>
 
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/uv/util.h"
 
@@ -29,7 +29,7 @@ class CallbackUdpSendReq : public UdpSendReq {
   }
 
  private:
-  SmallVector<Buffer, 4> m_bufs;
+  small_vector<Buffer, 4> m_bufs;
 };
 
 }  // namespace

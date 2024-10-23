@@ -10,8 +10,8 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 
 namespace cs {
 
@@ -50,7 +50,7 @@ class UnlimitedHandleResource {
   std::shared_ptr<TStruct> Free(THandle handle);
 
   template <typename T>
-  std::span<T> GetAll(wpi::SmallVectorImpl<T>& vec);
+  std::span<T> GetAll(wpi::small_vectorImpl<T>& vec);
 
   std::vector<std::shared_ptr<TStruct>> FreeAll();
 
@@ -149,7 +149,7 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename T>
 inline std::span<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
-    wpi::SmallVectorImpl<T>& vec) {
+    wpi::small_vectorImpl<T>& vec) {
   ForEach([&](THandle handle, const TStruct&) { vec.push_back(handle); });
   return vec;
 }

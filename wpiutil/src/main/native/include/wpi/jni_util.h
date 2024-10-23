@@ -18,11 +18,11 @@
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/mutex.h"
 #include "wpi/print.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/small_vector.h"
 #include "wpi/string.h"
 
 /** Java Native Interface (JNI) utility functions */
@@ -429,7 +429,7 @@ using CriticalJSpan = detail::JSpanBase<T, true, Extent>;
  * @param str String to convert.
  */
 inline jstring MakeJString(JNIEnv* env, std::string_view str) {
-  SmallVector<UTF16, 128> chars;
+  small_vector<UTF16, 128> chars;
   convertUTF8ToUTF16String(str, chars);
   return env->NewString(chars.begin(), chars.size());
 }
@@ -497,16 +497,16 @@ inline jintArray MakeJIntArray(JNIEnv* env, std::span<T> arr) {
 }
 
 /**
- * Convert a SmallVector to a jintArray.
+ * Convert a small_vector to a jintArray.
  *
  * This is required in addition to ArrayRef because template resolution occurs
  * prior to implicit conversions.
  *
  * @param env JRE environment.
- * @param arr SmallVector to convert.
+ * @param arr small_vector to convert.
  */
 template <typename T>
-inline jintArray MakeJIntArray(JNIEnv* env, const SmallVectorImpl<T>& arr) {
+inline jintArray MakeJIntArray(JNIEnv* env, const small_vectorImpl<T>& arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
@@ -517,7 +517,7 @@ inline jintArray MakeJIntArray(JNIEnv* env, const SmallVectorImpl<T>& arr) {
  * prior to implicit conversions.
  *
  * @param env JRE environment.
- * @param arr SmallVector to convert.
+ * @param arr small_vector to convert.
  */
 template <typename T>
 inline jintArray MakeJIntArray(JNIEnv* env, const std::vector<T>& arr) {

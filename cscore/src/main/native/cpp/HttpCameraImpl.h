@@ -8,6 +8,7 @@
 #include <atomic>
 #include <functional>
 #include <initializer_list>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -15,7 +16,6 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/raw_istream.h>
 #include <wpinet/HttpUtil.h>
@@ -100,7 +100,7 @@ class HttpCameraImpl : public SourceImpl {
 
   // Functions used by StreamThreadMain()
   wpi::HttpConnection* DeviceStreamConnect(
-      wpi::SmallVectorImpl<char>& boundary);
+      wpi::small_vectorImpl<char>& boundary);
   void DeviceStream(wpi::raw_istream& is, std::string_view boundary);
   bool DeviceStreamFrame(wpi::raw_istream& is, std::string& imageBuf);
 
@@ -135,10 +135,10 @@ class HttpCameraImpl : public SourceImpl {
 
   wpi::condition_variable m_sinkEnabledCond;
 
-  wpi::StringMap<std::string> m_settings;
+  std::map<std::string, std::string, std::less<>> m_settings;
   wpi::condition_variable m_settingsCond;
 
-  wpi::StringMap<std::string> m_streamSettings;
+  std::map<std::string, std::string, std::less<>> m_streamSettings;
   std::atomic_bool m_streamSettingsUpdated{false};
 
   wpi::condition_variable m_monitorCond;

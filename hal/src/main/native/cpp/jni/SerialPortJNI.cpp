@@ -240,7 +240,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SerialPortJNI_serialRead
   (JNIEnv* env, jclass, jint handle, jbyteArray dataReceived, jint size)
 {
-  wpi::SmallVector<char, 128> recvBuf;
+  wpi::small_vector<char, 128> recvBuf;
   recvBuf.resize(size);
   int32_t status = 0;
   jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPortHandle>(handle),

@@ -14,11 +14,11 @@
 
 #include <wpi/Base64.h>
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/print.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/sha1.h>
+#include <wpi/small_vector.h>
 
 #include "WebSocketDebug.h"
 #include "WebSocketSerializer.h"
@@ -134,7 +134,7 @@ class WebSocket::ClientHandshakeData {
   }
 
   SmallString<64> key;                       // the key sent to the server
-  SmallVector<std::string, 2> protocols;     // valid protocols
+  small_vector<std::string, 2> protocols;    // valid protocols
   HttpParser parser{HttpParser::kResponse};  // server response parser
   bool hasUpgrade = false;
   bool hasConnection = false;
@@ -145,7 +145,7 @@ class WebSocket::ClientHandshakeData {
 };
 
 static std::string_view AcceptHash(std::string_view key,
-                                   SmallVectorImpl<char>& buf) {
+                                   small_vectorImpl<char>& buf) {
   SHA1 hash;
   hash.Update(key);
   hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
@@ -222,7 +222,7 @@ void WebSocket::StartClient(std::string_view uri, std::string_view host,
   m_clientHandshake = std::make_unique<ClientHandshakeData>();
 
   // Build client request
-  SmallVector<uv::Buffer, 4> bufs;
+  small_vector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, kWriteAllocSize};
 
   os << "GET " << uri << " HTTP/1.1\r\n";
@@ -341,7 +341,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
   m_protocol = protocol;
 
   // Build server response
-  SmallVector<uv::Buffer, 4> bufs;
+  small_vector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, kWriteAllocSize};
 
   // Handle unsupported version
@@ -388,7 +388,7 @@ void WebSocket::StartServer(std::string_view key, std::string_view version,
 }
 
 void WebSocket::SendClose(uint16_t code, std::string_view reason) {
-  SmallVector<uv::Buffer, 4> bufs;
+  small_vector<uv::Buffer, 4> bufs;
   if (code != 1005) {
     raw_uv_ostream os{bufs, kWriteAllocSize};
     const uint8_t codeMsb[] = {static_cast<uint8_t>((code >> 8) & 0xff),
@@ -663,7 +663,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             }
             // If the connection is open, send a Pong in response
             if (m_state == OPEN) {
-              SmallVector<uv::Buffer, 4> bufs;
+              small_vector<uv::Buffer, 4> bufs;
               {
                 raw_uv_ostream os{bufs, kWriteAllocSize};
                 os << m_controlPayload;
@@ -856,7 +856,7 @@ void WebSocket::SendError(
   } else {
     err = UV_ESHUTDOWN;
   }
-  SmallVector<uv::Buffer, 4> bufs;
+  small_vector<uv::Buffer, 4> bufs;
   for (auto&& frame : frames) {
     bufs.append(frame.data.begin(), frame.data.end());
   }

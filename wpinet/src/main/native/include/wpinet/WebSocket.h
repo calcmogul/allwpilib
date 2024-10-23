@@ -16,7 +16,7 @@
 #include <utility>
 
 #include <wpi/Signal.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/uv/Buffer.h"
 #include "wpinet/uv/Error.h"
@@ -528,10 +528,10 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
 
   // incoming message buffers/state
   uint64_t m_lastReceivedTime = 0;
-  SmallVector<uint8_t, 14> m_header;
+  small_vector<uint8_t, 14> m_header;
   size_t m_headerSize = 0;
-  SmallVector<uint8_t, 1024> m_payload;
-  SmallVector<uint8_t, 64> m_controlPayload;
+  small_vector<uint8_t, 1024> m_payload;
+  small_vector<uint8_t, 64> m_controlPayload;
   size_t m_frameStart = 0;
   uint64_t m_frameSize = UINT64_MAX;
   uint8_t m_fragmentOpcode = 0;

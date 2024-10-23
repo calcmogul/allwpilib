@@ -5,7 +5,10 @@
 #include "sysid/analysis/AnalysisManager.h"
 
 #include <cmath>
+#include <functional>
 #include <limits>
+#include <map>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -13,7 +16,6 @@
 #include <units/angle.h>
 #include <wpi/MathExtras.h>
 #include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
 
 #include "sysid/analysis/FilteringUtils.h"
 
@@ -78,14 +80,15 @@ static std::vector<PreparedData> ConvertToPrepared(const MotorData& data) {
 
 /**
  * To preserve a raw copy of the data, this method saves a raw version
- * in the dataset StringMap where the key of the raw data starts with "raw-"
+ * in the dataset map where the key of the raw data starts with "raw-"
  * before the name of the original data.
  *
  * @tparam S The size of the array data that's being used
  *
  * @param dataset A reference to the dataset being used
  */
-static void CopyRawData(wpi::StringMap<MotorData>* dataset) {
+static void CopyRawData(
+    std::map<std::string, MotorData, std::less<>>* dataset) {
   auto& data = *dataset;
   // Loads the Raw Data
   for (auto& it : data) {
@@ -115,7 +118,7 @@ static Storage CombineDatasets(const std::vector<PreparedData>& slowForward,
 }
 
 void AnalysisManager::PrepareGeneralData() {
-  wpi::StringMap<std::vector<PreparedData>> preparedData;
+  std::map<std::string, std::vector<PreparedData>, std::less<>> preparedData;
 
   WPI_INFO(m_logger, "{}", "Preprocessing raw data.");
 

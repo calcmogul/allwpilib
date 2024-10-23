@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -14,7 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
 #include <wpi/iterator_range.h>
 #include <wpi/json_fwd.h>
 
@@ -103,7 +103,7 @@ class Storage {
     void Reset(Type newType);
   };
 
-  using ValueMap = wpi::StringMap<std::unique_ptr<Value>>;
+  using ValueMap = std::map<std::string, std::unique_ptr<Value>, std::less<>>;
   template <typename Iterator>
   using ChildIterator = detail::ChildIterator<Iterator>;
 

@@ -15,8 +15,8 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/json_fwd.h>
+#include <wpi/small_vector.h>
 #include <wpi/struct/Struct.h>
 
 #include "networktables/NetworkTableInstance.h"
@@ -88,7 +88,7 @@ class StructSubscriber : public Subscriber {
    * @return true if successful
    */
   bool GetInto(T* out) {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() < std::apply(S::GetSize, m_info)) {
       return false;
@@ -120,7 +120,7 @@ class StructSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(const T& defaultValue) const {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() < std::apply(S::GetSize, m_info)) {
       return {0, 0, defaultValue};
@@ -251,7 +251,7 @@ class StructPublisher : public Publisher {
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, value, info...); }, m_info);
     ::nt::SetRaw(m_pubHandle, buf, time);
@@ -280,7 +280,7 @@ class StructPublisher : public Publisher {
         return;
       }
     }
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, value, info...); }, m_info);
     ::nt::SetDefaultRaw(m_pubHandle, buf);

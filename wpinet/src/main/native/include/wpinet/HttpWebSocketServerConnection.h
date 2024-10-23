@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/HttpServerConnection.h"
 #include "wpinet/WebSocket.h"
@@ -44,8 +44,8 @@ class HttpWebSocketServerConnection
     // Handle upgrade event
     m_helper.upgrade.connect([this] {
       // Negotiate sub-protocol
-      SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
-                                                 m_protocols.end()};
+      small_vector<std::string_view, 2> protocols{m_protocols.begin(),
+                                                  m_protocols.end()};
       std::string_view protocol = m_helper.MatchProtocol(protocols).second;
 
       // Check that the upgrade is valid
@@ -119,7 +119,7 @@ class HttpWebSocketServerConnection
 
  private:
   WebSocketServerHelper m_helper;
-  SmallVector<std::string, 2> m_protocols;
+  small_vector<std::string, 2> m_protocols;
 };
 
 }  // namespace wpi

@@ -5,6 +5,8 @@
 #include "cameraserver/CameraServer.h"
 
 #include <atomic>
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -17,10 +19,9 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringArrayTopic.h>
 #include <networktables/StringTopic.h>
-#include <wpi/DenseMap.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
+#include <wpi/flat_map.h>
 #include <wpi/mutex.h>
 
 #include "cameraserver/CameraServerShared.h"
@@ -61,7 +62,7 @@ struct SourcePublisher {
   nt::StringArrayPublisher streamsPublisher;
   nt::StringEntry modeEntry;
   nt::StringArrayPublisher modesPublisher;
-  wpi::DenseMap<CS_Property, PropertyPublisher> properties;
+  wpi::flat_map<CS_Property, PropertyPublisher> properties;
 };
 
 struct Instance {
@@ -74,10 +75,10 @@ struct Instance {
   wpi::mutex m_mutex;
   std::atomic<int> m_defaultUsbDevice{0};
   std::string m_primarySourceName;
-  wpi::StringMap<cs::VideoSource> m_sources;
-  wpi::StringMap<cs::VideoSink> m_sinks;
-  wpi::DenseMap<CS_Sink, CS_Source> m_fixedSources;
-  wpi::DenseMap<CS_Source, SourcePublisher> m_publishers;
+  std::map<std::string, cs::VideoSource, std::less<>> m_sources;
+  std::map<std::string, cs::VideoSink, std::less<>> m_sinks;
+  wpi::flat_map<CS_Sink, CS_Source> m_fixedSources;
+  wpi::flat_map<CS_Source, SourcePublisher> m_publishers;
   std::shared_ptr<nt::NetworkTable> m_publishTable{
       nt::NetworkTableInstance::GetDefault().GetTable(kPublishName)};
   cs::VideoListener m_videoListener;
@@ -94,7 +95,7 @@ static Instance& GetInstance() {
 }
 
 static std::string_view MakeSourceValue(CS_Source source,
-                                        wpi::SmallVectorImpl<char>& buf) {
+                                        wpi::small_vectorImpl<char>& buf) {
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {

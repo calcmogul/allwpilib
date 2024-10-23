@@ -5,10 +5,10 @@
 #include "frc/shuffleboard/SendableCameraWrapper.h"
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 
-#include <wpi/StringMap.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -16,7 +16,9 @@ namespace frc {
 namespace detail {
 std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
     std::string_view cameraName) {
-  static wpi::StringMap<std::shared_ptr<SendableCameraWrapper>> wrappers;
+  static std::map<std::string, std::shared_ptr<SendableCameraWrapper>,
+                  std::less<>>
+      wrappers;
   return wrappers[cameraName];
 }
 

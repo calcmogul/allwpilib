@@ -64,7 +64,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
 }
 
 void NetworkTablesProvider::DisplayMenu() {
-  wpi::SmallVector<std::string_view, 6> path;
+  wpi::small_vector<std::string_view, 6> path;
   wpi::SmallString<64> name;
   for (auto&& entry : m_viewEntries) {
     path.clear();

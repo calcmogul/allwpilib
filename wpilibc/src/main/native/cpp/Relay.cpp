@@ -175,7 +175,7 @@ void Relay::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSafeState([=, this] { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
-      [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+      [=, this](wpi::small_vectorImpl<char>& buf) -> std::string_view {
         switch (Get()) {
           case kOn:
             return "On";

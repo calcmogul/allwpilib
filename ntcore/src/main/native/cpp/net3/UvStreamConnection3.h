@@ -9,7 +9,7 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 #include <wpinet/raw_uv_ostream.h>
 #include <wpinet/uv/Buffer.h>
 #include <wpinet/uv/Stream.h>
@@ -66,7 +66,7 @@ class UvStreamConnection3 final
   wpi::uv::Buffer AllocBuf();
 
   wpi::uv::Stream& m_stream;
-  wpi::SmallVector<wpi::uv::Buffer, 4> m_buffers;
+  wpi::small_vector<wpi::uv::Buffer, 4> m_buffers;
   std::vector<wpi::uv::Buffer> m_buf_pool;
   wpi::raw_uv_ostream m_os;
   std::string m_reason;

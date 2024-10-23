@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 16 Jun 2024 12:08:49 -0700
-Subject: [PATCH 4/5] Use wpi::SmallVector
+Subject: [PATCH 4/5] Use wpi::small_vector
 
 ---
  include/.styleguide                               |  1 +
@@ -39,7 +39,7 @@ index dff8e2a6ef24413e3e6356bf0ec57286e50654cf..bdbeb4730223f88cfdc0c424a8f7b852
  #include <numbers>
  #include <utility>
  
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
 +
  #include "sleipnir/autodiff/ExpressionType.hpp"
  #include "sleipnir/util/IntrusiveSharedPtr.hpp"
@@ -54,7 +54,7 @@ index dff8e2a6ef24413e3e6356bf0ec57286e50654cf..bdbeb4730223f88cfdc0c424a8f7b852
    // overflow. Instead, we iterate over its children to decrement their
    // refcounts and deallocate them.
 -  small_vector<Expression*> stack;
-+  wpi::SmallVector<Expression*> stack;
++  wpi::small_vector<Expression*> stack;
    stack.emplace_back(expr);
  
    while (!stack.empty()) {
@@ -66,7 +66,7 @@ index c614195d82ad022dfd0c3f6f8240b042c0056c2f..714bcbb82907e754138347334c7fca8a
  
  #include <span>
  
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
 +
  #include "sleipnir/autodiff/Expression.hpp"
  #include "sleipnir/util/FunctionRef.hpp"
@@ -80,7 +80,7 @@ index c614195d82ad022dfd0c3f6f8240b042c0056c2f..714bcbb82907e754138347334c7fca8a
  
      // BFS list sorted from parent to child.
 -    small_vector<Expression*> stack;
-+    wpi::SmallVector<Expression*> stack;
++    wpi::small_vector<Expression*> stack;
  
      stack.emplace_back(root.Get());
  
@@ -89,7 +89,7 @@ index c614195d82ad022dfd0c3f6f8240b042c0056c2f..714bcbb82907e754138347334c7fca8a
     * @param wrt Variables with respect to which to compute the gradient.
     */
 -  small_vector<ExpressionPtr> GenerateGradientTree(
-+  wpi::SmallVector<ExpressionPtr> GenerateGradientTree(
++  wpi::small_vector<ExpressionPtr> GenerateGradientTree(
        std::span<const ExpressionPtr> wrt) const {
      // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
      // for background on reverse accumulation automatic differentiation.
@@ -98,7 +98,7 @@ index c614195d82ad022dfd0c3f6f8240b042c0056c2f..714bcbb82907e754138347334c7fca8a
      }
  
 -    small_vector<ExpressionPtr> grad;
-+    wpi::SmallVector<ExpressionPtr> grad;
++    wpi::small_vector<ExpressionPtr> grad;
      grad.reserve(wrt.size());
      for (size_t row = 0; row < wrt.size(); ++row) {
        grad.emplace_back(MakeExpressionPtr());
@@ -107,15 +107,15 @@ index c614195d82ad022dfd0c3f6f8240b042c0056c2f..714bcbb82907e754138347334c7fca8a
   private:
    // List that maps nodes to their respective row.
 -  small_vector<int> m_rowList;
-+  wpi::SmallVector<int> m_rowList;
++  wpi::small_vector<int> m_rowList;
  
    // List for updating adjoints
 -  small_vector<Expression*> m_adjointList;
-+  wpi::SmallVector<Expression*> m_adjointList;
++  wpi::small_vector<Expression*> m_adjointList;
  
    // List for updating values
 -  small_vector<Expression*> m_valueList;
-+  wpi::SmallVector<Expression*> m_valueList;
++  wpi::small_vector<Expression*> m_valueList;
  };
  
  }  // namespace sleipnir::detail
@@ -127,7 +127,7 @@ index 4563aa234bd7b0ec22e12d2fc0b6f4569bee7f39..2e60d89e95280bdac422b0d7dab955ba
  
  #include <Eigen/Core>
  #include <Eigen/SparseCore>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/autodiff/ExpressionGraph.hpp"
  #include "sleipnir/autodiff/Jacobian.hpp"
@@ -144,7 +144,7 @@ index 4563aa234bd7b0ec22e12d2fc0b6f4569bee7f39..2e60d89e95280bdac422b0d7dab955ba
        : m_jacobian{
              [&] {
 -              small_vector<detail::ExpressionPtr> wrtVec;
-+              wpi::SmallVector<detail::ExpressionPtr> wrtVec;
++              wpi::small_vector<detail::ExpressionPtr> wrtVec;
                wrtVec.reserve(wrt.size());
                for (auto& elem : wrt) {
                  wrtVec.emplace_back(elem.expr);
@@ -156,7 +156,7 @@ index ac00c11ef8c947cbe95c58081bdbfb42bf901051..0c660156c80f94539383b8f0d01d7853
  #include <utility>
  
  #include <Eigen/SparseCore>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/autodiff/ExpressionGraph.hpp"
  #include "sleipnir/autodiff/Profiler.hpp"
@@ -172,7 +172,7 @@ index ac00c11ef8c947cbe95c58081bdbfb42bf901051..0c660156c80f94539383b8f0d01d7853
      VariableMatrix result{m_variables.Rows(), m_wrt.Rows()};
  
 -    small_vector<detail::ExpressionPtr> wrtVec;
-+    wpi::SmallVector<detail::ExpressionPtr> wrtVec;
++    wpi::small_vector<detail::ExpressionPtr> wrtVec;
      wrtVec.reserve(m_wrt.size());
      for (auto& elem : m_wrt) {
        wrtVec.emplace_back(elem.expr);
@@ -181,18 +181,18 @@ index ac00c11ef8c947cbe95c58081bdbfb42bf901051..0c660156c80f94539383b8f0d01d7853
    VariableMatrix m_wrt;
  
 -  small_vector<detail::ExpressionGraph> m_graphs;
-+  wpi::SmallVector<detail::ExpressionGraph> m_graphs;
++  wpi::small_vector<detail::ExpressionGraph> m_graphs;
  
    Eigen::SparseMatrix<double> m_J{m_variables.Rows(), m_wrt.Rows()};
  
    // Cached triplets for gradients of linear rows
 -  small_vector<Eigen::Triplet<double>> m_cachedTriplets;
-+  wpi::SmallVector<Eigen::Triplet<double>> m_cachedTriplets;
++  wpi::small_vector<Eigen::Triplet<double>> m_cachedTriplets;
  
    // List of row indices for nonlinear rows whose graients will be computed in
    // Value()
 -  small_vector<int> m_nonlinearRows;
-+  wpi::SmallVector<int> m_nonlinearRows;
++  wpi::small_vector<int> m_nonlinearRows;
  
    Profiler m_profiler;
  };
@@ -204,7 +204,7 @@ index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5
  #include <vector>
  
  #include <Eigen/Core>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/autodiff/Expression.hpp"
  #include "sleipnir/autodiff/ExpressionGraph.hpp"
@@ -222,8 +222,8 @@ index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5
             !std::same_as<std::decay_t<RHS>, double>)
 -small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
 -  small_vector<Variable> constraints;
-+wpi::SmallVector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
-+  wpi::SmallVector<Variable> constraints;
++wpi::small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
++  wpi::small_vector<Variable> constraints;
  
    if constexpr (ScalarLike<std::decay_t<LHS>> &&
                  ScalarLike<std::decay_t<RHS>>) {
@@ -232,7 +232,7 @@ index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5
  struct SLEIPNIR_DLLEXPORT EqualityConstraints {
    /// A vector of scalar equality constraints.
 -  small_vector<Variable> constraints;
-+  wpi::SmallVector<Variable> constraints;
++  wpi::small_vector<Variable> constraints;
  
    /**
     * Concatenates multiple equality constraints.
@@ -241,7 +241,7 @@ index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5
  struct SLEIPNIR_DLLEXPORT InequalityConstraints {
    /// A vector of scalar inequality constraints.
 -  small_vector<Variable> constraints;
-+  wpi::SmallVector<Variable> constraints;
++  wpi::small_vector<Variable> constraints;
  
    /**
     * Concatenates multiple inequality constraints.
@@ -253,7 +253,7 @@ index 47452b8988b3a1a96a78d28644200b1c4cdc89c9..57b09913d15e9590873ad7bf62e2baff
  #include <vector>
  
  #include <Eigen/Core>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/autodiff/Slice.hpp"
  #include "sleipnir/autodiff/Variable.hpp"
@@ -270,7 +270,7 @@ index 47452b8988b3a1a96a78d28644200b1c4cdc89c9..57b09913d15e9590873ad7bf62e2baff
  
   private:
 -  small_vector<Variable> m_storage;
-+  wpi::SmallVector<Variable> m_storage;
++  wpi::small_vector<Variable> m_storage;
    int m_rows = 0;
    int m_cols = 0;
  };
@@ -282,7 +282,7 @@ index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d
  #include <future>
  #include <span>
  
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
 +
  #include "sleipnir/optimization/SolverStatus.hpp"
  #include "sleipnir/util/FunctionRef.hpp"
@@ -295,7 +295,7 @@ index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d
          solve,
      std::span<const DecisionVariables> initialGuesses) {
 -  small_vector<std::future<MultistartResult<DecisionVariables>>> futures;
-+  wpi::SmallVector<std::future<MultistartResult<DecisionVariables>>> futures;
++  wpi::small_vector<std::future<MultistartResult<DecisionVariables>>> futures;
    futures.reserve(initialGuesses.size());
  
    for (const auto& initialGuess : initialGuesses) {
@@ -303,7 +303,7 @@ index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d
    }
  
 -  small_vector<MultistartResult<DecisionVariables>> results;
-+  wpi::SmallVector<MultistartResult<DecisionVariables>> results;
++  wpi::small_vector<MultistartResult<DecisionVariables>> results;
    results.reserve(futures.size());
  
    for (auto& future : futures) {
@@ -315,7 +315,7 @@ index 28b2943f5842229335e79eae14abbda6ff5b7000..e812fa5e3454903d4dfb8572539ebf1b
  #include <utility>
  
  #include <Eigen/Core>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/autodiff/Variable.hpp"
  #include "sleipnir/autodiff/VariableMatrix.hpp"
@@ -332,18 +332,18 @@ index 28b2943f5842229335e79eae14abbda6ff5b7000..e812fa5e3454903d4dfb8572539ebf1b
    // The list of decision variables, which are the root of the problem's
    // expression tree
 -  small_vector<Variable> m_decisionVariables;
-+  wpi::SmallVector<Variable> m_decisionVariables;
++  wpi::small_vector<Variable> m_decisionVariables;
  
    // The cost function: f(x)
    std::optional<Variable> m_f;
  
    // The list of equality constraints: cₑ(x) = 0
 -  small_vector<Variable> m_equalityConstraints;
-+  wpi::SmallVector<Variable> m_equalityConstraints;
++  wpi::small_vector<Variable> m_equalityConstraints;
  
    // The list of inequality constraints: cᵢ(x) ≥ 0
 -  small_vector<Variable> m_inequalityConstraints;
-+  wpi::SmallVector<Variable> m_inequalityConstraints;
++  wpi::small_vector<Variable> m_inequalityConstraints;
  
    // The user callback
    std::function<bool(const SolverIterationInfo& info)> m_callback =
@@ -355,7 +355,7 @@ index 441fa701d4972bc14973c6269d56d4a124deaee5..1951bd1ee8f3bee8d4a3c044c99354b0
  #include <cstddef>
  #include <memory>
  
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
 +
  #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
@@ -368,8 +368,8 @@ index 441fa701d4972bc14973c6269d56d4a124deaee5..1951bd1ee8f3bee8d4a3c044c99354b0
   private:
 -  small_vector<std::unique_ptr<std::byte[]>> m_buffer;
 -  small_vector<void*> m_freeList;
-+  wpi::SmallVector<std::unique_ptr<std::byte[]>> m_buffer;
-+  wpi::SmallVector<void*> m_freeList;
++  wpi::small_vector<std::unique_ptr<std::byte[]>> m_buffer;
++  wpi::small_vector<void*> m_freeList;
    size_t blocksPerChunk;
  
    /**
@@ -381,7 +381,7 @@ index cb9b4e191545e96c2bade5f8f99b0bec376b656b..7f526a2d9968e76b385a0ddfb2edf5ba
  #include <string_view>
  
  #include <Eigen/SparseCore>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
@@ -393,7 +393,7 @@ index cb9b4e191545e96c2bade5f8f99b0bec376b656b..7f526a2d9968e76b385a0ddfb2edf5ba
    const int cells_height = mat.rows();
  
 -  small_vector<uint8_t> cells;
-+  wpi::SmallVector<uint8_t> cells;
++  wpi::small_vector<uint8_t> cells;
  
    // Allocate space for matrix of characters plus trailing newlines
    cells.reserve(cells_width * cells_height);
@@ -415,7 +415,7 @@ index dcd8b56dc08516b80f89550c43cb7002745b93d8..892d2dd20f7fe92c2c91518a4ecb4874
  #include <limits>
  
  #include <Eigen/SparseCholesky>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "optimization/RegularizedLDLT.hpp"
  #include "optimization/solver/util/ErrorEstimate.hpp"
@@ -432,7 +432,7 @@ index dcd8b56dc08516b80f89550c43cb7002745b93d8..892d2dd20f7fe92c2c91518a4ecb4874
  
    // Kept outside the loop so its storage can be reused
 -  small_vector<Eigen::Triplet<double>> triplets;
-+  wpi::SmallVector<Eigen::Triplet<double>> triplets;
++  wpi::small_vector<Eigen::Triplet<double>> triplets;
  
    RegularizedLDLT solver;
  
@@ -444,7 +444,7 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
  #include <span>
  
  #include <Eigen/Core>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/autodiff/Variable.hpp"
  #include "sleipnir/autodiff/VariableMatrix.hpp"
@@ -461,7 +461,7 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
    constexpr double ρ = 1000.0;
  
 -  small_vector<Variable> fr_decisionVariables;
-+  wpi::SmallVector<Variable> fr_decisionVariables;
++  wpi::small_vector<Variable> fr_decisionVariables;
    fr_decisionVariables.reserve(decisionVariables.size() +
                                 2 * equalityConstraints.size() +
                                 2 * inequalityConstraints.size());
@@ -479,7 +479,7 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
  
    // cₑ(x) - pₑ + nₑ = 0
 -  small_vector<Variable> fr_equalityConstraints;
-+  wpi::SmallVector<Variable> fr_equalityConstraints;
++  wpi::small_vector<Variable> fr_equalityConstraints;
    fr_equalityConstraints.assign(equalityConstraints.begin(),
                                  equalityConstraints.end());
    for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
@@ -488,7 +488,7 @@ index c324ef093cc7dc8ce93af2cba337042a65b28475..0f13676aea0e80549ef1ef43e4972d54
  
    // cᵢ(x) - s - pᵢ + nᵢ = 0
 -  small_vector<Variable> fr_inequalityConstraints;
-+  wpi::SmallVector<Variable> fr_inequalityConstraints;
++  wpi::small_vector<Variable> fr_inequalityConstraints;
    fr_inequalityConstraints.assign(inequalityConstraints.begin(),
                                    inequalityConstraints.end());
    for (size_t row = 0; row < fr_inequalityConstraints.size(); ++row) {
@@ -500,7 +500,7 @@ index 3fbb849edc4a6b3336f94b5af9e018a37b07b123..02bdb5a8db5c80dd86d17ea4421ec564
  #include <utility>
  
  #include <Eigen/Core>
-+#include <wpi/SmallVector.h>
++#include <wpi/small_vector.h>
  
  #include "sleipnir/autodiff/Variable.hpp"
 -#include "sleipnir/util/small_vector.hpp"
@@ -512,7 +512,7 @@ index 3fbb849edc4a6b3336f94b5af9e018a37b07b123..02bdb5a8db5c80dd86d17ea4421ec564
    Variable* m_f = nullptr;
    double m_μ = 0.0;
 -  small_vector<FilterEntry> m_filter;
-+  wpi::SmallVector<FilterEntry> m_filter;
++  wpi::small_vector<FilterEntry> m_filter;
  };
  
  }  // namespace sleipnir

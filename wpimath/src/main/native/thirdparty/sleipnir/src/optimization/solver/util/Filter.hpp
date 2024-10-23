@@ -8,7 +8,7 @@
 #include <utility>
 
 #include <Eigen/Core>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/autodiff/Variable.hpp"
 
@@ -182,7 +182,7 @@ class Filter {
  private:
   Variable* m_f = nullptr;
   double m_μ = 0.0;
-  wpi::SmallVector<FilterEntry> m_filter;
+  wpi::small_vector<FilterEntry> m_filter;
 };
 
 }  // namespace sleipnir

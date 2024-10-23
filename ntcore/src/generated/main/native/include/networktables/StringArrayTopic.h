@@ -21,7 +21,7 @@
 
 namespace wpi {
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 }  // namespace wpi
 
 namespace nt {

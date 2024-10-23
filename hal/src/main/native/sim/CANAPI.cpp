@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 
 #include "CANAPIInternal.h"
 #include "HALInitializer.h"
@@ -29,9 +29,9 @@ struct CANStorage {
   HAL_CANDeviceType deviceType;
   uint8_t deviceId;
   wpi::mutex periodicSendsMutex;
-  wpi::SmallDenseMap<int32_t, int32_t> periodicSends;
+  wpi::Smallflat_map<int32_t, int32_t> periodicSends;
   wpi::mutex receivesMutex;
-  wpi::SmallDenseMap<int32_t, Receives> receives;
+  wpi::Smallflat_map<int32_t, Receives> receives;
 };
 }  // namespace
 

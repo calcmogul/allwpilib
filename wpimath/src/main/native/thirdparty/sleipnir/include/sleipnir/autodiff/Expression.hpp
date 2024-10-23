@@ -11,7 +11,7 @@
 #include <numbers>
 #include <utility>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/autodiff/ExpressionType.hpp"
 #include "sleipnir/util/IntrusiveSharedPtr.hpp"
@@ -428,7 +428,7 @@ inline void IntrusiveSharedPtrDecRefCount(Expression* expr) {
   // Expression destructor when expr's refcount reaches zero can cause a stack
   // overflow. Instead, we iterate over its children to decrement their
   // refcounts and deallocate them.
-  wpi::SmallVector<Expression*> stack;
+  wpi::small_vector<Expression*> stack;
   stack.emplace_back(expr);
 
   while (!stack.empty()) {

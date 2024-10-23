@@ -10,8 +10,8 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/SPI.h>
-#include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 
 #include "frc/DigitalSource.h"
 #include "frc/Errors.h"
@@ -201,7 +201,7 @@ int SPI::Write(uint8_t* data, int size) {
 int SPI::Read(bool initiate, uint8_t* dataReceived, int size) {
   int retVal = 0;
   if (initiate) {
-    wpi::SmallVector<uint8_t, 32> dataToSend;
+    wpi::small_vector<uint8_t, 32> dataToSend;
     dataToSend.resize(size);
     retVal = HAL_TransactionSPI(m_port, dataToSend.data(), dataReceived, size);
   } else {

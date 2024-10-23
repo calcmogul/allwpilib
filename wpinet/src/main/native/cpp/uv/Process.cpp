@@ -34,15 +34,15 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
   coptions.uid = 0;
   coptions.gid = 0;
 
-  SmallVector<char*, 4> argsBuf;
-  SmallVector<char*, 4> envBuf;
+  small_vector<char*, 4> argsBuf;
+  small_vector<char*, 4> envBuf;
   struct StdioContainer : public uv_stdio_container_t {
     StdioContainer() {
       flags = UV_IGNORE;
       data.fd = 0;
     }
   };
-  SmallVector<StdioContainer, 4> stdioBuf;
+  small_vector<StdioContainer, 4> stdioBuf;
 
   for (auto&& o : options) {
     switch (o.m_type) {

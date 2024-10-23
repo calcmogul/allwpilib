@@ -12,7 +12,7 @@
 
 namespace wpi {
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 }  // namespace wpi
 
 namespace glass {
@@ -28,7 +28,7 @@ class LEDDisplayModel : public glass::Model {
 
   virtual bool IsRunning() = 0;
 
-  virtual std::span<const Data> GetData(wpi::SmallVectorImpl<Data>& buf) = 0;
+  virtual std::span<const Data> GetData(wpi::small_vectorImpl<Data>& buf) = 0;
 };
 
 class LEDDisplaysModel : public glass::Model {

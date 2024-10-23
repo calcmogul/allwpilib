@@ -16,7 +16,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <ntcore_cpp.h>
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 #include <wpi/json.h>
 #include <wpi/struct/DynamicStruct.h>
 
@@ -182,7 +182,7 @@ class NetworkTablesModel : public Model {
 
   nt::NetworkTableInstance m_inst;
   nt::NetworkTableListenerPoller m_poller;
-  wpi::DenseMap<NT_Topic, std::unique_ptr<Entry>> m_entries;
+  wpi::flat_map<NT_Topic, std::unique_ptr<Entry>> m_entries;
 
   // sorted by name
   std::vector<Entry*> m_sortedEntries;

@@ -188,7 +188,7 @@ static void UpdateMsgpackValueSource(NetworkTablesModel& model,
         out->valueChildren.clear();
         out->valueChildrenMap = true;
       }
-      wpi::StringMap<size_t> elems;
+      std::map<std::string, size_t, std::less<>> elems;
       for (size_t i = 0, size = out->valueChildren.size(); i < size; ++i) {
         elems[out->valueChildren[i].name] = i;
       }
@@ -555,7 +555,7 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
         out->valueChildren.clear();
         out->valueChildrenMap = true;
       }
-      wpi::StringMap<size_t> elems;
+      std::map<std::string, size_t, std::less<>> elems;
       for (size_t i = 0, size = out->valueChildren.size(); i < size; ++i) {
         elems[out->valueChildren[i].name] = i;
       }
@@ -965,7 +965,7 @@ void NetworkTablesModel::RebuildTree() {
 void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
                                          int category) {
   tree->clear();
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::small_vector<std::string_view, 16> parts;
   for (auto& entry : m_sortedEntries) {
     if (!IsVisible(static_cast<ShowCategory>(category), entry->persistent,
                    entry->retained)) {

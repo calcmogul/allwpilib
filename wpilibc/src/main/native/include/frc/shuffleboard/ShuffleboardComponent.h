@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
+#include <string>
 #include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/StringMap.h>
 
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 
@@ -44,7 +46,8 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
    * @param properties the properties for this component
    * @return this component
    */
-  Derived& WithProperties(const wpi::StringMap<nt::Value>& properties) {
+  Derived& WithProperties(
+      const std::map<std::string, nt::Value, std::less<>>& properties) {
     m_properties = properties;
     m_metadataDirty = true;
     return *static_cast<Derived*>(this);

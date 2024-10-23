@@ -12,7 +12,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "frc/shuffleboard/ShuffleboardEventImportance.h"
 

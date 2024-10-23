@@ -148,7 +148,7 @@ CS_Property CS_GetSourceProperty(CS_Source source,
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status) {
-  wpi::SmallVector<CS_Property, 32> buf;
+  wpi::small_vector<CS_Property, 32> buf;
   auto vec = cs::EnumerateSourceProperties(source, buf, status);
   CS_Property* out = static_cast<CS_Property*>(
       wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
@@ -221,7 +221,7 @@ CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
 
 CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
                                  CS_Status* status) {
-  wpi::SmallVector<CS_Sink, 32> buf;
+  wpi::small_vector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSourceSinks(source, buf, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));
@@ -295,7 +295,7 @@ CS_Property CS_GetSinkProperty(CS_Sink sink, const struct WPI_String* name,
 
 CS_Property* CS_EnumerateSinkProperties(CS_Sink sink, int* count,
                                         CS_Status* status) {
-  wpi::SmallVector<CS_Property, 32> buf;
+  wpi::small_vector<CS_Property, 32> buf;
   auto vec = cs::EnumerateSinkProperties(sink, buf, status);
   CS_Property* out = static_cast<CS_Property*>(
       wpi::safe_malloc(vec.size() * sizeof(CS_Property)));
@@ -440,7 +440,7 @@ void CS_Shutdown(void) {
 }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
-  wpi::SmallVector<CS_Source, 32> buf;
+  wpi::small_vector<CS_Source, 32> buf;
   auto handles = cs::EnumerateSourceHandles(buf, status);
   CS_Source* sources = static_cast<CS_Source*>(
       wpi::safe_malloc(handles.size() * sizeof(CS_Source)));
@@ -463,7 +463,7 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 }
 
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
-  wpi::SmallVector<CS_Sink, 32> buf;
+  wpi::small_vector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSinkHandles(buf, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(wpi::safe_malloc(handles.size() * sizeof(CS_Sink)));

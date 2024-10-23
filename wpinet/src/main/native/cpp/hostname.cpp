@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "uv.h"
 
@@ -34,8 +34,8 @@ std::string GetHostname() {
   return rv;
 }
 
-std::string_view GetHostname(SmallVectorImpl<char>& name) {
-  // Use a tmp array to not require the SmallVector to be too large.
+std::string_view GetHostname(small_vectorImpl<char>& name) {
+  // Use a tmp array to not require the small_vector to be too large.
   char tmpName[256];
   size_t size = sizeof(tmpName);
 

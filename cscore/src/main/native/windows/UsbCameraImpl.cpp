@@ -71,7 +71,7 @@ UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              std::string_view path)
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path} {
-  wpi::SmallVector<wchar_t, 128> wideStorage;
+  wpi::small_vector<wchar_t, 128> wideStorage;
   wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
   m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
   m_deviceId = -1;
@@ -386,7 +386,7 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
           DEV_BROADCAST_DEVICEINTERFACE_A* pDi =
               reinterpret_cast<DEV_BROADCAST_DEVICEINTERFACE_A*>(parameter);
           m_path = pDi->dbcc_name;
-          wpi::SmallVector<wchar_t, 128> wideStorage;
+          wpi::small_vector<wchar_t, 128> wideStorage;
           wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
           m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
         } else {
@@ -735,7 +735,7 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     {
       std::scoped_lock lock(m_mutex);
       m_path = msg->dataStr;
-      wpi::SmallVector<wchar_t, 128> wideStorage;
+      wpi::small_vector<wchar_t, 128> wideStorage;
       wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
       m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
     }
@@ -1162,7 +1162,7 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   }
 
   info.path = static_cast<UsbCameraImpl&>(*data->source).GetPath();
-  wpi::SmallVector<char, 64> buf;
+  wpi::small_vector<char, 64> buf;
   info.name = static_cast<UsbCameraImpl&>(*data->source).GetDescription(buf);
   ParseVidAndPid(info.path, &info.productId, &info.vendorId);
   info.dev = -1;  // We have lost dev information by this point in time.

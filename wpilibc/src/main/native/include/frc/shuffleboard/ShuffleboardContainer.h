@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -14,7 +15,6 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 #include <wpi/SmallSet.h>
-#include <wpi/StringMap.h>
 
 #include "frc/shuffleboard/BuiltInLayouts.h"
 #include "frc/shuffleboard/LayoutType.h"
@@ -687,7 +687,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
  private:
   wpi::SmallSet<std::string, 32> m_usedTitles;
   std::vector<std::unique_ptr<ShuffleboardComponentBase>> m_components;
-  wpi::StringMap<ShuffleboardLayout*> m_layouts;
+  std::map<std::string, ShuffleboardLayout*, std::less<>> m_layouts;
 
   /**
    * Adds title to internal set if it hasn't already.

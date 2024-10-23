@@ -89,7 +89,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransactionB
     return 0;
   }
 
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::small_vector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
   jint retVal =
       HAL_TransactionSPI(static_cast<HAL_SPIPort>(port),
@@ -155,7 +155,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiRead
       reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataReceived));
   jint retVal;
   if (initiate) {
-    wpi::SmallVector<uint8_t, 128> sendBuf;
+    wpi::small_vector<uint8_t, 128> sendBuf;
     sendBuf.resize(size);
     retVal = HAL_TransactionSPI(static_cast<HAL_SPIPort>(port), sendBuf.data(),
                                 dataReceivedPtr, size);
@@ -182,10 +182,10 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadB
   }
 
   jint retVal;
-  wpi::SmallVector<uint8_t, 128> recvBuf;
+  wpi::small_vector<uint8_t, 128> recvBuf;
   recvBuf.resize(size);
   if (initiate) {
-    wpi::SmallVector<uint8_t, 128> sendBuf;
+    wpi::small_vector<uint8_t, 128> sendBuf;
     sendBuf.resize(size);
     retVal = HAL_TransactionSPI(static_cast<HAL_SPIPort>(port), sendBuf.data(),
                                 recvBuf.data(), size);
@@ -415,7 +415,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3IID
     return 0;
   }
 
-  wpi::SmallVector<uint32_t, 128> recvBuf;
+  wpi::small_vector<uint32_t, 128> recvBuf;
   recvBuf.resize(numToRead);
   int32_t status = 0;
   jint retval =

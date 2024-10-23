@@ -10,8 +10,8 @@
 
 #include <hal/cpp/fpga_clock.h>
 #include <wpi/Logger.h>
-#include <wpi/SmallVector.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 #include <wpinet/UDPClient.h>
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
@@ -34,7 +34,7 @@ static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
   wpi::print(stderr, "DS: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
-static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,
+static void generateEnabledDsPacket(wpi::small_vectorImpl<uint8_t>& data,
                                     uint16_t sendCount) {
   data.clear();
   data.push_back(sendCount >> 8);
@@ -57,7 +57,7 @@ void MockDS::Start() {
     auto timeout_time = hal::fpga_clock::now();
     int initCount = 0;
     uint16_t sendCount = 0;
-    wpi::SmallVector<uint8_t, 8> data;
+    wpi::small_vector<uint8_t, 8> data;
     while (m_active) {
       // Keep 20ms intervals, and increase time to next interval
       auto current = hal::fpga_clock::now();

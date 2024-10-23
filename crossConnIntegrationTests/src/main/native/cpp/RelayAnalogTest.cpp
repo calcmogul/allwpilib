@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <hal/AnalogInput.h>
 #include <hal/Relay.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "CrossConnects.h"
 #include "LifetimeWrappers.h"

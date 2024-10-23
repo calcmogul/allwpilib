@@ -9,9 +9,9 @@
 #include <string>
 
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 #include <wpinet/uv/util.h>
 
 #include "HALSimWSClientConnection.h"
@@ -76,7 +76,7 @@ bool HALSimWS::Initialize() {
 
     std::string_view filters(msgFilters);
     filters = wpi::trim(filters);
-    wpi::SmallVector<std::string_view, 16> filtersSplit;
+    wpi::small_vector<std::string_view, 16> filtersSplit;
 
     wpi::split(filters, filtersSplit, ',', -1, false);
     for (auto val : filtersSplit) {

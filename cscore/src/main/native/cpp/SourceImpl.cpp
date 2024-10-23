@@ -51,7 +51,7 @@ void SourceImpl::SetDescription(std::string_view description) {
 }
 
 std::string_view SourceImpl::GetDescription(
-    wpi::SmallVectorImpl<char>& buf) const {
+    wpi::small_vectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return {buf.data(), buf.size()};

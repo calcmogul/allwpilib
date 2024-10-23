@@ -9,8 +9,8 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 
 #include "networktables/BooleanArrayTopic.h"
 #include "networktables/BooleanTopic.h"

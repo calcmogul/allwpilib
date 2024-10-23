@@ -10,7 +10,7 @@
 #include <vector>
 
 #include <Eigen/Core>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/autodiff/Expression.hpp"
 #include "sleipnir/autodiff/ExpressionGraph.hpp"
@@ -445,8 +445,8 @@ template <typename LHS, typename RHS>
           (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
           (!std::same_as<std::decay_t<LHS>, double> ||
            !std::same_as<std::decay_t<RHS>, double>)
-wpi::SmallVector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
-  wpi::SmallVector<Variable> constraints;
+wpi::small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
+  wpi::small_vector<Variable> constraints;
 
   if constexpr (ScalarLike<std::decay_t<LHS>> &&
                 ScalarLike<std::decay_t<RHS>>) {
@@ -534,7 +534,7 @@ wpi::SmallVector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
  */
 struct SLEIPNIR_DLLEXPORT EqualityConstraints {
   /// A vector of scalar equality constraints.
-  wpi::SmallVector<Variable> constraints;
+  wpi::small_vector<Variable> constraints;
 
   /**
    * Concatenates multiple equality constraints.
@@ -596,7 +596,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
  */
 struct SLEIPNIR_DLLEXPORT InequalityConstraints {
   /// A vector of scalar inequality constraints.
-  wpi::SmallVector<Variable> constraints;
+  wpi::small_vector<Variable> constraints;
 
   /**
    * Concatenates multiple inequality constraints.

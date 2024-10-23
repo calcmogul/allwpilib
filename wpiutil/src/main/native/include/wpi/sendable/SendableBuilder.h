@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/SmallVector.h"
+#include "wpi/small_vector.h"
 
 namespace wpi {
 
@@ -285,11 +285,11 @@ class SendableBuilder {
    */
   virtual void AddSmallStringProperty(
       std::string_view key,
-      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<std::string_view(wpi::small_vectorImpl<char>& buf)> getter,
       std::function<void(std::string_view)> setter) = 0;
 
   /**
-   * Add a boolean array property (SmallVector form).
+   * Add a boolean array property (small_vector form).
    *
    * @param key     property name
    * @param getter  getter function (returns current value)
@@ -297,12 +297,12 @@ class SendableBuilder {
    */
   virtual void AddSmallBooleanArrayProperty(
       std::string_view key,
-      std::function<std::span<const int>(wpi::SmallVectorImpl<int>& buf)>
+      std::function<std::span<const int>(wpi::small_vectorImpl<int>& buf)>
           getter,
       std::function<void(std::span<const int>)> setter) = 0;
 
   /**
-   * Add an integer array property (SmallVector form).
+   * Add an integer array property (small_vector form).
    *
    * @param key     property name
    * @param getter  getter function (returns current value)
@@ -311,12 +311,12 @@ class SendableBuilder {
   virtual void AddSmallIntegerArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+          std::span<const int64_t>(wpi::small_vectorImpl<int64_t>& buf)>
           getter,
       std::function<void(std::span<const int64_t>)> setter) = 0;
 
   /**
-   * Add a float array property (SmallVector form).
+   * Add a float array property (small_vector form).
    *
    * @param key     property name
    * @param getter  getter function (returns current value)
@@ -324,12 +324,12 @@ class SendableBuilder {
    */
   virtual void AddSmallFloatArrayProperty(
       std::string_view key,
-      std::function<std::span<const float>(wpi::SmallVectorImpl<float>& buf)>
+      std::function<std::span<const float>(wpi::small_vectorImpl<float>& buf)>
           getter,
       std::function<void(std::span<const float>)> setter) = 0;
 
   /**
-   * Add a double array property (SmallVector form).
+   * Add a double array property (small_vector form).
    *
    * @param key     property name
    * @param getter  getter function (returns current value)
@@ -337,12 +337,12 @@ class SendableBuilder {
    */
   virtual void AddSmallDoubleArrayProperty(
       std::string_view key,
-      std::function<std::span<const double>(wpi::SmallVectorImpl<double>& buf)>
+      std::function<std::span<const double>(wpi::small_vectorImpl<double>& buf)>
           getter,
       std::function<void(std::span<const double>)> setter) = 0;
 
   /**
-   * Add a string array property (SmallVector form).
+   * Add a string array property (small_vector form).
    *
    * @param key     property name
    * @param getter  getter function (returns current value)
@@ -351,12 +351,12 @@ class SendableBuilder {
   virtual void AddSmallStringArrayProperty(
       std::string_view key,
       std::function<
-          std::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+          std::span<const std::string>(wpi::small_vectorImpl<std::string>& buf)>
           getter,
       std::function<void(std::span<const std::string>)> setter) = 0;
 
   /**
-   * Add a raw property (SmallVector form).
+   * Add a raw property (small_vector form).
    *
    * @param key     property name
    * @param typeString  type string
@@ -365,7 +365,7 @@ class SendableBuilder {
    */
   virtual void AddSmallRawProperty(
       std::string_view key, std::string_view typeString,
-      std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+      std::function<std::span<uint8_t>(wpi::small_vectorImpl<uint8_t>& buf)>
           getter,
       std::function<void(std::span<const uint8_t>)> setter) = 0;
 

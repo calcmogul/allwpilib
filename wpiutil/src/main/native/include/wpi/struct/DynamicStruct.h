@@ -7,6 +7,8 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -14,14 +16,10 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/MathExtras.h"
-#include "wpi/StringMap.h"
-#include "wpi/bit.h"
-
 namespace wpi {
 
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 
 class DynamicStruct;
 class MutableDynamicStruct;
@@ -317,15 +315,15 @@ class StructDescriptor {
 
  private:
   bool CheckCircular(
-      wpi::SmallVectorImpl<const StructDescriptor*>& stack) const;
+      wpi::small_vectorImpl<const StructDescriptor*>& stack) const;
   std::string CalculateOffsets(
-      wpi::SmallVectorImpl<const StructDescriptor*>& stack);
+      wpi::small_vectorImpl<const StructDescriptor*>& stack);
 
   std::string m_name;
   std::string m_schema;
   std::vector<StructDescriptor*> m_references;
   std::vector<StructFieldDescriptor> m_fields;
-  StringMap<size_t> m_fieldsByName;
+  std::map<std::string, size_t, std::less<>> m_fieldsByName;
   size_t m_size = 0;
   bool m_valid = false;
 };
@@ -357,7 +355,8 @@ class StructDescriptorDatabase {
   const StructDescriptor* Find(std::string_view name) const;
 
  private:
-  StringMap<std::unique_ptr<StructDescriptor>> m_structs;
+  std::map<std::string, std::unique_ptr<StructDescriptor>, std::less<>>
+      m_structs;
 };
 
 /**
@@ -449,7 +448,7 @@ class DynamicStruct {
   float GetFloatField(const StructFieldDescriptor* field,
                       size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::kFloat);
-    return bit_cast<float>(
+    return std::bit_cast<float>(
         static_cast<uint32_t>(GetFieldImpl(field, arrIndex)));
   }
 
@@ -463,7 +462,7 @@ class DynamicStruct {
   double GetDoubleField(const StructFieldDescriptor* field,
                         size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::kDouble);
-    return bit_cast<double>(GetFieldImpl(field, arrIndex));
+    return std::bit_cast<double>(GetFieldImpl(field, arrIndex));
   }
 
   /**
@@ -583,7 +582,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetFloatField(const StructFieldDescriptor* field, float value,
                      size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::kFloat);
-    SetFieldImpl(field, bit_cast<uint32_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint32_t>(value), arrIndex);
   }
 
   /**
@@ -596,7 +595,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetDoubleField(const StructFieldDescriptor* field, double value,
                       size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::kDouble);
-    SetFieldImpl(field, bit_cast<uint64_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint64_t>(value), arrIndex);
   }
 
   /**

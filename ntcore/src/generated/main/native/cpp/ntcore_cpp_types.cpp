@@ -59,7 +59,7 @@ static inline Timestamped<typename TypeInfo<T>::Value> GetAtomic(
 template <ValidType T>
 inline Timestamped<typename TypeInfo<T>::SmallRet> GetAtomic(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
+    wpi::small_vectorImpl<typename TypeInfo<T>::SmallElem>& buf,
     typename TypeInfo<T>::View defaultValue) {
   if (auto ii = InstanceImpl::Get(Handle{subentry}.GetInst())) {
     return ii->localStorage.GetAtomic<T>(subentry, buf, defaultValue);
@@ -221,14 +221,14 @@ std::vector<std::string> ReadQueueValuesString(NT_Handle subentry) {
 
 std::string_view GetString(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<char>& buf,
+    wpi::small_vectorImpl<char>& buf,
     std::string_view defaultValue) {
   return GetAtomic<std::string>(subentry, buf, defaultValue).value;
 }
 
 TimestampedStringView GetAtomicString(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<char>& buf,
+    wpi::small_vectorImpl<char>& buf,
     std::string_view defaultValue) {
   return GetAtomic<std::string>(subentry, buf, defaultValue);
 }
@@ -261,14 +261,14 @@ std::vector<std::vector<uint8_t>> ReadQueueValuesRaw(NT_Handle subentry) {
 
 std::span<uint8_t> GetRaw(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<uint8_t>& buf,
+    wpi::small_vectorImpl<uint8_t>& buf,
     std::span<const uint8_t> defaultValue) {
   return GetAtomic<uint8_t[]>(subentry, buf, defaultValue).value;
 }
 
 TimestampedRawView GetAtomicRaw(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<uint8_t>& buf,
+    wpi::small_vectorImpl<uint8_t>& buf,
     std::span<const uint8_t> defaultValue) {
   return GetAtomic<uint8_t[]>(subentry, buf, defaultValue);
 }
@@ -301,14 +301,14 @@ std::vector<std::vector<int>> ReadQueueValuesBooleanArray(NT_Handle subentry) {
 
 std::span<int> GetBooleanArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<int>& buf,
+    wpi::small_vectorImpl<int>& buf,
     std::span<const int> defaultValue) {
   return GetAtomic<bool[]>(subentry, buf, defaultValue).value;
 }
 
 TimestampedBooleanArrayView GetAtomicBooleanArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<int>& buf,
+    wpi::small_vectorImpl<int>& buf,
     std::span<const int> defaultValue) {
   return GetAtomic<bool[]>(subentry, buf, defaultValue);
 }
@@ -341,14 +341,14 @@ std::vector<std::vector<int64_t>> ReadQueueValuesIntegerArray(NT_Handle subentry
 
 std::span<int64_t> GetIntegerArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<int64_t>& buf,
+    wpi::small_vectorImpl<int64_t>& buf,
     std::span<const int64_t> defaultValue) {
   return GetAtomic<int64_t[]>(subentry, buf, defaultValue).value;
 }
 
 TimestampedIntegerArrayView GetAtomicIntegerArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<int64_t>& buf,
+    wpi::small_vectorImpl<int64_t>& buf,
     std::span<const int64_t> defaultValue) {
   return GetAtomic<int64_t[]>(subentry, buf, defaultValue);
 }
@@ -381,14 +381,14 @@ std::vector<std::vector<float>> ReadQueueValuesFloatArray(NT_Handle subentry) {
 
 std::span<float> GetFloatArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<float>& buf,
+    wpi::small_vectorImpl<float>& buf,
     std::span<const float> defaultValue) {
   return GetAtomic<float[]>(subentry, buf, defaultValue).value;
 }
 
 TimestampedFloatArrayView GetAtomicFloatArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<float>& buf,
+    wpi::small_vectorImpl<float>& buf,
     std::span<const float> defaultValue) {
   return GetAtomic<float[]>(subentry, buf, defaultValue);
 }
@@ -421,14 +421,14 @@ std::vector<std::vector<double>> ReadQueueValuesDoubleArray(NT_Handle subentry) 
 
 std::span<double> GetDoubleArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<double>& buf,
+    wpi::small_vectorImpl<double>& buf,
     std::span<const double> defaultValue) {
   return GetAtomic<double[]>(subentry, buf, defaultValue).value;
 }
 
 TimestampedDoubleArrayView GetAtomicDoubleArray(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<double>& buf,
+    wpi::small_vectorImpl<double>& buf,
     std::span<const double> defaultValue) {
   return GetAtomic<double[]>(subentry, buf, defaultValue);
 }

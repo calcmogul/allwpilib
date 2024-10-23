@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -13,8 +15,6 @@
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/descriptor_database.h>
 #include <google/protobuf/dynamic_message.h>
-
-#include "wpi/StringMap.h"
 
 namespace wpi {
 
@@ -69,9 +69,11 @@ class ProtobufMessageDatabase {
       std::make_unique<google::protobuf::DescriptorPool>();
   std::unique_ptr<google::protobuf::DynamicMessageFactory> m_factory =
       std::make_unique<google::protobuf::DynamicMessageFactory>();
-  wpi::StringMap<ProtoFile> m_files;  // indexed by filename
+  std::map<std::string, ProtoFile, std::less<>> m_files;  // indexed by filename
   // indexed by type string
-  mutable wpi::StringMap<std::unique_ptr<google::protobuf::Message>> m_msgs;
+  mutable std::map<std::string, std::unique_ptr<google::protobuf::Message>,
+                   std::less<>>
+      m_msgs;
 };
 
 }  // namespace wpi

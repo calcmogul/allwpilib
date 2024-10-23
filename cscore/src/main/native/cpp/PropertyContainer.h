@@ -7,13 +7,14 @@
 
 #include <atomic>
 #include <cstddef>
+#include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <wpi/StringMap.h>
 #include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
 
@@ -23,7 +24,7 @@
 namespace wpi {
 class Logger;
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 }  // namespace wpi
 
 namespace cs {
@@ -33,11 +34,11 @@ class PropertyContainer {
   virtual ~PropertyContainer() = default;
 
   int GetPropertyIndex(std::string_view name) const;
-  std::span<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
+  std::span<int> EnumerateProperties(wpi::small_vectorImpl<int>& vec,
                                      CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
   std::string_view GetPropertyName(int property,
-                                   wpi::SmallVectorImpl<char>& buf,
+                                   wpi::small_vectorImpl<char>& buf,
                                    CS_Status* status) const;
   int GetProperty(int property, CS_Status* status) const;
   virtual void SetProperty(int property, int value, CS_Status* status);
@@ -46,7 +47,7 @@ class PropertyContainer {
   int GetPropertyStep(int property, CS_Status* status) const;
   int GetPropertyDefault(int property, CS_Status* status) const;
   std::string_view GetStringProperty(int property,
-                                     wpi::SmallVectorImpl<char>& buf,
+                                     wpi::small_vectorImpl<char>& buf,
                                      CS_Status* status) const;
   virtual void SetStringProperty(int property, std::string_view value,
                                  CS_Status* status);
@@ -121,7 +122,7 @@ class PropertyContainer {
 
   // Cached properties (protected with m_mutex)
   mutable std::vector<std::unique_ptr<PropertyImpl>> m_propertyData;
-  mutable wpi::StringMap<int> m_properties;
+  mutable std::map<std::string, int, std::less<>> m_properties;
 };
 
 }  // namespace cs

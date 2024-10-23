@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <hal/DIO.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "CrossConnects.h"
 #include "LifetimeWrappers.h"
@@ -54,7 +54,7 @@ TEST_P(DIOTest, DIOCross) {
 }
 
 TEST(DIOTest, AllocateAll) {
-  wpi::SmallVector<DIOHandle, 32> dioHandles;
+  wpi::small_vector<DIOHandle, 32> dioHandles;
   for (int i = 0; i < HAL_GetNumDigitalChannels(); i++) {
     int32_t status = 0;
     dioHandles.emplace_back(i, true, &status);

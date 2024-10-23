@@ -13,7 +13,6 @@
 
 #include <glass/View.h>
 #include <glass/support/DataLogReaderThread.h>
-#include <wpi/StringMap.h>
 
 #include "sysid/analysis/Storage.h"
 

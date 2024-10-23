@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <Eigen/Core>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/autodiff/Slice.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
@@ -946,7 +946,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
   }
 
  private:
-  wpi::SmallVector<Variable> m_storage;
+  wpi::small_vector<Variable> m_storage;
   int m_rows = 0;
   int m_cols = 0;
 };

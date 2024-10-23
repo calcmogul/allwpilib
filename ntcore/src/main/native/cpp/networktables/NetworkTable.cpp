@@ -5,6 +5,8 @@
 #include "networktables/NetworkTable.h"
 
 #include <algorithm>
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -13,7 +15,6 @@
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
 
 #include "networktables/BooleanArrayTopic.h"
 #include "networktables/BooleanTopic.h"
@@ -47,14 +48,14 @@ std::string NetworkTable::NormalizeKey(std::string_view key,
 }
 
 std::string_view NetworkTable::NormalizeKey(std::string_view key,
-                                            wpi::SmallVectorImpl<char>& buf,
+                                            wpi::small_vectorImpl<char>& buf,
                                             bool withLeadingSlash) {
   buf.clear();
   if (withLeadingSlash) {
     buf.push_back(PATH_SEPARATOR_CHAR);
   }
   // for each path element, add it with a slash following
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::small_vector<std::string_view, 16> parts;
   wpi::split(key, parts, PATH_SEPARATOR_CHAR, -1, false);
   for (auto i = parts.begin(); i != parts.end(); ++i) {
     buf.append(i->begin(), i->end());
@@ -72,7 +73,7 @@ std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
   wpi::SmallString<128> path;
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::small_vector<std::string_view, 16> parts;
   wpi::split(key, parts, PATH_SEPARATOR_CHAR, -1, false);
   if (!parts.empty()) {
     for (auto i = parts.begin(); i != parts.end(); ++i) {
@@ -405,9 +406,9 @@ NT_Listener NetworkTable::AddListener(std::string_view key, int eventMask,
 }
 
 NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
-  // The lambda needs to be copyable, but StringMap is not, so use
-  // a shared_ptr to it.
-  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
+  // The lambda needs to be copyable, but map is not, so use a shared_ptr to it.
+  auto notified_tables =
+      std::make_shared<std::map<std::string, char, std::less<>>>();
 
   return NetworkTableInstance{m_inst}.AddListener(
       {{fmt::format("{}/", m_path)}}, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,

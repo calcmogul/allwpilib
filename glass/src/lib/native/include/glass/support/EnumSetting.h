@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 namespace glass {
 
@@ -26,7 +26,7 @@ class EnumSetting {
   void UpdateValue() const;
 
   std::string& m_str;
-  wpi::SmallVector<const char*, 8> m_choices;
+  wpi::small_vector<const char*, 8> m_choices;
   int m_defaultValue;
   mutable int m_value = -1;
 };

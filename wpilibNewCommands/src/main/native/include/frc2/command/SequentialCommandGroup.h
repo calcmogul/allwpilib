@@ -97,7 +97,7 @@ class SequentialCommandGroup
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
 
-  wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
+  wpi::small_vector<std::unique_ptr<Command>, 4> m_commands;
   size_t m_currentCommandIndex{invalid_index};
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{

@@ -18,10 +18,10 @@
 #include <hal/HALBase.h>
 #include <networktables/IntegerArrayTopic.h>
 #include <networktables/StringArrayTopic.h>
-#include <wpi/DenseMap.h>
-#include <wpi/SmallVector.h>
+#include <wpi/flat_map.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
+#include <wpi/small_vector.h>
 
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Subsystem.h"
@@ -35,11 +35,11 @@ class CommandScheduler::Impl {
 
   // A map from required subsystems to their requiring commands.  Also used as a
   // set of the currently-required subsystems.
-  wpi::DenseMap<Subsystem*, Command*> requirements;
+  wpi::flat_map<Subsystem*, Command*> requirements;
 
   // A map from subsystems registered with the scheduler to their default
   // commands.  Also used as a list of currently-registered subsystems.
-  wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
+  wpi::flat_map<Subsystem*, std::unique_ptr<Command>> subsystems;
 
   frc::EventLoop defaultButtonLoop;
   // The set of currently-registered buttons that will be polled every
@@ -50,17 +50,17 @@ class CommandScheduler::Impl {
 
   // Lists of user-supplied actions to be executed on scheduling events for
   // every command.
-  wpi::SmallVector<Action, 4> initActions;
-  wpi::SmallVector<Action, 4> executeActions;
-  wpi::SmallVector<InterruptAction, 4> interruptActions;
-  wpi::SmallVector<Action, 4> finishActions;
+  wpi::small_vector<Action, 4> initActions;
+  wpi::small_vector<Action, 4> executeActions;
+  wpi::small_vector<InterruptAction, 4> interruptActions;
+  wpi::small_vector<Action, 4> finishActions;
 
   // Flag and queues for avoiding concurrent modification if commands are
   // scheduled/canceled during run
   bool inRunLoop = false;
-  wpi::SmallVector<Command*, 4> toSchedule;
-  wpi::SmallVector<Command*, 4> toCancelCommands;
-  wpi::SmallVector<std::optional<Command*>, 4> toCancelInterruptors;
+  wpi::small_vector<Command*, 4> toSchedule;
+  wpi::small_vector<Command*, 4> toCancelCommands;
+  wpi::small_vector<std::optional<Command*>, 4> toCancelInterruptors;
   wpi::SmallSet<Command*, 4> endingCommands;
 };
 
@@ -127,7 +127,7 @@ void CommandScheduler::Schedule(Command* command) {
 
   const auto& requirements = command->GetRequirements();
 
-  wpi::SmallVector<Command*, 8> intersection;
+  wpi::small_vector<Command*, 8> intersection;
 
   bool isDisjoint = true;
   bool allInterruptible = true;
@@ -380,7 +380,7 @@ void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::CancelAll() {
-  wpi::SmallVector<Command*, 16> commands;
+  wpi::small_vector<Command*, 16> commands;
   for (auto&& command : m_impl->scheduledCommands) {
     commands.emplace_back(command);
   }

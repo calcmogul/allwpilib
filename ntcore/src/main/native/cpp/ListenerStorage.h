@@ -11,11 +11,11 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DenseMap.h>
 #include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
 #include <wpi/Synchronization.h>
+#include <wpi/flat_map.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 
 #include "Handle.h"
 #include "HandleMap.h"
@@ -93,7 +93,7 @@ class ListenerStorage final : public IListenerStorage {
 
     wpi::SignalObject<NT_Listener> handle;
     PollerData* poller;
-    wpi::SmallVector<std::pair<FinishEventFunc, unsigned int>, 2> sources;
+    wpi::small_vector<std::pair<FinishEventFunc, unsigned int>, 2> sources;
     unsigned int eventMask{0};
   };
   HandleMap<ListenerData, 8> m_listeners;
@@ -111,7 +111,7 @@ class ListenerStorage final : public IListenerStorage {
     void Main() final;
 
     NT_ListenerPoller m_poller;
-    wpi::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
+    wpi::flat_map<NT_Listener, ListenerCallback> m_callbacks;
     wpi::Event m_waitQueueWakeup;
     wpi::Event m_waitQueueWaiter;
   };

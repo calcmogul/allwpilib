@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 
 #include "Image.h"
 #include "cscore_cpp.h"
@@ -41,7 +41,7 @@ class Frame {
     Time time{0};
     SourceImpl& source;
     std::string error;
-    wpi::SmallVector<Image*, 4> images;
+    wpi::small_vector<Image*, 4> images;
     std::vector<int> compressionParams;
   };
 

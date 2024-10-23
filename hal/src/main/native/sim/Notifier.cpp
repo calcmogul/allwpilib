@@ -12,10 +12,10 @@
 #include <string>
 #include <utility>
 
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 
 #include "HALInitializer.h"
 #include "NotifierInternal.h"
@@ -88,7 +88,7 @@ void WakeupNotifiers() {
 
 void WaitNotifiers() {
   std::unique_lock ulock(notifiersWaiterMutex);
-  wpi::SmallVector<HAL_NotifierHandle, 8> waiters;
+  wpi::small_vector<HAL_NotifierHandle, 8> waiters;
 
   // Wait for all Notifiers to hit HAL_WaitForNotifierAlarm()
   notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
@@ -124,7 +124,7 @@ void WakeupWaitNotifiers() {
   std::unique_lock ulock(notifiersWaiterMutex);
   int32_t status = 0;
   uint64_t curTime = HAL_GetFPGATime(&status);
-  wpi::SmallVector<std::pair<HAL_NotifierHandle, uint64_t>, 8> waiters;
+  wpi::small_vector<std::pair<HAL_NotifierHandle, uint64_t>, 8> waiters;
 
   // Wake up Notifiers that have expired timeouts
   notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {

@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 #include <hal/DMA.h>
 #include <hal/HAL.h>
-#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/priority_mutex.h>
+#include <wpi/small_vector.h>
 
 #include "CrossConnects.h"
 #include "LifetimeWrappers.h"
@@ -144,8 +144,8 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
 }
 
 struct InterruptCheckData {
-  wpi::SmallVector<uint64_t, 8> risingStamps;
-  wpi::SmallVector<uint64_t, 8> fallingStamps;
+  wpi::small_vector<uint64_t, 8> risingStamps;
+  wpi::small_vector<uint64_t, 8> fallingStamps;
   wpi::priority_mutex mutex;
   wpi::condition_variable cond;
   HAL_InterruptHandle handle;
@@ -312,7 +312,7 @@ TEST_P(PWMTest, TimingDMA1x) {
 }
 
 TEST(PWMTest, AllocateAll) {
-  wpi::SmallVector<PWMHandle, 21> pwmHandles;
+  wpi::small_vector<PWMHandle, 21> pwmHandles;
   for (int i = 0; i < HAL_GetNumPWMChannels(); i++) {
     int32_t status = 0;
     pwmHandles.emplace_back(PWMHandle(i, &status));

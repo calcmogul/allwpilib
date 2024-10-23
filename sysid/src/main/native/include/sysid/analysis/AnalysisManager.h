@@ -9,15 +9,12 @@
 #include <exception>
 #include <limits>
 #include <numeric>
-#include <optional>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <vector>
 
 #include <units/time.h>
 #include <wpi/Logger.h>
-#include <wpi/StringMap.h>
 #include <wpi/json.h>
 
 #include "sysid/analysis/AnalysisType.h"

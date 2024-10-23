@@ -10,10 +10,10 @@
 
 namespace wpi {
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 
 std::string GetHostname();
-std::string_view GetHostname(SmallVectorImpl<char>& name);
+std::string_view GetHostname(small_vectorImpl<char>& name);
 }  // namespace wpi
 
 #endif  // WPINET_HOSTNAME_H_

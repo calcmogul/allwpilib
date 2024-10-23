@@ -8,7 +8,7 @@
 #include <span>
 
 #include <Eigen/Core>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
@@ -65,7 +65,7 @@ inline void FeasibilityRestoration(
 
   constexpr double ρ = 1000.0;
 
-  wpi::SmallVector<Variable> fr_decisionVariables;
+  wpi::small_vector<Variable> fr_decisionVariables;
   fr_decisionVariables.reserve(decisionVariables.size() +
                                2 * equalityConstraints.size() +
                                2 * inequalityConstraints.size());
@@ -157,7 +157,7 @@ inline void FeasibilityRestoration(
   }
 
   // cₑ(x) - pₑ + nₑ = 0
-  wpi::SmallVector<Variable> fr_equalityConstraints;
+  wpi::small_vector<Variable> fr_equalityConstraints;
   fr_equalityConstraints.assign(equalityConstraints.begin(),
                                 equalityConstraints.end());
   for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
@@ -166,7 +166,7 @@ inline void FeasibilityRestoration(
   }
 
   // cᵢ(x) - s - pᵢ + nᵢ = 0
-  wpi::SmallVector<Variable> fr_inequalityConstraints;
+  wpi::small_vector<Variable> fr_inequalityConstraints;
   fr_inequalityConstraints.assign(inequalityConstraints.begin(),
                                   inequalityConstraints.end());
   for (size_t row = 0; row < fr_inequalityConstraints.size(); ++row) {

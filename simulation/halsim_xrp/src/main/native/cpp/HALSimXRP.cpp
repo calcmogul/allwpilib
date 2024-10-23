@@ -143,7 +143,7 @@ uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
 }
 
 void HALSimXRP::SendStateToXRP() {
-  wpi::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::small_vector<uv::Buffer, 4> sendBufs;
   wpi::raw_uv_ostream stream{sendBufs, [&] {
                                std::lock_guard lock(m_buffer_mutex);
                                return GetBufferPool().Allocate();

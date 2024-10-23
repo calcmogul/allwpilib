@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include <limits>
+#include <map>
 #include <numbers>
 #include <numeric>
 #include <string>
@@ -319,7 +320,7 @@ static std::string RemoveStr(std::string_view str, std::string_view removeStr) {
  * @return The maximum duration of the Dynamic Tests
  */
 static units::second_t GetMaxStepTime(
-    wpi::StringMap<std::vector<PreparedData>>& data) {
+    std::map<std::string, std::vector<PreparedData>, std::less<>>& data) {
   auto maxStepTime = 0_s;
   for (auto& it : data) {
     auto key = it.first();
@@ -338,7 +339,7 @@ static units::second_t GetMaxStepTime(
 }
 
 void sysid::InitialTrimAndFilter(
-    wpi::StringMap<std::vector<PreparedData>>* data,
+    std::map<std::string, std::vector<PreparedData>, std::less<>>* data,
     AnalysisManager::Settings* settings,
     std::vector<units::second_t>& positionDelays,
     std::vector<units::second_t>& velocityDelays, units::second_t& minStepTime,
@@ -419,7 +420,8 @@ void sysid::InitialTrimAndFilter(
   }
 }
 
-void sysid::AccelFilter(wpi::StringMap<std::vector<PreparedData>>* data) {
+void sysid::AccelFilter(
+    std::map<std::string, std::vector<PreparedData>, std::less<>>* data) {
   auto& preparedData = *data;
 
   // Remove points with acceleration = 0

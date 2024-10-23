@@ -356,7 +356,7 @@ inline typename TypeInfo<T>::Value CopyValue(typename TypeInfo<T>::View value) {
 template <SmallArrayType T>
 inline typename TypeInfo<T>::SmallRet CopyValue(
     typename TypeInfo<T>::View arr,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
+    wpi::small_vectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
   buf.assign(arr.begin(), arr.end());
   return {buf.data(), buf.size()};
 }
@@ -375,7 +375,7 @@ inline typename TypeInfo<T>::Value GetValueCopy(const Value& value) {
 template <SmallArrayType T, bool ConvertNumeric>
 inline typename TypeInfo<T>::SmallRet GetValueCopy(
     const Value& value,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
+    wpi::small_vectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
   if constexpr (ConvertNumeric && NumericArrayType<T>) {
     if (value.IsIntegerArray()) {
       auto arr = value.GetIntegerArray();
@@ -407,7 +407,7 @@ inline Timestamped<typename TypeInfo<T>::Value> GetTimestamped(
 template <SmallArrayType T, bool ConvertNumeric>
 inline Timestamped<typename TypeInfo<T>::SmallRet> GetTimestamped(
     const Value& value,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
+    wpi::small_vectorImpl<typename TypeInfo<T>::SmallElem>& buf) {
   return {value.time(), value.server_time(),
           GetValueCopy<T, ConvertNumeric>(value, buf)};
 }

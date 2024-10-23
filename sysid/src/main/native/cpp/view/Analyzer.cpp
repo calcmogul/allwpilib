@@ -30,7 +30,7 @@ using namespace sysid;
 
 Analyzer::Analyzer(glass::Storage& storage, wpi::Logger& logger)
     : m_logger(logger) {
-  // Fill the StringMap with preset values.
+  // Fill the map with preset values.
   m_presets["Default"] = presets::kDefault;
   m_presets["WPILib"] = presets::kWPILib;
   m_presets["CTRE Phoenix 5"] = presets::kCTREv5;

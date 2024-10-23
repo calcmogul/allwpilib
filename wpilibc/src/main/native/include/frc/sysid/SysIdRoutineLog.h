@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <string>
 #include <string_view>
 
@@ -41,8 +43,9 @@ enum class State {
  * SysIdRoutineLog instance, with a unique log name.
  */
 class SysIdRoutineLog {
-  using MotorEntries = wpi::StringMap<wpi::log::DoubleLogEntry>;
-  using LogEntries = wpi::StringMap<MotorEntries>;
+  using MotorEntries =
+      std::map<std::string, wpi::log::DoubleLogEntry, std::less<>>;
+  using LogEntries = std::map<std::string, MotorEntries, std::less<>>;
 
  public:
   /** Logs data from a single motor during a SysIdRoutine. */

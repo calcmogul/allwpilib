@@ -6,13 +6,14 @@
 
 #include <stdint.h>
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
 #include <wpi/UidVector.h>
 #include <wpi/spinlock.h>
 
@@ -172,12 +173,12 @@ class SimDeviceData {
     HAL_SimDeviceHandle handle{0};
     std::string name;
     wpi::UidVector<std::unique_ptr<Value>, 16> values;
-    wpi::StringMap<Value*> valueMap;
+    std::map<std::string, Value*, std::less<>> valueMap;
     impl::SimUnnamedCallbackRegistry<HALSIM_SimValueCallback> valueCreated;
   };
 
   wpi::UidVector<std::shared_ptr<Device>, 4> m_devices;
-  wpi::StringMap<std::weak_ptr<Device>> m_deviceMap;
+  std::map<std::string, std::weak_ptr<Device>, std::less<>> m_deviceMap;
   std::vector<std::pair<std::string, bool>> m_prefixEnabled;
 
   wpi::recursive_spinlock m_mutex;

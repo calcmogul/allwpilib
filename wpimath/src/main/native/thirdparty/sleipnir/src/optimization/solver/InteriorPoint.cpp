@@ -9,7 +9,7 @@
 #include <limits>
 
 #include <Eigen/SparseCholesky>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "optimization/RegularizedLDLT.hpp"
 #include "optimization/solver/util/ErrorEstimate.hpp"
@@ -226,7 +226,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   };
 
   // Kept outside the loop so its storage can be reused
-  wpi::SmallVector<Eigen::Triplet<double>> triplets;
+  wpi::small_vector<Eigen::Triplet<double>> triplets;
 
   RegularizedLDLT solver;
 

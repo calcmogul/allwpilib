@@ -5,7 +5,9 @@
 #ifndef WPINET_HTTPUTIL_H_
 #define WPINET_HTTPUTIL_H_
 
+#include <functional>
 #include <initializer_list>
+#include <map>
 #include <memory>
 #include <optional>
 #include <span>
@@ -15,9 +17,8 @@
 #include <vector>
 
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
 #include <wpi/raw_istream.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/NetworkStream.h"
 #include "wpinet/raw_socket_istream.h"
@@ -29,14 +30,14 @@ namespace wpi {
 // @param buf Buffer for output
 // @param error Set to true if an error occurred
 // @return Escaped string
-std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
+std::string_view UnescapeURI(std::string_view str, small_vectorImpl<char>& buf,
                              bool* error);
 
 // Escape a string with %xx-encoding.
 // @param buf Buffer for output
 // @param spacePlus If true, encodes spaces to '+' rather than "%20"
 // @return Escaped string
-std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
+std::string_view EscapeURI(std::string_view str, small_vectorImpl<char>& buf,
                            bool spacePlus = true);
 
 // Parse a set of HTTP headers.  Saves just the Content-Type and Content-Length
@@ -45,8 +46,8 @@ std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
 // @param contentType If not null, Content-Type contents are saved here.
 // @param contentLength If not null, Content-Length contents are saved here.
 // @return False if error occurred in input stream
-bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
-                      SmallVectorImpl<char>* contentLength);
+bool ParseHttpHeaders(raw_istream& is, small_vectorImpl<char>* contentType,
+                      small_vectorImpl<char>* contentLength);
 
 // Look for a MIME multi-part boundary.  On return, the input stream will
 // be located at the character following the boundary (usually "\r\n").
@@ -89,10 +90,10 @@ class HttpQueryMap {
    *         name is not present in the query map.
    */
   std::optional<std::string_view> Get(std::string_view name,
-                                      SmallVectorImpl<char>& buf) const;
+                                      small_vectorImpl<char>& buf) const;
 
  private:
-  StringMap<std::string_view> m_elems;
+  std::map<std::string, std::string_view, std::less<>> m_elems;
 };
 
 class HttpPathRef;
@@ -221,7 +222,7 @@ class HttpPath {
 
  private:
   SmallString<128> m_pathBuf;
-  SmallVector<size_t, 16> m_pathEnds;
+  small_vector<size_t, 16> m_pathEnds;
 };
 
 /**
@@ -318,7 +319,7 @@ class HttpRequest {
   template <typename T>
   HttpRequest(const HttpLocation& loc, const T& extraParams)
       : host{loc.host}, port{loc.port} {
-    SmallVector<std::pair<std::string_view, std::string_view>, 4> params;
+    small_vector<std::pair<std::string_view, std::string_view>, 4> params;
     for (const auto& p : loc.params) {
       params.emplace_back(std::make_pair(GetFirst(p), GetSecond(p)));
     }
@@ -375,8 +376,8 @@ class HttpRequest {
     return elem.first;
   }
   template <typename T>
-  static std::string_view GetFirst(const StringMapEntry<T>& elem) {
-    return elem.getKey();
+  static std::string_view GetFirst(const std::pair<std::string, T>& elem) {
+    return elem.first;
   }
   template <typename T>
   static std::string_view GetSecond(const T& elem) {

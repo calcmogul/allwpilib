@@ -6,7 +6,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/autodiff/ExpressionGraph.hpp"
 #include "sleipnir/autodiff/Jacobian.hpp"
@@ -36,7 +36,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
   Hessian(Variable variable, const VariableMatrix& wrt) noexcept
       : m_jacobian{
             [&] {
-              wpi::SmallVector<detail::ExpressionPtr> wrtVec;
+              wpi::small_vector<detail::ExpressionPtr> wrtVec;
               wrtVec.reserve(wrt.size());
               for (auto& elem : wrt) {
                 wrtVec.emplace_back(elem.expr);

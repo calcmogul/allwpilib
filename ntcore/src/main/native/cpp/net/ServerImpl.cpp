@@ -16,11 +16,11 @@
 #include <fmt/ranges.h>
 #include <wpi/Base64.h>
 #include <wpi/MessagePack.h>
-#include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 #include <wpi/timestamp.h>
 
 #include "IConnectionList.h"
@@ -190,7 +190,7 @@ void ServerImpl::ClientData::UpdateMetaClientSub() {
 
 std::span<ServerImpl::SubscriberData*> ServerImpl::ClientData::GetSubscribers(
     std::string_view name, bool special,
-    wpi::SmallVectorImpl<SubscriberData*>& buf) {
+    wpi::small_vectorImpl<SubscriberData*>& buf) {
   buf.resize(0);
   for (auto&& subPair : m_subscribers) {
     SubscriberData* subscriber = subPair.getSecond().get();
@@ -671,7 +671,7 @@ void ServerImpl::ClientData3::SendValue(TopicData* topic, const Value& value,
       break;
     case ValueSendMode::kNormal: {
       // replace, or append if not present
-      wpi::DenseMap<NT_Topic, size_t>::iterator it;
+      wpi::flat_map<NT_Topic, size_t>::iterator it;
       std::tie(it, added) =
           m_outgoingValueMap.try_emplace(topic->id, m_outgoing.size());
       if (!added && it->second < m_outgoing.size()) {
@@ -1281,7 +1281,7 @@ std::shared_ptr<void> ServerImpl::RemoveClient(int clientId) {
   auto& client = m_clients[clientId];
 
   // remove all publishers and subscribers for this client
-  wpi::SmallVector<TopicData*, 16> toDelete;
+  wpi::small_vector<TopicData*, 16> toDelete;
   for (auto&& topic : m_topics) {
     bool pubChanged = false;
     bool subChanged = false;
@@ -1721,7 +1721,7 @@ ServerImpl::TopicData* ServerImpl::CreateTopic(ClientData* client,
       }
 
       // look for subscriber matching prefixes
-      wpi::SmallVector<SubscriberData*, 16> subscribersBuf;
+      wpi::small_vector<SubscriberData*, 16> subscribersBuf;
       auto subscribers =
           aClient->GetSubscribers(name, topic->special, subscribersBuf);
 

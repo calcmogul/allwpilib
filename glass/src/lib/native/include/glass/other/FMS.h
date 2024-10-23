@@ -10,7 +10,7 @@
 
 namespace wpi {
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 }  // namespace wpi
 
 namespace glass {
@@ -28,7 +28,7 @@ class FMSModel : public Model {
   virtual DataSource* GetTestData() = 0;
   virtual DataSource* GetAutonomousData() = 0;
   virtual std::string_view GetGameSpecificMessage(
-      wpi::SmallVectorImpl<char>& buf) = 0;
+      wpi::small_vectorImpl<char>& buf) = 0;
 
   virtual void SetFmsAttached(bool val) = 0;
   virtual void SetDsAttached(bool val) = 0;

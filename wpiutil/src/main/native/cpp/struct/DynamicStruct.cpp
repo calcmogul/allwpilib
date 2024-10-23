@@ -11,10 +11,9 @@
 
 #include <fmt/format.h>
 
-#include "wpi/Endian.h"
 #include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/small_vector.h"
 #include "wpi/struct/SchemaParser.h"
 
 using namespace wpi;
@@ -112,7 +111,7 @@ const StructFieldDescriptor* StructDescriptor::FindFieldByName(
 }
 
 bool StructDescriptor::CheckCircular(
-    wpi::SmallVectorImpl<const StructDescriptor*>& stack) const {
+    wpi::small_vectorImpl<const StructDescriptor*>& stack) const {
   stack.emplace_back(this);
   for (auto&& ref : m_references) {
     if (std::find(stack.begin(), stack.end(), ref) != stack.end()) {
@@ -127,7 +126,7 @@ bool StructDescriptor::CheckCircular(
 }
 
 std::string StructDescriptor::CalculateOffsets(
-    wpi::SmallVectorImpl<const StructDescriptor*>& stack) {
+    wpi::small_vectorImpl<const StructDescriptor*>& stack) {
   size_t offset = 0;
   unsigned int shift = 0;
   size_t prevBitfieldSize = 0;
@@ -286,7 +285,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
   theStruct->m_valid = isValid;
   if (isValid) {
     // we have all the info needed, so calculate field offset & shift
-    wpi::SmallVector<const StructDescriptor*, 16> stack;
+    wpi::small_vector<const StructDescriptor*, 16> stack;
     auto err2 = theStruct->CalculateOffsets(stack);
     if (!err2.empty()) {
       *err = std::move(err2);
@@ -294,7 +293,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     }
   } else {
     // check for circular reference
-    wpi::SmallVector<const StructDescriptor*, 16> stack;
+    wpi::small_vector<const StructDescriptor*, 16> stack;
     if (!theStruct->CheckCircular(stack)) {
       wpi::SmallString<128> buf;
       wpi::raw_svector_ostream os{buf};

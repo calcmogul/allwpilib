@@ -4,20 +4,18 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cmath>
 #include <exception>
 #include <functional>
+#include <map>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
 #include <frc/filter/LinearFilter.h>
 #include <units/time.h>
-#include <wpi/StringMap.h>
 #include <wpi/array.h>
 
 #include "sysid/analysis/AnalysisManager.h"
@@ -201,19 +199,19 @@ frc::LinearFilter<double> CentralFiniteDifference(units::second_t period) {
  * @param unit The angular unit that the arm test is in (only for calculating
  *             cosine data)
  */
-void InitialTrimAndFilter(wpi::StringMap<std::vector<PreparedData>>* data,
-                          AnalysisManager::Settings* settings,
-                          std::vector<units::second_t>& positionDelays,
-                          std::vector<units::second_t>& velocityDelays,
-                          units::second_t& minStepTime,
-                          units::second_t& maxStepTime,
-                          std::string_view unit = "");
+void InitialTrimAndFilter(
+    std::map<std::string, std::vector<PreparedData>, std::less<>>* data,
+    AnalysisManager::Settings* settings,
+    std::vector<units::second_t>& positionDelays,
+    std::vector<units::second_t>& velocityDelays, units::second_t& minStepTime,
+    units::second_t& maxStepTime, std::string_view unit = "");
 
 /**
  * Removes all points with acceleration = 0.
  *
  * @param data A pointer to a PreparedData vector
  */
-void AccelFilter(wpi::StringMap<std::vector<PreparedData>>* data);
+void AccelFilter(
+    std::map<std::string, std::vector<PreparedData>, std::less<>>* data);
 
 }  // namespace sysid

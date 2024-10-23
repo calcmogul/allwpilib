@@ -29,7 +29,7 @@ class RepeatedField;
 namespace wpi {
 
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 
 /**
  * Protobuf serialization template. Unspecialized class has no members; only
@@ -218,7 +218,7 @@ namespace detail {
 void DeleteProtobuf(google::protobuf::Message* msg);
 bool ParseProtobuf(google::protobuf::Message* msg,
                    std::span<const uint8_t> data);
-bool SerializeProtobuf(wpi::SmallVectorImpl<uint8_t>& out,
+bool SerializeProtobuf(wpi::small_vectorImpl<uint8_t>& out,
                        const google::protobuf::Message& msg);
 bool SerializeProtobuf(std::vector<uint8_t>& out,
                        const google::protobuf::Message& msg);
@@ -292,13 +292,13 @@ class ProtobufMessage {
   }
 
   /**
-   * Packs object into a SmallVector.
+   * Packs object into a small_vector.
    *
    * @param[out] out output bytes
    * @param[in] value value
    * @return true if successful
    */
-  bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
+  bool Pack(wpi::small_vectorImpl<uint8_t>& out, const T& value) {
     Protobuf<T>::Pack(m_msg, value);
     return detail::SerializeProtobuf(out, *m_msg);
   }

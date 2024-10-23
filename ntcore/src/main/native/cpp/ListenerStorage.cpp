@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "ntcore_c.h"
 
@@ -300,7 +300,7 @@ ListenerStorage::DestroyListenerPoller(NT_ListenerPoller pollerHandle) {
   std::scoped_lock lock{m_mutex};
   if (auto poller = m_pollers.Remove(pollerHandle)) {
     // ensure all listeners that use this poller are removed
-    wpi::SmallVector<NT_Listener, 16> toRemove;
+    wpi::small_vector<NT_Listener, 16> toRemove;
     for (auto&& listener : m_listeners) {
       if (listener->poller == poller.get()) {
         toRemove.emplace_back(listener->handle);

@@ -7,12 +7,12 @@
 #include <stdint.h>
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
+#include <wpi/small_vector.h>
 
 #include "glass/Context.h"
 #include "glass/Storage.h"
@@ -33,10 +33,10 @@ class Context {
   std::string storageLoadDir = ".";
   std::string storageAutoSaveDir = ".";
   std::string storageName = "imgui";
-  wpi::SmallVector<Storage*, 32> storageStack;
-  wpi::StringMap<std::unique_ptr<Storage>> storageRoots;
-  wpi::StringMap<bool> deviceHidden;
-  wpi::StringMap<DataSource*> sources;
+  wpi::small_vector<Storage*, 32> storageStack;
+  std::map<std::string, std::unique_ptr<Storage>, std::less<>> storageRoots;
+  std::map<std::string, bool, std::less<>> deviceHidden;
+  std::map<std::string, DataSource*, std::less<>> sources;
   Storage& sourceNameStorage;
   uint64_t zeroTime = 0;
   bool isPlatformSaveDir = false;

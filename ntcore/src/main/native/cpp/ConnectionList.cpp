@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/json.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 
 #include "IListenerStorage.h"
 #include "ntcore_c.h"
@@ -100,7 +100,7 @@ void ConnectionList::AddListener(NT_Listener listener, unsigned int eventMask) {
   if ((eventMask & (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE)) ==
           (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE) &&
       !m_connections.empty()) {
-    wpi::SmallVector<const ConnectionInfo*, 16> infos;
+    wpi::small_vector<const ConnectionInfo*, 16> infos;
     infos.reserve(m_connections.size());
     for (auto&& conn : m_connections) {
       infos.emplace_back(&(*conn));

@@ -88,7 +88,7 @@ FileLogger::~FileLogger() {
 std::function<void(std::string_view)> FileLogger::Buffer(
     std::function<void(std::string_view)> callback) {
   return [callback,
-          buf = wpi::SmallVector<char, 64>{}](std::string_view data) mutable {
+          buf = wpi::small_vector<char, 64>{}](std::string_view data) mutable {
     buf.append(data.begin(), data.end());
     if (!wpi::contains({data.data(), data.size()}, "\n")) {
       return;

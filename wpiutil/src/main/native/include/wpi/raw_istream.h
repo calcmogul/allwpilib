@@ -15,7 +15,7 @@
 #include <system_error>
 #include <vector>
 
-#include "wpi/SmallVector.h"
+#include "wpi/small_vector.h"
 
 namespace wpi {
 
@@ -53,7 +53,7 @@ class raw_istream {
     return m_read_count;
   }
 
-  raw_istream& readinto(SmallVectorImpl<char>& buf, size_t len) {
+  raw_istream& readinto(small_vectorImpl<char>& buf, size_t len) {
     size_t old_size = buf.size();
     buf.append(len, 0);
     read_impl(&buf[old_size], len);
@@ -61,7 +61,7 @@ class raw_istream {
     return *this;
   }
 
-  raw_istream& readinto(SmallVectorImpl<uint8_t>& buf, size_t len) {
+  raw_istream& readinto(small_vectorImpl<uint8_t>& buf, size_t len) {
     size_t old_size = buf.size();
     buf.append(len, 0);
     read_impl(&buf[old_size], len);
@@ -99,7 +99,7 @@ class raw_istream {
   // @param buf Buffer for output
   // @param maxLen Maximum length
   // @return Line
-  std::string_view getline(SmallVectorImpl<char>& buf, int maxLen);
+  std::string_view getline(small_vectorImpl<char>& buf, int maxLen);
 
   virtual void close() = 0;
 

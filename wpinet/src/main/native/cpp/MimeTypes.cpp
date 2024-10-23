@@ -4,8 +4,11 @@
 
 #include "wpinet/MimeTypes.h"
 
+#include <functional>
+#include <map>
+#include <string>
+
 #include <wpi/StringExtras.h>
-#include <wpi/StringMap.h>
 
 namespace wpi {
 
@@ -13,7 +16,7 @@ namespace wpi {
 // https://github.com/DEGoodmanWilson/libmime/blob/stable/0.1.2/mime/mime.cpp
 std::string_view MimeTypeFromPath(std::string_view path) {
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
-  static StringMap<const char*> mimeTypes{
+  static std::map<std::string, const char*, std::less<>> mimeTypes{
       // text
       {"css", "text/css"},
       {"csv", "text/csv"},

@@ -7,11 +7,11 @@
 #include <memory>
 
 #include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 
 #include "wpinet/raw_uv_ostream.h"
 
@@ -103,7 +103,7 @@ void HttpServerConnection::SendResponse(int code, std::string_view codeText,
                                         std::string_view contentType,
                                         std::string_view content,
                                         std::string_view extraHeader) {
-  SmallVector<uv::Buffer, 4> toSend;
+  small_vector<uv::Buffer, 4> toSend;
   raw_uv_ostream os{toSend, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(), extraHeader);
   os << content;
@@ -121,7 +121,7 @@ void HttpServerConnection::SendStaticResponse(
     contentEncodingHeader = "Content-Encoding: gzip\r\n";
   }
 
-  SmallVector<uv::Buffer, 4> bufs;
+  small_vector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(),
               fmt::format("{}{}", extraHeader, contentEncodingHeader));

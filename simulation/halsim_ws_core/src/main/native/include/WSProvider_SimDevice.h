@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -12,7 +13,6 @@
 
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
-#include <wpi/StringMap.h>
 #include <wpinet/uv/AsyncFunction.h>
 
 #include "WSBaseProvider.h"
@@ -74,7 +74,8 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   void CancelCallbacks();
 
-  wpi::StringMap<std::unique_ptr<SimDeviceValueData>> m_valueHandles;
+  std::map<std::string, std::unique_ptr<SimDeviceValueData>, std::less<>>
+      m_valueHandles;
   std::shared_mutex m_vhLock;
 
   HAL_SimDeviceHandle m_handle;
@@ -82,7 +83,7 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
   std::shared_ptr<HALSimWSProviderSimDevices> m_simDevicesBase;
 
   int32_t m_simValueCreatedCbKey = 0;
-  wpi::StringMap<int32_t> m_simValueChangedCbKeys;
+  std::map<std::string, int32_t, std::less<>> m_simValueChangedCbKeys;
 };
 
 class HALSimWSProviderSimDevices {

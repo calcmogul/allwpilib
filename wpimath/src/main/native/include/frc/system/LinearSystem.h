@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 #include <wpi/Algorithm.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
@@ -201,7 +201,7 @@ class LinearSystem {
         outputIndices...);
 
     // Sort and deduplicate output indices
-    wpi::SmallVector<int> outputIndicesArray{outputIndices...};
+    wpi::small_vector<int> outputIndicesArray{outputIndices...};
     std::sort(outputIndicesArray.begin(), outputIndicesArray.end());
     auto last =
         std::unique(outputIndicesArray.begin(), outputIndicesArray.end());

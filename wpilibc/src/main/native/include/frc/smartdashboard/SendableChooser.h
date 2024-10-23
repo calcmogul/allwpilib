@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <concepts>
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <wpi/StringMap.h>
 #include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/smartdashboard/SendableChooserBase.h"
@@ -36,7 +36,7 @@ namespace frc {
 template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class SendableChooser : public SendableChooserBase {
-  wpi::StringMap<T> m_choices;
+  std::map<std::string, T, std::less<>> m_choices;
   std::function<void(T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value) {
@@ -131,22 +131,18 @@ class SendableChooser : public SendableChooserBase {
             keys.emplace_back(choice.first());
           }
 
-          // Unlike std::map, wpi::StringMap elements
-          // are not sorted
-          std::sort(keys.begin(), keys.end());
-
           return keys;
         },
         nullptr);
     builder.AddSmallStringProperty(
         kDefault,
-        [=, this](wpi::SmallVectorImpl<char>&) -> std::string_view {
+        [=, this](wpi::small_vectorImpl<char>&) -> std::string_view {
           return m_defaultChoice;
         },
         nullptr);
     builder.AddSmallStringProperty(
         kActive,
-        [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+        [=, this](wpi::small_vectorImpl<char>& buf) -> std::string_view {
           std::scoped_lock lock(m_mutex);
           if (m_haveSelected) {
             buf.assign(m_selected.begin(), m_selected.end());

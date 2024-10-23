@@ -7,7 +7,7 @@
 #include <string_view>
 
 #include <Eigen/SparseCore>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/util/SymbolExports.hpp"
 
@@ -32,7 +32,7 @@ SLEIPNIR_DLLEXPORT inline void Spy(std::ostream& file,
   const int cells_width = mat.cols() + 1;
   const int cells_height = mat.rows();
 
-  wpi::SmallVector<uint8_t> cells;
+  wpi::small_vector<uint8_t> cells;
 
   // Allocate space for matrix of characters plus trailing newlines
   cells.reserve(cells_width * cells_height);

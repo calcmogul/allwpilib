@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -13,9 +15,8 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DenseMap.h>
-#include <wpi/StringMap.h>
 #include <wpi/Synchronization.h>
+#include <wpi/flat_map.h>
 #include <wpi/json.h>
 #include <wpi/mutex.h>
 
@@ -251,7 +252,7 @@ class LocalStorage final : public net::ILocalStorage {
   template <SmallArrayType T>
   Timestamped<typename TypeInfo<T>::SmallRet> GetAtomic(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
+      wpi::small_vectorImpl<typename TypeInfo<T>::SmallElem>& buf,
       typename TypeInfo<T>::View defaultValue);
 
   std::vector<Value> ReadQueueValue(NT_Handle subentry, unsigned int types) {
@@ -398,7 +399,7 @@ class LocalStorage final : public net::ILocalStorage {
     bool onNetwork{false};  // true if there are any remote publishers
     bool lastValueFromNetwork{false};
 
-    wpi::SmallVector<DataLoggerEntry, 1> datalogs;
+    wpi::small_vector<DataLoggerEntry, 1> datalogs;
     NT_Type datalogType{NT_UNASSIGNED};
 
     VectorSet<PublisherData*> localPublishers;
@@ -566,16 +567,16 @@ class LocalStorage final : public net::ILocalStorage {
     HandleMap<DataLoggerData, 16> m_dataloggers;
 
     // name mappings
-    wpi::StringMap<TopicData*> m_nameTopics;
+    std::map<std::string, TopicData*, std::less<>> m_nameTopics;
 
     // listeners
-    wpi::DenseMap<NT_Listener, std::unique_ptr<ListenerData>> m_listeners;
+    wpi::flat_map<NT_Listener, std::unique_ptr<ListenerData>> m_listeners;
 
     // string-based listeners
     VectorSet<ListenerData*> m_topicPrefixListeners;
 
     // schema publishers
-    wpi::StringMap<NT_Publisher> m_schemas;
+    std::map<std::string, NT_Publisher, std::less<>> m_schemas;
 
     // topic functions
     void NotifyTopic(TopicData* topic, unsigned int eventFlags);
@@ -680,7 +681,7 @@ Timestamped<typename TypeInfo<T>::Value> LocalStorage::GetAtomic(
 template <SmallArrayType T>
 Timestamped<typename TypeInfo<T>::SmallRet> LocalStorage::GetAtomic(
     NT_Handle subentry,
-    wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
+    wpi::small_vectorImpl<typename TypeInfo<T>::SmallElem>& buf,
     typename TypeInfo<T>::View defaultValue) {
   std::scoped_lock lock{m_mutex};
   Value* value = m_impl.GetSubEntryValue(subentry);

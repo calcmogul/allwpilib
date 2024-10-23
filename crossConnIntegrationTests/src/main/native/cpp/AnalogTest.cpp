@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <hal/AnalogInput.h>
 #include <hal/AnalogOutput.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "CrossConnects.h"
 #include "LifetimeWrappers.h"
@@ -41,7 +41,7 @@ TEST_P(AnalogCrossTest, AnalogCross) {
 }
 
 TEST(AnalogInputTest, AllocateAll) {
-  wpi::SmallVector<AnalogInputHandle, 21> analogHandles;
+  wpi::small_vector<AnalogInputHandle, 21> analogHandles;
   for (int i = 0; i < HAL_GetNumAnalogInputs(); i++) {
     int32_t status = 0;
     analogHandles.emplace_back(AnalogInputHandle(i, &status));
@@ -75,7 +75,7 @@ TEST(AnalogInputTest, UnderAllocateFails) {
 }
 
 TEST(AnalogOutputTest, AllocateAll) {
-  wpi::SmallVector<AnalogOutputHandle, 21> analogHandles;
+  wpi::small_vector<AnalogOutputHandle, 21> analogHandles;
   for (int i = 0; i < HAL_GetNumAnalogOutputs(); i++) {
     int32_t status = 0;
     analogHandles.emplace_back(AnalogOutputHandle(i, &status));

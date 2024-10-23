@@ -16,9 +16,9 @@
 #include <fmt/format.h>
 #include <wpi/EventVector.h>
 #include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 
 #include "HALInitializer.h"
 #include "hal/DriverStation.h"

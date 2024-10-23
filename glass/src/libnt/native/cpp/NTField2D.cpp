@@ -16,8 +16,8 @@
 #include <ntcore_cpp.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/small_vector.h>
 
 using namespace glass;
 
@@ -68,7 +68,7 @@ void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
 }
 
 void NTField2DModel::ObjectModel::UpdateNT() {
-  wpi::SmallVector<double, 9> arr;
+  wpi::small_vector<double, 9> arr;
   for (auto&& pose : m_poses) {
     auto& translation = pose.Translation();
     arr.push_back(translation.X().value());

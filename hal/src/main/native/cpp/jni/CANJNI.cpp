@@ -149,7 +149,7 @@ Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
   uint32_t handle = static_cast<uint32_t>(sessionHandle);
   uint32_t messagesRead = 0;
 
-  wpi::SmallVector<HAL_CANStreamMessage, 16> messageBuffer;
+  wpi::small_vector<HAL_CANStreamMessage, 16> messageBuffer;
   messageBuffer.resize_for_overwrite(messagesToRead);
 
   int32_t status = 0;

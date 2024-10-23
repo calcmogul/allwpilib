@@ -5,16 +5,16 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
+#include <string>
 #include <string_view>
-#include <vector>
 
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableListener.h>
 #include <networktables/StringTopic.h>
 #include <networktables/Topic.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringMap.h>
+#include <wpi/flat_map.h>
 
 #include "glass/Model.h"
 #include "glass/Provider.h"
@@ -90,7 +90,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   };
 
   // mapping from .type string to model/view creators
-  wpi::StringMap<Builder> m_typeMap;
+  std::map<std::string, Builder, std::less<>> m_typeMap;
 
   struct SubListener {
     nt::StringSubscriber subscriber;
@@ -98,7 +98,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   };
 
   // mapping from .type topic to subscriber/listener
-  wpi::DenseMap<NT_Topic, SubListener> m_topicMap;
+  wpi::flat_map<NT_Topic, SubListener> m_topicMap;
 
   struct Entry : public ModelEntry {
     Entry(nt::Topic typeTopic, std::string_view name, const Builder& builder)

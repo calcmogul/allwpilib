@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include <fmt/format.h>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 #include <wpi/timestamp.h>
 
 using namespace glass;
@@ -42,7 +42,7 @@ NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
 }
 
 std::string_view NTFMSModel::GetGameSpecificMessage(
-    wpi::SmallVectorImpl<char>& buf) {
+    wpi::small_vectorImpl<char>& buf) {
   return m_gameSpecificMessage.Get(buf, "");
 }
 

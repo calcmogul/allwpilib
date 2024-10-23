@@ -106,7 +106,7 @@ void LogLoader::Display() {
 
 void LogLoader::RebuildEntryTree() {
   m_entryTree.clear();
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::small_vector<std::string_view, 16> parts;
   m_reader->ForEachEntryName([&](const glass::DataLogReaderEntry& entry) {
     // only show double/float/string entries (TODO: support struct/protobuf)
     if (entry.type != "double" && entry.type != "float" &&

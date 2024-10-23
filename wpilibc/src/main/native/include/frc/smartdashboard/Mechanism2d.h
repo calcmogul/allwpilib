@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -11,7 +13,6 @@
 #include <networktables/NTSendable.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/StringTopic.h>
-#include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -84,7 +85,7 @@ class Mechanism2d : public nt::NTSendable,
   std::string m_color;
   mutable wpi::mutex m_mutex;
   std::shared_ptr<nt::NetworkTable> m_table;
-  wpi::StringMap<std::unique_ptr<MechanismRoot2d>> m_roots;
+  std::map<std::string, std::unique_ptr<MechanismRoot2d>, std::less<>> m_roots;
   nt::DoubleArrayPublisher m_dimsPub;
   nt::StringPublisher m_colorPub;
 };

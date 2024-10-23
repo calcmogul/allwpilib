@@ -349,7 +349,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
 
   SendHTMLHeadTitle(os);
   os << startRootPage;
-  wpi::SmallVector<int, 32> properties_vec;
+  wpi::small_vector<int, 32> properties_vec;
   CS_Status status = 0;
   for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
     wpi::SmallString<128> name_buf;
@@ -489,7 +489,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
   }
 
   os << "{\n\"controls\": [\n";
-  wpi::SmallVector<int, 32> properties_vec;
+  wpi::small_vector<int, 32> properties_vec;
   bool first = true;
   CS_Status status = 0;
   for (auto prop : source.EnumerateProperties(properties_vec, &status)) {

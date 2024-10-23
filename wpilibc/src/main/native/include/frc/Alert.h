@@ -4,15 +4,16 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <networktables/NTSendable.h>
 #include <units/time.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
 #include <wpi/sendable/SendableHelper.h>
+#include <wpi/small_vector.h>
 
 namespace frc {
 
@@ -113,14 +114,14 @@ class Alert {
   class SendableAlerts : public nt::NTSendable,
                          public wpi::SendableHelper<SendableAlerts> {
    public:
-    wpi::SmallVector<std::shared_ptr<Alert>> m_alerts;
+    wpi::small_vector<std::shared_ptr<Alert>> m_alerts;
     void InitSendable(nt::NTSendableBuilder& builder) override;
 
    private:
     std::vector<std::string> GetStrings(AlertType type) const;
   };
 
-  static wpi::StringMap<SendableAlerts> groups;
+  static std::map<std::string, SendableAlerts, std::less<>> groups;
 };
 
 }  // namespace frc

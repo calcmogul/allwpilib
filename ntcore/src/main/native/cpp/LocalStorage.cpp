@@ -129,7 +129,7 @@ void LocalStorage::Impl::NotifyTopic(TopicData* topic,
     m_listenerStorage.Notify(topic->listeners, eventFlags, topicInfo);
   }
 
-  wpi::SmallVector<NT_Listener, 32> listeners;
+  wpi::small_vector<NT_Listener, 32> listeners;
   for (auto listener : m_topicPrefixListeners) {
     if (listener->multiSubscriber &&
         listener->multiSubscriber->Matches(topic->name, topic->special)) {
@@ -800,7 +800,7 @@ void LocalStorage::Impl::AddListenerImpl(NT_Listener listenerHandle,
           .get();
 
   // if we're doing anything immediate, get the list of matching topics
-  wpi::SmallVector<TopicData*, 32> topics;
+  wpi::small_vector<TopicData*, 32> topics;
   if ((eventMask & NT_EVENT_IMMEDIATE) != 0 &&
       (eventMask & (NT_EVENT_PUBLISH | NT_EVENT_VALUE_ALL)) != 0) {
     for (auto&& topic : m_topics) {

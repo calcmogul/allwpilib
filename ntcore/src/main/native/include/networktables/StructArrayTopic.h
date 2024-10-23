@@ -15,9 +15,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/json_fwd.h>
 #include <wpi/mutex.h>
+#include <wpi/small_vector.h>
 #include <wpi/struct/Struct.h>
 
 #include "networktables/NetworkTableInstance.h"
@@ -126,7 +126,7 @@ class StructArraySubscriber : public Subscriber {
              std::convertible_to<std::ranges::range_value_t<U>, T>
 #endif
   TimestampedValueType GetAtomic(U&& defaultValue) const {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     size_t size = std::apply(S::GetSize, m_info);
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() == 0 || (view.value.size() % size) != 0) {
@@ -155,7 +155,7 @@ class StructArraySubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueType GetAtomic(std::span<const T> defaultValue) const {
-    wpi::SmallVector<uint8_t, 128> buf;
+    wpi::small_vector<uint8_t, 128> buf;
     size_t size = std::apply(S::GetSize, m_info);
     TimestampedRawView view = ::nt::GetAtomicRaw(m_subHandle, buf, {});
     if (view.value.size() == 0 || (view.value.size() % size) != 0) {

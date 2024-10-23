@@ -10,10 +10,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 #include <wpi/spinlock.h>
 
 #if defined(WIN32) || defined(_WIN32)
@@ -100,7 +100,7 @@ int HAL_LoadOneExtension(const char* library) {
 
 int HAL_LoadExtensions(void) {
   int rc = 1;
-  wpi::SmallVector<std::string_view, 2> libraries;
+  wpi::small_vector<std::string_view, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) {
     if (GetShowNotFoundMessage()) {

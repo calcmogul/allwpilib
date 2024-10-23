@@ -11,7 +11,7 @@
 #include <utility>
 
 #include <Eigen/Core>
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
@@ -358,16 +358,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
  private:
   // The list of decision variables, which are the root of the problem's
   // expression tree
-  wpi::SmallVector<Variable> m_decisionVariables;
+  wpi::small_vector<Variable> m_decisionVariables;
 
   // The cost function: f(x)
   std::optional<Variable> m_f;
 
   // The list of equality constraints: cₑ(x) = 0
-  wpi::SmallVector<Variable> m_equalityConstraints;
+  wpi::small_vector<Variable> m_equalityConstraints;
 
   // The list of inequality constraints: cᵢ(x) ≥ 0
-  wpi::SmallVector<Variable> m_inequalityConstraints;
+  wpi::small_vector<Variable> m_inequalityConstraints;
 
   // The user callback
   std::function<bool(const SolverIterationInfo& info)> m_callback =

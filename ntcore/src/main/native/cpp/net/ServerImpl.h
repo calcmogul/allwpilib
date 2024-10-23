@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <string>
@@ -15,10 +16,9 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DenseMap.h>
 #include <wpi/SmallPtrSet.h>
-#include <wpi/StringMap.h>
 #include <wpi/UidVector.h>
+#include <wpi/flat_map.h>
 #include <wpi/json.h>
 
 #include "ClientMessageQueue.h"
@@ -37,7 +37,7 @@
 namespace wpi {
 class Logger;
 template <typename T>
-class SmallVectorImpl;
+class small_vectorImpl;
 class raw_ostream;
 }  // namespace wpi
 
@@ -163,7 +163,7 @@ class ServerImpl final {
         return added;
       }
     };
-    wpi::SmallDenseMap<ClientData*, TopicClientData, 4> clients;
+    wpi::Smallflat_map<ClientData*, TopicClientData, 4> clients;
 
     // meta topics
     TopicData* metaPub = nullptr;
@@ -205,7 +205,7 @@ class ServerImpl final {
 
     std::span<SubscriberData*> GetSubscribers(
         std::string_view name, bool special,
-        wpi::SmallVectorImpl<SubscriberData*>& buf);
+        wpi::small_vectorImpl<SubscriberData*>& buf);
 
     std::string_view GetName() const { return m_name; }
     int GetId() const { return m_id; }
@@ -225,8 +225,8 @@ class ServerImpl final {
 
     wpi::Logger& m_logger;
 
-    wpi::DenseMap<int, std::unique_ptr<PublisherData>> m_publishers;
-    wpi::DenseMap<int, std::unique_ptr<SubscriberData>> m_subscribers;
+    wpi::flat_map<int, std::unique_ptr<PublisherData>> m_publishers;
+    wpi::flat_map<int, std::unique_ptr<SubscriberData>> m_subscribers;
 
    public:
     // meta topics
@@ -257,7 +257,7 @@ class ServerImpl final {
 
     bool DoProcessIncomingMessages(ClientMessageQueue& queue, size_t max);
 
-    wpi::DenseMap<TopicData*, bool> m_announceSent;
+    wpi::flat_map<TopicData*, bool> m_announceSent;
 
    private:
     std::array<ClientMessage, 16> m_msgsBuf;
@@ -397,7 +397,7 @@ class ServerImpl final {
 
     NetworkIncomingClientQueue m_incoming;
     std::vector<net3::Message3> m_outgoing;
-    wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
+    wpi::flat_map<NT_Topic, size_t> m_outgoingValueMap;
     int64_t m_nextPubUid{1};
     uint64_t m_lastSendMs{0};
 
@@ -412,7 +412,7 @@ class ServerImpl final {
 
       bool UpdateFlags(TopicData* topic);
     };
-    wpi::DenseMap<TopicData*, TopicData3> m_topics3;
+    wpi::flat_map<TopicData*, TopicData3> m_topics3;
     TopicData3* GetTopic3(TopicData* topic) {
       return &m_topics3.try_emplace(topic, topic).first->second;
     }
@@ -468,7 +468,7 @@ class ServerImpl final {
     PubSubOptionsImpl options;
     std::vector<uint8_t> metaClient;
     std::vector<uint8_t> metaTopic;
-    wpi::DenseMap<TopicData*, bool> topics;
+    wpi::flat_map<TopicData*, bool> topics;
     // in options as double, but copy here as integer; rounded to the nearest
     // 10 ms
     uint32_t periodMs;
@@ -481,7 +481,7 @@ class ServerImpl final {
   ClientDataLocal* m_localClient;
   std::vector<std::unique_ptr<ClientData>> m_clients;
   wpi::UidVector<std::unique_ptr<TopicData>, 16> m_topics;
-  wpi::StringMap<TopicData*> m_nameTopics;
+  std::map<std::string, TopicData*, std::less<>> m_nameTopics;
   bool m_persistentChanged{false};
 
   // global meta topics (other meta topics are linked to from the specific

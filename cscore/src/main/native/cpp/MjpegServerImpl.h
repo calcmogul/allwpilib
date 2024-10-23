@@ -13,9 +13,9 @@
 #include <vector>
 
 #include <wpi/SafeThread.h>
-#include <wpi/SmallVector.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/small_vector.h>
 #include <wpinet/NetworkAcceptor.h>
 #include <wpinet/NetworkStream.h>
 #include <wpinet/raw_socket_ostream.h>

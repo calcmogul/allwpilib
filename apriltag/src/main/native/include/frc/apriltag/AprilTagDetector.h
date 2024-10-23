@@ -6,13 +6,14 @@
 
 #include <stdint.h>
 
-#include <memory>
+#include <functional>
+#include <map>
 #include <span>
+#include <string>
 #include <string_view>
 #include <utility>
 
 #include <units/angle.h>
-#include <wpi/StringMap.h>
 #include <wpi/SymbolExports.h>
 
 #include "frc/apriltag/AprilTagDetection.h"
@@ -255,7 +256,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
   void DestroyFamily(std::string_view name, void* data);
 
   void* m_impl;
-  wpi::StringMap<void*> m_families;
+  std::map<std::string, void*, std::less<>> m_families;
   units::radian_t m_qtpCriticalAngle = 10_deg;
 };
 

@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/SmallVector.h>
+#include <wpi/small_vector.h>
 
 namespace wpi::uv {
 
@@ -167,7 +167,7 @@ class SimpleBufferPool {
   size_t Remaining() const { return m_pool.size(); }
 
  private:
-  SmallVector<Buffer, DEPTH> m_pool;
+  small_vector<Buffer, DEPTH> m_pool;
   size_t m_size;  // NOLINT
 };
 

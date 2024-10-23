@@ -11,10 +11,10 @@
 #include <string_view>
 
 #include <wpi/MemoryBuffer.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
+#include <wpi/small_vector.h>
 #include <wpinet/MimeTypes.h>
 #include <wpinet/UrlParser.h>
 #include <wpinet/raw_uv_ostream.h>
@@ -89,7 +89,7 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
   }
 
   // render json to buffers
-  wpi::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::small_vector<uv::Buffer, 4> sendBufs;
   wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
                            std::lock_guard lock(m_buffers_mutex);
                            return m_buffers.Allocate();
@@ -133,7 +133,7 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
     return;
   }
 
-  wpi::SmallVector<uv::Buffer, 4> toSend;
+  wpi::small_vector<uv::Buffer, 4> toSend;
   wpi::raw_uv_ostream os{toSend, 4096};
   BuildHeader(os, code, codeText, contentType, size, extraHeader);
   SendData(os.bufs(), false);
@@ -141,7 +141,7 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
   Log(code);
 
   // Read the file byte by byte
-  wpi::SmallVector<uv::Buffer, 4> bodyData;
+  wpi::small_vector<uv::Buffer, 4> bodyData;
   wpi::raw_uv_ostream bodyOs{bodyData, 4096};
 
   bodyOs << fileBuffer.value()->GetBuffer();

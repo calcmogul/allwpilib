@@ -5,14 +5,14 @@
 #pragma once
 
 #include <concepts>
+#include <functional>
+#include <map>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/StringMap.h>
 
 #include "frc/Errors.h"
 
@@ -83,7 +83,8 @@ class MechanismObject2d {
 
  private:
   std::string m_name;
-  wpi::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;
+  std::map<std::string, std::unique_ptr<MechanismObject2d>, std::less<>>
+      m_objects;
   std::shared_ptr<nt::NetworkTable> m_table;
   void Update(std::shared_ptr<nt::NetworkTable> table);
 };
