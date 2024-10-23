@@ -11,11 +11,10 @@
 #include <fmt/format.h>
 #include <wpi/Base64.h>
 #include <wpi/StringExtras.h>
-#include <wpi/raw_ostream.h>
 
 namespace wpi {
 
-std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
+std::string_view UnescapeURI(std::string_view str, SmallVector<char>& buf,
                              bool* error) {
   buf.clear();
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
@@ -54,7 +53,7 @@ std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
   return {buf.data(), buf.size()};
 }
 
-std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
+std::string_view EscapeURI(std::string_view str, SmallVector<char>& buf,
                            bool spacePlus) {
   static const char* const hexLut = "0123456789ABCDEF";
 
@@ -98,7 +97,7 @@ std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf) {
 }
 
 HttpQueryMap::HttpQueryMap(std::string_view query) {
-  SmallVector<std::string_view, 16> queryElems;
+  SmallVector<std::string_view> queryElems;
   split(query, queryElems, '&', 100, false);
   for (auto elem : queryElems) {
     auto [nameEsc, valueEsc] = split(elem, '=');
@@ -113,7 +112,7 @@ HttpQueryMap::HttpQueryMap(std::string_view query) {
 }
 
 std::optional<std::string_view> HttpQueryMap::Get(
-    std::string_view name, wpi::SmallVectorImpl<char>& buf) const {
+    std::string_view name, wpi::SmallVector<char>& buf) const {
   auto it = m_elems.find(name);
   if (it == m_elems.end()) {
     return {};
@@ -132,7 +131,7 @@ HttpPath::HttpPath(std::string_view path) {
     m_pathEnds.emplace_back(0);
     return;
   }
-  wpi::SmallVector<std::string_view, 16> pathElems;
+  wpi::SmallVector<std::string_view> pathElems;
   split(path, pathElems, '/', 100, false);
   for (auto elem : pathElems) {
     SmallString<64> buf;
@@ -169,8 +168,8 @@ std::string_view HttpPath::operator[](size_t n) const {
   return slice(m_pathBuf, n == 0 ? 0 : m_pathEnds[n - 1], m_pathEnds[n]);
 }
 
-bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
-                      SmallVectorImpl<char>* contentLength) {
+bool ParseHttpHeaders(raw_istream& is, SmallVector<char>* contentType,
+                      SmallVector<char>* contentLength) {
   if (contentType) {
     contentType->clear();
   }

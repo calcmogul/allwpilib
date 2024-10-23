@@ -4,6 +4,8 @@
 
 #include "frc/apriltag/AprilTagFieldLayout.h"
 
+#include <fstream>
+#include <string>
 #include <system_error>
 #include <utility>
 #include <vector>
@@ -12,7 +14,6 @@
 #include <units/length.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/json.h>
-#include <wpi/raw_ostream.h>
 
 using namespace frc;
 
@@ -89,10 +90,8 @@ std::optional<frc::Pose3d> AprilTagFieldLayout::GetTagPose(int ID) const {
 }
 
 void AprilTagFieldLayout::Serialize(std::string_view path) {
-  std::error_code error_code;
-
-  wpi::raw_fd_ostream output{path, error_code};
-  if (error_code) {
+  std::ofstream output{std::string{path}};
+  if (!output.is_open()) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 

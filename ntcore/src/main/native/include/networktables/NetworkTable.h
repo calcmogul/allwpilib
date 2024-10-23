@@ -95,7 +95,7 @@ class NetworkTable final {
                                   bool withLeadingSlash = true);
 
   static std::string_view NormalizeKey(std::string_view key,
-                                       wpi::SmallVectorImpl<char>& buf,
+                                       wpi::SmallVector<char>& buf,
                                        bool withLeadingSlash = true);
 
   /**

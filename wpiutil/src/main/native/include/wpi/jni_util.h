@@ -22,7 +22,6 @@
 #include "wpi/StringExtras.h"
 #include "wpi/mutex.h"
 #include "wpi/print.h"
-#include "wpi/raw_ostream.h"
 #include "wpi/string.h"
 
 /** Java Native Interface (JNI) utility functions */
@@ -175,7 +174,7 @@ class JStringRef {
   WPI_String wpi_str() const { return wpi::make_string(str()); }
 
  private:
-  SmallString<128> m_str;
+  SmallString<40> m_str;
 };
 
 namespace detail {
@@ -429,9 +428,9 @@ using CriticalJSpan = detail::JSpanBase<T, true, Extent>;
  * @param str String to convert.
  */
 inline jstring MakeJString(JNIEnv* env, std::string_view str) {
-  SmallVector<UTF16, 128> chars;
+  SmallVector<UTF16> chars;
   convertUTF8ToUTF16String(str, chars);
-  return env->NewString(chars.begin(), chars.size());
+  return env->NewString(chars.data(), chars.size());
 }
 
 // details for MakeJIntArray
@@ -506,7 +505,7 @@ inline jintArray MakeJIntArray(JNIEnv* env, std::span<T> arr) {
  * @param arr SmallVector to convert.
  */
 template <typename T>
-inline jintArray MakeJIntArray(JNIEnv* env, const SmallVectorImpl<T>& arr) {
+inline jintArray MakeJIntArray(JNIEnv* env, const SmallVector<T>& arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
@@ -826,7 +825,6 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string_view skipPrefix) {
 
   bool foundFirst = false;
   std::string buf;
-  raw_string_ostream oss(buf);
   for (jsize i = 0; i < stackTraceLength; i++) {
     // add the result of toString method of each element in the result
     JLocal<jobject> curStackTraceElement(
@@ -849,10 +847,12 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string_view skipPrefix) {
       }
       foundFirst = true;
     }
-    oss << "\tat " << elem << '\n';
+    buf.append("\tat ");
+    buf.append(elem);
+    buf += '\n';
   }
 
-  return oss.str();
+  return buf;
 }
 
 inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
@@ -902,7 +902,6 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
 
   bool haveLoc = false;
   std::string buf;
-  raw_string_ostream oss(buf);
   for (jsize i = 0; i < stackTraceLength; i++) {
     // add the result of toString method of each element in the result
     JLocal<jobject> curStackTraceElement(
@@ -919,7 +918,8 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
 
     // add a line to res
     JStringRef elem(env, stackElementString);
-    oss << elem << '\n';
+    buf.append(elem);
+    buf += '\n';
 
     if (func) {
       // func is caller of immediate caller (if there was one)
@@ -934,7 +934,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
     }
   }
 
-  return oss.str();
+  return buf;
 }
 
 /**

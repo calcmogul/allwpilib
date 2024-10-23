@@ -5,32 +5,32 @@
 #include "wpi/DataLogWriter.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include "wpi/raw_ostream.h"
-
 using namespace wpi::log;
 
-DataLogWriter::DataLogWriter(std::string_view filename, std::error_code& ec,
+DataLogWriter::DataLogWriter(std::string_view filename,
                              std::string_view extraHeader)
-    : DataLogWriter{s_defaultMessageLog, filename, ec, extraHeader} {}
+    : DataLogWriter{s_defaultMessageLog, filename, extraHeader} {}
 
 DataLogWriter::DataLogWriter(wpi::Logger& msglog, std::string_view filename,
-                             std::error_code& ec, std::string_view extraHeader)
-    : DataLogWriter{msglog, std::make_unique<raw_fd_ostream>(filename, ec),
+                             std::string_view extraHeader)
+    : DataLogWriter{msglog,
+                    std::make_unique<std::ofstream>(std::string{filename}),
                     extraHeader} {
-  if (ec) {
+  if (!m_os->is_open()) {
     Stop();
   }
 }
 
-DataLogWriter::DataLogWriter(std::unique_ptr<wpi::raw_ostream> os,
+DataLogWriter::DataLogWriter(std::unique_ptr<std::ofstream> os,
                              std::string_view extraHeader)
     : DataLogWriter{s_defaultMessageLog, std::move(os), extraHeader} {}
 
 DataLogWriter::DataLogWriter(wpi::Logger& msglog,
-                             std::unique_ptr<wpi::raw_ostream> os,
+                             std::unique_ptr<std::ofstream> os,
                              std::string_view extraHeader)
     : DataLog{msglog, extraHeader}, m_os{std::move(os)} {
   StartFile();
@@ -68,12 +68,9 @@ bool DataLogWriter::BufferFull() {
 extern "C" {
 
 struct WPI_DataLog* WPI_DataLog_CreateWriter(
-    const struct WPI_String* filename, int* errorCode,
-    const struct WPI_String* extraHeader) {
-  std::error_code ec;
+    const struct WPI_String* filename, const struct WPI_String* extraHeader) {
   auto rv = reinterpret_cast<WPI_DataLog*>(new DataLogWriter{
-      wpi::to_string_view(filename), ec, wpi::to_string_view(extraHeader)});
-  *errorCode = ec.value();
+      wpi::to_string_view(filename), wpi::to_string_view(extraHeader)});
   return rv;
 }
 

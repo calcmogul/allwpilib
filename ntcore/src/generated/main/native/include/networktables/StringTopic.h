@@ -15,16 +15,12 @@
 #include <string_view>
 #include <vector>
 
+#include <wpi/SmallVector.h>
 #include <wpi/json_fwd.h>
 
 #include "networktables/NetworkTableType.h"
 #include "networktables/Topic.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi
 
 namespace nt {
 
@@ -86,7 +82,7 @@ class StringSubscriber : public Subscriber {
    * @param buf storage for returned value
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf) const {
+  SmallRetType Get(wpi::SmallVector<SmallElemType>& buf) const {
     return Get(buf, m_defaultValue);
   }
 
@@ -98,7 +94,7 @@ class StringSubscriber : public Subscriber {
    * @param defaultValue default value to return if no value has been published
    * @return value
    */
-  SmallRetType Get(wpi::SmallVectorImpl<SmallElemType>& buf, ParamType defaultValue) const {
+  SmallRetType Get(wpi::SmallVector<SmallElemType>& buf, ParamType defaultValue) const {
     return nt::GetString(m_subHandle, buf, defaultValue);
   }
 
@@ -134,7 +130,7 @@ class StringSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf) const {
+      wpi::SmallVector<SmallElemType>& buf) const {
     return GetAtomic(buf, m_defaultValue);
   }
 
@@ -148,7 +144,7 @@ class StringSubscriber : public Subscriber {
    * @return timestamped value
    */
   TimestampedValueViewType GetAtomic(
-      wpi::SmallVectorImpl<SmallElemType>& buf,
+      wpi::SmallVector<SmallElemType>& buf,
       ParamType defaultValue) const {
     return nt::GetAtomicString(m_subHandle, buf, defaultValue);
   }

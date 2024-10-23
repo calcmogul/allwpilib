@@ -14,7 +14,6 @@
 #include <networktables/DoubleArrayTopic.h>
 #include <networktables/MultiSubscriber.h>
 #include <ntcore_cpp.h>
-#include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>

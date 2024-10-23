@@ -8,8 +8,8 @@
 
 #include <wpi/Endian.h>
 #include <wpi/SmallVector.h>
+#include <wpi/bit.h>
 #include <wpi/leb128.h>
-#include <wpi/raw_ostream.h>
 
 #include "Message3.h"
 
@@ -22,19 +22,19 @@ static void Write8(wpi::raw_ostream& os, uint8_t val) {
 
 static void Write16(wpi::raw_ostream& os, uint16_t val) {
   uint8_t buf[2];
-  wpi::support::endian::write16be(buf, val);
+  wpi::write16be(buf, val);
   os << buf;
 }
 
 static void Write32(wpi::raw_ostream& os, uint32_t val) {
   uint8_t buf[4];
-  wpi::support::endian::write32be(buf, val);
+  wpi::write32be(buf, val);
   os << buf;
 }
 
 static void WriteDouble(wpi::raw_ostream& os, double val) {
   uint8_t buf[8];
-  wpi::support::endian::write64be(buf, std::bit_cast<uint64_t>(val));
+  wpi::write64be(buf, std::bit_cast<uint64_t>(val));
   os << buf;
 }
 

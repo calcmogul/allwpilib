@@ -34,7 +34,7 @@ static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
   wpi::print(stderr, "DS: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
-static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,
+static void generateEnabledDsPacket(wpi::SmallVector<uint8_t>& data,
                                     uint16_t sendCount) {
   data.clear();
   data.push_back(sendCount >> 8);

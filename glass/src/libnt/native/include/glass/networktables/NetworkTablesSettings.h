@@ -8,13 +8,9 @@
 
 #include <ntcore_cpp.h>
 #include <wpi/SafeThread.h>
+#include <wpi/SmallVector.h>
 
 #include "glass/support/EnumSetting.h"
-
-namespace wpi {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi
 
 namespace glass {
 

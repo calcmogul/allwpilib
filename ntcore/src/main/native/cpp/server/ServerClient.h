@@ -13,6 +13,8 @@
 #include <string_view>
 #include <utility>
 
+#include <wpi/SmallVector.h>
+#include <wpi/flat_map.h>
 #include <wpi/json_fwd.h>
 
 #include "net/NetworkOutgoingQueue.h"
@@ -22,8 +24,6 @@
 
 namespace wpi {
 class Logger;
-template <typename T>
-class SmallVectorImpl;
 }  // namespace wpi
 
 namespace nt::server {
@@ -69,7 +69,7 @@ class ServerClient {
 
   std::span<ServerSubscriber*> GetSubscribers(
       std::string_view name, bool special,
-      wpi::SmallVectorImpl<ServerSubscriber*>& buf);
+      wpi::SmallVector<ServerSubscriber*>& buf);
 
   std::string_view GetName() const { return m_name; }
   int GetId() const { return m_id; }
@@ -88,8 +88,8 @@ class ServerClient {
 
   wpi::Logger& m_logger;
 
-  wpi::DenseMap<int, std::unique_ptr<ServerPublisher>> m_publishers;
-  wpi::DenseMap<int, std::unique_ptr<ServerSubscriber>> m_subscribers;
+  std::flat_map<int, std::unique_ptr<ServerPublisher>> m_publishers;
+  std::flat_map<int, std::unique_ptr<ServerSubscriber>> m_subscribers;
 
  public:
   // meta topics

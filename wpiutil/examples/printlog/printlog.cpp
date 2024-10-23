@@ -11,8 +11,8 @@
 #include <fmt/ranges.h>
 
 #include "wpi/DataLogReader.h"
-#include "wpi/DenseMap.h"
 #include "wpi/MemoryBuffer.h"
+#include "wpi/flat_map.h"
 #include "wpi/print.h"
 
 int main(int argc, const char** argv) {
@@ -32,7 +32,7 @@ int main(int argc, const char** argv) {
     return EXIT_FAILURE;
   }
 
-  wpi::DenseMap<int, wpi::log::StartRecordData> entries;
+  wpi::flat_map<int, wpi::log::StartRecordData> entries;
   for (auto&& record : reader) {
     if (record.IsStart()) {
       wpi::log::StartRecordData data;

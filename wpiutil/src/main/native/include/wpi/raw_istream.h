@@ -53,17 +53,17 @@ class raw_istream {
     return m_read_count;
   }
 
-  raw_istream& readinto(SmallVectorImpl<char>& buf, size_t len) {
+  raw_istream& readinto(SmallVector<char>& buf, size_t len) {
     size_t old_size = buf.size();
-    buf.append(len, 0);
+    buf.insert(buf.end(), len, 0);
     read_impl(&buf[old_size], len);
     buf.resize(old_size + m_read_count);
     return *this;
   }
 
-  raw_istream& readinto(SmallVectorImpl<uint8_t>& buf, size_t len) {
+  raw_istream& readinto(SmallVector<uint8_t>& buf, size_t len) {
     size_t old_size = buf.size();
-    buf.append(len, 0);
+    buf.insert(buf.end(), len, 0);
     read_impl(&buf[old_size], len);
     buf.resize(old_size + m_read_count);
     return *this;
@@ -99,7 +99,7 @@ class raw_istream {
   // @param buf Buffer for output
   // @param maxLen Maximum length
   // @return Line
-  std::string_view getline(SmallVectorImpl<char>& buf, int maxLen);
+  std::string_view getline(SmallVector<char>& buf, int maxLen);
 
   virtual void close() = 0;
 

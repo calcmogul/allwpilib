@@ -8,8 +8,8 @@
 #include <string_view>
 #include <utility>
 
-#include <wpi/DenseMap.h>
 #include <wpi/SmallPtrSet.h>
+#include <wpi/flat_map.h>
 #include <wpi/json.h>
 
 #include "net/NetworkOutgoingQueue.h"
@@ -94,7 +94,7 @@ struct ServerTopic {
     }
   }
 
-  wpi::SmallDenseMap<ServerClient*, TopicClientData, 4> clients;
+  wpi::flat_map<ServerClient*, TopicClientData> clients;
 
   // meta topics
   ServerTopic* metaPub = nullptr;

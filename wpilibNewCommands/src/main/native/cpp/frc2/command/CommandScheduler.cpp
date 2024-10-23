@@ -18,8 +18,8 @@
 #include <hal/HALBase.h>
 #include <networktables/IntegerArrayTopic.h>
 #include <networktables/StringArrayTopic.h>
-#include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
+#include <wpi/flat_map.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -35,11 +35,11 @@ class CommandScheduler::Impl {
 
   // A map from required subsystems to their requiring commands.  Also used as a
   // set of the currently-required subsystems.
-  wpi::DenseMap<Subsystem*, Command*> requirements;
+  wpi::flat_map<Subsystem*, Command*> requirements;
 
   // A map from subsystems registered with the scheduler to their default
   // commands.  Also used as a list of currently-registered subsystems.
-  wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
+  wpi::flat_map<Subsystem*, std::unique_ptr<Command>> subsystems;
 
   frc::EventLoop defaultButtonLoop;
   // The set of currently-registered buttons that will be polled every
@@ -58,7 +58,7 @@ class CommandScheduler::Impl {
   // Map of Command* -> CommandPtr for CommandPtrs transferred to the scheduler
   // via Schedule(CommandPtr&&). These are erased (destroyed) at the very end of
   // the loop cycle when the command lifecycle is complete.
-  wpi::DenseMap<Command*, CommandPtr> ownedCommands;
+  wpi::flat_map<Command*, CommandPtr> ownedCommands;
 };
 
 template <typename TMap, typename TKey>
@@ -358,7 +358,7 @@ void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::CancelAll() {
-  wpi::SmallVector<Command*, 16> commands;
+  wpi::SmallVector<Command*> commands;
   for (auto&& command : m_impl->scheduledCommands) {
     commands.emplace_back(command);
   }

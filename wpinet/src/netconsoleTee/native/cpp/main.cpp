@@ -25,7 +25,7 @@ namespace uv = wpi::uv;
 static uint64_t startTime = wpi::Now();
 
 static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
-                          wpi::SmallVectorImpl<uv::Buffer>& bufs, bool tcp,
+                          wpi::SmallVector<uv::Buffer>& bufs, bool tcp,
                           uint16_t tcpSeq) {
   // scan for last newline
   std::string_view str(buf.base, len);

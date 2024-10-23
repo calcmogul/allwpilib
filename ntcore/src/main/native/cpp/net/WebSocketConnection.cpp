@@ -7,10 +7,8 @@
 #include <algorithm>
 #include <span>
 
-#include <wpi/Endian.h>
 #include <wpi/Logger.h>
 #include <wpi/SpanExtras.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 #include <wpinet/WebSocket.h>
 #include <wpinet/raw_uv_ostream.h>
@@ -124,7 +122,7 @@ void WebSocketConnection::SendPing(uint64_t time) {
   WPI_DEBUG4(m_logger, "conn: sending ping {}", time);
   auto buf = AllocBuf();
   buf.len = 8;
-  wpi::support::endian::write64<wpi::endianness::native>(buf.base, time);
+  std::memcpy(buf.base, &time, sizeof(time));
   m_ws.SendPing({buf}, [selfweak = weak_from_this()](auto bufs, auto err) {
     if (auto self = selfweak.lock()) {
       self->m_err = err;

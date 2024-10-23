@@ -6,7 +6,6 @@
 
 #include "wpi/SpanExtras.h"
 #include "wpi/raw_istream.h"
-#include "wpi/raw_ostream.h"
 
 namespace wpi {
 
@@ -19,7 +18,7 @@ uint64_t SizeUleb128(uint64_t val) {
   return count;
 }
 
-uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val) {
+uint64_t WriteUleb128(SmallVector<char>& dest, uint64_t val) {
   size_t count = 0;
 
   do {
@@ -35,19 +34,6 @@ uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val) {
   } while (val != 0);
 
   return count;
-}
-
-void WriteUleb128(raw_ostream& os, uint64_t val) {
-  do {
-    uint8_t byte = val & 0x7f;
-    val >>= 7;
-
-    if (val != 0) {
-      byte |= 0x80;  // mark this byte to show that more bytes will follow
-    }
-
-    os << byte;
-  } while (val != 0);
 }
 
 uint64_t ReadUleb128(const char* addr, uint64_t* ret) {

@@ -80,7 +80,7 @@ void glass::DisplayFMS(FMSModel* model, bool editableDsAttached) {
   }
 
   // Game Specific Message
-  wpi::SmallString<64> gameSpecificMessageBuf;
+  wpi::SmallString<40> gameSpecificMessageBuf;
   std::string gameSpecificMessage{
       model->GetGameSpecificMessage(gameSpecificMessageBuf)};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
@@ -149,7 +149,7 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     }
   }
 
-  wpi::SmallString<64> gameSpecificMessageBuf;
+  wpi::SmallString<40> gameSpecificMessageBuf;
   std::string_view gameSpecificMessage =
       model->GetGameSpecificMessage(gameSpecificMessageBuf);
   ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.data() : "?");

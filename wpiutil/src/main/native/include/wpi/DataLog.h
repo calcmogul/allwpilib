@@ -20,14 +20,15 @@
 #include <version>
 
 #include "wpi/DataLog_c.h"
-#include "wpi/DenseMap.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
+#include "wpi/flat_map.h"
 #include "wpi/mutex.h"
 #include "wpi/protobuf/Protobuf.h"
 #include "wpi/string.h"
 #include "wpi/struct/Struct.h"
 #include "wpi/timestamp.h"
+#include "wpi/type_traits.h"
 
 namespace wpi {
 class Logger;
@@ -522,7 +523,7 @@ class DataLog {
     std::string metadata;
     unsigned int count;
   };
-  wpi::DenseMap<int, EntryInfo2> m_entryIds;
+  wpi::flat_map<int, EntryInfo2> m_entryIds;
   int m_lastId = 0;
 };
 
@@ -1342,7 +1343,7 @@ class StructLogEntry : public DataLogEntry {
       }
     }
     wpi::SmallVector<uint8_t, 128> buf;
-    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    buf.resize(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
     m_log->AppendRaw(m_entry, buf, timestamp);
   }
@@ -1373,7 +1374,7 @@ class StructLogEntry : public DataLogEntry {
       }
     }
     wpi::SmallVector<uint8_t, 128> buf;
-    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    buf.resize(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, data, info...); }, m_info);
     std::scoped_lock lock{m_mutex};
     if (m_lastValue.empty() ||

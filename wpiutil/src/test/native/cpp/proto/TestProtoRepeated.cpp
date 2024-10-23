@@ -156,7 +156,7 @@ TEST(RepeatedTestProtoTest, RoundtripNanopb) {
   kExpectedData.double_msg.emplace_back(5.05);
 
   wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::SmallVector<uint8_t> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

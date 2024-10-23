@@ -139,13 +139,13 @@ class SendableChooser : public SendableChooserBase {
         nullptr);
     builder.AddSmallStringProperty(
         kDefault,
-        [=, this](wpi::SmallVectorImpl<char>&) -> std::string_view {
+        [=, this](wpi::SmallVector<char>&) -> std::string_view {
           return m_defaultChoice;
         },
         nullptr);
     builder.AddSmallStringProperty(
         kActive,
-        [=, this](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+        [=, this](wpi::SmallVector<char>& buf) -> std::string_view {
           std::scoped_lock lock(m_mutex);
           if (m_haveSelected) {
             buf.assign(m_selected.begin(), m_selected.end());

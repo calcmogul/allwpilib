@@ -23,7 +23,7 @@ using namespace glass;
 
 bool glass::DisplayPneumaticControlSolenoids(PneumaticControlModel* model,
                                              int index, bool outputsEnabled) {
-  wpi::SmallVector<int, 16> channels;
+  wpi::SmallVector<int> channels;
   model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
       if (j >= static_cast<int>(channels.size())) {

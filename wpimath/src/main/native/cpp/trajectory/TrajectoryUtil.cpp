@@ -4,22 +4,20 @@
 
 #include "frc/trajectory/TrajectoryUtil.h"
 
+#include <fstream>
 #include <string>
 #include <system_error>
 
 #include <fmt/format.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/json.h>
-#include <wpi/raw_ostream.h>
 
 using namespace frc;
 
 void TrajectoryUtil::ToPathweaverJson(const Trajectory& trajectory,
                                       std::string_view path) {
-  std::error_code error_code;
-
-  wpi::raw_fd_ostream output{path, error_code};
-  if (error_code) {
+  std::ofstream output{std::string{path}};
+  if (!output.is_open()) {
     throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 

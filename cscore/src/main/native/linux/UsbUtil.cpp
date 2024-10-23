@@ -15,7 +15,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 
 #include "Instance.h"
 

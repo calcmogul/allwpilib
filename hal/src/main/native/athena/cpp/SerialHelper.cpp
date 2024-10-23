@@ -137,16 +137,15 @@ void SerialHelper::SortHubPathVector() {
   m_sortedHubPath.clear();
   m_sortedHubPath = m_unsortedHubPath;
   std::sort(m_sortedHubPath.begin(), m_sortedHubPath.end(),
-            [](const wpi::SmallVectorImpl<char>& lhs,
-               const wpi::SmallVectorImpl<char>& rhs) -> int {
+            [](const wpi::SmallVector<char>& lhs,
+               const wpi::SmallVector<char>& rhs) -> int {
               std::string_view lhsRef(lhs.begin(), lhs.size());
               std::string_view rhsRef(rhs.begin(), rhs.size());
               return lhsRef.compare(rhsRef);
             });
 }
 
-void SerialHelper::CoiteratedSort(
-    wpi::SmallVectorImpl<wpi::SmallString<16>>& vec) {
+void SerialHelper::CoiteratedSort(wpi::SmallVector<wpi::SmallString<16>>& vec) {
   wpi::SmallVector<wpi::SmallString<16>, 4> sortedVec;
   for (auto& str : m_sortedHubPath) {
     for (size_t i = 0; i < m_unsortedHubPath.size(); i++) {
@@ -243,7 +242,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
         continue;
       }
 
-      wpi::SmallVector<std::string_view, 16> pathSplitVec;
+      wpi::SmallVector<std::string_view> pathSplitVec;
       // Split path into individual directories
       wpi::split(path, pathSplitVec, '/', -1, false);
 

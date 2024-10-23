@@ -10,10 +10,9 @@
 
 #include <fmt/format.h>
 
-#include "wpi/Endian.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
-#include "wpi/raw_ostream.h"
+#include "wpi/bit.h"
 #include "wpi/struct/SchemaParser.h"
 
 using namespace wpi;
@@ -111,7 +110,7 @@ const StructFieldDescriptor* StructDescriptor::FindFieldByName(
 }
 
 bool StructDescriptor::CheckCircular(
-    wpi::SmallVectorImpl<const StructDescriptor*>& stack) const {
+    wpi::SmallVector<const StructDescriptor*>& stack) const {
   stack.emplace_back(this);
   for (auto&& ref : m_references) {
     if (std::find(stack.begin(), stack.end(), ref) != stack.end()) {
@@ -126,7 +125,7 @@ bool StructDescriptor::CheckCircular(
 }
 
 std::string StructDescriptor::CalculateOffsets(
-    wpi::SmallVectorImpl<const StructDescriptor*>& stack) {
+    wpi::SmallVector<const StructDescriptor*>& stack) {
   size_t offset = 0;
   unsigned int shift = 0;
   size_t prevBitfieldSize = 0;
@@ -282,7 +281,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
   theStruct.m_valid = isValid;
   if (isValid) {
     // we have all the info needed, so calculate field offset & shift
-    wpi::SmallVector<const StructDescriptor*, 16> stack;
+    wpi::SmallVector<const StructDescriptor*> stack;
     auto err2 = theStruct.CalculateOffsets(stack);
     if (!err2.empty()) {
       *err = std::move(err2);
@@ -290,17 +289,16 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     }
   } else {
     // check for circular reference
-    wpi::SmallVector<const StructDescriptor*, 16> stack;
+    wpi::SmallVector<const StructDescriptor*> stack;
     if (!theStruct.CheckCircular(stack)) {
       wpi::SmallString<128> buf;
-      wpi::raw_svector_ostream os{buf};
       for (auto&& elem : stack) {
         if (!buf.empty()) {
-          os << " <- ";
+          buf.append(" <- ");
         }
-        os << elem->GetName();
+        buf.append(elem->GetName());
       }
-      *err = fmt::format("circular struct reference: {}", os.str());
+      *err = fmt::format("circular struct reference: {}", buf);
       [[unlikely]] return nullptr;
     }
   }
@@ -328,13 +326,13 @@ uint64_t DynamicStruct::GetFieldImpl(const StructFieldDescriptor* field,
       val = m_data[field->m_offset + arrIndex];
       break;
     case 2:
-      val = support::endian::read16le(&m_data[field->m_offset + arrIndex * 2]);
+      val = read16le(&m_data[field->m_offset + arrIndex * 2]);
       break;
     case 4:
-      val = support::endian::read32le(&m_data[field->m_offset + arrIndex * 4]);
+      val = read32le(&m_data[field->m_offset + arrIndex * 4]);
       break;
     case 8:
-      val = support::endian::read64le(&m_data[field->m_offset + arrIndex * 8]);
+      val = read64le(&m_data[field->m_offset + arrIndex * 8]);
       break;
     default:
       assert(false && "invalid field size");
@@ -447,16 +445,13 @@ void MutableDynamicStruct::SetFieldImpl(const StructFieldDescriptor* field,
         m_data[field->m_offset + arrIndex] = value;
         break;
       case 2:
-        support::endian::write16le(&m_data[field->m_offset + arrIndex * 2],
-                                   value);
+        write16le(&m_data[field->m_offset + arrIndex * 2], value);
         break;
       case 4:
-        support::endian::write32le(&m_data[field->m_offset + arrIndex * 4],
-                                   value);
+        write32le(&m_data[field->m_offset + arrIndex * 4], value);
         break;
       case 8:
-        support::endian::write64le(&m_data[field->m_offset + arrIndex * 8],
-                                   value);
+        write64le(&m_data[field->m_offset + arrIndex * 8], value);
         break;
       default:
         assert(false && "invalid field size");
@@ -474,26 +469,26 @@ void MutableDynamicStruct::SetFieldImpl(const StructFieldDescriptor* field,
     }
     case 2: {
       uint8_t* data = &m_data[field->m_offset + arrIndex * 2];
-      uint16_t val = support::endian::read16le(data);
+      uint16_t val = read16le(data);
       val &= ~(field->m_bitMask << field->m_bitShift);
       val |= (value & field->m_bitMask) << field->m_bitShift;
-      support::endian::write16le(data, val);
+      write16le(data, val);
       break;
     }
     case 4: {
       uint8_t* data = &m_data[field->m_offset + arrIndex * 4];
-      uint32_t val = support::endian::read32le(data);
+      uint32_t val = read32le(data);
       val &= ~(field->m_bitMask << field->m_bitShift);
       val |= (value & field->m_bitMask) << field->m_bitShift;
-      support::endian::write32le(data, val);
+      write32le(data, val);
       break;
     }
     case 8: {
       uint8_t* data = &m_data[field->m_offset + arrIndex * 8];
-      uint64_t val = support::endian::read64le(data);
+      uint64_t val = read64le(data);
       val &= ~(field->m_bitMask << field->m_bitShift);
       val |= (value & field->m_bitMask) << field->m_bitShift;
-      support::endian::write64le(data, val);
+      write64le(data, val);
       break;
     }
     default:

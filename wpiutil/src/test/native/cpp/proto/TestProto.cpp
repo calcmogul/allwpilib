@@ -116,7 +116,7 @@ TEST(TestProtoTest, RoundtripNanopb) {
   const TestProto kExpectedData = TestProto{};
 
   wpi::ProtobufMessage<TestProto> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::SmallVector<uint8_t> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   std::optional<TestProto> unpacked_data = message.Unpack(buf);

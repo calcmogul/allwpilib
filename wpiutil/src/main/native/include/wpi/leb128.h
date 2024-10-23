@@ -10,12 +10,11 @@
 #include <optional>
 #include <span>
 
+#include "wpi/SmallVector.h"
+
 namespace wpi {
 
-template <typename T>
-class SmallVectorImpl;
 class raw_istream;
-class raw_ostream;
 
 /**
  * Get size of unsigned LEB128 data.
@@ -40,19 +39,7 @@ uint64_t SizeUleb128(uint64_t val);
  * @param dest The address where the ULEB128 data is to be stored.
  * @param val Value to be stored.
  */
-uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val);
-
-/**
- * Write unsigned LEB128 data.
- *
- * Encode an unsigned LEB128 encoded datum. The algorithm is taken
- * from Appendix C of the DWARF 3 spec. For information on the
- * encodings refer to section "7.6 - Variable Length Data".
- *
- * @param os Output stream.
- * @param val Value to be stored.
- */
-void WriteUleb128(raw_ostream& os, uint64_t val);
+uint64_t WriteUleb128(SmallVector<char>& dest, uint64_t val);
 
 /**
  * Read unsigned LEB128 data.

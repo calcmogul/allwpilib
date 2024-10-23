@@ -28,7 +28,7 @@ TEST(LEB128Test, WriteUleb128) {
 #define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD)                \
   do {                                                         \
     std::string_view expected(EXPECTED, sizeof(EXPECTED) - 1); \
-    SmallString<32> buf;                                       \
+    SmallString<40> buf;                                       \
     size_t size = WriteUleb128(buf, VALUE);                    \
     EXPECT_EQ(size, buf.size());                               \
     EXPECT_EQ(expected, buf.str());                            \

@@ -151,7 +151,7 @@ void HttpCameraImpl::StreamThreadMain() {
 }
 
 wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
-    wpi::SmallVectorImpl<char>& boundary) {
+    wpi::SmallVector<char>& boundary) {
   // Build the request
   wpi::HttpRequest req;
   {

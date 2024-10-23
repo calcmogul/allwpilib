@@ -19,7 +19,6 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"

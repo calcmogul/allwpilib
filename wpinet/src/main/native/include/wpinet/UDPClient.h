@@ -40,7 +40,7 @@ class UDPClient {
   int send(std::string_view data, std::string_view server, int port);
   int receive(uint8_t* data_received, int receive_len);
   int receive(uint8_t* data_received, int receive_len,
-              SmallVectorImpl<char>* addr_received, int* port_received);
+              SmallVector<char>* addr_received, int* port_received);
   int set_timeout(double timeout);
 };
 

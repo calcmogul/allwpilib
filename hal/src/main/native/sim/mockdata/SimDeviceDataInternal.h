@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/Compiler.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/UidVector.h>
@@ -76,7 +77,7 @@ class SimUnnamedCallbackRegistry {
   }
 
   template <typename... U>
-  LLVM_ATTRIBUTE_ALWAYS_INLINE void operator()(U&&... u) const {
+  WPI_ALWAYS_INLINE void operator()(U&&... u) const {
     return Invoke(std::forward<U>(u)...);
   }
 
@@ -139,7 +140,7 @@ class SimPrefixCallbackRegistry {
   }
 
   template <typename... U>
-  LLVM_ATTRIBUTE_ALWAYS_INLINE void operator()(U&&... u) const {
+  WPI_ALWAYS_INLINE void operator()(U&&... u) const {
     return Invoke(std::forward<U>(u)...);
   }
 

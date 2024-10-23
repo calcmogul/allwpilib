@@ -9,8 +9,6 @@
 #include <span>
 #include <vector>
 
-#include <wpi/raw_ostream.h>
-
 #include "gmock/gmock.h"
 #include "net3/WireConnection3.h"
 

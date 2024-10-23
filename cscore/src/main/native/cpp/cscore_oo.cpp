@@ -36,7 +36,7 @@ std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
 }
 
 std::vector<VideoSink> VideoSource::EnumerateSinks() {
-  wpi::SmallVector<CS_Sink, 16> handles_buf;
+  wpi::SmallVector<CS_Sink> handles_buf;
   CS_Status status = 0;
   auto handles = EnumerateSourceSinks(m_handle, handles_buf, &status);
 
@@ -49,7 +49,7 @@ std::vector<VideoSink> VideoSource::EnumerateSinks() {
 }
 
 std::vector<VideoSource> VideoSource::EnumerateSources() {
-  wpi::SmallVector<CS_Source, 16> handles_buf;
+  wpi::SmallVector<CS_Source> handles_buf;
   CS_Status status = 0;
   auto handles = ::cs::EnumerateSourceHandles(handles_buf, &status);
 
@@ -75,7 +75,7 @@ std::vector<VideoProperty> VideoSink::EnumerateProperties() const {
 }
 
 std::vector<VideoSink> VideoSink::EnumerateSinks() {
-  wpi::SmallVector<CS_Sink, 16> handles_buf;
+  wpi::SmallVector<CS_Sink> handles_buf;
   CS_Status status = 0;
   auto handles = ::cs::EnumerateSinkHandles(handles_buf, &status);
 

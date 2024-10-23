@@ -13,7 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/Endian.h"
 #include "wpi/Logger.h"
 #include "wpi/SmallString.h"
 #include "wpi/print.h"
@@ -78,7 +77,7 @@ void DataLog::StartFile() {
   uint8_t* buf = Reserve(m_extraHeader.size() + 12);
   static const uint8_t header[] = {'W', 'P', 'I', 'L', 'O', 'G', 0, 1};
   std::memcpy(buf, header, 8);
-  support::endian::write32le(buf + 8, m_extraHeader.size());
+  write32le(buf + 8, m_extraHeader.size());
   std::memcpy(buf + 12, m_extraHeader.data(), m_extraHeader.size());
 
   // Existing start and schema data records
@@ -205,7 +204,7 @@ void DataLog::AppendStartRecord(int id, std::string_view name,
   size_t strsize = name.size() + type.size() + metadata.size();
   uint8_t* buf = StartRecord(0, timestamp, 5 + 12 + strsize, 5);
   *buf++ = impl::kControlStart;
-  wpi::support::endian::write32le(buf, id);
+  wpi::write32le(buf, id);
   AppendStringImpl(name);
   AppendStringImpl(type);
   AppendStringImpl(metadata);
@@ -240,7 +239,7 @@ void DataLog::Finish(int entry, int64_t timestamp) {
   }
   uint8_t* buf = StartRecord(0, timestamp, 5, 5);
   *buf++ = impl::kControlFinish;
-  wpi::support::endian::write32le(buf, entry);
+  wpi::write32le(buf, entry);
 }
 
 void DataLog::SetMetadata(int entry, std::string_view metadata,
@@ -255,7 +254,7 @@ void DataLog::SetMetadata(int entry, std::string_view metadata,
   }
   uint8_t* buf = StartRecord(0, timestamp, 5 + 4 + metadata.size(), 5);
   *buf++ = impl::kControlSetMetadata;
-  wpi::support::endian::write32le(buf, entry);
+  wpi::write32le(buf, entry);
   AppendStringImpl(metadata);
 }
 
@@ -304,7 +303,7 @@ void DataLog::AppendImpl(std::span<const uint8_t> data) {
 
 void DataLog::AppendStringImpl(std::string_view str) {
   uint8_t* buf = Reserve(4);
-  wpi::support::endian::write32le(buf, str.size());
+  wpi::write32le(buf, str.size());
   AppendImpl({reinterpret_cast<const uint8_t*>(str.data()), str.size()});
 }
 
@@ -362,7 +361,7 @@ void DataLog::AppendInteger(int entry, int64_t value, int64_t timestamp) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 8, 8);
-  wpi::support::endian::write64le(buf, value);
+  wpi::write64le(buf, value);
 }
 
 void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
@@ -377,7 +376,7 @@ void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
   if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 4);
   } else {
-    wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(value));
+    wpi::write32le(buf, std::bit_cast<uint32_t>(value));
   }
 }
 
@@ -393,7 +392,7 @@ void DataLog::AppendDouble(int entry, double value, int64_t timestamp) {
   if constexpr (std::endian::native == std::endian::little) {
     std::memcpy(buf, &value, 8);
   } else {
-    wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(value));
+    wpi::write64le(buf, std::bit_cast<uint64_t>(value));
   }
 }
 
@@ -476,14 +475,14 @@ void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
     while ((arr.size() * 8) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 8)) {
-        wpi::support::endian::write64le(buf, val);
+        wpi::write64le(buf, val);
         buf += 8;
       }
       arr = arr.subspan(kBlockSize / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {
-      wpi::support::endian::write64le(buf, val);
+      wpi::write64le(buf, val);
       buf += 8;
     }
   }
@@ -508,14 +507,14 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
     while ((arr.size() * 4) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 4)) {
-        wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
+        wpi::write32le(buf, std::bit_cast<uint32_t>(val));
         buf += 4;
       }
       arr = arr.subspan(kBlockSize / 4);
     }
     buf = Reserve(arr.size() * 4);
     for (auto val : arr) {
-      wpi::support::endian::write32le(buf, std::bit_cast<uint32_t>(val));
+      wpi::write32le(buf, std::bit_cast<uint32_t>(val));
       buf += 4;
     }
   }
@@ -540,14 +539,14 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
     while ((arr.size() * 8) > kBlockSize) {
       buf = Reserve(kBlockSize);
       for (auto val : arr.subspan(0, kBlockSize / 8)) {
-        wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
+        wpi::write64le(buf, std::bit_cast<uint64_t>(val));
         buf += 8;
       }
       arr = arr.subspan(kBlockSize / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {
-      wpi::support::endian::write64le(buf, std::bit_cast<uint64_t>(val));
+      wpi::write64le(buf, std::bit_cast<uint64_t>(val));
       buf += 8;
     }
   }
@@ -569,7 +568,7 @@ void DataLog::AppendStringArray(int entry, std::span<const std::string> arr,
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
-  wpi::support::endian::write32le(buf, arr.size());
+  wpi::write32le(buf, arr.size());
   for (auto&& str : arr) {
     AppendStringImpl(str);
   }
@@ -592,7 +591,7 @@ void DataLog::AppendStringArray(int entry,
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
-  wpi::support::endian::write32le(buf, arr.size());
+  wpi::write32le(buf, arr.size());
   for (auto&& sv : arr) {
     AppendStringImpl(sv);
   }
@@ -615,7 +614,7 @@ void DataLog::AppendStringArray(int entry,
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
-  wpi::support::endian::write32le(buf, arr.size());
+  wpi::write32le(buf, arr.size());
   for (auto&& sv : arr) {
     AppendStringImpl(sv.str);
   }

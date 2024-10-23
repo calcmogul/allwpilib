@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 
 #include "net/ClientMessageQueue.h"
 #include "server/Functions.h"
@@ -39,7 +39,7 @@ class ServerClient4Base : public ServerClient,
 
   bool DoProcessIncomingMessages(net::ClientMessageQueue& queue, size_t max);
 
-  wpi::DenseMap<ServerTopic*, bool> m_announceSent;
+  wpi::flat_map<ServerTopic*, bool> m_announceSent;
 
  private:
   std::array<net::ClientMessage, 16> m_msgsBuf;

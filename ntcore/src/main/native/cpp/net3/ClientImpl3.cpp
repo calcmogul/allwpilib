@@ -12,8 +12,7 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringMap.h>
+#include <wpi/flat_map.h>
 #include <wpi/timestamp.h>
 
 #include "Log.h"
