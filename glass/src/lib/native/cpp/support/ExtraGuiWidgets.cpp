@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 
 #include "glass/DataSource.h"
 #include "glass/support/ExpressionParser.h"
@@ -230,7 +230,7 @@ struct InputExprState {
   char inputBuffer[kBufferSize];
 };
 
-static wpi::DenseMap<int, InputExprState> exprStates;
+static wpi::flat_map<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
 static char previewBuffer[kBufferSize];
 

@@ -21,7 +21,7 @@ using namespace frc;
 
 wpi::mutex PneumaticsControlModule::m_handleLock;
 std::unique_ptr<
-    wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>>
+    wpi::flat_map<int, std::weak_ptr<PneumaticsControlModule::DataStore>>>
     PneumaticsControlModule::m_handleMap = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
@@ -29,7 +29,7 @@ std::unique_ptr<
 std::weak_ptr<PneumaticsControlModule::DataStore>&
 PneumaticsControlModule::GetDataStore(int module) {
   if (!m_handleMap) {
-    m_handleMap = std::make_unique<wpi::DenseMap<
+    m_handleMap = std::make_unique<wpi::flat_map<
         int, std::weak_ptr<PneumaticsControlModule::DataStore>>>();
   }
   return (*m_handleMap)[module];

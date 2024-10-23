@@ -116,7 +116,7 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
 // Removes non-alphanumeric characters and replaces spaces with underscores.
 // e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
 static std::string_view NormalizeName(std::string_view name,
-                                      wpi::SmallVectorImpl<char>& buf) {
+                                      wpi::SmallVector<char>& buf) {
   bool newWord = false;
   for (auto ch : name) {
     if (std::isalnum(ch)) {

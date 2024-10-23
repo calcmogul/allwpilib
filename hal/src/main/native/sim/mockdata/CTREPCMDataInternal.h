@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/Compiler.h>
+
 #include "../PortsInternal.h"
 #include "hal/simulation/CTREPCMData.h"
 #include "hal/simulation/SimDataValue.h"
@@ -17,8 +19,7 @@ class CTREPCMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(PressureSwitch)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorCurrent)
 
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr HAL_Bool
-  GetSolenoidOutputDefault() {
+  static WPI_ALWAYS_INLINE constexpr HAL_Bool GetSolenoidOutputDefault() {
     return false;
   }
 

@@ -184,7 +184,7 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents
   int32_t status = 0;
   int32_t size = HAL_GetPowerDistributionNumChannels(handle, &status);
   wpi::SmallVector<double, 24> storage;
-  storage.resize_for_overwrite(size);
+  storage.resize(size);
 
   HAL_GetPowerDistributionAllChannelCurrents(handle, storage.data(), size,
                                              &status);

@@ -11,7 +11,6 @@
 
 #include <wpi/Logger.h>
 #include <wpi/SmallVector.h>
-#include <wpi/raw_ostream.h>
 
 using namespace wpi;
 using namespace wpi::uv;

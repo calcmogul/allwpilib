@@ -17,7 +17,6 @@
 #include "wpi/UidVector.h"
 #include "wpi/condition_variable.h"
 #include "wpi/mutex.h"
-#include "wpi/raw_ostream.h"
 
 namespace wpi {
 

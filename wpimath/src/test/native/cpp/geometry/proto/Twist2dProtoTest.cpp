@@ -16,7 +16,7 @@ const Twist2d kExpectedData = Twist2d{2.29_m, 35.04_m, 35.04_rad};
 
 TEST(Twist2dProtoTest, Roundtrip) {
   wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::SmallVector<uint8_t> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

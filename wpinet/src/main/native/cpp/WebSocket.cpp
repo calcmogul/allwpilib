@@ -17,7 +17,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/print.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/sha1.h>
 
 #include "WebSocketDebug.h"
@@ -123,8 +122,7 @@ class WebSocket::ClientHandshakeData {
     for (char& v : nonce) {
       v = static_cast<char>(dist(gen));
     }
-    raw_svector_ostream os(key);
-    Base64Encode(os, {nonce, 16});
+    Base64Encode(key, {nonce, 16});
   }
   ~ClientHandshakeData() {
     if (auto t = timer.lock()) {
@@ -145,7 +143,7 @@ class WebSocket::ClientHandshakeData {
 };
 
 static std::string_view AcceptHash(std::string_view key,
-                                   SmallVectorImpl<char>& buf) {
+                                   SmallVector<char>& buf) {
   SHA1 hash;
   hash.Update(key);
   hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");

@@ -17,7 +17,6 @@
 
 #include <fmt/format.h>
 
-#include "wpi/Endian.h"
 #include "wpi/array.h"
 #include "wpi/bit.h"
 #include "wpi/ct_string.h"
@@ -585,10 +584,10 @@ struct Struct<uint16_t> {
   static constexpr size_t GetSize() { return 2; }
   static constexpr std::string_view GetSchema() { return "uint16 value"; }
   static uint16_t Unpack(std::span<const uint8_t> data) {
-    return support::endian::read16le(data.data());
+    return read16le(data.data());
   }
   static void Pack(std::span<uint8_t> data, uint16_t value) {
-    support::endian::write16le(data.data(), value);
+    write16le(data.data(), value);
   }
 };
 
@@ -602,10 +601,10 @@ struct Struct<int16_t> {
   static constexpr size_t GetSize() { return 2; }
   static constexpr std::string_view GetSchema() { return "int16 value"; }
   static int16_t Unpack(std::span<const uint8_t> data) {
-    return support::endian::read16le(data.data());
+    return read16le(data.data());
   }
   static void Pack(std::span<uint8_t> data, int16_t value) {
-    support::endian::write16le(data.data(), value);
+    write16le(data.data(), value);
   }
 };
 
@@ -619,10 +618,10 @@ struct Struct<uint32_t> {
   static constexpr size_t GetSize() { return 4; }
   static constexpr std::string_view GetSchema() { return "uint32 value"; }
   static uint32_t Unpack(std::span<const uint8_t> data) {
-    return support::endian::read32le(data.data());
+    return read32le(data.data());
   }
   static void Pack(std::span<uint8_t> data, uint32_t value) {
-    support::endian::write32le(data.data(), value);
+    write32le(data.data(), value);
   }
 };
 
@@ -636,10 +635,10 @@ struct Struct<int32_t> {
   static constexpr size_t GetSize() { return 4; }
   static constexpr std::string_view GetSchema() { return "int32 value"; }
   static int32_t Unpack(std::span<const uint8_t> data) {
-    return support::endian::read32le(data.data());
+    return read32le(data.data());
   }
   static void Pack(std::span<uint8_t> data, int32_t value) {
-    support::endian::write32le(data.data(), value);
+    write32le(data.data(), value);
   }
 };
 
@@ -653,10 +652,10 @@ struct Struct<uint64_t> {
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "uint64 value"; }
   static uint64_t Unpack(std::span<const uint8_t> data) {
-    return support::endian::read64le(data.data());
+    return read64le(data.data());
   }
   static void Pack(std::span<uint8_t> data, uint64_t value) {
-    support::endian::write64le(data.data(), value);
+    write64le(data.data(), value);
   }
 };
 
@@ -670,10 +669,10 @@ struct Struct<int64_t> {
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "int64 value"; }
   static int64_t Unpack(std::span<const uint8_t> data) {
-    return support::endian::read64le(data.data());
+    return read64le(data.data());
   }
   static void Pack(std::span<uint8_t> data, int64_t value) {
-    support::endian::write64le(data.data(), value);
+    write64le(data.data(), value);
   }
 };
 
@@ -687,10 +686,10 @@ struct Struct<float> {
   static constexpr size_t GetSize() { return 4; }
   static constexpr std::string_view GetSchema() { return "float value"; }
   static float Unpack(std::span<const uint8_t> data) {
-    return bit_cast<float>(support::endian::read32le(data.data()));
+    return std::bit_cast<float>(read32le(data.data()));
   }
   static void Pack(std::span<uint8_t> data, float value) {
-    support::endian::write32le(data.data(), bit_cast<uint32_t>(value));
+    write32le(data.data(), std::bit_cast<uint32_t>(value));
   }
 };
 
@@ -704,10 +703,10 @@ struct Struct<double> {
   static constexpr size_t GetSize() { return 8; }
   static constexpr std::string_view GetSchema() { return "double value"; }
   static double Unpack(std::span<const uint8_t> data) {
-    return bit_cast<double>(support::endian::read64le(data.data()));
+    return std::bit_cast<double>(read64le(data.data()));
   }
   static void Pack(std::span<uint8_t> data, double value) {
-    support::endian::write64le(data.data(), bit_cast<uint64_t>(value));
+    write64le(data.data(), std::bit_cast<uint64_t>(value));
   }
 };
 

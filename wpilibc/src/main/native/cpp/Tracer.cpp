@@ -6,7 +6,6 @@
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
 

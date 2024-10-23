@@ -22,7 +22,7 @@ struct IndicatorData {
 }  // namespace
 
 void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
-  wpi::SmallVector<LEDDisplayModel::Data, 64> dataBuf;
+  wpi::SmallVector<LEDDisplayModel::Data, 10> dataBuf;
   auto data = model->GetData(dataBuf);
   int length = data.size();
   bool running = model->IsRunning();

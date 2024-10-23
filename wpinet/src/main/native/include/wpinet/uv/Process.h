@@ -71,7 +71,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
       m_data.str = m_strData.c_str();
     }
 
-    /*implicit*/ Option(const SmallVectorImpl<char>& arg)  // NOLINT
+    /*implicit*/ Option(const SmallVector<char>& arg)  // NOLINT
         : m_strData(arg.data(), arg.size()) {
       m_data.str = m_strData.c_str();
     }

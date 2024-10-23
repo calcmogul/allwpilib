@@ -42,7 +42,7 @@ NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
 }
 
 std::string_view NTFMSModel::GetGameSpecificMessage(
-    wpi::SmallVectorImpl<char>& buf) {
+    wpi::SmallVector<char>& buf) {
   return m_gameSpecificMessage.Get(buf, "");
 }
 

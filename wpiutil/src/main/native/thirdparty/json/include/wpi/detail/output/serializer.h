@@ -65,21 +65,14 @@ class serializer
     @param[in] error_handler_  how to react on decoding errors
     */
     serializer(output_adapter_t<char> s, const char ichar,
-               error_handler_t error_handler_ = error_handler_t::strict,
-               size_t indent_init_len = 512)
+               error_handler_t error_handler_ = error_handler_t::strict)
         : o(std::move(s))
         , loc(std::localeconv())
         , thousands_sep(loc->thousands_sep == nullptr ? '\0' : std::char_traits<char>::to_char_type(* (loc->thousands_sep)))
         , decimal_point(loc->decimal_point == nullptr ? '\0' : std::char_traits<char>::to_char_type(* (loc->decimal_point)))
         , indent_char(ichar)
-        , indent_string(indent_init_len, indent_char)
+        , indent_string(512, indent_char)
         , error_handler(error_handler_)
-    {}
-    
-    serializer(raw_ostream& os, const char ichar,
-               size_t indent_init_len = 512,
-               error_handler_t error_handler_ = error_handler_t::strict)
-        : serializer(output_adapter<char>(os), ichar, error_handler_, indent_init_len)
     {}
 
     // delete because of pointer members

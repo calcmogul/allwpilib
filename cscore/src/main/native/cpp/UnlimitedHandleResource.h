@@ -50,7 +50,7 @@ class UnlimitedHandleResource {
   std::shared_ptr<TStruct> Free(THandle handle);
 
   template <typename T>
-  std::span<T> GetAll(wpi::SmallVectorImpl<T>& vec);
+  std::span<T> GetAll(wpi::SmallVector<T>& vec);
 
   std::vector<std::shared_ptr<TStruct>> FreeAll();
 
@@ -149,7 +149,7 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename T>
 inline std::span<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
-    wpi::SmallVectorImpl<T>& vec) {
+    wpi::SmallVector<T>& vec) {
   ForEach([&](THandle handle, const TStruct&) { vec.push_back(handle); });
   return vec;
 }

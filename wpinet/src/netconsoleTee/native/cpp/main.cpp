@@ -10,7 +10,6 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/bit.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
 
@@ -26,7 +25,7 @@ namespace uv = wpi::uv;
 static uint64_t startTime = wpi::Now();
 
 static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
-                          wpi::SmallVectorImpl<uv::Buffer>& bufs, bool tcp,
+                          wpi::SmallVector<uv::Buffer>& bufs, bool tcp,
                           uint16_t tcpSeq) {
   // scan for last newline
   std::string_view str(buf.base, len);
@@ -43,7 +42,7 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   if (tcp) {
     // Header is 2 byte len, 1 byte type, 4 byte timestamp, 2 byte sequence num
     uint32_t ts =
-        wpi::bit_cast<uint32_t, float>((wpi::Now() - startTime) * 1.0e-6);
+        std::bit_cast<uint32_t, float>((wpi::Now() - startTime) * 1.0e-6);
     uint16_t len = rem.size() + toCopy.size() + 1 + 4 + 2;
     const uint8_t header[] = {static_cast<uint8_t>((len >> 8) & 0xff),
                               static_cast<uint8_t>(len & 0xff),

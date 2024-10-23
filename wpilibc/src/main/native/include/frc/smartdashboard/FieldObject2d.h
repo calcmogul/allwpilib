@@ -95,7 +95,7 @@ class FieldObject2d {
    * @param out output SmallVector to hold 2D poses
    * @return span referring to output SmallVector
    */
-  std::span<const Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
+  std::span<const Pose2d> GetPoses(wpi::SmallVector<Pose2d>& out) const;
 
  private:
   void UpdateEntry(bool setDefault = false);

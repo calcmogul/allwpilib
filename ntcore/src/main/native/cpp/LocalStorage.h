@@ -335,7 +335,7 @@ class LocalStorage final : public net::ILocalStorage {
   template <SmallArrayType T>
   Timestamped<typename TypeInfo<T>::SmallRet> GetAtomic(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<typename TypeInfo<T>::SmallElem>& buf,
+      wpi::SmallVector<typename TypeInfo<T>::SmallElem>& buf,
       typename TypeInfo<T>::View defaultValue) {
     std::scoped_lock lock{m_mutex};
     Value* value = m_impl.GetSubEntryValue(subentry);

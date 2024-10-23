@@ -117,7 +117,6 @@ file(
     GLOB_RECURSE wpiutil_native_src
     src/main/native/cpp/*.cpp
     src/main/native/thirdparty/json/cpp/*.cpp
-    src/main/native/thirdparty/llvm/cpp/*.cpp
     src/main/native/thirdparty/mpack/src/*.cpp
     src/main/native/thirdparty/nanopb/src/*.cpp
 )
@@ -200,7 +199,6 @@ install(
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/expected/include/
         src/main/native/thirdparty/json/include/
-        src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/memory/include/
         src/main/native/thirdparty/mpack/include/
         src/main/native/thirdparty/nanopb/include/
@@ -214,7 +212,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/expected/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/nanopb/include>

@@ -32,7 +32,7 @@ int PropertyContainer::GetPropertyIndex(std::string_view name) const {
 }
 
 std::span<int> PropertyContainer::EnumerateProperties(
-    wpi::SmallVectorImpl<int>& vec, CS_Status* status) const {
+    wpi::SmallVector<int>& vec, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
   }
@@ -58,8 +58,9 @@ CS_PropertyKind PropertyContainer::GetPropertyKind(int property) const {
   return prop->propKind;
 }
 
-std::string_view PropertyContainer::GetPropertyName(
-    int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
+std::string_view PropertyContainer::GetPropertyName(int property,
+                                                    wpi::SmallVector<char>& buf,
+                                                    CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
   }
@@ -168,7 +169,7 @@ int PropertyContainer::GetPropertyDefault(int property,
 }
 
 std::string_view PropertyContainer::GetStringProperty(
-    int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
+    int property, wpi::SmallVector<char>& buf, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
   }

@@ -24,7 +24,6 @@
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/raw_istream.h"
-#include "wpi/raw_ostream.h"
 
 using namespace wpi;
 
@@ -236,12 +235,9 @@ void SHA1::Update(raw_istream& is) {
   }
 }
 
-/*
- * Add padding and return the message digest.
- */
+std::string SHA1::Final() {
+  std::string out;
 
-static void finalize(uint32_t digest[], unsigned char* buffer, size_t& buf_size,
-                     uint64_t& transforms, raw_ostream& os, bool hex) {
   /* Total number of hashed bits */
   uint64_t total_bits = (transforms * BLOCK_BYTES + buf_size) * 8;
 
@@ -270,45 +266,105 @@ static void finalize(uint32_t digest[], unsigned char* buffer, size_t& buf_size,
   static const char* const LUT = "0123456789abcdef";
   for (size_t i = 0; i < 5; i++) {
     uint32_t v = digest[i];
-    if (hex) {
-      os << LUT[(v >> 28) & 0xf] << LUT[(v >> 24) & 0xf] << LUT[(v >> 20) & 0xf]
-         << LUT[(v >> 16) & 0xf] << LUT[(v >> 12) & 0xf] << LUT[(v >> 8) & 0xf]
-         << LUT[(v >> 4) & 0xf] << LUT[(v >> 0) & 0xf];
-    } else {
-      os.write(static_cast<unsigned char>((v >> 24) & 0xff));
-      os.write(static_cast<unsigned char>((v >> 16) & 0xff));
-      os.write(static_cast<unsigned char>((v >> 8) & 0xff));
-      os.write(static_cast<unsigned char>((v >> 0) & 0xff));
-    }
+    out += LUT[(v >> 28) & 0xf];
+    out += LUT[(v >> 24) & 0xf];
+    out += LUT[(v >> 20) & 0xf];
+    out += LUT[(v >> 16) & 0xf];
+    out += LUT[(v >> 12) & 0xf];
+    out += LUT[(v >> 8) & 0xf];
+    out += LUT[(v >> 4) & 0xf];
+    out += LUT[(v >> 0) & 0xf];
   }
 
   /* Reset for next run */
   reset(digest, buf_size, transforms);
+
+  return out;
 }
 
-std::string SHA1::Final() {
-  std::string out;
-  raw_string_ostream os(out);
+std::string_view SHA1::Final(SmallVector<char>& buf) {
+  /* Total number of hashed bits */
+  uint64_t total_bits = (transforms * BLOCK_BYTES + buf_size) * 8;
 
-  finalize(digest, buffer, buf_size, transforms, os, true);
+  /* Padding */
+  buffer[buf_size++] = 0x80;
+  for (size_t i = buf_size; i < BLOCK_BYTES; ++i) {
+    buffer[i] = 0x00;
+  }
 
-  return os.str();
+  uint32_t block[BLOCK_INTS];
+  buffer_to_block(buffer, block);
+
+  if (buf_size > BLOCK_BYTES - 8) {
+    do_transform(digest, block, transforms);
+    for (size_t i = 0; i < BLOCK_INTS - 2; i++) {
+      block[i] = 0;
+    }
+  }
+
+  /* Append total_bits, split this uint64_t into two uint32_t */
+  block[BLOCK_INTS - 1] = total_bits;
+  block[BLOCK_INTS - 2] = (total_bits >> 32);
+  do_transform(digest, block, transforms);
+
+  /* Hex string */
+  static const char* const LUT = "0123456789abcdef";
+  for (size_t i = 0; i < 5; i++) {
+    uint32_t v = digest[i];
+    buf.push_back(LUT[(v >> 28) & 0xf]);
+    buf.push_back(LUT[(v >> 24) & 0xf]);
+    buf.push_back(LUT[(v >> 20) & 0xf]);
+    buf.push_back(LUT[(v >> 16) & 0xf]);
+    buf.push_back(LUT[(v >> 12) & 0xf]);
+    buf.push_back(LUT[(v >> 8) & 0xf]);
+    buf.push_back(LUT[(v >> 4) & 0xf]);
+    buf.push_back(LUT[(v >> 0) & 0xf]);
+  }
+
+  /* Reset for next run */
+  reset(digest, buf_size, transforms);
+
+  return std::string_view{buf.data(), buf.size()};
 }
 
-std::string_view SHA1::Final(SmallVectorImpl<char>& buf) {
-  raw_svector_ostream os(buf);
+std::string_view SHA1::RawFinal(SmallVector<char>& buf) {
+  /* Total number of hashed bits */
+  uint64_t total_bits = (transforms * BLOCK_BYTES + buf_size) * 8;
 
-  finalize(digest, buffer, buf_size, transforms, os, true);
+  /* Padding */
+  buffer[buf_size++] = 0x80;
+  for (size_t i = buf_size; i < BLOCK_BYTES; ++i) {
+    buffer[i] = 0x00;
+  }
 
-  return os.str();
-}
+  uint32_t block[BLOCK_INTS];
+  buffer_to_block(buffer, block);
 
-std::string_view SHA1::RawFinal(SmallVectorImpl<char>& buf) {
-  raw_svector_ostream os(buf);
+  if (buf_size > BLOCK_BYTES - 8) {
+    do_transform(digest, block, transforms);
+    for (size_t i = 0; i < BLOCK_INTS - 2; i++) {
+      block[i] = 0;
+    }
+  }
 
-  finalize(digest, buffer, buf_size, transforms, os, false);
+  /* Append total_bits, split this uint64_t into two uint32_t */
+  block[BLOCK_INTS - 1] = total_bits;
+  block[BLOCK_INTS - 2] = (total_bits >> 32);
+  do_transform(digest, block, transforms);
 
-  return os.str();
+  /* Hex string */
+  for (size_t i = 0; i < 5; i++) {
+    uint32_t v = digest[i];
+    buf.push_back(static_cast<unsigned char>((v >> 24) & 0xff));
+    buf.push_back(static_cast<unsigned char>((v >> 16) & 0xff));
+    buf.push_back(static_cast<unsigned char>((v >> 8) & 0xff));
+    buf.push_back(static_cast<unsigned char>((v >> 0) & 0xff));
+  }
+
+  /* Reset for next run */
+  reset(digest, buf_size, transforms);
+
+  return std::string_view{buf.data(), buf.size()};
 }
 
 std::string SHA1::FromFile(std::string_view filename) {

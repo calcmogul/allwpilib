@@ -9,7 +9,6 @@
 #include <vector>
 
 #include <wpi/MessagePack.h>
-#include <wpi/raw_ostream.h>
 
 namespace nt::server {
 

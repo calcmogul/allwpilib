@@ -7,10 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
-#include <concepts>
-#include <functional>
 #include <span>
-#include <string_view>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -18,6 +15,7 @@
 #include <wpi/SmallVector.h>
 #include <wpi/json_fwd.h>
 #include <wpi/struct/Struct.h>
+#include <wpi/type_traits.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/Topic.h"
@@ -252,7 +250,7 @@ class StructPublisher : public Publisher {
       }
     }
     wpi::SmallVector<uint8_t, 128> buf;
-    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    buf.resize(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, value, info...); }, m_info);
     ::nt::SetRaw(m_pubHandle, buf, time);
   }
@@ -281,7 +279,7 @@ class StructPublisher : public Publisher {
       }
     }
     wpi::SmallVector<uint8_t, 128> buf;
-    buf.resize_for_overwrite(std::apply(S::GetSize, m_info));
+    buf.resize(std::apply(S::GetSize, m_info));
     std::apply([&](const I&... info) { S::Pack(buf, value, info...); }, m_info);
     ::nt::SetDefaultRaw(m_pubHandle, buf);
   }

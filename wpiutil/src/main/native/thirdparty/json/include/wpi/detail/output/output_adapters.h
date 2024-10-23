@@ -22,8 +22,6 @@
 
 #include <wpi/detail/macro_scope.h>
 
-#include <wpi/raw_ostream.h>
-
 WPI_JSON_NAMESPACE_BEGIN
 namespace detail
 {
@@ -120,27 +118,6 @@ class output_string_adapter : public output_adapter_protocol<CharType>
     StringType& str;
 };
 
-template<typename CharType>
-class raw_ostream_adapter : public output_adapter_protocol<CharType>
-{
-  public:
-    explicit raw_ostream_adapter(raw_ostream& s) noexcept
-        : os(s) {}
-
-
-    void write_character(CharType c) override {
-        os << c;
-    }
-
-    JSON_HEDLEY_NON_NULL(2)
-    void write_characters(const CharType* s, std::size_t length) override {
-        os.write(s, length);
-    }
-
-  private:
-    raw_ostream& os;
-};
-
 template<typename CharType, typename StringType = std::basic_string<CharType>>
 class output_adapter
 {
@@ -156,9 +133,6 @@ class output_adapter
 
     output_adapter(StringType& s)
         : oa(std::make_shared<output_string_adapter<CharType, StringType>>(s)) {}
-
-    output_adapter(raw_ostream& os)
-        : oa(std::make_shared<raw_ostream_adapter<CharType>>(os)) {}
 
     operator output_adapter_t<CharType>()
     {

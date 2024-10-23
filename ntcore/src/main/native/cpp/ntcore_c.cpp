@@ -411,7 +411,7 @@ NT_MultiSubscriber NT_SubscribeMultiple(
     NT_Inst inst, const struct WPI_String* prefixes, size_t prefixes_len,
     const struct NT_PubSubOptions* options) {
   wpi::SmallVector<std::string_view, 8> p;
-  p.resize_for_overwrite(prefixes_len);
+  p.resize(prefixes_len);
   for (size_t i = 0; i < prefixes_len; ++i) {
     p[i] = wpi::to_string_view(&prefixes[i]);
   }

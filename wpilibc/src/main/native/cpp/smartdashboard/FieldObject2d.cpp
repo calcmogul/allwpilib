@@ -70,7 +70,7 @@ std::vector<Pose2d> FieldObject2d::GetPoses() const {
 }
 
 std::span<const Pose2d> FieldObject2d::GetPoses(
-    wpi::SmallVectorImpl<Pose2d>& out) const {
+    wpi::SmallVector<Pose2d>& out) const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();
   out.assign(m_poses.begin(), m_poses.end());

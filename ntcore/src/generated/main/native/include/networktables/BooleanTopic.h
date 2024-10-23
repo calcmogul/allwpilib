@@ -13,16 +13,12 @@
 #include <string_view>
 #include <vector>
 
+#include <wpi/SmallVector.h>
 #include <wpi/json_fwd.h>
 
 #include "networktables/NetworkTableType.h"
 #include "networktables/Topic.h"
 #include "ntcore_cpp.h"
-
-namespace wpi {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi
 
 namespace nt {
 

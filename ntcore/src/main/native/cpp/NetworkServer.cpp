@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <fstream>
 #include <memory>
 #include <span>
 #include <string>
@@ -19,7 +20,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/HttpWebSocketServerConnection.h>
@@ -373,8 +373,8 @@ void NetworkServer::LoadPersistent() {
     fs::copy_file(m_persistentFilename, m_persistentFilename + ".bak",
                   std::filesystem::copy_options::overwrite_existing, ec);
     // try to write an empty file so it doesn't happen again
-    wpi::raw_fd_ostream os{m_persistentFilename, ec, fs::F_Text};
-    if (ec.value() == 0) {
+    std::ofstream os{m_persistentFilename};
+    if (os.is_open()) {
       os << "[]\n";
       os.close();
     }
@@ -389,11 +389,9 @@ void NetworkServer::SavePersistent(std::string_view filename,
                                    std::string_view data) {
   // write to temporary file
   auto tmp = fmt::format("{}.tmp", filename);
-  std::error_code ec;
-  wpi::raw_fd_ostream os{tmp, ec, fs::F_Text};
-  if (ec.value() != 0) {
-    INFO("could not open persistent file '{}' for write: {}", tmp,
-         ec.message());
+  std::ofstream os{tmp};
+  if (!os.is_open()) {
+    INFO("could not open persistent file '{}' for write", tmp);
     return;
   }
   os << data;

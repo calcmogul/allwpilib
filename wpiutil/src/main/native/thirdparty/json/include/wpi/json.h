@@ -1288,24 +1288,6 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return result;
     }
 
-    void dump(raw_ostream& os, const int indent = -1,
-                  const char indent_char = ' ',
-                  const bool ensure_ascii = false,
-                  const error_handler_t error_handler = error_handler_t::strict) const {
-      serializer s(os, indent_char);
-
-      if (indent >= 0)
-      {
-          s.dump(*this, true, ensure_ascii, static_cast<unsigned int>(indent));
-      }
-      else
-      {
-          s.dump(*this, false, ensure_ascii, 0);
-      }
-
-      os.flush();
-    }
-
     /// @brief return the type of the JSON value (explicit)
     /// @sa https://json.nlohmann.me/api/basic_json/type/
     constexpr value_t type() const noexcept
@@ -4016,12 +3998,6 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return o << j;
     }
 #endif  // JSON_NO_IO
-    
-    friend raw_ostream& operator<<(raw_ostream& o, const basic_json& j)
-    {
-        j.dump(o, 0);
-        return o;
-    }
     /// @}
 
     /////////////////////

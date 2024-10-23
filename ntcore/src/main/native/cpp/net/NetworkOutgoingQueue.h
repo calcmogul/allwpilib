@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 
 #include "Message.h"
 #include "WireConnection.h"
@@ -178,7 +178,7 @@ class NetworkOutgoingQueue {
     }
 
     // what queues are ready to send?
-    wpi::SmallVector<unsigned int, 16> queues;
+    wpi::SmallVector<unsigned int> queues;
     for (unsigned int i = 0; i < m_queues.size(); ++i) {
       if (!m_queues[i].msgs.empty() &&
           (flush || curTimeMs >= m_queues[i].nextSendMs)) {
@@ -305,7 +305,7 @@ class NetworkOutgoingQueue {
     unsigned int queueIndex = 0;
     int valuePos = -1;  // -1 if not in queue
   };
-  wpi::DenseMap<int, HandleInfo> m_idMap;
+  wpi::flat_map<int, HandleInfo> m_idMap;
   size_t m_totalSize{0};
   uint64_t m_lastSendMs{0};
   int64_t m_timeOffsetUs{0};

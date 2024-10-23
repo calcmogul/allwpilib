@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/Compiler.h>
+
 #include "../PortsInternal.h"
 #include "hal/simulation/PowerDistributionData.h"
 #include "hal/simulation/SimDataValue.h"
@@ -16,9 +18,7 @@ class PowerDistributionData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Voltage)
   HAL_SIMDATAVALUE_DEFINE_NAME(Current)
 
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr double GetCurrentDefault() {
-    return 0.0;
-  }
+  static WPI_ALWAYS_INLINE constexpr double GetCurrentDefault() { return 0.0; }
 
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{

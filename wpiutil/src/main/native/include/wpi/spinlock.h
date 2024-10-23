@@ -22,10 +22,10 @@ class spinlock {
  public:
   spinlock() noexcept { lock_flag.clear(); }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   bool try_lock() { return !lock_flag.test_and_set(std::memory_order_acquire); }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   void lock() {
     for (unsigned int i = 1; !try_lock(); ++i) {
       if ((i & 0xff) == 0) {
@@ -34,7 +34,7 @@ class spinlock {
     }
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   void unlock() { lock_flag.clear(std::memory_order_release); }
 };
 
@@ -51,7 +51,7 @@ class recursive_spinlock1 {
  public:
   recursive_spinlock1() noexcept { lock_flag.clear(); }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   bool try_lock() {
     if (!lock_flag.test_and_set(std::memory_order_acquire)) {
       owner_thread_id.store(std::this_thread::get_id(),
@@ -66,7 +66,7 @@ class recursive_spinlock1 {
     return true;
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   void lock() {
     for (unsigned int i = 1; !try_lock(); ++i) {
       if ((i & 0xffff) == 0) {
@@ -75,7 +75,7 @@ class recursive_spinlock1 {
     }
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   void unlock() {
     assert(owner_thread_id.load(std::memory_order_acquire) ==
            std::this_thread::get_id());
@@ -98,7 +98,7 @@ class recursive_spinlock2 {
   int32_t recursive_counter{0};
 
  public:
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   bool try_lock() {
     auto owner = std::thread::id{};
     auto us = std::this_thread::get_id();
@@ -112,7 +112,7 @@ class recursive_spinlock2 {
     return true;
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   void lock() {
     for (unsigned int i = 1; !try_lock(); ++i) {
       if ((i & 0xffff) == 0) {
@@ -121,7 +121,7 @@ class recursive_spinlock2 {
     }
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
+  WPI_ALWAYS_INLINE
   void unlock() {
     assert(owner_thread_id.load(std::memory_order_acquire) ==
            std::this_thread::get_id());

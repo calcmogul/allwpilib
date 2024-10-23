@@ -47,7 +47,7 @@ void ServerClient::UpdateMetaClientSub() {
 
 std::span<ServerSubscriber*> ServerClient::GetSubscribers(
     std::string_view name, bool special,
-    wpi::SmallVectorImpl<ServerSubscriber*>& buf) {
+    wpi::SmallVector<ServerSubscriber*>& buf) {
   buf.resize(0);
   for (auto&& subPair : m_subscribers) {
     ServerSubscriber* subscriber = subPair.getSecond().get();

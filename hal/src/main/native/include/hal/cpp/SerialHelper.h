@@ -59,7 +59,7 @@ class SerialHelper {
 
  private:
   void SortHubPathVector();
-  void CoiteratedSort(wpi::SmallVectorImpl<wpi::SmallString<16>>& vec);
+  void CoiteratedSort(wpi::SmallVector<wpi::SmallString<16>>& vec);
   void QueryHubPaths(int32_t* status);
 
   int32_t GetIndexForPort(HAL_SerialPort port, int32_t* status);

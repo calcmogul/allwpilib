@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/Compiler.h>
+
 #include "hal/simulation/AnalogTriggerData.h"
 #include "hal/simulation/SimDataValue.h"
 
@@ -14,7 +16,7 @@ class AnalogTriggerData {
   HAL_SIMDATAVALUE_DEFINE_NAME(TriggerUpperBound)
   HAL_SIMDATAVALUE_DEFINE_NAME(TriggerMode)
 
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
+  static WPI_ALWAYS_INLINE HAL_Value
   MakeTriggerModeValue(HALSIM_AnalogTriggerMode value) {
     return HAL_MakeEnum(value);
   }

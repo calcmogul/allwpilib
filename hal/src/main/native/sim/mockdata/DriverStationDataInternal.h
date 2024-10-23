@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <wpi/Compiler.h>
 #include <wpi/spinlock.h>
 
 #include "hal/simulation/DriverStationData.h"
@@ -31,7 +32,7 @@ class DriverStationData {
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(MatchInfo)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NewData)
 
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
+  static WPI_ALWAYS_INLINE HAL_Value
   MakeAllianceStationIdValue(HAL_AllianceStationID value) {
     return HAL_MakeEnum(value);
   }

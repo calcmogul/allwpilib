@@ -77,7 +77,7 @@ std::string GetPropertyName(CS_Property property, CS_Status* status) {
 }
 
 std::string_view GetPropertyName(CS_Property property,
-                                 wpi::SmallVectorImpl<char>& buf,
+                                 wpi::SmallVector<char>& buf,
                                  CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
@@ -152,7 +152,7 @@ std::string GetStringProperty(CS_Property property, CS_Status* status) {
 }
 
 std::string_view GetStringProperty(CS_Property property,
-                                   wpi::SmallVectorImpl<char>& buf,
+                                   wpi::SmallVector<char>& buf,
                                    CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
@@ -204,8 +204,7 @@ std::string GetSourceName(CS_Source source, CS_Status* status) {
   return std::string{data->source->GetName()};
 }
 
-std::string_view GetSourceName(CS_Source source,
-                               wpi::SmallVectorImpl<char>& buf,
+std::string_view GetSourceName(CS_Source source, wpi::SmallVector<char>& buf,
                                CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
@@ -226,7 +225,7 @@ std::string GetSourceDescription(CS_Source source, CS_Status* status) {
 }
 
 std::string_view GetSourceDescription(CS_Source source,
-                                      wpi::SmallVectorImpl<char>& buf,
+                                      wpi::SmallVector<char>& buf,
                                       CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
@@ -290,8 +289,7 @@ CS_Property GetSourceProperty(CS_Source source, std::string_view name,
 }
 
 std::span<CS_Property> EnumerateSourceProperties(
-    CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
-    CS_Status* status) {
+    CS_Source source, wpi::SmallVector<CS_Property>& vec, CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
@@ -402,7 +400,7 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
 }
 
 std::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                        wpi::SmallVectorImpl<CS_Sink>& vec,
+                                        wpi::SmallVector<CS_Sink>& vec,
                                         CS_Status* status) {
   auto& inst = Instance::GetInstance();
   auto data = inst.GetSource(source);
@@ -540,7 +538,7 @@ std::string GetSinkName(CS_Sink sink, CS_Status* status) {
   return std::string{data->sink->GetName()};
 }
 
-std::string_view GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+std::string_view GetSinkName(CS_Sink sink, wpi::SmallVector<char>& buf,
                              CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
@@ -560,8 +558,7 @@ std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
   return std::string{data->sink->GetDescription(buf)};
 }
 
-std::string_view GetSinkDescription(CS_Sink sink,
-                                    wpi::SmallVectorImpl<char>& buf,
+std::string_view GetSinkDescription(CS_Sink sink, wpi::SmallVector<char>& buf,
                                     CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
@@ -587,7 +584,7 @@ CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
 }
 
 std::span<CS_Property> EnumerateSinkProperties(
-    CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status) {
+    CS_Sink sink, wpi::SmallVector<CS_Property>& vec, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
@@ -868,12 +865,12 @@ void Shutdown() {
 // Utility Functions
 //
 
-std::span<CS_Source> EnumerateSourceHandles(
-    wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status) {
+std::span<CS_Source> EnumerateSourceHandles(wpi::SmallVector<CS_Source>& vec,
+                                            CS_Status* status) {
   return Instance::GetInstance().EnumerateSourceHandles(vec);
 }
 
-std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
+std::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVector<CS_Sink>& vec,
                                         CS_Status* status) {
   return Instance::GetInstance().EnumerateSinkHandles(vec);
 }

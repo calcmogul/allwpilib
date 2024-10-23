@@ -12,7 +12,7 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 
 #include "MessageHandler.h"
 #include "NetworkOutgoingQueue.h"
@@ -87,7 +87,7 @@ class ClientImpl final : private ServerMessageHandler {
   std::vector<std::unique_ptr<PublisherData>> m_publishers;
 
   // indexed by server-provided topic id
-  wpi::DenseMap<int, int> m_topicMap;
+  wpi::flat_map<int, int> m_topicMap;
 
   // ping
   NetworkPing m_ping;

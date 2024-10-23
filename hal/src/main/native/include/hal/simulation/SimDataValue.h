@@ -21,14 +21,14 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
  public:
   explicit SimDataValueBase(T value) : m_value(value) {}
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE void CancelCallback(int32_t uid) { Cancel(uid); }
+  WPI_ALWAYS_INLINE void CancelCallback(int32_t uid) { Cancel(uid); }
 
   T Get() const {
     std::scoped_lock lock(m_mutex);
     return m_value;
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE operator T() const { return Get(); }  // NOLINT
+  WPI_ALWAYS_INLINE operator T() const { return Get(); }  // NOLINT
 
   void Reset(T value) {
     std::scoped_lock lock(m_mutex);
@@ -105,16 +105,15 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
   explicit SimDataValue(T value)
       : impl::SimDataValueBase<T, MakeValue>(value) {}
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE int32_t RegisterCallback(
-      HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
+  WPI_ALWAYS_INLINE int32_t RegisterCallback(HAL_NotifyCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify) {
     return this->DoRegisterCallback(callback, param, initialNotify, GetName());
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE void Set(T value) {
-    this->DoSet(value, GetName());
-  }
+  WPI_ALWAYS_INLINE void Set(T value) { this->DoSet(value, GetName()); }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE SimDataValue& operator=(T value) {
+  WPI_ALWAYS_INLINE SimDataValue& operator=(T value) {
     Set(value);
     return *this;
   }
@@ -125,10 +124,9 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
  * This creates a function named GetNAMEName() that returns "NAME".
  * @param NAME the name to return
  */
-#define HAL_SIMDATAVALUE_DEFINE_NAME(NAME)                  \
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr const char* \
-      Get##NAME##Name() {                                   \
-    return #NAME;                                           \
+#define HAL_SIMDATAVALUE_DEFINE_NAME(NAME)                           \
+  static WPI_ALWAYS_INLINE constexpr const char* Get##NAME##Name() { \
+    return #NAME;                                                    \
   }
 
 /**

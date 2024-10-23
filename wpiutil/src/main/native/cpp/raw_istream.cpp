@@ -33,7 +33,7 @@
 
 using namespace wpi;
 
-std::string_view raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
+std::string_view raw_istream::getline(SmallVector<char>& buf, int maxLen) {
   buf.clear();
   for (int i = 0; i < maxLen; ++i) {
     char c;

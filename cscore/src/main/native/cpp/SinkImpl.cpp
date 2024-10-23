@@ -37,8 +37,7 @@ void SinkImpl::SetDescription(std::string_view description) {
   m_description = description;
 }
 
-std::string_view SinkImpl::GetDescription(
-    wpi::SmallVectorImpl<char>& buf) const {
+std::string_view SinkImpl::GetDescription(wpi::SmallVector<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return {buf.data(), buf.size()};
@@ -114,7 +113,7 @@ std::string SinkImpl::GetError() const {
   return std::string{m_source->GetCurFrame().GetError()};
 }
 
-std::string_view SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
+std::string_view SinkImpl::GetError(wpi::SmallVector<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   if (!m_source) {
     return "no source connected";
@@ -222,7 +221,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   return data->sink->GetError();
 }
 
-std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+std::string_view GetSinkError(CS_Sink sink, wpi::SmallVector<char>& buf,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {

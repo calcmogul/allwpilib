@@ -14,8 +14,8 @@
 #include <vector>
 
 #include <wpi/DataLogReader.h>
-#include <wpi/DenseMap.h>
 #include <wpi/Signal.h>
+#include <wpi/flat_map.h>
 #include <wpi/mutex.h>
 #include <wpi/struct/DynamicStruct.h>
 
@@ -97,7 +97,7 @@ class DataLogReaderThread {
   std::atomic_bool m_done{false};
   std::atomic<unsigned int> m_numRecords{0};
   std::map<std::string, DataLogReaderEntry, std::less<>> m_entriesByName;
-  wpi::DenseMap<int, DataLogReaderEntry*> m_entriesById;
+  wpi::flat_map<int, DataLogReaderEntry*> m_entriesById;
   wpi::StructDescriptorDatabase m_structDb;
 #ifndef NO_PROTOBUF
   wpi::ProtobufMessageDatabase m_protoDb;

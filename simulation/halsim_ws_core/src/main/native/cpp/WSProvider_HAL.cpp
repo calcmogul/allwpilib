@@ -4,15 +4,12 @@
 
 #include "WSProvider_HAL.h"
 
-#include <algorithm>
-#include <atomic>
 #include <string_view>
 
 #include <hal/Extensions.h>
 #include <hal/HAL.h>
 #include <hal/Ports.h>
 #include <hal/simulation/MockHooks.h>
-#include <wpi/raw_ostream.h>
 
 namespace wpilibws {
 

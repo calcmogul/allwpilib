@@ -14,12 +14,9 @@
 #include <utility>
 #include <vector>
 
-#include "ntcore_c.h"
+#include <wpi/SmallVector.h>
 
-namespace wpi {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi
+#include "ntcore_c.h"
 
 namespace nt {
 /**
@@ -447,11 +444,11 @@ std::vector<TimestampedString> ReadQueueString(NT_Handle subentry);
  */
 std::vector<std::string> ReadQueueValuesString(NT_Handle subentry);
 
-std::string_view GetString(NT_Handle subentry, wpi::SmallVectorImpl<char>& buf, std::string_view defaultValue);
+std::string_view GetString(NT_Handle subentry, wpi::SmallVector<char>& buf, std::string_view defaultValue);
 
 TimestampedStringView GetAtomicString(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<char>& buf,
+      wpi::SmallVector<char>& buf,
       std::string_view defaultValue);
 
 /** @} */
@@ -539,11 +536,11 @@ std::vector<TimestampedRaw> ReadQueueRaw(NT_Handle subentry);
  */
 std::vector<std::vector<uint8_t>> ReadQueueValuesRaw(NT_Handle subentry);
 
-std::span<uint8_t> GetRaw(NT_Handle subentry, wpi::SmallVectorImpl<uint8_t>& buf, std::span<const uint8_t> defaultValue);
+std::span<uint8_t> GetRaw(NT_Handle subentry, wpi::SmallVector<uint8_t>& buf, std::span<const uint8_t> defaultValue);
 
 TimestampedRawView GetAtomicRaw(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<uint8_t>& buf,
+      wpi::SmallVector<uint8_t>& buf,
       std::span<const uint8_t> defaultValue);
 
 /** @} */
@@ -631,11 +628,11 @@ std::vector<TimestampedBooleanArray> ReadQueueBooleanArray(NT_Handle subentry);
  */
 std::vector<std::vector<int>> ReadQueueValuesBooleanArray(NT_Handle subentry);
 
-std::span<int> GetBooleanArray(NT_Handle subentry, wpi::SmallVectorImpl<int>& buf, std::span<const int> defaultValue);
+std::span<int> GetBooleanArray(NT_Handle subentry, wpi::SmallVector<int>& buf, std::span<const int> defaultValue);
 
 TimestampedBooleanArrayView GetAtomicBooleanArray(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<int>& buf,
+      wpi::SmallVector<int>& buf,
       std::span<const int> defaultValue);
 
 /** @} */
@@ -723,11 +720,11 @@ std::vector<TimestampedIntegerArray> ReadQueueIntegerArray(NT_Handle subentry);
  */
 std::vector<std::vector<int64_t>> ReadQueueValuesIntegerArray(NT_Handle subentry);
 
-std::span<int64_t> GetIntegerArray(NT_Handle subentry, wpi::SmallVectorImpl<int64_t>& buf, std::span<const int64_t> defaultValue);
+std::span<int64_t> GetIntegerArray(NT_Handle subentry, wpi::SmallVector<int64_t>& buf, std::span<const int64_t> defaultValue);
 
 TimestampedIntegerArrayView GetAtomicIntegerArray(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<int64_t>& buf,
+      wpi::SmallVector<int64_t>& buf,
       std::span<const int64_t> defaultValue);
 
 /** @} */
@@ -815,11 +812,11 @@ std::vector<TimestampedFloatArray> ReadQueueFloatArray(NT_Handle subentry);
  */
 std::vector<std::vector<float>> ReadQueueValuesFloatArray(NT_Handle subentry);
 
-std::span<float> GetFloatArray(NT_Handle subentry, wpi::SmallVectorImpl<float>& buf, std::span<const float> defaultValue);
+std::span<float> GetFloatArray(NT_Handle subentry, wpi::SmallVector<float>& buf, std::span<const float> defaultValue);
 
 TimestampedFloatArrayView GetAtomicFloatArray(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<float>& buf,
+      wpi::SmallVector<float>& buf,
       std::span<const float> defaultValue);
 
 /** @} */
@@ -907,11 +904,11 @@ std::vector<TimestampedDoubleArray> ReadQueueDoubleArray(NT_Handle subentry);
  */
 std::vector<std::vector<double>> ReadQueueValuesDoubleArray(NT_Handle subentry);
 
-std::span<double> GetDoubleArray(NT_Handle subentry, wpi::SmallVectorImpl<double>& buf, std::span<const double> defaultValue);
+std::span<double> GetDoubleArray(NT_Handle subentry, wpi::SmallVector<double>& buf, std::span<const double> defaultValue);
 
 TimestampedDoubleArrayView GetAtomicDoubleArray(
       NT_Handle subentry,
-      wpi::SmallVectorImpl<double>& buf,
+      wpi::SmallVector<double>& buf,
       std::span<const double> defaultValue);
 
 /** @} */

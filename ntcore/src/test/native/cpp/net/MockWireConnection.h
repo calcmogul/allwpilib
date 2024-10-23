@@ -11,8 +11,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/raw_ostream.h>
-
 #include "gmock/gmock.h"
 #include "net/WireConnection.h"
 
