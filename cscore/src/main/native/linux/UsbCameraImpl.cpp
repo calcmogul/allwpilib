@@ -30,7 +30,6 @@
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
 #include "Instance.h"

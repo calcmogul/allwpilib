@@ -7,7 +7,6 @@
 #include <cstdio>
 #include <string>
 
-#include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
 #include <wpi/SmallString.h>
 #include <wpi/print.h>

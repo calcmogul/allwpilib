@@ -332,7 +332,7 @@ void SendableBuilderImpl::AddSmallPropertyImpl(Topic topic, Getter getter,
 
 void SendableBuilderImpl::AddSmallStringProperty(
     std::string_view key,
-    std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+    std::function<std::string_view(wpi::SmallVector<char>& buf)> getter,
     std::function<void(std::string_view)> setter) {
   AddSmallPropertyImpl<char, 128>(m_table->GetStringTopic(key),
                                   std::move(getter), std::move(setter));
@@ -340,7 +340,7 @@ void SendableBuilderImpl::AddSmallStringProperty(
 
 void SendableBuilderImpl::AddSmallBooleanArrayProperty(
     std::string_view key,
-    std::function<std::span<const int>(wpi::SmallVectorImpl<int>& buf)> getter,
+    std::function<std::span<const int>(wpi::SmallVector<int>& buf)> getter,
     std::function<void(std::span<const int>)> setter) {
   AddSmallPropertyImpl<int, 16>(m_table->GetBooleanArrayTopic(key),
                                 std::move(getter), std::move(setter));
@@ -348,7 +348,7 @@ void SendableBuilderImpl::AddSmallBooleanArrayProperty(
 
 void SendableBuilderImpl::AddSmallIntegerArrayProperty(
     std::string_view key,
-    std::function<std::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+    std::function<std::span<const int64_t>(wpi::SmallVector<int64_t>& buf)>
         getter,
     std::function<void(std::span<const int64_t>)> setter) {
   AddSmallPropertyImpl<int64_t, 16>(m_table->GetIntegerArrayTopic(key),
@@ -357,8 +357,7 @@ void SendableBuilderImpl::AddSmallIntegerArrayProperty(
 
 void SendableBuilderImpl::AddSmallFloatArrayProperty(
     std::string_view key,
-    std::function<std::span<const float>(wpi::SmallVectorImpl<float>& buf)>
-        getter,
+    std::function<std::span<const float>(wpi::SmallVector<float>& buf)> getter,
     std::function<void(std::span<const float>)> setter) {
   AddSmallPropertyImpl<float, 16>(m_table->GetFloatArrayTopic(key),
                                   std::move(getter), std::move(setter));
@@ -366,7 +365,7 @@ void SendableBuilderImpl::AddSmallFloatArrayProperty(
 
 void SendableBuilderImpl::AddSmallDoubleArrayProperty(
     std::string_view key,
-    std::function<std::span<const double>(wpi::SmallVectorImpl<double>& buf)>
+    std::function<std::span<const double>(wpi::SmallVector<double>& buf)>
         getter,
     std::function<void(std::span<const double>)> setter) {
   AddSmallPropertyImpl<double, 16>(m_table->GetDoubleArrayTopic(key),
@@ -376,7 +375,7 @@ void SendableBuilderImpl::AddSmallDoubleArrayProperty(
 void SendableBuilderImpl::AddSmallStringArrayProperty(
     std::string_view key,
     std::function<
-        std::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+        std::span<const std::string>(wpi::SmallVector<std::string>& buf)>
         getter,
     std::function<void(std::span<const std::string>)> setter) {
   AddSmallPropertyImpl<std::string, 16>(m_table->GetStringArrayTopic(key),
@@ -385,8 +384,7 @@ void SendableBuilderImpl::AddSmallStringArrayProperty(
 
 void SendableBuilderImpl::AddSmallRawProperty(
     std::string_view key, std::string_view typeString,
-    std::function<std::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
-        getter,
+    std::function<std::span<uint8_t>(wpi::SmallVector<uint8_t>& buf)> getter,
     std::function<void(std::span<const uint8_t>)> setter) {
   auto topic = m_table->GetRawTopic(key);
   auto prop = std::make_unique<PropertyImpl<nt::RawTopic>>();

@@ -11,10 +11,10 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/DenseMap.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
 #include <wpi/Synchronization.h>
+#include <wpi/flat_map.h>
 #include <wpi/mutex.h>
 
 #include "Handle.h"
@@ -111,7 +111,7 @@ class ListenerStorage final : public IListenerStorage {
     void Main() final;
 
     NT_ListenerPoller m_poller;
-    wpi::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
+    wpi::flat_map<NT_Listener, ListenerCallback> m_callbacks;
     wpi::Event m_waitQueueWakeup;
     wpi::Event m_waitQueueWaiter;
   };

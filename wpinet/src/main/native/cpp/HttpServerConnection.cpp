@@ -10,7 +10,6 @@
 #include <wpi/SmallVector.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
 #include <wpi/print.h>
 
 #include "wpinet/raw_uv_ostream.h"

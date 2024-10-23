@@ -14,13 +14,10 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
-#include "wpi/bit.h"
 
 namespace wpi {
-
-template <typename T>
-class SmallVectorImpl;
 
 class DynamicStruct;
 class MutableDynamicStruct;
@@ -316,10 +313,9 @@ class StructDescriptor {
   }
 
  private:
-  bool CheckCircular(
-      wpi::SmallVectorImpl<const StructDescriptor*>& stack) const;
+  bool CheckCircular(wpi::SmallVector<const StructDescriptor*>& stack) const;
   std::string CalculateOffsets(
-      wpi::SmallVectorImpl<const StructDescriptor*>& stack);
+      wpi::SmallVector<const StructDescriptor*>& stack);
 
   std::string m_name;
   std::string m_schema;
@@ -459,7 +455,7 @@ class DynamicStruct {
   float GetFloatField(const StructFieldDescriptor* field,
                       size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::kFloat);
-    return bit_cast<float>(
+    return std::bit_cast<float>(
         static_cast<uint32_t>(GetFieldImpl(field, arrIndex)));
   }
 
@@ -473,7 +469,7 @@ class DynamicStruct {
   double GetDoubleField(const StructFieldDescriptor* field,
                         size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::kDouble);
-    return bit_cast<double>(GetFieldImpl(field, arrIndex));
+    return std::bit_cast<double>(GetFieldImpl(field, arrIndex));
   }
 
   /**
@@ -593,7 +589,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetFloatField(const StructFieldDescriptor* field, float value,
                      size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::kFloat);
-    SetFieldImpl(field, bit_cast<uint32_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint32_t>(value), arrIndex);
   }
 
   /**
@@ -606,7 +602,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetDoubleField(const StructFieldDescriptor* field, double value,
                       size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::kDouble);
-    SetFieldImpl(field, bit_cast<uint64_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint64_t>(value), arrIndex);
   }
 
   /**

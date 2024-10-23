@@ -9,7 +9,6 @@
 
 #include <wpi/json.h>
 #include <wpi/mpack.h>
-#include <wpi/raw_ostream.h>
 
 #include "Message.h"
 #include "PubSubOptions.h"

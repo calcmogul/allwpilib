@@ -9,10 +9,10 @@
 #include <cstring>
 #include <mutex>
 
-#include "wpi/DenseMap.h"
 #include "wpi/SmallVector.h"
 #include "wpi/UidVector.h"
 #include "wpi/condition_variable.h"
+#include "wpi/flat_map.h"
 #include "wpi/mutex.h"
 
 using namespace wpi;
@@ -33,7 +33,7 @@ struct HandleManager {
   wpi::mutex mutex;
   wpi::UidVector<int, 8> eventIds;
   wpi::UidVector<int, 8> semaphoreIds;
-  wpi::DenseMap<WPI_Handle, State> states;
+  wpi::flat_map<WPI_Handle, State> states;
 };
 
 }  // namespace

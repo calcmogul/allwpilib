@@ -5,7 +5,9 @@
 #ifndef WPINET_HTTPUTIL_H_
 #define WPINET_HTTPUTIL_H_
 
+#include <functional>
 #include <initializer_list>
+#include <map>
 #include <memory>
 #include <optional>
 #include <span>
@@ -16,7 +18,6 @@
 
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
-#include <wpi/StringMap.h>
 #include <wpi/raw_istream.h>
 
 #include "wpinet/NetworkStream.h"
@@ -29,14 +30,14 @@ namespace wpi {
 // @param buf Buffer for output
 // @param error Set to true if an error occurred
 // @return Escaped string
-std::string_view UnescapeURI(std::string_view str, SmallVectorImpl<char>& buf,
+std::string_view UnescapeURI(std::string_view str, SmallVector<char>& buf,
                              bool* error);
 
 // Escape a string with %xx-encoding.
 // @param buf Buffer for output
 // @param spacePlus If true, encodes spaces to '+' rather than "%20"
 // @return Escaped string
-std::string_view EscapeURI(std::string_view str, SmallVectorImpl<char>& buf,
+std::string_view EscapeURI(std::string_view str, SmallVector<char>& buf,
                            bool spacePlus = true);
 
 // Escape a string for HTML output.
@@ -50,8 +51,8 @@ std::string_view EscapeHTML(std::string_view str, SmallVectorImpl<char>& buf);
 // @param contentType If not null, Content-Type contents are saved here.
 // @param contentLength If not null, Content-Length contents are saved here.
 // @return False if error occurred in input stream
-bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
-                      SmallVectorImpl<char>* contentLength);
+bool ParseHttpHeaders(raw_istream& is, SmallVector<char>* contentType,
+                      SmallVector<char>* contentLength);
 
 // Look for a MIME multi-part boundary.  On return, the input stream will
 // be located at the character following the boundary (usually "\r\n").
@@ -94,10 +95,10 @@ class HttpQueryMap {
    *         name is not present in the query map.
    */
   std::optional<std::string_view> Get(std::string_view name,
-                                      SmallVectorImpl<char>& buf) const;
+                                      SmallVector<char>& buf) const;
 
  private:
-  StringMap<std::string_view> m_elems;
+  std::map<std::string, std::string_view, std::less<>> m_elems;
 };
 
 class HttpPathRef;
@@ -226,7 +227,7 @@ class HttpPath {
 
  private:
   SmallString<128> m_pathBuf;
-  SmallVector<size_t, 16> m_pathEnds;
+  SmallVector<size_t> m_pathEnds;
 };
 
 /**

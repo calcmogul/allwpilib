@@ -99,8 +99,7 @@ class HttpCameraImpl : public SourceImpl {
   void StreamThreadMain();
 
   // Functions used by StreamThreadMain()
-  wpi::HttpConnection* DeviceStreamConnect(
-      wpi::SmallVectorImpl<char>& boundary);
+  wpi::HttpConnection* DeviceStreamConnect(wpi::SmallVector<char>& boundary);
   void DeviceStream(wpi::raw_istream& is, std::string_view boundary);
   bool DeviceStreamFrame(wpi::raw_istream& is, std::string& imageBuf);
 

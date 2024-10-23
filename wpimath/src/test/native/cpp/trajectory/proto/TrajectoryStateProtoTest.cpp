@@ -21,7 +21,7 @@ const Trajectory::State kExpectedData = Trajectory::State{
 
 TEST(TrajectoryStateProtoTest, Roundtrip) {
   wpi::ProtobufMessage<decltype(kExpectedData)> message;
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::SmallVector<uint8_t> buf;
 
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);

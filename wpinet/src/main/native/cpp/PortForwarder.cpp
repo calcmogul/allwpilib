@@ -8,7 +8,7 @@
 #include <string>
 
 #include <fmt/format.h>
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 #include <wpi/print.h>
 
 #include "wpinet/EventLoopRunner.h"
@@ -21,7 +21,7 @@ using namespace wpi;
 struct PortForwarder::Impl {
  public:
   EventLoopRunner runner;
-  DenseMap<unsigned int, std::weak_ptr<uv::Tcp>> servers;
+  flat_map<unsigned int, std::weak_ptr<uv::Tcp>> servers;
 };
 
 PortForwarder::PortForwarder() : m_impl{new Impl} {}

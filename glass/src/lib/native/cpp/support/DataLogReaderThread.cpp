@@ -20,8 +20,7 @@ DataLogReaderThread::~DataLogReaderThread() {
 }
 
 void DataLogReaderThread::ReadMain() {
-  wpi::SmallDenseMap<
-      int, std::pair<DataLogReaderEntry*, std::span<const uint8_t>>, 8>
+  wpi::flat_map<int, std::pair<DataLogReaderEntry*, std::span<const uint8_t>>>
       schemaEntries;
 
   for (auto recordIt = m_reader.begin(), recordEnd = m_reader.end();

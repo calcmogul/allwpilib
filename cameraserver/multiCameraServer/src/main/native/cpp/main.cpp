@@ -12,10 +12,8 @@
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
 #include <wpi/json.h>
 #include <wpi/print.h>
-#include <wpi/raw_ostream.h>
 
 #include "cameraserver/CameraServer.h"
 

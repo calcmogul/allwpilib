@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include <wpi/flat_map.h>
 #include <wpi/timestamp.h>
 
 #include "Log.h"
@@ -68,7 +69,7 @@ void ServerClient3::SendValue(ServerTopic* topic, const Value& value,
       break;
     case net::ValueSendMode::kNormal: {
       // replace, or append if not present
-      wpi::DenseMap<NT_Topic, size_t>::iterator it;
+      std::flat_map<NT_Topic, size_t>::iterator it;
       std::tie(it, added) =
           m_outgoingValueMap.try_emplace(topic->id, m_outgoing.size());
       if (!added && it->second < m_outgoing.size()) {

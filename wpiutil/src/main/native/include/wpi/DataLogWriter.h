@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <fstream>
 #include <memory>
 #include <string_view>
 #include <system_error>
@@ -11,7 +12,6 @@
 #include "wpi/DataLog.h"
 
 namespace wpi {
-class raw_ostream;
 class Logger;
 }  // namespace wpi
 
@@ -29,10 +29,9 @@ class DataLogWriter final : public DataLog {
    * Constructs with a filename.
    *
    * @param filename filename to use
-   * @param ec error code if failed to open file (output)
    * @param extraHeader extra header data
    */
-  explicit DataLogWriter(std::string_view filename, std::error_code& ec,
+  explicit DataLogWriter(std::string_view filename,
                          std::string_view extraHeader = "");
 
   /**
@@ -40,11 +39,10 @@ class DataLogWriter final : public DataLog {
    *
    * @param msglog message logger
    * @param filename filename to use
-   * @param ec error code if failed to open file (output)
    * @param extraHeader extra header data
    */
   DataLogWriter(wpi::Logger& msglog, std::string_view filename,
-                std::error_code& ec, std::string_view extraHeader = "");
+                std::string_view extraHeader = "");
 
   /**
    * Constructs with an output stream.
@@ -52,7 +50,7 @@ class DataLogWriter final : public DataLog {
    * @param os output stream
    * @param extraHeader extra header data
    */
-  explicit DataLogWriter(std::unique_ptr<wpi::raw_ostream> os,
+  explicit DataLogWriter(std::unique_ptr<std::ofstream> os,
                          std::string_view extraHeader = "");
 
   /**
@@ -62,7 +60,7 @@ class DataLogWriter final : public DataLog {
    * @param os output stream
    * @param extraHeader extra header data
    */
-  DataLogWriter(wpi::Logger& msglog, std::unique_ptr<wpi::raw_ostream> os,
+  DataLogWriter(wpi::Logger& msglog, std::unique_ptr<std::ofstream> os,
                 std::string_view extraHeader = "");
 
   ~DataLogWriter() final;
@@ -86,12 +84,12 @@ class DataLogWriter final : public DataLog {
    *
    * @return output stream
    */
-  wpi::raw_ostream& GetStream() { return *m_os; }
+  std::ofstream& GetStream() { return *m_os; }
 
  private:
   bool BufferFull() final;
 
-  std::unique_ptr<wpi::raw_ostream> m_os;
+  std::unique_ptr<std::ofstream> m_os;
 };
 
 }  // namespace wpi::log

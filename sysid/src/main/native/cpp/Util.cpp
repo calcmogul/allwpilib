@@ -5,11 +5,12 @@
 #include "sysid/Util.h"
 
 #include <filesystem>
+#include <fstream>
 #include <stdexcept>
+#include <string>
 
 #include <IconsFontAwesome6.h>
 #include <imgui.h>
-#include <wpi/raw_ostream.h>
 
 void sysid::CreateTooltip(const char* text) {
   ImGui::SameLine();
@@ -64,13 +65,11 @@ void sysid::SaveFile(std::string_view contents,
   std::filesystem::create_directories(path.root_directory());
 
   // Open a fd_ostream to write to file.
-  std::error_code ec;
-  // NOLINTNEXTLINE(build/include_what_you_use)
-  wpi::raw_fd_ostream ostream{path.string(), ec};
+  std::ofstream ostream{path.string()};
 
   // Check error code.
-  if (ec) {
-    throw std::runtime_error("Cannot write to file: " + ec.message());
+  if (!ostream.is_open()) {
+    throw std::runtime_error("Cannot write to file");
   }
 
   // Write contents.

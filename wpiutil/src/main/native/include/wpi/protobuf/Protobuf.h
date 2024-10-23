@@ -17,13 +17,11 @@
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+#include "wpi/SmallVector.h"
 #include "wpi/array.h"
 #include "wpi/function_ref.h"
 
 namespace wpi {
-
-template <typename T>
-class SmallVectorImpl;
 
 /**
  * Protobuf serialization template. Unspecialized class has no members; only
@@ -36,7 +34,7 @@ template <typename T>
 struct Protobuf {};
 
 namespace detail {
-using SmallVectorType = wpi::SmallVectorImpl<uint8_t>;
+using SmallVectorType = wpi::SmallVector<uint8_t>;
 using StdVectorType = std::vector<uint8_t>;
 bool WriteFromSmallVector(pb_ostream_t* stream, const pb_byte_t* buf,
                           size_t count);
@@ -345,7 +343,7 @@ class ProtobufMessage {
    * @param[in] value value
    * @return true if successful
    */
-  bool Pack(wpi::SmallVectorImpl<uint8_t>& out, const T& value) {
+  bool Pack(wpi::SmallVector<uint8_t>& out, const T& value) {
     ProtoOutputStream<std::remove_cvref_t<T>> stream{out};
     return Protobuf<std::remove_cvref_t<T>>::Pack(stream, value);
   }

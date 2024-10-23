@@ -73,7 +73,7 @@ class ServerClient3 final : public ServerClient, private net3::MessageHandler3 {
 
   net::NetworkIncomingClientQueue m_incoming;
   std::vector<net3::Message3> m_outgoing;
-  wpi::DenseMap<NT_Topic, size_t> m_outgoingValueMap;
+  wpi::flat_map<NT_Topic, size_t> m_outgoingValueMap;
   int64_t m_nextPubUid{1};
   uint64_t m_lastSendMs{0};
 
@@ -88,7 +88,7 @@ class ServerClient3 final : public ServerClient, private net3::MessageHandler3 {
 
     bool UpdateFlags(ServerTopic* topic);
   };
-  wpi::DenseMap<ServerTopic*, TopicData3> m_topics3;
+  wpi::flat_map<ServerTopic*, TopicData3> m_topics3;
   TopicData3* GetTopic3(ServerTopic* topic) {
     return &m_topics3.try_emplace(topic, topic).first->second;
   }

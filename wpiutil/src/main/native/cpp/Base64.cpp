@@ -60,9 +60,6 @@
 #include <string>
 #include <vector>
 
-#include "wpi/SmallVector.h"
-#include "wpi/raw_ostream.h"
-
 namespace wpi {
 
 // aaaack but it's fast and const should make it shared text page.
@@ -83,7 +80,9 @@ static const unsigned char pr2six[256] = {
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64};
 
-size_t Base64Decode(raw_ostream& os, std::string_view encoded) {
+size_t Base64Decode(std::string_view encoded, std::string* plain) {
+  plain->resize(0);
+
   auto bytes_begin = reinterpret_cast<const unsigned char*>(encoded.data());
   auto bytes_end = bytes_begin + encoded.size();
   const unsigned char* end = bytes_begin;
@@ -98,122 +97,157 @@ size_t Base64Decode(raw_ostream& os, std::string_view encoded) {
   const unsigned char* cur = bytes_begin;
 
   while (nprbytes > 4) {
-    os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
-    os << static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
-    os << static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+    *plain +=
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+    *plain +=
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+    *plain += static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
     cur += 4;
     nprbytes -= 4;
   }
 
   // Note: (nprbytes == 1) would be an error, so just ignore that case
   if (nprbytes > 1) {
-    os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+    *plain +=
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
   }
   if (nprbytes > 2) {
-    os << static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+    *plain +=
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
   }
   if (nprbytes > 3) {
-    os << static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+    *plain += static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
   }
 
   return (end - bytes_begin) + ((4 - nprbytes) & 3);
 }
 
-size_t Base64Decode(std::string_view encoded, std::string* plain) {
-  plain->resize(0);
-  raw_string_ostream os(*plain);
-  size_t rv = Base64Decode(os, encoded);
-  os.flush();
-  return rv;
-}
-
-std::string_view Base64Decode(std::string_view encoded, size_t* num_read,
-                              SmallVectorImpl<char>& buf) {
-  buf.clear();
-  raw_svector_ostream os(buf);
-  *num_read = Base64Decode(os, encoded);
-  return os.str();
-}
-
 size_t Base64Decode(std::string_view encoded, std::vector<uint8_t>* plain) {
   plain->resize(0);
-  raw_uvector_ostream os(*plain);
-  return Base64Decode(os, encoded);
-}
 
-std::span<uint8_t> Base64Decode(std::string_view encoded, size_t* num_read,
-                                SmallVectorImpl<uint8_t>& buf) {
-  buf.clear();
-  raw_usvector_ostream os(buf);
-  *num_read = Base64Decode(os, encoded);
-  return os.array();
-}
-
-static const char basis_64[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-void Base64Encode(raw_ostream& os, std::string_view plain) {
-  if (plain.empty()) {
-    return;
+  auto bytes_begin = reinterpret_cast<const unsigned char*>(encoded.data());
+  auto bytes_end = bytes_begin + encoded.size();
+  const unsigned char* end = bytes_begin;
+  while (pr2six[*end] <= 63 && end != bytes_end) {
+    ++end;
   }
-  size_t len = plain.size();
+  size_t nprbytes = end - bytes_begin;
+  if (nprbytes == 0) {
+    return 0;
+  }
 
-  size_t i;
-  for (i = 0; (i + 2) < len; i += 3) {
-    os << basis_64[(plain[i] >> 2) & 0x3F];
-    os << basis_64[((plain[i] & 0x3) << 4) |
-                   (static_cast<int>(plain[i + 1] & 0xF0) >> 4)];
-    os << basis_64[((plain[i + 1] & 0xF) << 2) |
-                   (static_cast<int>(plain[i + 2] & 0xC0) >> 6)];
-    os << basis_64[plain[i + 2] & 0x3F];
+  const unsigned char* cur = bytes_begin;
+
+  while (nprbytes > 4) {
+    plain->push_back(
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4));
+    plain->push_back(
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2));
+    plain->push_back(
+        static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]));
+    cur += 4;
+    nprbytes -= 4;
   }
-  if (i < len) {
-    os << basis_64[(plain[i] >> 2) & 0x3F];
-    if (i == (len - 1)) {
-      os << basis_64[((plain[i] & 0x3) << 4)];
-      os << '=';
-    } else {
-      os << basis_64[((plain[i] & 0x3) << 4) |
-                     (static_cast<int>(plain[i + 1] & 0xF0) >> 4)];
-      os << basis_64[((plain[i + 1] & 0xF) << 2)];
-    }
-    os << '=';
+
+  // Note: (nprbytes == 1) would be an error, so just ignore that case
+  if (nprbytes > 1) {
+    plain->push_back(
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4));
   }
+  if (nprbytes > 2) {
+    plain->push_back(
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2));
+  }
+  if (nprbytes > 3) {
+    plain->push_back(
+        static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]));
+  }
+
+  return (end - bytes_begin) + ((4 - nprbytes) & 3);
 }
 
 void Base64Encode(std::string_view plain, std::string* encoded) {
   encoded->resize(0);
-  raw_string_ostream os(*encoded);
-  Base64Encode(os, plain);
-  os.flush();
-}
 
-std::string_view Base64Encode(std::string_view plain,
-                              SmallVectorImpl<char>& buf) {
-  buf.clear();
-  raw_svector_ostream os(buf);
-  Base64Encode(os, plain);
-  return os.str();
-}
+  auto bytes_begin = reinterpret_cast<const unsigned char*>(encoded->data());
+  auto bytes_end = bytes_begin + encoded->size();
+  const unsigned char* end = bytes_begin;
+  while (pr2six[*end] <= 63 && end != bytes_end) {
+    ++end;
+  }
+  size_t nprbytes = end - bytes_begin;
+  if (nprbytes == 0) {
+    return;
+  }
 
-void Base64Encode(raw_ostream& os, std::span<const uint8_t> plain) {
-  Base64Encode(os, std::string_view{reinterpret_cast<const char*>(plain.data()),
-                                    plain.size()});
+  const unsigned char* cur = bytes_begin;
+
+  while (nprbytes > 4) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+    cur += 4;
+    nprbytes -= 4;
+  }
+
+  // Note: (nprbytes == 1) would be an error, so just ignore that case
+  if (nprbytes > 1) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+  }
+  if (nprbytes > 2) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+  }
+  if (nprbytes > 3) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+  }
 }
 
 void Base64Encode(std::span<const uint8_t> plain, std::string* encoded) {
   encoded->resize(0);
-  raw_string_ostream os(*encoded);
-  Base64Encode(os, plain);
-  os.flush();
-}
 
-std::string_view Base64Encode(std::span<const uint8_t> plain,
-                              SmallVectorImpl<char>& buf) {
-  buf.clear();
-  raw_svector_ostream os(buf);
-  Base64Encode(os, plain);
-  return os.str();
+  auto bytes_begin = reinterpret_cast<const unsigned char*>(encoded->data());
+  auto bytes_end = bytes_begin + encoded->size();
+  const unsigned char* end = bytes_begin;
+  while (pr2six[*end] <= 63 && end != bytes_end) {
+    ++end;
+  }
+  size_t nprbytes = end - bytes_begin;
+  if (nprbytes == 0) {
+    return;
+  }
+
+  const unsigned char* cur = bytes_begin;
+
+  while (nprbytes > 4) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+    cur += 4;
+    nprbytes -= 4;
+  }
+
+  // Note: (nprbytes == 1) would be an error, so just ignore that case
+  if (nprbytes > 1) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+  }
+  if (nprbytes > 2) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+  }
+  if (nprbytes > 3) {
+    *encoded +=
+        static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+  }
 }
 
 }  // namespace wpi

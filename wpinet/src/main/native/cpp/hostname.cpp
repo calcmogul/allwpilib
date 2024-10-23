@@ -34,7 +34,7 @@ std::string GetHostname() {
   return rv;
 }
 
-std::string_view GetHostname(SmallVectorImpl<char>& name) {
+std::string_view GetHostname(SmallVector<char>& name) {
   // Use a tmp array to not require the SmallVector to be too large.
   char tmpName[256];
   size_t size = sizeof(tmpName);

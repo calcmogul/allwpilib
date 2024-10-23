@@ -38,7 +38,7 @@ units::volt_t PSIToVolts(units::pounds_per_square_inch_t pressure,
 }
 
 wpi::mutex PneumaticHub::m_handleLock;
-std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>>
+std::unique_ptr<wpi::flat_map<int, std::weak_ptr<PneumaticHub::DataStore>>>
     PneumaticHub::m_handleMap = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
@@ -46,7 +46,7 @@ std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>>
 std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(int module) {
   if (!m_handleMap) {
     m_handleMap = std::make_unique<
-        wpi::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>>();
+        wpi::flat_map<int, std::weak_ptr<PneumaticHub::DataStore>>>();
   }
   return (*m_handleMap)[module];
 }

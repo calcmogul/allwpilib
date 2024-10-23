@@ -204,8 +204,7 @@ int UDPClient::receive(uint8_t* data_received, int receive_len) {
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len,
-                       SmallVectorImpl<char>* addr_received,
-                       int* port_received) {
+                       SmallVector<char>* addr_received, int* port_received) {
   if (m_port == 0) {
     return -1;  // return if not receiving
   }

@@ -8,10 +8,10 @@
 #include <memory>
 #include <string_view>
 
-#include <wpi/DenseMap.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/Synchronization.h>
+#include <wpi/flat_map.h>
 #include <wpi/json.h>
 
 #include "HandleMap.h"
@@ -308,7 +308,7 @@ class StorageImpl {
   wpi::StringMap<LocalTopic*> m_nameTopics;
 
   // listeners
-  wpi::DenseMap<NT_Listener, std::unique_ptr<LocalListener>> m_listeners;
+  wpi::flat_map<NT_Listener, std::unique_ptr<LocalListener>> m_listeners;
 
   // string-based listeners
   VectorSet<LocalListener*> m_topicPrefixListeners;

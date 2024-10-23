@@ -7,7 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/DenseMap.h>
+#include <wpi/flat_map.h>
 #include <wpi/mutex.h>
 
 #include "PneumaticsBase.h"
@@ -203,7 +203,7 @@ class PneumaticsControlModule : public PneumaticsBase {
   int m_module;
 
   static wpi::mutex m_handleLock;
-  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>>
+  static std::unique_ptr<wpi::flat_map<int, std::weak_ptr<DataStore>>>
       m_handleMap;
   static std::weak_ptr<DataStore>& GetDataStore(int module);
 };

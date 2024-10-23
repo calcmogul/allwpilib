@@ -6,7 +6,6 @@
 
 #include <concepts>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>

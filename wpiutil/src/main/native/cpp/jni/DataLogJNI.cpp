@@ -524,7 +524,7 @@ Java_edu_wpi_first_util_datalog_DataLogJNI_appendIntegerArray
         entry, {reinterpret_cast<const int64_t*>(jarr.data()), jarr.size()},
         timestamp);
   } else {
-    wpi::SmallVector<int64_t, 16> arr;
+    wpi::SmallVector<int64_t> arr;
     arr.reserve(jarr.size());
     for (auto v : jarr) {
       arr.push_back(v);

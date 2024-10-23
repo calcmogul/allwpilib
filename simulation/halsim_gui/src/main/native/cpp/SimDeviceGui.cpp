@@ -13,8 +13,8 @@
 #include <glass/other/DeviceTree.h>
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
-#include <wpi/DenseMap.h>
 #include <wpi/StringExtras.h>
+#include <wpi/flat_map.h>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"
@@ -61,7 +61,7 @@ class SimDevicesModel : public glass::Model {
   }
 
  private:
-  wpi::DenseMap<HAL_SimValueHandle, std::unique_ptr<SimValueSource>> m_sources;
+  wpi::flat_map<HAL_SimValueHandle, std::unique_ptr<SimValueSource>> m_sources;
 };
 }  // namespace
 

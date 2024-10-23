@@ -47,14 +47,14 @@ std::string NetworkTable::NormalizeKey(std::string_view key,
 }
 
 std::string_view NetworkTable::NormalizeKey(std::string_view key,
-                                            wpi::SmallVectorImpl<char>& buf,
+                                            wpi::SmallVector<char>& buf,
                                             bool withLeadingSlash) {
   buf.clear();
   if (withLeadingSlash) {
     buf.push_back(PATH_SEPARATOR_CHAR);
   }
   // for each path element, add it with a slash following
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::SmallVector<std::string_view> parts;
   wpi::split(key, parts, PATH_SEPARATOR_CHAR, -1, false);
   for (auto i = parts.begin(); i != parts.end(); ++i) {
     buf.append(i->begin(), i->end());
@@ -72,7 +72,7 @@ std::vector<std::string> NetworkTable::GetHierarchy(std::string_view key) {
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
   wpi::SmallString<128> path;
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::SmallVector<std::string_view> parts;
   wpi::split(key, parts, PATH_SEPARATOR_CHAR, -1, false);
   if (!parts.empty()) {
     for (auto i = parts.begin(); i != parts.end(); ++i) {

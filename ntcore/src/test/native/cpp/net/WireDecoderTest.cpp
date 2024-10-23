@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 #include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #include "../MockLogger.h"
 #include "../PubSubOptionsMatcher.h"

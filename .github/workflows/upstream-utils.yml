@@ -108,12 +108,6 @@ jobs:
           ./libuv.py clone
           ./libuv.py copy-src
           ./libuv.py format-patch
-      - name: Run llvm.py
-        run: |
-          cd upstream_utils
-          ./llvm.py clone
-          ./llvm.py copy-src
-          ./llvm.py format-patch
       - name: Run mpack.py
         run: |
           cd upstream_utils

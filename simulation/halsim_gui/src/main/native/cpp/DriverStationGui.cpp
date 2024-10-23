@@ -225,7 +225,7 @@ class FMSSimModel : public glass::FMSModel {
   glass::DataSource* GetTestData() override { return &m_test; }
   glass::DataSource* GetAutonomousData() override { return &m_autonomous; }
   std::string_view GetGameSpecificMessage(
-      wpi::SmallVectorImpl<char>& buf) override {
+      wpi::SmallVector<char>& buf) override {
     return m_gameMessage;
   }
 

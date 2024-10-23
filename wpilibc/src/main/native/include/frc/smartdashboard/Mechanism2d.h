@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -11,7 +13,6 @@
 #include <networktables/NTSendable.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/StringTopic.h>
-#include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
 

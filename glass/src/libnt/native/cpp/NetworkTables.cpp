@@ -32,7 +32,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/mpack.h>
 #include <wpi/print.h>
-#include <wpi/raw_ostream.h>
 
 #ifndef NO_PROTOBUF
 #include <google/protobuf/descriptor.h>
@@ -965,7 +964,7 @@ void NetworkTablesModel::RebuildTree() {
 void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
                                          int category) {
   tree->clear();
-  wpi::SmallVector<std::string_view, 16> parts;
+  wpi::SmallVector<std::string_view> parts;
   for (auto& entry : m_sortedEntries) {
     if (!IsVisible(static_cast<ShowCategory>(category), entry->persistent,
                    entry->retained)) {

@@ -11,7 +11,6 @@
 
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/fmt/raw_ostream.h>
 #include <wpi/print.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/TCPAcceptor.h>

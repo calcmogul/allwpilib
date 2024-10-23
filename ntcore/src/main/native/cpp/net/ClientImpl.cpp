@@ -13,7 +13,6 @@
 
 #include <fmt/format.h>
 #include <wpi/Logger.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"

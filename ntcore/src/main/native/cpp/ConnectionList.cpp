@@ -9,7 +9,6 @@
 
 #include <wpi/SmallVector.h>
 #include <wpi/json.h>
-#include <wpi/raw_ostream.h>
 
 #include "IListenerStorage.h"
 #include "ntcore_c.h"
@@ -19,19 +18,18 @@ using namespace nt;
 
 static std::string ConnInfoToJson(bool connected, const ConnectionInfo& info) {
   std::string str;
-  wpi::raw_string_ostream os{str};
-  wpi::json::serializer s{os, ' ', 0};
-  os << "{\"connected\":" << (connected ? "true" : "false");
-  os << ",\"remote_id\":\"";
+  wpi::json::serializer s{str, ' ', 0};
+  str.append("{\"connected\":");
+  str.append(connected ? "true" : "false");
+  str.append(",\"remote_id\":\"");
   s.dump_escaped(info.remote_id, false);
-  os << "\",\"remote_ip\":\"";
+  str.append("\",\"remote_ip\":\"");
   s.dump_escaped(info.remote_ip, false);
-  os << "\",\"remote_port\":";
+  str.append("\",\"remote_port\":");
   s.dump_integer(static_cast<uint64_t>(info.remote_port));
-  os << ",\"protocol_version\":";
+  str.append(",\"protocol_version\":");
   s.dump_integer(static_cast<uint64_t>(info.protocol_version));
-  os << "}";
-  os.flush();
+  str.append("}");
   return str;
 }
 
@@ -100,7 +98,7 @@ void ConnectionList::AddListener(NT_Listener listener, unsigned int eventMask) {
   if ((eventMask & (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE)) ==
           (NT_EVENT_CONNECTED | NT_EVENT_IMMEDIATE) &&
       !m_connections.empty()) {
-    wpi::SmallVector<const ConnectionInfo*, 16> infos;
+    wpi::SmallVector<const ConnectionInfo*> infos;
     infos.reserve(m_connections.size());
     for (auto&& conn : m_connections) {
       infos.emplace_back(&(*conn));

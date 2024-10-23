@@ -11,7 +11,6 @@
 #include "wpi/Demangle.h"
 #include "wpi/SmallString.h"
 #include "wpi/StringExtras.h"
-#include "wpi/raw_ostream.h"
 
 namespace wpi {
 
@@ -21,7 +20,6 @@ std::string GetStackTraceDefault(int offset) {
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
   wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream trace(buf);
 
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
@@ -32,13 +30,18 @@ std::string GetStackTraceDefault(int offset) {
       std::tie(sym, offset) = split(sym, '+');
       std::string_view addr;
       std::tie(offset, addr) = split(offset, ')');
-      trace << "\tat " << Demangle(sym) << " + " << offset << addr << "\n";
+      buf.append("\tat ");
+      buf.append(Demangle(sym));
+      buf.append(" + ");
+      buf.append(offset);
+      buf.append(addr);
+      buf.append("\n");
     }
   }
 
   std::free(mangledSymbols);
 
-  return std::string{trace.str()};
+  return std::string{buf};
 #else
   // backtrace_symbols not supported on android
   return "";

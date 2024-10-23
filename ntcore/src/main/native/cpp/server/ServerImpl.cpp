@@ -103,7 +103,7 @@ void ServerImpl::SendAnnounce(ServerTopic* topic, ServerClient* client) {
     }
 
     // look for subscriber matching prefixes
-    wpi::SmallVector<ServerSubscriber*, 16> subscribersBuf;
+    wpi::SmallVector<ServerSubscriber*> subscribersBuf;
     auto subscribers =
         aClient->GetSubscribers(topic->name, topic->special, subscribersBuf);
 

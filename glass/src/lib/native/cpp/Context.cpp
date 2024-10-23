@@ -5,6 +5,7 @@
 #include "glass/Context.h"
 
 #include <filesystem>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -17,7 +18,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 #include <wpi/json.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 #include <wpigui.h>
 #include <wpigui_internal.h>
@@ -65,7 +65,6 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
 
   // loop over JSON and generate ini format
   std::string iniStr;
-  wpi::raw_string_ostream ini{iniStr};
 
   for (auto&& jsection : jfile.items()) {
     if (jsection.key() == "Docking") {
@@ -82,11 +81,18 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
                        jsection.key().c_str(), jsubsection.key().c_str());
         return false;
       }
-      ini << '[' << jsection.key() << "][" << jsubsection.key() << "]\n";
+      iniStr += '[';
+      iniStr.append(jsection.key());
+      iniStr.append("][");
+      iniStr.append(jsubsection.key());
+      iniStr.append("]\n");
       for (auto&& jkv : jsubsection.value().items()) {
         try {
           auto& value = jkv.value().get_ref<const std::string&>();
-          ini << jkv.key() << '=' << value << "\n";
+          iniStr.append(jkv.key());
+          iniStr += '=';
+          iniStr.append(value);
+          iniStr += '\n';
         } catch (wpi::json::exception&) {
           ImGui::LogText("%s section %s subsection %s value %s is not string",
                          filename, jsection.key().c_str(),
@@ -94,7 +100,7 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
           return false;
         }
       }
-      ini << '\n';
+      iniStr += '\n';
     }
   }
 
@@ -107,22 +113,23 @@ static bool JsonToWindow(const wpi::json& jfile, const char* filename) {
                        "Docking", jsubsection.key().c_str());
         return false;
       }
-      ini << "[Docking][" << jsubsection.key() << "]\n";
+      iniStr.append("[Docking][");
+      iniStr.append(jsubsection.key());
+      iniStr.append("]\n");
       for (auto&& jv : jsubsection.value()) {
         try {
           auto& value = jv.get_ref<const std::string&>();
-          ini << value << "\n";
+          iniStr.append(value);
+          iniStr += '\n';
         } catch (wpi::json::exception&) {
           ImGui::LogText("%s section %s subsection %s value is not string",
                          filename, "Docking", jsubsection.key().c_str());
           return false;
         }
       }
-      ini << '\n';
+      iniStr += '\n';
     }
   }
-
-  ini.flush();
 
   ImGui::LoadIniSettingsFromMemory(iniStr.data(), iniStr.size());
   return true;
@@ -246,28 +253,24 @@ static wpi::json WindowToJson() {
 }
 
 bool SaveWindowStorageImpl(const std::string& filename) {
-  std::error_code ec;
-  wpi::raw_fd_ostream os{filename, ec};
-  if (ec) {
-    ImGui::LogText("error opening %s: %s", filename.c_str(),
-                   ec.message().c_str());
+  std::ofstream os{filename};
+  if (!os.is_open()) {
+    ImGui::LogText("error opening %s", filename.c_str());
     return false;
   }
-  WindowToJson().dump(os, 2);
+  os << WindowToJson().dump(2);
   os << '\n';
   return true;
 }
 
 static bool SaveStorageRootImpl(Context* ctx, const std::string& filename,
                                 const Storage& storage) {
-  std::error_code ec;
-  wpi::raw_fd_ostream os{filename, ec};
-  if (ec) {
-    ImGui::LogText("error opening %s: %s", filename.c_str(),
-                   ec.message().c_str());
+  std::ofstream os{filename};
+  if (!os.is_open()) {
+    ImGui::LogText("error opening %s", filename.c_str());
     return false;
   }
-  storage.ToJson().dump(os, 2);
+  os << storage.ToJson().dump(2);
   os << '\n';
   return true;
 }

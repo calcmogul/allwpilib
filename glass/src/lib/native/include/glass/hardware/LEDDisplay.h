@@ -6,14 +6,10 @@
 
 #include <span>
 
+#include <wpi/SmallVector.h>
 #include <wpi/function_ref.h>
 
 #include "glass/Model.h"
-
-namespace wpi {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi
 
 namespace glass {
 
@@ -28,7 +24,7 @@ class LEDDisplayModel : public glass::Model {
 
   virtual bool IsRunning() = 0;
 
-  virtual std::span<const Data> GetData(wpi::SmallVectorImpl<Data>& buf) = 0;
+  virtual std::span<const Data> GetData(wpi::SmallVector<Data>& buf) = 0;
 };
 
 class LEDDisplaysModel : public glass::Model {

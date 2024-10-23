@@ -51,7 +51,7 @@ class SimCallbackRegistryBase {
     return m_callbacks->emplace_back(param, callback) + 1;
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE void DoReset() {
+  WPI_ALWAYS_INLINE void DoReset() {
     if (m_callbacks) {
       m_callbacks->clear();
     }
@@ -90,7 +90,7 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
   }
 
   template <typename... U>
-  LLVM_ATTRIBUTE_ALWAYS_INLINE void operator()(U&&... u) const {
+  WPI_ALWAYS_INLINE void operator()(U&&... u) const {
     return Invoke(std::forward<U>(u)...);
   }
 };
@@ -100,10 +100,9 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
  * This creates a function named GetNAMEName() that returns "NAME".
  * @param NAME the name to return
  */
-#define HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NAME)           \
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr const char* \
-      Get##NAME##Name() {                                   \
-    return #NAME;                                           \
+#define HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NAME)                    \
+  static WPI_ALWAYS_INLINE constexpr const char* Get##NAME##Name() { \
+    return #NAME;                                                    \
   }
 
 /**
