@@ -210,6 +210,9 @@ wpilib_jni_cc_library(
     name = "wpimathjni",
     srcs = glob(["src/main/native/cpp/jni/**"]),
     java_dep = ":wpimath-java",
+    javacopts = [
+        "-Xep:UnicodeInCode:OFF",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":wpimath",
