@@ -17,6 +17,7 @@
 #include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
@@ -324,6 +325,28 @@ class WPILIB_DLLEXPORT Rotation3d {
    */
   constexpr Rotation3d RotateBy(const Rotation3d& other) const {
     return Rotation3d{other.m_q * m_q};
+  }
+
+  /**
+   * Projects the rotation forward by integrating the given body rates over
+   * time.
+   *
+   * @param rollRate The body roll rate.
+   * @param pitchRate The body pitch rate.
+   * @param yawRate The body yaw rate.
+   * @param dt The time over which to integrate.
+   * @return The rotation in the world frame projected forward.
+   */
+  constexpr Rotation3d Integrate(units::radians_per_second_t rollRate,
+                                 units::radians_per_second_t pitchRate,
+                                 units::radians_per_second_t yawRate,
+                                 units::second_t dt) const {
+    // qₖ₊₁ = qₖ exp(Ω dt) where Ω = 0 + ω_x/2 i + ω_y/2 j + ω_z/2 k
+    //
+    // https://math.stackexchange.com/a/2099673
+    Quaternion Ω{0.0, rollRate.value() / 2, pitchRate.value() / 2,
+                 yawRate.value() / 2};
+    return Rotation3d{m_q * (Ω * dt.value()).Exp()};
   }
 
   /**
