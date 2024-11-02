@@ -435,6 +435,23 @@ public class Rotation3d
   }
 
   /**
+   * Projects the rotation forward by integrating the given body rates over time.
+   *
+   * @param rollRate The body roll rate in radians per second.
+   * @param pitchRate The body pitch rate in radians per second.
+   * @param yawRate The body yaw rate in radians per second.
+   * @param dt The time over which to integrate in seconds.
+   * @return The rotation in the world frame projected forward.
+   */
+  public Rotation3d integrate(double rollRate, double pitchRate, double yawRate, double dt) {
+    // qₖ₊₁ = qₖ exp(Ω dt) where Ω = 0 + ω_x/2 i + ω_y/2 j + ω_z/2 k
+    //
+    // https://math.stackexchange.com/a/2099673
+    var Ω = new Quaternion(0.0, rollRate / 2, pitchRate / 2, yawRate / 2);
+    return new Rotation3d(m_q.times(Ω.times(dt).exp()));
+  }
+
+  /**
    * Returns the quaternion representation of the Rotation3d.
    *
    * @return The quaternion representation of the Rotation3d.

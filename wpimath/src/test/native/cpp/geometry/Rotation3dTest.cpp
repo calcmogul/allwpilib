@@ -276,6 +276,18 @@ TEST(Rotation3dTest, RelativeTo) {
   EXPECT_EQ(expected, result);
 }
 
+TEST(Rotation3dTest, Integrate) {
+  Rotation3d rot{0_deg, 0_deg, 90_deg};
+
+  auto integrated1 = rot.Integrate(0_deg_per_s, 0_deg_per_s, 20_deg_per_s, 1_s);
+  Rotation3d expected1{0_deg, 0_deg, 110_deg};
+  EXPECT_EQ(expected1, integrated1);
+
+  auto integrated2 = rot.Integrate(0_deg_per_s, 20_deg_per_s, 0_deg_per_s, 1_s);
+  Rotation3d expected2{0_deg, 20_deg, 90_deg};
+  EXPECT_EQ(expected2, integrated2);
+}
+
 TEST(Rotation3dTest, Minus) {
   const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
