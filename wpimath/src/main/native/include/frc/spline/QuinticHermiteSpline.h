@@ -11,6 +11,7 @@
 #include "frc/spline/Spline.h"
 
 namespace frc {
+
 /**
  * Represents a hermite spline of degree 5.
  */
@@ -30,10 +31,10 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    * @param yFinalControlVector The control vector for the final point in
    * the y dimension.
    */
-  QuinticHermiteSpline(wpi::array<double, 3> xInitialControlVector,
-                       wpi::array<double, 3> xFinalControlVector,
-                       wpi::array<double, 3> yInitialControlVector,
-                       wpi::array<double, 3> yFinalControlVector)
+  constexpr QuinticHermiteSpline(wpi::array<double, 3> xInitialControlVector,
+                                 wpi::array<double, 3> xFinalControlVector,
+                                 wpi::array<double, 3> yInitialControlVector,
+                                 wpi::array<double, 3> yFinalControlVector)
       : m_initialControlVector{xInitialControlVector, yInitialControlVector},
         m_finalControlVector{xFinalControlVector, yFinalControlVector} {
     const auto hermite = MakeHermiteBasis();
@@ -70,14 +71,16 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    * Returns the coefficients matrix.
    * @return The coefficients matrix.
    */
-  Matrixd<6, 6> Coefficients() const override { return m_coefficients; }
+  constexpr Matrixd<6, 6> Coefficients() const override {
+    return m_coefficients;
+  }
 
   /**
    * Returns the initial control vector that created this spline.
    *
    * @return The initial control vector that created this spline.
    */
-  const ControlVector& GetInitialControlVector() const override {
+  constexpr const ControlVector& GetInitialControlVector() const override {
     return m_initialControlVector;
   }
 
@@ -86,7 +89,7 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    *
    * @return The final control vector that created this spline.
    */
-  const ControlVector& GetFinalControlVector() const override {
+  constexpr const ControlVector& GetFinalControlVector() const override {
     return m_finalControlVector;
   }
 
@@ -152,6 +155,7 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
                       {finalVector[1]},   {finalVector[2]}};
   }
 };
+
 }  // namespace frc
 
 #include "frc/spline/proto/QuinticHermiteSplineProto.h"

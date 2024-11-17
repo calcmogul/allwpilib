@@ -102,14 +102,15 @@ class WPILIB_DLLEXPORT Trajectory {
     }
   };
 
-  Trajectory() = default;
+  constexpr Trajectory() = default;
 
   /**
    * Constructs a trajectory from a vector of states.
    *
    * @throws std::invalid_argument if the vector of states is empty.
    */
-  explicit Trajectory(const std::vector<State>& states) : m_states(states) {
+  constexpr explicit Trajectory(const std::vector<State>& states)
+      : m_states(states) {
     if (m_states.empty()) {
       throw std::invalid_argument(
           "Trajectory manually initialized with no states.");
@@ -122,14 +123,14 @@ class WPILIB_DLLEXPORT Trajectory {
    * Returns the overall duration of the trajectory.
    * @return The duration of the trajectory.
    */
-  units::second_t TotalTime() const { return m_totalTime; }
+  constexpr units::second_t TotalTime() const { return m_totalTime; }
 
   /**
    * Return the states of the trajectory.
    *
    * @return The states of the trajectory.
    */
-  const std::vector<State>& States() const { return m_states; }
+  constexpr const std::vector<State>& States() const { return m_states; }
 
   /**
    * Sample the trajectory at a point in time.
@@ -138,7 +139,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * @return The state at that point in time.
    * @throws std::runtime_error if the trajectory has no states.
    */
-  State Sample(units::second_t t) const {
+  constexpr State Sample(units::second_t t) const {
     if (m_states.empty()) {
       throw std::runtime_error(
           "Trajectory cannot be sampled if it has no states.");
@@ -182,7 +183,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * @param transform The transform to transform the trajectory by.
    * @return The transformed trajectory.
    */
-  Trajectory TransformBy(const Transform2d& transform) {
+  constexpr Trajectory TransformBy(const Transform2d& transform) {
     auto& firstState = m_states[0];
     auto& firstPose = firstState.pose;
 
@@ -210,7 +211,7 @@ class WPILIB_DLLEXPORT Trajectory {
    *             the current trajectory will be transformed into.
    * @return The transformed trajectory.
    */
-  Trajectory RelativeTo(const Pose2d& pose) {
+  constexpr Trajectory RelativeTo(const Pose2d& pose) {
     auto newStates = m_states;
     for (auto& state : newStates) {
       state.pose = state.pose.RelativeTo(pose);
@@ -226,7 +227,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  Trajectory operator+(const Trajectory& other) const {
+  constexpr Trajectory operator+(const Trajectory& other) const {
     // If this is a default constructed trajectory with no states, then we can
     // simply return the rhs trajectory.
     if (m_states.empty()) {
@@ -252,12 +253,12 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @return The initial pose of the trajectory.
    */
-  Pose2d InitialPose() const { return Sample(0_s).pose; }
+  constexpr Pose2d InitialPose() const { return Sample(0_s).pose; }
 
   /**
    * Checks equality between this Trajectory and another object.
    */
-  bool operator==(const Trajectory&) const = default;
+  constexpr bool operator==(const Trajectory&) const = default;
 
  private:
   std::vector<State> m_states;

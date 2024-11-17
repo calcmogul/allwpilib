@@ -39,7 +39,7 @@ class HolonomicDriveControllerTest {
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.8)));
 
     TrajectoryConfig config = new TrajectoryConfig(8.0, 4.0);
-    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
+    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config).get();
 
     final double kDt = 0.02;
     final double kTotalTime = trajectory.getTotalTimeSeconds();

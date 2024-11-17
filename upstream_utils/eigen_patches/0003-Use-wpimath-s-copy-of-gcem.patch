@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 17 Nov 2024 12:16:24 -0800
+Subject: [PATCH 3/3] Use wpimath's copy of gcem
+
+---
+ Eigen/Core | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Eigen/Core b/Eigen/Core
+index 9679b5b748a2788a5d8e5093a3a057b00e0c9eb8..c26d066ddf8b88138f72900361bd2a254f58ca3c 100644
+--- a/Eigen/Core
++++ b/Eigen/Core
+@@ -182,7 +182,7 @@ using std::ptrdiff_t;
+ #include "src/Core/util/MoreMeta.h"
+ 
+ // for compile-time math
+-#include "src/gcem/gcem.hpp"
++#include <gcem.hpp>
+ 
+ #include "src/Core/NumTraits.h"
+ #include "src/Core/MathFunctions.h"

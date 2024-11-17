@@ -59,7 +59,7 @@ class Spline {
    * @param t The point t
    * @return The pose and curvature at that point.
    */
-  std::optional<PoseWithCurvature> GetPoint(double t) const {
+  constexpr std::optional<PoseWithCurvature> GetPoint(double t) const {
     Vectord<Degree + 1> polynomialBases;
 
     // Populate the polynomial bases

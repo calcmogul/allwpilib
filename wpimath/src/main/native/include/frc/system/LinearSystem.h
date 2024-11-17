@@ -8,10 +8,10 @@
 #include <concepts>
 #include <stdexcept>
 #include <type_traits>
+#include <vector>
 
 #include <gcem.hpp>
 #include <wpi/Algorithm.h>
-#include <wpi/SmallVector.h>
 
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
@@ -160,8 +160,9 @@ class LinearSystem {
    * @param clampedU The control input.
    * @param dt       Timestep for model update.
    */
-  StateVector CalculateX(const StateVector& x, const InputVector& clampedU,
-                         units::second_t dt) const {
+  constexpr StateVector CalculateX(const StateVector& x,
+                                   const InputVector& clampedU,
+                                   units::second_t dt) const {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);
@@ -178,8 +179,8 @@ class LinearSystem {
    * @param x The current state.
    * @param clampedU The control input.
    */
-  OutputVector CalculateY(const StateVector& x,
-                          const InputVector& clampedU) const {
+  constexpr OutputVector CalculateY(const StateVector& x,
+                                    const InputVector& clampedU) const {
     return m_C * x + m_D * clampedU;
   }
 
@@ -199,7 +200,7 @@ class LinearSystem {
    * @throws std::domain_error if duplication exists in outputIndices.
    */
   template <std::same_as<int>... OutputIndices>
-  LinearSystem<States, Inputs, sizeof...(OutputIndices)> Slice(
+  constexpr LinearSystem<States, Inputs, sizeof...(OutputIndices)> Slice(
       OutputIndices... outputIndices) {
     static_assert(sizeof...(OutputIndices) <= Outputs,
                   "More outputs requested than available. This is usually due "
@@ -216,7 +217,7 @@ class LinearSystem {
         outputIndices...);
 
     // Sort and deduplicate output indices
-    wpi::SmallVector<int> outputIndicesArray{outputIndices...};
+    std::vector<int> outputIndicesArray{outputIndices...};
     std::sort(outputIndicesArray.begin(), outputIndicesArray.end());
     auto last =
         std::unique(outputIndicesArray.begin(), outputIndicesArray.end());

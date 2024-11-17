@@ -37,10 +37,10 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-                    const Rotation2d& gyroAngle,
-                    const WheelPositions& wheelPositions,
-                    const Pose2d& initialPose = Pose2d{})
+  constexpr explicit Odometry(
+      const Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+      const Rotation2d& gyroAngle, const WheelPositions& wheelPositions,
+      const Pose2d& initialPose = Pose2d{})
       : m_kinematics(kinematics),
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions) {
@@ -58,8 +58,9 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param pose The position on the field that your robot is at.
    */
-  void ResetPosition(const Rotation2d& gyroAngle,
-                     const WheelPositions& wheelPositions, const Pose2d& pose) {
+  constexpr void ResetPosition(const Rotation2d& gyroAngle,
+                               const WheelPositions& wheelPositions,
+                               const Pose2d& pose) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
     m_gyroOffset = m_pose.Rotation() - gyroAngle;
@@ -71,7 +72,7 @@ class WPILIB_DLLEXPORT Odometry {
    *
    * @param pose The pose to reset to.
    */
-  void ResetPose(const Pose2d& pose) {
+  constexpr void ResetPose(const Pose2d& pose) {
     m_gyroOffset = m_gyroOffset + (pose.Rotation() - m_pose.Rotation());
     m_pose = pose;
     m_previousAngle = pose.Rotation();
@@ -82,7 +83,7 @@ class WPILIB_DLLEXPORT Odometry {
    *
    * @param translation The translation to reset to.
    */
-  void ResetTranslation(const Translation2d& translation) {
+  constexpr void ResetTranslation(const Translation2d& translation) {
     m_pose = Pose2d{translation, m_pose.Rotation()};
   }
 
@@ -91,7 +92,7 @@ class WPILIB_DLLEXPORT Odometry {
    *
    * @param rotation The rotation to reset to.
    */
-  void ResetRotation(const Rotation2d& rotation) {
+  constexpr void ResetRotation(const Rotation2d& rotation) {
     m_gyroOffset = m_gyroOffset + (rotation - m_pose.Rotation());
     m_pose = Pose2d{m_pose.Translation(), rotation};
     m_previousAngle = rotation;
@@ -101,7 +102,7 @@ class WPILIB_DLLEXPORT Odometry {
    * Returns the position of the robot on the field.
    * @return The pose of the robot.
    */
-  const Pose2d& GetPose() const { return m_pose; }
+  constexpr const Pose2d& GetPose() const { return m_pose; }
 
   /**
    * Updates the robot's position on the field using forward kinematics and
@@ -114,8 +115,8 @@ class WPILIB_DLLEXPORT Odometry {
    *
    * @return The new pose of the robot.
    */
-  const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const WheelPositions& wheelPositions) {
+  constexpr const Pose2d& Update(const Rotation2d& gyroAngle,
+                                 const WheelPositions& wheelPositions) {
     auto angle = gyroAngle + m_gyroOffset;
 
     auto twist =

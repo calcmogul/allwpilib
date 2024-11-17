@@ -91,17 +91,19 @@ class DifferentialDriveVoltageConstraintTest {
     assertDoesNotThrow(
         () ->
             TrajectoryGenerator.generateTrajectory(
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                new ArrayList<>(),
-                new Pose2d(0, 1, Rotation2d.kPi),
-                config));
+                    new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+                    new ArrayList<>(),
+                    new Pose2d(0, 1, Rotation2d.kPi),
+                    config)
+                .get());
 
     assertDoesNotThrow(
         () ->
             TrajectoryGenerator.generateTrajectory(
-                new Pose2d(0, 1, Rotation2d.kPi),
-                new ArrayList<>(),
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                config.setReversed(true)));
+                    new Pose2d(0, 1, Rotation2d.kPi),
+                    new ArrayList<>(),
+                    new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+                    config.setReversed(true))
+                .get());
   }
 }

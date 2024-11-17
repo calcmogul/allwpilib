@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
+#include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/acceleration.h"
@@ -86,11 +88,18 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * in meters/second.
    * @param dt Discretization timestep.
    */
-  DifferentialDriveWheelVoltages Calculate(
+  constexpr DifferentialDriveWheelVoltages Calculate(
       units::meters_per_second_t currentLeftVelocity,
       units::meters_per_second_t nextLeftVelocity,
       units::meters_per_second_t currentRightVelocity,
-      units::meters_per_second_t nextRightVelocity, units::second_t dt);
+      units::meters_per_second_t nextRightVelocity, units::second_t dt) {
+    frc::LinearPlantInversionFeedforward<2, 2> feedforward{m_plant, dt};
+
+    Eigen::Vector2d r{currentLeftVelocity, currentRightVelocity};
+    Eigen::Vector2d nextR{nextLeftVelocity, nextRightVelocity};
+    auto u = feedforward.Calculate(r, nextR);
+    return {units::volt_t{u(0)}, units::volt_t{u(1)}};
+  }
 
   decltype(1_V / 1_mps) m_kVLinear;
   decltype(1_V / 1_mps_sq) m_kALinear;

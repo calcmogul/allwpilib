@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
@@ -12,6 +14,7 @@
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "frc/kinematics/Odometry.h"
 #include "units/length.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**
@@ -41,10 +44,16 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit DifferentialDriveOdometry(const Rotation2d& gyroAngle,
-                                     units::meter_t leftDistance,
-                                     units::meter_t rightDistance,
-                                     const Pose2d& initialPose = Pose2d{});
+  constexpr explicit DifferentialDriveOdometry(
+      const Rotation2d& gyroAngle, units::meter_t leftDistance,
+      units::meter_t rightDistance, const Pose2d& initialPose = Pose2d{})
+      : Odometry(m_kinematicsImpl, gyroAngle, {leftDistance, rightDistance},
+                 initialPose) {
+    if (!std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kOdometry_DifferentialDrive, 1);
+    }
+  }
 
   /**
    * Resets the robot's position on the field.
@@ -60,8 +69,10 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose2d& pose) {
+  constexpr void ResetPosition(const Rotation2d& gyroAngle,
+                               units::meter_t leftDistance,
+                               units::meter_t rightDistance,
+                               const Pose2d& pose) {
     Odometry::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
@@ -76,8 +87,9 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
    * @param rightDistance The distance traveled by the right encoder.
    * @return The new pose of the robot.
    */
-  const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance) {
+  constexpr const Pose2d& Update(const Rotation2d& gyroAngle,
+                                 units::meter_t leftDistance,
+                                 units::meter_t rightDistance) {
     return Odometry::Update(gyroAngle, {leftDistance, rightDistance});
   }
 

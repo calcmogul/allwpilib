@@ -12,12 +12,13 @@
 #include "frc/trajectory/Trajectory.h"
 
 namespace frc {
+
 /**
  * Trajectory utilities.
  */
 class WPILIB_DLLEXPORT TrajectoryUtil {
  public:
-  TrajectoryUtil() = delete;
+  constexpr TrajectoryUtil() = delete;
 
   /**
    * Exports a Trajectory to a PathWeaver-style JSON file.
@@ -58,4 +59,5 @@ class WPILIB_DLLEXPORT TrajectoryUtil {
   // Usage reporting for PathWeaver Trajectory instances
   inline static int pathWeaverTrajectoryInstances = 0;
 };
+
 }  // namespace frc

@@ -4,20 +4,16 @@
 
 #pragma once
 
-#include <functional>
-
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/timestamp.h>
 
 #include "frc/estimator/PoseEstimator3d.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
-#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveOdometry3d.h"
-#include "units/time.h"
 
 namespace frc {
+
 /**
  * This class wraps Mecanum Drive Odometry to fuse latency-compensated
  * vision measurements with mecanum drive encoder velocity measurements. It will
@@ -56,10 +52,14 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
    * @param wheelPositions The distance measured by each wheel.
    * @param initialPose The starting pose estimate.
    */
-  MecanumDrivePoseEstimator3d(MecanumDriveKinematics& kinematics,
-                              const Rotation3d& gyroAngle,
-                              const MecanumDriveWheelPositions& wheelPositions,
-                              const Pose3d& initialPose);
+  constexpr MecanumDrivePoseEstimator3d(
+      MecanumDriveKinematics& kinematics, const Rotation3d& gyroAngle,
+      const MecanumDriveWheelPositions& wheelPositions,
+      const Pose3d& initialPose)
+      : MecanumDrivePoseEstimator3d{
+            kinematics,           gyroAngle,
+            wheelPositions,       initialPose,
+            {0.1, 0.1, 0.1, 0.1}, {0.45, 0.45, 0.45, 0.45}} {}
 
   /**
    * Constructs a MecanumDrivePoseEstimator3d.
@@ -77,11 +77,16 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
    * meters, and angle in radians). Increase these numbers to trust the vision
    * pose measurement less.
    */
-  MecanumDrivePoseEstimator3d(
+  constexpr MecanumDrivePoseEstimator3d(
       MecanumDriveKinematics& kinematics, const Rotation3d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose3d& initialPose, const wpi::array<double, 4>& stateStdDevs,
-      const wpi::array<double, 4>& visionMeasurementStdDevs);
+      const wpi::array<double, 4>& visionMeasurementStdDevs)
+      : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,
+                        visionMeasurementStdDevs),
+        m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
+    ResetPose(initialPose);
+  }
 
  private:
   MecanumDriveOdometry3d m_odometryImpl;

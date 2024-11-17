@@ -4,16 +4,19 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <wpi/SymbolExports.h>
 
-#include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/DifferentialDriveWheelPositions.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "frc/kinematics/Odometry3d.h"
 #include "units/length.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
+
 /**
  * Class for differential drive odometry. Odometry allows you to track the
  * robot's position on the field over the course of a match using readings from
@@ -41,10 +44,16 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit DifferentialDriveOdometry3d(const Rotation3d& gyroAngle,
-                                       units::meter_t leftDistance,
-                                       units::meter_t rightDistance,
-                                       const Pose3d& initialPose = Pose3d{});
+  constexpr explicit DifferentialDriveOdometry3d(
+      const Rotation3d& gyroAngle, units::meter_t leftDistance,
+      units::meter_t rightDistance, const Pose3d& initialPose = Pose3d{})
+      : Odometry3d(m_kinematicsImpl, gyroAngle, {leftDistance, rightDistance},
+                   initialPose) {
+    if (!std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kOdometry_DifferentialDrive, 1);
+    }
+  }
 
   /**
    * Resets the robot's position on the field.
@@ -60,8 +69,10 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose3d& pose) {
+  constexpr void ResetPosition(const Rotation3d& gyroAngle,
+                               units::meter_t leftDistance,
+                               units::meter_t rightDistance,
+                               const Pose3d& pose) {
     Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
@@ -76,12 +87,14 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param rightDistance The distance traveled by the right encoder.
    * @return The new pose of the robot.
    */
-  const Pose3d& Update(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance) {
+  constexpr const Pose3d& Update(const Rotation3d& gyroAngle,
+                                 units::meter_t leftDistance,
+                                 units::meter_t rightDistance) {
     return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
   DifferentialDriveKinematics m_kinematicsImpl{units::meter_t{1}};
 };
+
 }  // namespace frc

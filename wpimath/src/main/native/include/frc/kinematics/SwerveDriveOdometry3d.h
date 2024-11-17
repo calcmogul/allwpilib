@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <chrono>
 #include <cstddef>
-#include <ctime>
+#include <type_traits>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
@@ -15,8 +14,6 @@
 #include "SwerveDriveKinematics.h"
 #include "SwerveModulePosition.h"
 #include "SwerveModuleState.h"
-#include "frc/geometry/Pose2d.h"
-#include "units/time.h"
 
 namespace frc {
 
@@ -46,15 +43,17 @@ class SwerveDriveOdometry3d
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif  // defined(__GNUC__) && !defined(__clang__)
-  SwerveDriveOdometry3d(
+  constexpr SwerveDriveOdometry3d(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation3d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose3d& initialPose = Pose3d{})
       : SwerveDriveOdometry3d::Odometry3d(m_kinematicsImpl, gyroAngle,
                                           modulePositions, initialPose),
         m_kinematicsImpl(kinematics) {
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+    if (!std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+    }
   }
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop

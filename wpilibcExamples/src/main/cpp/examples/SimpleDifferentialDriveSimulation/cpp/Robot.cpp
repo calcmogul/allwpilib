@@ -14,9 +14,11 @@
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    m_trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-        frc::Pose2d{2_m, 2_m, 0_rad}, {}, frc::Pose2d{6_m, 4_m, 0_rad},
-        frc::TrajectoryConfig(2_mps, 2_mps_sq));
+    m_trajectory =
+        frc::TrajectoryGenerator::GenerateTrajectory(
+            frc::Pose2d{2_m, 2_m, 0_rad}, {}, frc::Pose2d{6_m, 4_m, 0_rad},
+            frc::TrajectoryConfig(2_mps, 2_mps_sq))
+            .value();
   }
 
   void RobotPeriodic() override { m_drive.Periodic(); }

@@ -154,8 +154,9 @@ class KalmanFilterTest {
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(5, 5, Rotation2d.kZero)),
-            new TrajectoryConfig(2, 2));
+                List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(5, 5, Rotation2d.kZero)),
+                new TrajectoryConfig(2, 2))
+            .get();
     var time = 0.0;
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);
 

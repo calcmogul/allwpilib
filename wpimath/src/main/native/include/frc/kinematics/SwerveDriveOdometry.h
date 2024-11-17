@@ -5,7 +5,7 @@
 #pragma once
 
 #include <cstddef>
-#include <ctime>
+#include <type_traits>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
@@ -41,15 +41,17 @@ class SwerveDriveOdometry
    * @param modulePositions The wheel positions reported by each module.
    * @param initialPose The starting position of the robot on the field.
    */
-  SwerveDriveOdometry(
+  constexpr SwerveDriveOdometry(
       SwerveDriveKinematics<NumModules> kinematics, const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
       const Pose2d& initialPose = Pose2d{})
       : SwerveDriveOdometry::Odometry(m_kinematicsImpl, gyroAngle,
                                       modulePositions, initialPose),
         m_kinematicsImpl(kinematics) {
-    wpi::math::MathSharedStore::ReportUsage(
-        wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+    if (!std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kOdometry_SwerveDrive, 1);
+    }
   }
 
  private:

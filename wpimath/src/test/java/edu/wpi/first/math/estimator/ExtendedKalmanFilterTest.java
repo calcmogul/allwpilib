@@ -117,7 +117,7 @@ class ExtendedKalmanFilterTest {
             new Pose2d(2.75, 22.521, Rotation2d.kZero),
             new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
+        TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1)).get();
 
     Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
 

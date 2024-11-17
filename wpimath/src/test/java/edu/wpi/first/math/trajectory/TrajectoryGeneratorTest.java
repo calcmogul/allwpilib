@@ -6,8 +6,8 @@ package edu.wpi.first.math.trajectory;
 
 import static edu.wpi.first.math.util.Units.feetToMeters;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,7 +44,7 @@ class TrajectoryGeneratorTest {
     TrajectoryConfig config =
         new TrajectoryConfig(maxVelocity, maxAccel).setReversed(true).addConstraints(constraints);
 
-    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+    return TrajectoryGenerator.generateTrajectory(waypoints, config).get();
   }
 
   @Test
@@ -73,21 +73,21 @@ class TrajectoryGeneratorTest {
             List.of(Pose2d.kZero, new Pose2d(1, 0, Rotation2d.kPi)),
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
-    assertEquals(traj.getStates().size(), 1);
-    assertEquals(traj.getTotalTimeSeconds(), 0);
+    assertFalse(traj.isPresent());
   }
 
   @Test
   void testQuinticCurvatureOptimization() {
     Trajectory t =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-                new Pose2d(0, 1, Rotation2d.kPi),
-                new Pose2d(-1, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, -1, Rotation2d.kZero),
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
-            new TrajectoryConfig(2, 2));
+                List.of(
+                    new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+                    new Pose2d(0, 1, Rotation2d.kPi),
+                    new Pose2d(-1, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, -1, Rotation2d.kZero),
+                    new Pose2d(1, 0, Rotation2d.kCCW_Pi_2)),
+                new TrajectoryConfig(2, 2))
+            .get();
 
     for (int i = 1; i < t.getStates().size() - 1; ++i) {
       assertNotEquals(0, t.getStates().get(i).curvatureRadPerMeter);

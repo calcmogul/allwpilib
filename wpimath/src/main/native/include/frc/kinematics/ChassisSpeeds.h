@@ -12,6 +12,7 @@
 #include "units/velocity.h"
 
 namespace frc {
+
 /**
  * Represents the speed of a robot chassis. Although this struct contains
  * similar members compared to a Twist2d, they do NOT represent the same thing.
@@ -191,6 +192,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    */
   constexpr bool operator==(const ChassisSpeeds& other) const = default;
 };
+
 }  // namespace frc
 
 #include "frc/kinematics/proto/ChassisSpeedsProto.h"

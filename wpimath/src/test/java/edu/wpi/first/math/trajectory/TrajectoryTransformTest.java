@@ -19,7 +19,8 @@ class TrajectoryTransformTest {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config);
+                Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config)
+            .get();
 
     var transformedTrajectory =
         trajectory.transformBy(
@@ -37,10 +38,11 @@ class TrajectoryTransformTest {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
-            List.of(),
-            new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),
-            config);
+                new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
+                List.of(),
+                new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),
+                config)
+            .get();
 
     var transformedTrajectory = trajectory.relativeTo(new Pose2d(1, 2, Rotation2d.fromDegrees(30)));
 

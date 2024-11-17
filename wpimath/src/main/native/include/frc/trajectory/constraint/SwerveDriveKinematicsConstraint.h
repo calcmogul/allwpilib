@@ -21,12 +21,12 @@ namespace frc {
 template <size_t NumModules>
 class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
-  SwerveDriveKinematicsConstraint(
+  constexpr SwerveDriveKinematicsConstraint(
       const frc::SwerveDriveKinematics<NumModules>& kinematics,
       units::meters_per_second_t maxSpeed)
       : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
-  units::meters_per_second_t MaxVelocity(
+  constexpr units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t velocity) const override {
     auto xVelocity = velocity * pose.Rotation().Cos();
@@ -40,8 +40,9 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
     return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
+  constexpr MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const override {
     return {};
   }
 

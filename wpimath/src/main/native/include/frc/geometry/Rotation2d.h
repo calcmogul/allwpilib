@@ -5,7 +5,6 @@
 #pragma once
 
 #include <type_traits>
-#include <utility>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -14,7 +13,6 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
-#include "frc/ct_matrix.h"
 #include "units/angle.h"
 #include "wpimath/MathShared.h"
 
@@ -70,32 +68,22 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @throws std::domain_error if the rotation matrix isn't special orthogonal.
    */
   constexpr explicit Rotation2d(const Eigen::Matrix2d& rotationMatrix) {
-    auto impl =
-        []<typename Matrix2d>(const Matrix2d& R) -> std::pair<double, double> {
-      // Require that the rotation matrix is special orthogonal. This is true if
-      // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
-      if ((R * R.transpose() - Matrix2d::Identity()).norm() > 1e-9) {
-        throw std::domain_error("Rotation matrix isn't orthogonal");
-      }
-      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
-        throw std::domain_error(
-            "Rotation matrix is orthogonal but not special orthogonal");
-      }
+    const auto& R = rotationMatrix;
 
-      // R = [cosθ  −sinθ]
-      //     [sinθ   cosθ]
-      return {R(0, 0), R(1, 0)};
-    };
-
-    if (std::is_constant_evaluated()) {
-      auto cossin = impl(ct_matrix2d{rotationMatrix});
-      m_cos = std::get<0>(cossin);
-      m_sin = std::get<1>(cossin);
-    } else {
-      auto cossin = impl(rotationMatrix);
-      m_cos = std::get<0>(cossin);
-      m_sin = std::get<1>(cossin);
+    // Require that the rotation matrix is special orthogonal. This is true if
+    // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+    if ((R * R.transpose() - Eigen::Matrix2d::Identity()).norm() > 1e-9) {
+      throw std::domain_error("Rotation matrix isn't orthogonal");
     }
+    if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+      throw std::domain_error(
+          "Rotation matrix is orthogonal but not special orthogonal");
+    }
+
+    // R = [cosθ  −sinθ]
+    //     [sinθ   cosθ]
+    m_cos = R(0, 0);
+    m_sin = R(1, 0);
   }
 
   /**

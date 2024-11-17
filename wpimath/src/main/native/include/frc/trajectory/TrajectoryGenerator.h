@@ -4,20 +4,24 @@
 
 #pragma once
 
-#include <functional>
-#include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/function.h>
+#include <wpi/print.h>
 
+#include "frc/spline/SplineHelper.h"
 #include "frc/spline/SplineParameterizer.h"
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryConfig.h"
+#include "frc/trajectory/TrajectoryParameterizer.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace frc {
+
 /**
  * Helper class used to generate trajectories with various constraints.
  */
@@ -37,10 +41,43 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config            The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  static Trajectory GenerateTrajectory(
+  static constexpr std::optional<Trajectory> GenerateTrajectory(
       Spline<3>::ControlVector initial,
       const std::vector<Translation2d>& interiorWaypoints,
-      Spline<3>::ControlVector end, const TrajectoryConfig& config);
+      Spline<3>::ControlVector end, const TrajectoryConfig& config) {
+    const Transform2d flip{Translation2d{}, 180_deg};
+
+    // Make theta normal for trajectory generation if path is reversed.
+    // Flip the headings.
+    if (config.IsReversed()) {
+      initial.x[1] *= -1;
+      initial.y[1] *= -1;
+      end.x[1] *= -1;
+      end.y[1] *= -1;
+    }
+
+    std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+    try {
+      points =
+          SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
+              initial, interiorWaypoints, end));
+    } catch (SplineParameterizer::MalformedSplineException& e) {
+      return std::nullopt;
+    }
+
+    // After trajectory generation, flip theta back so it's relative to the
+    // field. Also fix curvature.
+    if (config.IsReversed()) {
+      for (auto& point : points) {
+        point = {point.first + flip, -point.second};
+      }
+    }
+
+    return TrajectoryParameterizer::TimeParameterizeTrajectory(
+        points, config.Constraints(), config.StartVelocity(),
+        config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
+        config.IsReversed());
+  }
 
   /**
    * Generates a trajectory from the given waypoints and config. This method
@@ -54,9 +91,13 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config            The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  static Trajectory GenerateTrajectory(
+  static constexpr std::optional<Trajectory> GenerateTrajectory(
       const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
-      const Pose2d& end, const TrajectoryConfig& config);
+      const Pose2d& end, const TrajectoryConfig& config) {
+    auto [startCV, endCV] = SplineHelper::CubicControlVectorsFromWaypoints(
+        start, interiorWaypoints, end);
+    return GenerateTrajectory(startCV, interiorWaypoints, endCV, config);
+  }
 
   /**
    * Generates a trajectory from the given quintic control vectors and config.
@@ -68,9 +109,40 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config         The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  static Trajectory GenerateTrajectory(
+  static constexpr std::optional<Trajectory> GenerateTrajectory(
       std::vector<Spline<5>::ControlVector> controlVectors,
-      const TrajectoryConfig& config);
+      const TrajectoryConfig& config) {
+    const Transform2d flip{Translation2d{}, 180_deg};
+    // Make theta normal for trajectory generation if path is reversed.
+    if (config.IsReversed()) {
+      for (auto& vector : controlVectors) {
+        // Flip the headings.
+        vector.x[1] *= -1;
+        vector.y[1] *= -1;
+      }
+    }
+
+    std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+    try {
+      points = SplinePointsFromSplines(
+          SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
+    } catch (SplineParameterizer::MalformedSplineException& e) {
+      return std::nullopt;
+    }
+
+    // After trajectory generation, flip theta back so it's relative to the
+    // field. Also fix curvature.
+    if (config.IsReversed()) {
+      for (auto& point : points) {
+        point = {point.first + flip, -point.second};
+      }
+    }
+
+    return TrajectoryParameterizer::TimeParameterizeTrajectory(
+        points, config.Constraints(), config.StartVelocity(),
+        config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
+        config.IsReversed());
+  }
 
   /**
    * Generates a trajectory from the given waypoints and config. This method
@@ -81,8 +153,37 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @param config    The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  static Trajectory GenerateTrajectory(const std::vector<Pose2d>& waypoints,
-                                       const TrajectoryConfig& config);
+  static constexpr std::optional<Trajectory> GenerateTrajectory(
+      const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
+    auto newWaypoints = waypoints;
+    const Transform2d flip{Translation2d{}, 180_deg};
+    if (config.IsReversed()) {
+      for (auto& waypoint : newWaypoints) {
+        waypoint = waypoint + flip;
+      }
+    }
+
+    std::vector<SplineParameterizer::PoseWithCurvature> points;
+    try {
+      points = SplinePointsFromSplines(SplineHelper::OptimizeCurvature(
+          SplineHelper::QuinticSplinesFromWaypoints(newWaypoints)));
+    } catch (SplineParameterizer::MalformedSplineException& e) {
+      return std::nullopt;
+    }
+
+    // After trajectory generation, flip theta back so it's relative to the
+    // field. Also fix curvature.
+    if (config.IsReversed()) {
+      for (auto& point : points) {
+        point = {point.first + flip, -point.second};
+      }
+    }
+
+    return TrajectoryParameterizer::TimeParameterizeTrajectory(
+        points, config.Constraints(), config.StartVelocity(),
+        config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
+        config.IsReversed());
+  }
 
   /**
    * Generate spline points from a vector of splines by parameterizing the
@@ -93,7 +194,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
    * @return The spline points for use in time parameterization of a trajectory.
    */
   template <typename Spline>
-  static std::vector<PoseWithCurvature> SplinePointsFromSplines(
+  static constexpr std::vector<PoseWithCurvature> SplinePointsFromSplines(
       const std::vector<Spline>& splines) {
     // Create the vector of spline points.
     std::vector<PoseWithCurvature> splinePoints;
@@ -113,18 +214,6 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
     }
     return splinePoints;
   }
-
-  /**
-   * Set error reporting function. By default, it is output to stderr.
-   *
-   * @param func Error reporting function.
-   */
-  static void SetErrorHandler(std::function<void(const char*)> func);
-
- private:
-  static void ReportError(const char* error);
-
-  static const Trajectory kDoNothingTrajectory;
-  static std::function<void(const char*)> s_errorFunc;
 };
+
 }  // namespace frc

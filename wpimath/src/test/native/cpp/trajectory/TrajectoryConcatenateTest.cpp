@@ -9,9 +9,11 @@
 
 TEST(TrajectoryConcatenateTest, States) {
   auto t1 = frc::TrajectoryGenerator::GenerateTrajectory(
-      {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
+                {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq})
+                .value();
   auto t2 = frc::TrajectoryGenerator::GenerateTrajectory(
-      {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq});
+                {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq})
+                .value();
 
   auto t = t1 + t2;
 

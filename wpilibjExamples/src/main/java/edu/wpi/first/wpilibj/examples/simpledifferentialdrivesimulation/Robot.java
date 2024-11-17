@@ -34,10 +34,11 @@ public class Robot extends TimedRobot {
   public Robot() {
     m_trajectory =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(2, 2, Rotation2d.kZero),
-            List.of(),
-            new Pose2d(6, 4, Rotation2d.kZero),
-            new TrajectoryConfig(2, 2));
+                new Pose2d(2, 2, Rotation2d.kZero),
+                List.of(),
+                new Pose2d(6, 4, Rotation2d.kZero),
+                new TrajectoryConfig(2, 2))
+            .get();
   }
 
   @Override

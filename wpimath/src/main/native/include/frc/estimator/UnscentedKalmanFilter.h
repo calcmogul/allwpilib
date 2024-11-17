@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <functional>
 #include <utility>
 
 #include <Eigen/Cholesky>
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/function.h>
 
 #include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
@@ -77,9 +77,13 @@ class UnscentedKalmanFilter {
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
-  UnscentedKalmanFilter(
-      std::function<StateVector(const StateVector&, const InputVector&)> f,
-      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+  constexpr UnscentedKalmanFilter(
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const InputVector&)>
+          f,
+      wpi::copyable_function<OutputVector(const StateVector&,
+                                          const InputVector&)>
+          h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
       units::second_t dt)
       : m_f(std::move(f)), m_h(std::move(h)) {
@@ -135,21 +139,29 @@ class UnscentedKalmanFilter {
    * @param addFuncX           A function that adds two state vectors.
    * @param dt                 Nominal discretization timestep.
    */
-  UnscentedKalmanFilter(
-      std::function<StateVector(const StateVector&, const InputVector&)> f,
-      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+  constexpr UnscentedKalmanFilter(
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const InputVector&)>
+          f,
+      wpi::copyable_function<OutputVector(const StateVector&,
+                                          const InputVector&)>
+          h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
-      std::function<StateVector(const Matrixd<States, 2 * States + 1>&,
-                                const Vectord<2 * States + 1>&)>
+      wpi::copyable_function<StateVector(const Matrixd<States, 2 * States + 1>&,
+                                         const Vectord<2 * States + 1>&)>
           meanFuncX,
-      std::function<OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
-                                 const Vectord<2 * States + 1>&)>
+      wpi::copyable_function<
+          OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
+                       const Vectord<2 * States + 1>&)>
           meanFuncY,
-      std::function<StateVector(const StateVector&, const StateVector&)>
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const StateVector&)>
           residualFuncX,
-      std::function<OutputVector(const OutputVector&, const OutputVector&)>
+      wpi::copyable_function<OutputVector(const OutputVector&,
+                                          const OutputVector&)>
           residualFuncY,
-      std::function<StateVector(const StateVector&, const StateVector&)>
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const StateVector&)>
           addFuncX,
       units::second_t dt)
       : m_f(std::move(f)),
@@ -169,7 +181,7 @@ class UnscentedKalmanFilter {
   /**
    * Returns the square-root error covariance matrix S.
    */
-  const StateMatrix& S() const { return m_S; }
+  constexpr const StateMatrix& S() const { return m_S; }
 
   /**
    * Returns an element of the square-root error covariance matrix S.
@@ -177,19 +189,19 @@ class UnscentedKalmanFilter {
    * @param i Row of S.
    * @param j Column of S.
    */
-  double S(int i, int j) const { return m_S(i, j); }
+  constexpr double S(int i, int j) const { return m_S(i, j); }
 
   /**
    * Set the current square-root error covariance matrix S.
    *
    * @param S The square-root error covariance matrix S.
    */
-  void SetS(const StateMatrix& S) { m_S = S; }
+  constexpr void SetS(const StateMatrix& S) { m_S = S; }
 
   /**
    * Returns the reconstructed error covariance matrix P.
    */
-  StateMatrix P() const { return m_S.transpose() * m_S; }
+  constexpr StateMatrix P() const { return m_S.transpose() * m_S; }
 
   /**
    * Set the current square-root error covariance matrix S by taking the square
@@ -197,26 +209,26 @@ class UnscentedKalmanFilter {
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const StateMatrix& P) { m_S = P.llt().matrixU(); }
+  constexpr void SetP(const StateMatrix& P) { m_S = P.llt().matrixU(); }
 
   /**
    * Returns the state estimate x-hat.
    */
-  const StateVector& Xhat() const { return m_xHat; }
+  constexpr const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_xHat(i); }
+  constexpr double Xhat(int i) const { return m_xHat(i); }
 
   /**
    * Set initial state estimate x-hat.
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
+  constexpr void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -224,12 +236,12 @@ class UnscentedKalmanFilter {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_xHat(i) = value; }
+  constexpr void SetXhat(int i, double value) { m_xHat(i) = value; }
 
   /**
    * Resets the observer.
    */
-  void Reset() {
+  constexpr void Reset() {
     m_xHat.setZero();
     m_S.setZero();
     m_sigmasF.setZero();
@@ -241,7 +253,7 @@ class UnscentedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  constexpr void Predict(const InputVector& u, units::second_t dt) {
     m_dt = dt;
 
     // Discretize Q before projecting mean and covariance forward
@@ -273,7 +285,7 @@ class UnscentedKalmanFilter {
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  void Correct(const InputVector& u, const OutputVector& y) {
+  constexpr void Correct(const InputVector& u, const OutputVector& y) {
     Correct<Outputs>(u, y, m_h, m_contR, m_meanFuncY, m_residualFuncY,
                      m_residualFuncX, m_addFuncX);
   }
@@ -287,8 +299,8 @@ class UnscentedKalmanFilter {
    * @param y Measurement vector.
    * @param R Continuous measurement noise covariance matrix.
    */
-  void Correct(const InputVector& u, const OutputVector& y,
-               const Matrixd<Outputs, Outputs>& R) {
+  constexpr void Correct(const InputVector& u, const OutputVector& y,
+                         const Matrixd<Outputs, Outputs>& R) {
     Correct<Outputs>(u, y, m_h, R, m_meanFuncY, m_residualFuncY,
                      m_residualFuncX, m_addFuncX);
   }
@@ -307,10 +319,11 @@ class UnscentedKalmanFilter {
    * @param R Continuous measurement noise covariance matrix.
    */
   template <int Rows>
-  void Correct(
-      const InputVector& u, const Vectord<Rows>& y,
-      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
-      const Matrixd<Rows, Rows>& R) {
+  constexpr void Correct(const InputVector& u, const Vectord<Rows>& y,
+                         wpi::copyable_function<Vectord<Rows>(
+                             const StateVector&, const InputVector&)>
+                             h,
+                         const Matrixd<Rows, Rows>& R) {
     auto meanFuncY = [](const Matrixd<Outputs, 2 * States + 1>& sigmas,
                         const Vectord<2 * States + 1>& Wc) -> Vectord<Rows> {
       return sigmas * Wc;
@@ -351,18 +364,23 @@ class UnscentedKalmanFilter {
    * @param addFuncX      A function that adds two state vectors.
    */
   template <int Rows>
-  void Correct(
+  constexpr void Correct(
       const InputVector& u, const Vectord<Rows>& y,
-      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      wpi::copyable_function<Vectord<Rows>(const StateVector&,
+                                           const InputVector&)>
+          h,
       const Matrixd<Rows, Rows>& R,
-      std::function<Vectord<Rows>(const Matrixd<Rows, 2 * States + 1>&,
-                                  const Vectord<2 * States + 1>&)>
+      wpi::copyable_function<Vectord<Rows>(const Matrixd<Rows, 2 * States + 1>&,
+                                           const Vectord<2 * States + 1>&)>
           meanFuncY,
-      std::function<Vectord<Rows>(const Vectord<Rows>&, const Vectord<Rows>&)>
+      wpi::copyable_function<Vectord<Rows>(const Vectord<Rows>&,
+                                           const Vectord<Rows>&)>
           residualFuncY,
-      std::function<StateVector(const StateVector&, const StateVector&)>
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const StateVector&)>
           residualFuncX,
-      std::function<StateVector(const StateVector&, const StateVector&)>
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const StateVector&)>
           addFuncX) {
     Matrixd<Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
     Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discR);
@@ -413,19 +431,22 @@ class UnscentedKalmanFilter {
   }
 
  private:
-  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
-  std::function<OutputVector(const StateVector&, const InputVector&)> m_h;
-  std::function<StateVector(const Matrixd<States, 2 * States + 1>&,
-                            const Vectord<2 * States + 1>&)>
+  wpi::copyable_function<StateVector(const StateVector&, const InputVector&)>
+      m_f;
+  wpi::copyable_function<OutputVector(const StateVector&, const InputVector&)>
+      m_h;
+  wpi::copyable_function<StateVector(const Matrixd<States, 2 * States + 1>&,
+                                     const Vectord<2 * States + 1>&)>
       m_meanFuncX;
-  std::function<OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
-                             const Vectord<2 * States + 1>&)>
+  wpi::copyable_function<OutputVector(const Matrixd<Outputs, 2 * States + 1>&,
+                                      const Vectord<2 * States + 1>&)>
       m_meanFuncY;
-  std::function<StateVector(const StateVector&, const StateVector&)>
+  wpi::copyable_function<StateVector(const StateVector&, const StateVector&)>
       m_residualFuncX;
-  std::function<OutputVector(const OutputVector&, const OutputVector&)>
+  wpi::copyable_function<OutputVector(const OutputVector&, const OutputVector&)>
       m_residualFuncY;
-  std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
+  wpi::copyable_function<StateVector(const StateVector&, const StateVector&)>
+      m_addFuncX;
   StateVector m_xHat;
   StateMatrix m_S;
   StateMatrix m_contQ;

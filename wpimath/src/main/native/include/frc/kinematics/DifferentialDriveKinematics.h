@@ -18,6 +18,7 @@
 #include "wpimath/MathShared.h"
 
 namespace frc {
+
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to
  * left and right wheel velocities for a differential drive.
@@ -102,6 +103,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   /// Differential drive trackwidth.
   units::meter_t trackWidth;
 };
+
 }  // namespace frc
 
 #include "frc/kinematics/proto/DifferentialDriveKinematicsProto.h"

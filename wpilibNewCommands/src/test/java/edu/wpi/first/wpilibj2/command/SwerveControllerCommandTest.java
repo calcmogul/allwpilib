@@ -98,7 +98,7 @@ class SwerveControllerCommandTest {
     waypoints.add(Pose2d.kZero);
     waypoints.add(new Pose2d(1, 5, new Rotation2d(3)));
     var config = new TrajectoryConfig(8.8, 0.1);
-    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
+    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config).get();
 
     final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
 

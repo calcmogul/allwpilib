@@ -4,18 +4,15 @@
 
 #pragma once
 
-#include <functional>
-
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/timestamp.h>
 
 #include "frc/estimator/PoseEstimator.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
-#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveOdometry.h"
-#include "units/time.h"
 
 namespace frc {
 /**
@@ -51,10 +48,13 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
    * @param wheelPositions The distance measured by each wheel.
    * @param initialPose The starting pose estimate.
    */
-  MecanumDrivePoseEstimator(MecanumDriveKinematics& kinematics,
-                            const Rotation2d& gyroAngle,
-                            const MecanumDriveWheelPositions& wheelPositions,
-                            const Pose2d& initialPose);
+  constexpr MecanumDrivePoseEstimator(
+      MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+      const MecanumDriveWheelPositions& wheelPositions,
+      const Pose2d& initialPose)
+      : MecanumDrivePoseEstimator{kinematics,      gyroAngle,
+                                  wheelPositions,  initialPose,
+                                  {0.1, 0.1, 0.1}, {0.45, 0.45, 0.45}} {}
 
   /**
    * Constructs a MecanumDrivePoseEstimator.
@@ -72,11 +72,16 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  MecanumDrivePoseEstimator(
+  constexpr MecanumDrivePoseEstimator(
       MecanumDriveKinematics& kinematics, const Rotation2d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
       const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs);
+      const wpi::array<double, 3>& visionMeasurementStdDevs)
+      : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
+                      visionMeasurementStdDevs),
+        m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
+    ResetPose(initialPose);
+  }
 
  private:
   MecanumDriveOdometry m_odometryImpl;

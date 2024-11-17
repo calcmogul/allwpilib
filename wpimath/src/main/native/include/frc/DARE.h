@@ -82,7 +82,7 @@ namespace detail {
  * @return Solution to the DARE.
  */
 template <int States, int Inputs>
-Eigen::Matrix<double, States, States> DARE(
+constexpr Eigen::Matrix<double, States, States> DARE(
     const Eigen::Matrix<double, States, States>& A,
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,
@@ -162,7 +162,7 @@ Eigen::Matrix<double, States, States> DARE(
  * @return Solution to the DARE on success, or DAREError on failure.
  */
 template <int States, int Inputs>
-wpi::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
+constexpr wpi::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
     const Eigen::Matrix<double, States, States>& A,
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,
@@ -277,7 +277,7 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
 @return Solution to the DARE on success, or DAREError on failure.
 */
 template <int States, int Inputs>
-wpi::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
+constexpr wpi::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
     const Eigen::Matrix<double, States, States>& A,
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,

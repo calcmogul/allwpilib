@@ -36,8 +36,9 @@ class MerweScaledSigmaPoints {
    *             For Gaussian distributions, beta = 2 is optimal.
    * @param kappa Secondary scaling parameter usually set to 0 or 3 - States.
    */
-  explicit MerweScaledSigmaPoints(double alpha = 1e-3, double beta = 2,
-                                  int kappa = 3 - States) {
+  constexpr explicit MerweScaledSigmaPoints(double alpha = 1e-3,
+                                            double beta = 2,
+                                            int kappa = 3 - States) {
     m_alpha = alpha;
     m_kappa = kappa;
 
@@ -47,7 +48,7 @@ class MerweScaledSigmaPoints {
   /**
    * Returns number of sigma points for each variable in the state x.
    */
-  int NumSigmas() { return 2 * States + 1; }
+  constexpr int NumSigmas() { return 2 * States + 1; }
 
   /**
    * Computes the sigma points for an unscented Kalman filter given the mean
@@ -61,7 +62,7 @@ class MerweScaledSigmaPoints {
    *         Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    *
    */
-  Matrixd<States, 2 * States + 1> SquareRootSigmaPoints(
+  constexpr Matrixd<States, 2 * States + 1> SquareRootSigmaPoints(
       const Vectord<States>& x, const Matrixd<States, States>& S) {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
     double eta = std::sqrt(lambda + States);
@@ -82,26 +83,26 @@ class MerweScaledSigmaPoints {
   /**
    * Returns the weight for each sigma point for the mean.
    */
-  const Vectord<2 * States + 1>& Wm() const { return m_Wm; }
+  constexpr const Vectord<2 * States + 1>& Wm() const { return m_Wm; }
 
   /**
    * Returns an element of the weight for each sigma point for the mean.
    *
    * @param i Element of vector to return.
    */
-  double Wm(int i) const { return m_Wm(i, 0); }
+  constexpr double Wm(int i) const { return m_Wm(i, 0); }
 
   /**
    * Returns the weight for each sigma point for the covariance.
    */
-  const Vectord<2 * States + 1>& Wc() const { return m_Wc; }
+  constexpr const Vectord<2 * States + 1>& Wc() const { return m_Wc; }
 
   /**
    * Returns an element of the weight for each sigma point for the covariance.
    *
    * @param i Element of vector to return.
    */
-  double Wc(int i) const { return m_Wc(i, 0); }
+  constexpr double Wc(int i) const { return m_Wc(i, 0); }
 
  private:
   Vectord<2 * States + 1> m_Wm;
@@ -114,7 +115,7 @@ class MerweScaledSigmaPoints {
    *
    * @param beta Incorporates prior knowledge of the distribution of the mean.
    */
-  void ComputeWeights(double beta) {
+  constexpr void ComputeWeights(double beta) {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
 
     double c = 0.5 / (States + lambda);

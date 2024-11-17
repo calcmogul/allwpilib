@@ -20,7 +20,7 @@ namespace frc {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T>
-T RK4(F&& f, T x, units::second_t dt) {
+constexpr T RK4(F&& f, T x, units::second_t dt) {
   const auto h = dt.value();
 
   T k1 = f(x);
@@ -40,7 +40,7 @@ T RK4(F&& f, T x, units::second_t dt) {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T, typename U>
-T RK4(F&& f, T x, U u, units::second_t dt) {
+constexpr T RK4(F&& f, T x, U u, units::second_t dt) {
   const auto h = dt.value();
 
   T k1 = f(x, u);
@@ -60,7 +60,7 @@ T RK4(F&& f, T x, U u, units::second_t dt) {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T>
-T RK4(F&& f, units::second_t t, T y, units::second_t dt) {
+constexpr T RK4(F&& f, units::second_t t, T y, units::second_t dt) {
   const auto h = dt.to<double>();
 
   T k1 = f(t, y);
@@ -83,7 +83,7 @@ T RK4(F&& f, units::second_t t, T y, units::second_t dt) {
  *                 number like 1e-6.
  */
 template <typename F, typename T, typename U>
-T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
+constexpr T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
   // Butcher tableau the following arrays came from.
 
@@ -166,8 +166,8 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
  *                 number like 1e-6.
  */
 template <typename F, typename T>
-T RKDP(F&& f, units::second_t t, T y, units::second_t dt,
-       double maxError = 1e-6) {
+constexpr T RKDP(F&& f, units::second_t t, T y, units::second_t dt,
+                 double maxError = 1e-6) {
   // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
   // Butcher tableau the following arrays came from.
 

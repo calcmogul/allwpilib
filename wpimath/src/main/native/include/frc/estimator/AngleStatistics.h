@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <functional>
 #include <numbers>
+
+#include <wpi/function.h>
 
 #include "frc/EigenCore.h"
 #include "frc/MathUtil.h"
@@ -22,8 +23,9 @@ namespace frc {
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-Vectord<States> AngleResidual(const Vectord<States>& a,
-                              const Vectord<States>& b, int angleStateIdx) {
+constexpr Vectord<States> AngleResidual(const Vectord<States>& a,
+                                        const Vectord<States>& b,
+                                        int angleStateIdx) {
   Vectord<States> ret = a - b;
   ret[angleStateIdx] =
       AngleModulus(units::radian_t{ret[angleStateIdx]}).value();
@@ -38,7 +40,8 @@ Vectord<States> AngleResidual(const Vectord<States>& a,
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-std::function<Vectord<States>(const Vectord<States>&, const Vectord<States>&)>
+constexpr wpi::copyable_function<Vectord<States>(const Vectord<States>&,
+                                                 const Vectord<States>&)>
 AngleResidual(int angleStateIdx) {
   return [=](auto a, auto b) {
     return AngleResidual<States>(a, b, angleStateIdx);
@@ -55,8 +58,9 @@ AngleResidual(int angleStateIdx) {
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-Vectord<States> AngleAdd(const Vectord<States>& a, const Vectord<States>& b,
-                         int angleStateIdx) {
+constexpr Vectord<States> AngleAdd(const Vectord<States>& a,
+                                   const Vectord<States>& b,
+                                   int angleStateIdx) {
   Vectord<States> ret = a + b;
   ret[angleStateIdx] =
       InputModulus(ret[angleStateIdx], -std::numbers::pi, std::numbers::pi);
@@ -71,7 +75,8 @@ Vectord<States> AngleAdd(const Vectord<States>& a, const Vectord<States>& b,
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-std::function<Vectord<States>(const Vectord<States>&, const Vectord<States>&)>
+constexpr wpi::copyable_function<Vectord<States>(const Vectord<States>&,
+                                                 const Vectord<States>&)>
 AngleAdd(int angleStateIdx) {
   return [=](auto a, auto b) { return AngleAdd<States>(a, b, angleStateIdx); };
 }
@@ -88,9 +93,9 @@ AngleAdd(int angleStateIdx) {
  * @param angleStatesIdx The row containing the angles.
  */
 template <int CovDim, int States>
-Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
-                          const Vectord<2 * States + 1>& Wm,
-                          int angleStatesIdx) {
+constexpr Vectord<CovDim> AngleMean(
+    const Matrixd<CovDim, 2 * States + 1>& sigmas,
+    const Vectord<2 * States + 1>& Wm, int angleStatesIdx) {
   double sumSin = (sigmas.row(angleStatesIdx).unaryExpr([](auto it) {
                     return std::sin(it);
                   }) *
@@ -117,8 +122,8 @@ Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
  * @param angleStateIdx The row containing the angles.
  */
 template <int CovDim, int States>
-std::function<Vectord<CovDim>(const Matrixd<CovDim, 2 * States + 1>&,
-                              const Vectord<2 * States + 1>&)>
+constexpr wpi::copyable_function<Vectord<CovDim>(
+    const Matrixd<CovDim, 2 * States + 1>&, const Vectord<2 * States + 1>&)>
 AngleMean(int angleStateIdx) {
   return [=](auto sigmas, auto Wm) {
     return AngleMean<CovDim, States>(sigmas, Wm, angleStateIdx);

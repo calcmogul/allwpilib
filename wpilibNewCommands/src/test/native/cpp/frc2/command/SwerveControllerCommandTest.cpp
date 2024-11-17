@@ -78,7 +78,8 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+                        waypoints, {8.8_mps, 0.1_mps_sq})
+                        .value();
 
   auto endState = trajectory.Sample(trajectory.TotalTime());
 

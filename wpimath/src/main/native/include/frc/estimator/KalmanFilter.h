@@ -67,9 +67,10 @@ class KalmanFilter {
    * @param dt                 Nominal discretization timestep.
    * @throws std::invalid_argument If the system is undetectable.
    */
-  KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
-               const StateArray& stateStdDevs,
-               const OutputArray& measurementStdDevs, units::second_t dt) {
+  constexpr KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
+                         const StateArray& stateStdDevs,
+                         const OutputArray& measurementStdDevs,
+                         units::second_t dt) {
     m_plant = &plant;
 
     m_contQ = MakeCovMatrix(stateStdDevs);
@@ -123,7 +124,7 @@ class KalmanFilter {
   /**
    * Returns the error covariance matrix P.
    */
-  const StateMatrix& P() const { return m_P; }
+  constexpr const StateMatrix& P() const { return m_P; }
 
   /**
    * Returns an element of the error covariance matrix P.
@@ -131,33 +132,33 @@ class KalmanFilter {
    * @param i Row of P.
    * @param j Column of P.
    */
-  double P(int i, int j) const { return m_P(i, j); }
+  constexpr double P(int i, int j) const { return m_P(i, j); }
 
   /**
    * Set the current error covariance matrix P.
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const StateMatrix& P) { m_P = P; }
+  constexpr void SetP(const StateMatrix& P) { m_P = P; }
 
   /**
    * Returns the state estimate x-hat.
    */
-  const StateVector& Xhat() const { return m_xHat; }
+  constexpr const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_xHat(i); }
+  constexpr double Xhat(int i) const { return m_xHat(i); }
 
   /**
    * Set initial state estimate x-hat.
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
+  constexpr void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -165,12 +166,12 @@ class KalmanFilter {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_xHat(i) = value; }
+  constexpr void SetXhat(int i, double value) { m_xHat(i) = value; }
 
   /**
    * Resets the observer.
    */
-  void Reset() {
+  constexpr void Reset() {
     m_xHat.setZero();
     m_P = m_initP;
   }
@@ -181,7 +182,7 @@ class KalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  constexpr void Predict(const InputVector& u, units::second_t dt) {
     // Find discrete A and Q
     StateMatrix discA;
     StateMatrix discQ;
@@ -201,7 +202,7 @@ class KalmanFilter {
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  void Correct(const InputVector& u, const OutputVector& y) {
+  constexpr void Correct(const InputVector& u, const OutputVector& y) {
     Correct(u, y, m_contR);
   }
 
@@ -214,8 +215,8 @@ class KalmanFilter {
    * @param y Measurement vector.
    * @param R Continuous measurement noise covariance matrix.
    */
-  void Correct(const InputVector& u, const OutputVector& y,
-               const Matrixd<Outputs, Outputs>& R) {
+  constexpr void Correct(const InputVector& u, const OutputVector& y,
+                         const Matrixd<Outputs, Outputs>& R) {
     const auto& C = m_plant->C();
     const auto& D = m_plant->D();
 

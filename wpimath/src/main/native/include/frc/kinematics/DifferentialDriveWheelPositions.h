@@ -10,6 +10,7 @@
 #include "units/length.h"
 
 namespace frc {
+
 /**
  * Represents the wheel positions for a differential drive drivetrain.
  */
@@ -40,6 +41,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
             wpi::Lerp(right, endValue.right, t)};
   }
 };
+
 }  // namespace frc
 
 #include "frc/kinematics/proto/DifferentialDriveWheelPositionsProto.h"

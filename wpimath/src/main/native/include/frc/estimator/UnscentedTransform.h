@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <functional>
 #include <tuple>
 
 #include <Eigen/QR>
+#include <wpi/function.h>
 
 #include "frc/EigenCore.h"
 
@@ -36,15 +36,15 @@ namespace frc {
  * sigmas.
  */
 template <int CovDim, int States>
-std::tuple<Vectord<CovDim>, Matrixd<CovDim, CovDim>>
+constexpr std::tuple<Vectord<CovDim>, Matrixd<CovDim, CovDim>>
 SquareRootUnscentedTransform(
     const Matrixd<CovDim, 2 * States + 1>& sigmas,
     const Vectord<2 * States + 1>& Wm, const Vectord<2 * States + 1>& Wc,
-    std::function<Vectord<CovDim>(const Matrixd<CovDim, 2 * States + 1>&,
-                                  const Vectord<2 * States + 1>&)>
+    wpi::copyable_function<Vectord<CovDim>(
+        const Matrixd<CovDim, 2 * States + 1>&, const Vectord<2 * States + 1>&)>
         meanFunc,
-    std::function<Vectord<CovDim>(const Vectord<CovDim>&,
-                                  const Vectord<CovDim>&)>
+    wpi::copyable_function<Vectord<CovDim>(const Vectord<CovDim>&,
+                                           const Vectord<CovDim>&)>
         residualFunc,
     const Matrixd<CovDim, CovDim>& squareRootR) {
   // New mean is usually just the sum of the sigmas * weight:

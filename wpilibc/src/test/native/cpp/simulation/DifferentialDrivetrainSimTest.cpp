@@ -40,7 +40,8 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
       frc::DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
 
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      frc::Pose2d{}, {}, frc::Pose2d{2_m, 2_m, 0_rad}, config);
+                        frc::Pose2d{}, {}, frc::Pose2d{2_m, 2_m, 0_rad}, config)
+                        .value();
 
   for (auto t = 0_s; t < trajectory.TotalTime(); t += 20_ms) {
     auto state = trajectory.Sample(t);

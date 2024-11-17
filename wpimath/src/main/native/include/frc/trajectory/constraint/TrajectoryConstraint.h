@@ -14,6 +14,7 @@
 #include "units/velocity.h"
 
 namespace frc {
+
 /**
  * An interface for defining user-defined velocity and acceleration constraints
  * while generating trajectories.
@@ -76,4 +77,5 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
       const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t speed) const = 0;
 };
+
 }  // namespace frc

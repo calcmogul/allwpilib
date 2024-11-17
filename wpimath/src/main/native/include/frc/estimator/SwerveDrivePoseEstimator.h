@@ -50,7 +50,7 @@ class SwerveDrivePoseEstimator
    *     the swerve modules.
    * @param initialPose The starting pose estimate.
    */
-  SwerveDrivePoseEstimator(
+  constexpr SwerveDrivePoseEstimator(
       SwerveDriveKinematics<NumModules>& kinematics,
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
@@ -76,7 +76,7 @@ class SwerveDrivePoseEstimator
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  SwerveDrivePoseEstimator(
+  constexpr SwerveDrivePoseEstimator(
       SwerveDriveKinematics<NumModules>& kinematics,
       const Rotation2d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,

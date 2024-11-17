@@ -120,13 +120,14 @@ class SwerveDriveOdometryTest {
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+                List.of(
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                    new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                    new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+                new TrajectoryConfig(0.5, 2))
+            .get();
 
     var rand = new Random(4915);
 
@@ -210,13 +211,14 @@ class SwerveDriveOdometryTest {
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+                List.of(
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                    new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                    new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+                new TrajectoryConfig(0.5, 2))
+            .get();
 
     var rand = new Random(4915);
 

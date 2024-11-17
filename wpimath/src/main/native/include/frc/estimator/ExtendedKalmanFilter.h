@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <functional>
 #include <string>
 #include <utility>
 
 #include <Eigen/Cholesky>
 #include <wpi/array.h>
+#include <wpi/function.h>
 
 #include "frc/DARE.h"
 #include "frc/EigenCore.h"
@@ -73,9 +73,13 @@ class ExtendedKalmanFilter {
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
-  ExtendedKalmanFilter(
-      std::function<StateVector(const StateVector&, const InputVector&)> f,
-      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+  constexpr ExtendedKalmanFilter(
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const InputVector&)>
+          f,
+      wpi::copyable_function<OutputVector(const StateVector&,
+                                          const InputVector&)>
+          h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
       units::second_t dt)
       : m_f(std::move(f)), m_h(std::move(h)) {
@@ -157,13 +161,19 @@ class ExtendedKalmanFilter {
    * @param addFuncX           A function that adds two state vectors.
    * @param dt                 Nominal discretization timestep.
    */
-  ExtendedKalmanFilter(
-      std::function<StateVector(const StateVector&, const InputVector&)> f,
-      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+  constexpr ExtendedKalmanFilter(
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const InputVector&)>
+          f,
+      wpi::copyable_function<OutputVector(const StateVector&,
+                                          const InputVector&)>
+          h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
-      std::function<OutputVector(const OutputVector&, const OutputVector&)>
+      wpi::copyable_function<OutputVector(const OutputVector&,
+                                          const OutputVector&)>
           residualFuncY,
-      std::function<StateVector(const StateVector&, const StateVector&)>
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const StateVector&)>
           addFuncX,
       units::second_t dt)
       : m_f(std::move(f)),
@@ -226,7 +236,7 @@ class ExtendedKalmanFilter {
   /**
    * Returns the error covariance matrix P.
    */
-  const StateMatrix& P() const { return m_P; }
+  constexpr const StateMatrix& P() const { return m_P; }
 
   /**
    * Returns an element of the error covariance matrix P.
@@ -234,33 +244,33 @@ class ExtendedKalmanFilter {
    * @param i Row of P.
    * @param j Column of P.
    */
-  double P(int i, int j) const { return m_P(i, j); }
+  constexpr double P(int i, int j) const { return m_P(i, j); }
 
   /**
    * Set the current error covariance matrix P.
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const StateMatrix& P) { m_P = P; }
+  constexpr void SetP(const StateMatrix& P) { m_P = P; }
 
   /**
    * Returns the state estimate x-hat.
    */
-  const StateVector& Xhat() const { return m_xHat; }
+  constexpr const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_xHat(i); }
+  constexpr double Xhat(int i) const { return m_xHat(i); }
 
   /**
    * Set initial state estimate x-hat.
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
+  constexpr void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -268,12 +278,12 @@ class ExtendedKalmanFilter {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_xHat(i) = value; }
+  constexpr void SetXhat(int i, double value) { m_xHat(i) = value; }
 
   /**
    * Resets the observer.
    */
-  void Reset() {
+  constexpr void Reset() {
     m_xHat.setZero();
     m_P = m_initP;
   }
@@ -284,7 +294,7 @@ class ExtendedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  constexpr void Predict(const InputVector& u, units::second_t dt) {
     // Find continuous A
     StateMatrix contA =
         NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
@@ -308,7 +318,7 @@ class ExtendedKalmanFilter {
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  void Correct(const InputVector& u, const OutputVector& y) {
+  constexpr void Correct(const InputVector& u, const OutputVector& y) {
     Correct<Outputs>(u, y, m_h, m_contR, m_residualFuncY, m_addFuncX);
   }
 
@@ -321,8 +331,8 @@ class ExtendedKalmanFilter {
    * @param y Measurement vector.
    * @param R Continuous measurement noise covariance matrix.
    */
-  void Correct(const InputVector& u, const OutputVector& y,
-               const Matrixd<Outputs, Outputs>& R) {
+  constexpr void Correct(const InputVector& u, const OutputVector& y,
+                         const Matrixd<Outputs, Outputs>& R) {
     Correct<Outputs>(u, y, m_h, R, m_residualFuncY, m_addFuncX);
   }
 
@@ -340,10 +350,11 @@ class ExtendedKalmanFilter {
    * @param R Continuous measurement noise covariance matrix.
    */
   template <int Rows>
-  void Correct(
-      const InputVector& u, const Vectord<Rows>& y,
-      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
-      const Matrixd<Rows, Rows>& R) {
+  constexpr void Correct(const InputVector& u, const Vectord<Rows>& y,
+                         wpi::copyable_function<Vectord<Rows>(
+                             const StateVector&, const InputVector&)>
+                             h,
+                         const Matrixd<Rows, Rows>& R) {
     auto residualFuncY = [](const Vectord<Rows>& a,
                             const Vectord<Rows>& b) -> Vectord<Rows> {
       return a - b;
@@ -371,13 +382,17 @@ class ExtendedKalmanFilter {
    * @param addFuncX      A function that adds two state vectors.
    */
   template <int Rows>
-  void Correct(
+  constexpr void Correct(
       const InputVector& u, const Vectord<Rows>& y,
-      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      wpi::copyable_function<Vectord<Rows>(const StateVector&,
+                                           const InputVector&)>
+          h,
       const Matrixd<Rows, Rows>& R,
-      std::function<Vectord<Rows>(const Vectord<Rows>&, const Vectord<Rows>&)>
+      wpi::copyable_function<Vectord<Rows>(const Vectord<Rows>&,
+                                           const Vectord<Rows>&)>
           residualFuncY,
-      std::function<StateVector(const StateVector&, const StateVector&)>
+      wpi::copyable_function<StateVector(const StateVector&,
+                                         const StateVector&)>
           addFuncX) {
     const Matrixd<Rows, States> C =
         NumericalJacobianX<Rows, States, Inputs>(h, m_xHat, u);
@@ -411,11 +426,14 @@ class ExtendedKalmanFilter {
   }
 
  private:
-  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
-  std::function<OutputVector(const StateVector&, const InputVector&)> m_h;
-  std::function<OutputVector(const OutputVector&, const OutputVector&)>
+  wpi::copyable_function<StateVector(const StateVector&, const InputVector&)>
+      m_f;
+  wpi::copyable_function<OutputVector(const StateVector&, const InputVector&)>
+      m_h;
+  wpi::copyable_function<OutputVector(const OutputVector&, const OutputVector&)>
       m_residualFuncY;
-  std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
+  wpi::copyable_function<StateVector(const StateVector&, const StateVector&)>
+      m_addFuncX;
   StateVector m_xHat = StateVector::Zero();
   StateMatrix m_P;
   StateMatrix m_contQ;

@@ -22,6 +22,7 @@
 #include "units/velocity.h"
 
 namespace frc {
+
 /**
  * Represents the configuration for generating a trajectory. This class stores
  * the start velocity, end velocity, max velocity, max acceleration, custom
@@ -39,21 +40,21 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * @param maxVelocity The max velocity of the trajectory.
    * @param maxAcceleration The max acceleration of the trajectory.
    */
-  TrajectoryConfig(units::meters_per_second_t maxVelocity,
-                   units::meters_per_second_squared_t maxAcceleration)
+  constexpr TrajectoryConfig(units::meters_per_second_t maxVelocity,
+                             units::meters_per_second_squared_t maxAcceleration)
       : m_maxVelocity(maxVelocity), m_maxAcceleration(maxAcceleration) {}
 
-  TrajectoryConfig(const TrajectoryConfig&) = delete;
-  TrajectoryConfig& operator=(const TrajectoryConfig&) = delete;
+  constexpr TrajectoryConfig(const TrajectoryConfig&) = delete;
+  constexpr TrajectoryConfig& operator=(const TrajectoryConfig&) = delete;
 
-  TrajectoryConfig(TrajectoryConfig&&) = default;
-  TrajectoryConfig& operator=(TrajectoryConfig&&) = default;
+  constexpr TrajectoryConfig(TrajectoryConfig&&) = default;
+  constexpr TrajectoryConfig& operator=(TrajectoryConfig&&) = default;
 
   /**
    * Sets the start velocity of the trajectory.
    * @param startVelocity The start velocity of the trajectory.
    */
-  void SetStartVelocity(units::meters_per_second_t startVelocity) {
+  constexpr void SetStartVelocity(units::meters_per_second_t startVelocity) {
     m_startVelocity = startVelocity;
   }
 
@@ -61,7 +62,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Sets the end velocity of the trajectory.
    * @param endVelocity The end velocity of the trajectory.
    */
-  void SetEndVelocity(units::meters_per_second_t endVelocity) {
+  constexpr void SetEndVelocity(units::meters_per_second_t endVelocity) {
     m_endVelocity = endVelocity;
   }
 
@@ -69,14 +70,14 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Sets the reversed flag of the trajectory.
    * @param reversed Whether the trajectory should be reversed or not.
    */
-  void SetReversed(bool reversed) { m_reversed = reversed; }
+  constexpr void SetReversed(bool reversed) { m_reversed = reversed; }
 
   /**
    * Adds a user-defined constraint to the trajectory.
    * @param constraint The user-defined constraint.
    */
   template <std::derived_from<TrajectoryConstraint> Constraint>
-  void AddConstraint(Constraint constraint) {
+  constexpr void AddConstraint(Constraint constraint) {
     m_constraints.emplace_back(std::make_unique<Constraint>(constraint));
   }
 
@@ -86,7 +87,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    *
    * @param kinematics The differential drive kinematics.
    */
-  void SetKinematics(const DifferentialDriveKinematics& kinematics) {
+  constexpr void SetKinematics(const DifferentialDriveKinematics& kinematics) {
     AddConstraint(
         DifferentialDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }
@@ -97,7 +98,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    *
    * @param kinematics The mecanum drive kinematics.
    */
-  void SetKinematics(MecanumDriveKinematics kinematics) {
+  constexpr void SetKinematics(MecanumDriveKinematics kinematics) {
     AddConstraint(MecanumDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }
 
@@ -108,7 +109,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * @param kinematics The swerve drive kinematics.
    */
   template <size_t NumModules>
-  void SetKinematics(SwerveDriveKinematics<NumModules>& kinematics) {
+  constexpr void SetKinematics(SwerveDriveKinematics<NumModules>& kinematics) {
     AddConstraint(SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }
 
@@ -116,25 +117,31 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Returns the starting velocity of the trajectory.
    * @return The starting velocity of the trajectory.
    */
-  units::meters_per_second_t StartVelocity() const { return m_startVelocity; }
+  constexpr units::meters_per_second_t StartVelocity() const {
+    return m_startVelocity;
+  }
 
   /**
    * Returns the ending velocity of the trajectory.
    * @return The ending velocity of the trajectory.
    */
-  units::meters_per_second_t EndVelocity() const { return m_endVelocity; }
+  constexpr units::meters_per_second_t EndVelocity() const {
+    return m_endVelocity;
+  }
 
   /**
    * Returns the maximum velocity of the trajectory.
    * @return The maximum velocity of the trajectory.
    */
-  units::meters_per_second_t MaxVelocity() const { return m_maxVelocity; }
+  constexpr units::meters_per_second_t MaxVelocity() const {
+    return m_maxVelocity;
+  }
 
   /**
    * Returns the maximum acceleration of the trajectory.
    * @return The maximum acceleration of the trajectory.
    */
-  units::meters_per_second_squared_t MaxAcceleration() const {
+  constexpr units::meters_per_second_squared_t MaxAcceleration() const {
     return m_maxAcceleration;
   }
 
@@ -142,8 +149,8 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Returns the user-defined constraints of the trajectory.
    * @return The user-defined constraints of the trajectory.
    */
-  const std::vector<std::unique_ptr<TrajectoryConstraint>>& Constraints()
-      const {
+  constexpr const std::vector<std::unique_ptr<TrajectoryConstraint>>&
+  Constraints() const {
     return m_constraints;
   }
 
@@ -151,7 +158,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Returns whether the trajectory is reversed or not.
    * @return whether the trajectory is reversed or not.
    */
-  bool IsReversed() const { return m_reversed; }
+  constexpr bool IsReversed() const { return m_reversed; }
 
  private:
   units::meters_per_second_t m_startVelocity = 0_mps;
@@ -161,4 +168,5 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
   std::vector<std::unique_ptr<TrajectoryConstraint>> m_constraints;
   bool m_reversed = false;
 };
+
 }  // namespace frc

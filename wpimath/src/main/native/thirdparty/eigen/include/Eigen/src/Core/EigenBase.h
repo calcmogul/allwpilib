@@ -50,10 +50,10 @@ struct EigenBase {
   /** \returns a const reference to the derived object */
   EIGEN_DEVICE_FUNC constexpr const Derived& derived() const { return *static_cast<const Derived*>(this); }
 
-  EIGEN_DEVICE_FUNC inline Derived& const_cast_derived() const {
+  EIGEN_DEVICE_FUNC inline constexpr Derived& const_cast_derived() const {
     return *static_cast<Derived*>(const_cast<EigenBase*>(this));
   }
-  EIGEN_DEVICE_FUNC inline const Derived& const_derived() const { return *static_cast<const Derived*>(this); }
+  EIGEN_DEVICE_FUNC inline constexpr const Derived& const_derived() const { return *static_cast<const Derived*>(this); }
 
   /** \returns the number of rows. \sa cols(), RowsAtCompileTime */
   EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR inline Index rows() const EIGEN_NOEXCEPT { return derived().rows(); }
@@ -65,13 +65,13 @@ struct EigenBase {
 
   /** \internal Don't use it, but do the equivalent: \code dst = *this; \endcode */
   template <typename Dest>
-  EIGEN_DEVICE_FUNC inline void evalTo(Dest& dst) const {
+  EIGEN_DEVICE_FUNC inline constexpr void evalTo(Dest& dst) const {
     derived().evalTo(dst);
   }
 
   /** \internal Don't use it, but do the equivalent: \code dst += *this; \endcode */
   template <typename Dest>
-  EIGEN_DEVICE_FUNC inline void addTo(Dest& dst) const {
+  EIGEN_DEVICE_FUNC inline constexpr void addTo(Dest& dst) const {
     // This is the default implementation,
     // derived class can reimplement it in a more optimized way.
     typename Dest::PlainObject res(rows(), cols());
@@ -81,7 +81,7 @@ struct EigenBase {
 
   /** \internal Don't use it, but do the equivalent: \code dst -= *this; \endcode */
   template <typename Dest>
-  EIGEN_DEVICE_FUNC inline void subTo(Dest& dst) const {
+  EIGEN_DEVICE_FUNC inline constexpr void subTo(Dest& dst) const {
     // This is the default implementation,
     // derived class can reimplement it in a more optimized way.
     typename Dest::PlainObject res(rows(), cols());
@@ -91,7 +91,7 @@ struct EigenBase {
 
   /** \internal Don't use it, but do the equivalent: \code dst.applyOnTheRight(*this); \endcode */
   template <typename Dest>
-  EIGEN_DEVICE_FUNC inline void applyThisOnTheRight(Dest& dst) const {
+  EIGEN_DEVICE_FUNC inline constexpr void applyThisOnTheRight(Dest& dst) const {
     // This is the default implementation,
     // derived class can reimplement it in a more optimized way.
     dst = dst * this->derived();
@@ -99,7 +99,7 @@ struct EigenBase {
 
   /** \internal Don't use it, but do the equivalent: \code dst.applyOnTheLeft(*this); \endcode */
   template <typename Dest>
-  EIGEN_DEVICE_FUNC inline void applyThisOnTheLeft(Dest& dst) const {
+  EIGEN_DEVICE_FUNC inline constexpr void applyThisOnTheLeft(Dest& dst) const {
     // This is the default implementation,
     // derived class can reimplement it in a more optimized way.
     dst = this->derived() * dst;
@@ -109,6 +109,20 @@ struct EigenBase {
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE DeviceWrapper<Derived, Device> device(Device& device);
   template <typename Device>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE DeviceWrapper<const Derived, Device> device(Device& device) const;
+
+  /**
+   * By defining the empty destructor here, subclasses which override the destructor with `~SubClass = default` will not
+   * inline their destructor.  This ensures ensures the destructor symbol will exists in the binary.
+   * This is needed to support expression evaluation in lldb (for _some_ reason).  Without this hack, the destructor
+   * will be inlined and lldb will produce a missing symbol error (referring to eg ~MatrixBase destructor) when trying
+   * to evaluate an expression that returns an Eigen::Matrix.
+   *
+   * We use the normal default destructor to make the object trivially destructible when not debugging or when testing
+   * as the testsuite asserts std::is_trivially_destructible
+   */
+#if !defined(EIGEN_NO_DEBUG) && !defined(EIGEN_TESTING_PLAINOBJECT_CTOR)
+  EIGEN_DEVICE_FUNC constexpr ~EigenBase() {}
+#endif
 };
 
 /***************************************************************************
@@ -125,21 +139,21 @@ struct EigenBase {
  */
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC Derived& DenseBase<Derived>::operator=(const EigenBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC constexpr Derived& DenseBase<Derived>::operator=(const EigenBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived());
   return derived();
 }
 
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC Derived& DenseBase<Derived>::operator+=(const EigenBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC constexpr Derived& DenseBase<Derived>::operator+=(const EigenBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::add_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }
 
 template <typename Derived>
 template <typename OtherDerived>
-EIGEN_DEVICE_FUNC Derived& DenseBase<Derived>::operator-=(const EigenBase<OtherDerived>& other) {
+EIGEN_DEVICE_FUNC constexpr Derived& DenseBase<Derived>::operator-=(const EigenBase<OtherDerived>& other) {
   call_assignment(derived(), other.derived(), internal::sub_assign_op<Scalar, typename OtherDerived::Scalar>());
   return derived();
 }

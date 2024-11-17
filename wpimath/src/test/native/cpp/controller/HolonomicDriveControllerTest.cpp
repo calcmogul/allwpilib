@@ -34,7 +34,8 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
   auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
                                frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {8.0_mps, 4.0_mps_sq});
+                        waypoints, {8.0_mps, 4.0_mps_sq})
+                        .value();
 
   constexpr units::second_t kDt = 20_ms;
   auto totalTime = trajectory.TotalTime();
