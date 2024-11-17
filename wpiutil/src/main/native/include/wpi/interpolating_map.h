@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <map>
+#include <algorithm>
 #include <utility>
+#include <vector>
 
 namespace wpi {
 
@@ -28,8 +29,13 @@ class interpolating_map {
    * @param key   The key.
    * @param value The value.
    */
-  void insert(const Key& key, const Value& value) {
-    m_container.insert(std::pair{key, value});
+  constexpr void insert(const Key& key, const Value& value) {
+    std::pair item{key, value};
+    m_container.insert(
+        std::upper_bound(
+            m_container.begin(), m_container.end(), key,
+            [](const Key& lhs, const auto& rhs) { return lhs < rhs.first; }),
+        item);
   }
 
   /**
@@ -38,8 +44,13 @@ class interpolating_map {
    * @param key   The key.
    * @param value The value.
    */
-  void insert(Key&& key, Value&& value) {
-    m_container.insert(std::pair{key, value});
+  constexpr void insert(Key&& key, Value&& value) {
+    std::pair item{key, value};
+    m_container.insert(
+        std::upper_bound(
+            m_container.begin(), m_container.end(), key,
+            [](const Key& lhs, const auto& rhs) { return lhs < rhs.first; }),
+        item);
   }
 
   /**
@@ -50,11 +61,13 @@ class interpolating_map {
    *
    * @param key The key.
    */
-  Value operator[](const Key& key) const {
-    using const_iterator = typename std::map<Key, Value>::const_iterator;
+  constexpr Value operator[](const Key& key) const {
+    using const_iterator = typename decltype(m_container)::const_iterator;
 
     // Get iterator to upper bound key-value pair for the given key
-    const_iterator upper = m_container.upper_bound(key);
+    const_iterator upper = std::upper_bound(
+        m_container.begin(), m_container.end(), key,
+        [](const Key& lhs, const auto& rhs) { return lhs < rhs.first; });
 
     // If key > largest key in table, return value for largest table key
     if (upper == m_container.end()) {
@@ -78,10 +91,10 @@ class interpolating_map {
   /**
    * Clears the contents.
    */
-  void clear() { m_container.clear(); }
+  constexpr void clear() { m_container.clear(); }
 
  private:
-  std::map<Key, Value> m_container;
+  std::vector<std::pair<Key, Value>> m_container;
 };
 
 }  // namespace wpi

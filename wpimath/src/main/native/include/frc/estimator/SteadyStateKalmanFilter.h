@@ -70,10 +70,10 @@ class SteadyStateKalmanFilter {
    * @param dt                 Nominal discretization timestep.
    * @throws std::invalid_argument If the system is undetectable.
    */
-  SteadyStateKalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
-                          const StateArray& stateStdDevs,
-                          const OutputArray& measurementStdDevs,
-                          units::second_t dt) {
+  constexpr SteadyStateKalmanFilter(
+      LinearSystem<States, Inputs, Outputs>& plant,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      units::second_t dt) {
     m_plant = &plant;
 
     auto contQ = MakeCovMatrix(stateStdDevs);
@@ -147,13 +147,14 @@ class SteadyStateKalmanFilter {
     Reset();
   }
 
-  SteadyStateKalmanFilter(SteadyStateKalmanFilter&&) = default;
-  SteadyStateKalmanFilter& operator=(SteadyStateKalmanFilter&&) = default;
+  constexpr SteadyStateKalmanFilter(SteadyStateKalmanFilter&&) = default;
+  constexpr SteadyStateKalmanFilter& operator=(SteadyStateKalmanFilter&&) =
+      default;
 
   /**
    * Returns the steady-state Kalman gain matrix K.
    */
-  const Matrixd<States, Outputs>& K() const { return m_K; }
+  constexpr const Matrixd<States, Outputs>& K() const { return m_K; }
 
   /**
    * Returns an element of the steady-state Kalman gain matrix K.
@@ -161,26 +162,26 @@ class SteadyStateKalmanFilter {
    * @param i Row of K.
    * @param j Column of K.
    */
-  double K(int i, int j) const { return m_K(i, j); }
+  constexpr double K(int i, int j) const { return m_K(i, j); }
 
   /**
    * Returns the state estimate x-hat.
    */
-  const StateVector& Xhat() const { return m_xHat; }
+  constexpr const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_xHat(i); }
+  constexpr double Xhat(int i) const { return m_xHat(i); }
 
   /**
    * Set initial state estimate x-hat.
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
+  constexpr void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -188,12 +189,12 @@ class SteadyStateKalmanFilter {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_xHat(i) = value; }
+  constexpr void SetXhat(int i, double value) { m_xHat(i) = value; }
 
   /**
    * Resets the observer.
    */
-  void Reset() { m_xHat.setZero(); }
+  constexpr void Reset() { m_xHat.setZero(); }
 
   /**
    * Project the model into the future with a new control input u.
@@ -201,7 +202,7 @@ class SteadyStateKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  constexpr void Predict(const InputVector& u, units::second_t dt) {
     m_xHat = m_plant->CalculateX(m_xHat, u, dt);
   }
 
@@ -211,7 +212,7 @@ class SteadyStateKalmanFilter {
    * @param u Same control input used in the last predict step.
    * @param y Measurement vector.
    */
-  void Correct(const InputVector& u, const OutputVector& y) {
+  constexpr void Correct(const InputVector& u, const OutputVector& y) {
     const auto& C = m_plant->C();
     const auto& D = m_plant->D();
 

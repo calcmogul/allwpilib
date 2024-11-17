@@ -10,6 +10,7 @@
 #include "units/velocity.h"
 
 namespace frc {
+
 /**
  * Represents the wheel speeds for a differential drive drivetrain.
  */
@@ -120,6 +121,7 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
     return operator*(1.0 / scalar);
   }
 };
+
 }  // namespace frc
 
 #include "frc/kinematics/proto/DifferentialDriveWheelSpeedsProto.h"

@@ -125,9 +125,9 @@ def copy_upstream_src(wpilib_root):
 
 def main():
     name = "eigen"
-    url = "https://gitlab.com/libeigen/eigen.git"
-    # master on 2024-11-14
-    tag = "0fb2ed140d4fc0108553ecfb25f2d7fc1a9319a1"
+    url = "https://gitlab.com/calcmogul/eigen.git"
+    # make-almost-everything-constexpr on 2024-11-17
+    tag = "9d7563b4bfc4a4bd7f8d66bbda9bafc1e90993a6"
 
     eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()

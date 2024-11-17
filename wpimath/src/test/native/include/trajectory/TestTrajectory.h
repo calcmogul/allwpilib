@@ -4,13 +4,10 @@
 
 #pragma once
 
-#include <memory>
-#include <utility>
 #include <vector>
 
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
 namespace frc {
 class TestTrajectory {
@@ -29,7 +26,8 @@ class TestTrajectory {
             .Translation()};
 
     return TrajectoryGenerator::GenerateTrajectory(sideStart, vector,
-                                                   crossScale, config);
+                                                   crossScale, config)
+        .value();
   }
 };
 

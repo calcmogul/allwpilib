@@ -43,7 +43,7 @@ class LinearPlantInversionFeedforward {
    * @param dt    Discretization timestep.
    */
   template <int Outputs>
-  LinearPlantInversionFeedforward(
+  constexpr LinearPlantInversionFeedforward(
       const LinearSystem<States, Inputs, Outputs>& plant, units::second_t dt)
       : LinearPlantInversionFeedforward(plant.A(), plant.B(), dt) {}
 
@@ -54,9 +54,9 @@ class LinearPlantInversionFeedforward {
    * @param B  Continuous input matrix of the plant being controlled.
    * @param dt Discretization timestep.
    */
-  LinearPlantInversionFeedforward(const Matrixd<States, States>& A,
-                                  const Matrixd<States, Inputs>& B,
-                                  units::second_t dt)
+  constexpr LinearPlantInversionFeedforward(const Matrixd<States, States>& A,
+                                            const Matrixd<States, Inputs>& B,
+                                            units::second_t dt)
       : m_dt(dt) {
     DiscretizeAB<States, Inputs>(A, B, dt, &m_A, &m_B);
     Reset();
@@ -67,7 +67,7 @@ class LinearPlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  const InputVector& Uff() const { return m_uff; }
+  constexpr const InputVector& Uff() const { return m_uff; }
 
   /**
    * Returns an element of the previously calculated feedforward.
@@ -76,14 +76,14 @@ class LinearPlantInversionFeedforward {
    *
    * @return The row of the calculated feedforward.
    */
-  double Uff(int i) const { return m_uff(i); }
+  constexpr double Uff(int i) const { return m_uff(i); }
 
   /**
    * Returns the current reference vector r.
    *
    * @return The current reference vector.
    */
-  const StateVector& R() const { return m_r; }
+  constexpr const StateVector& R() const { return m_r; }
 
   /**
    * Returns an element of the reference vector r.
@@ -92,14 +92,14 @@ class LinearPlantInversionFeedforward {
    *
    * @return The row of the current reference vector.
    */
-  double R(int i) const { return m_r(i); }
+  constexpr double R(int i) const { return m_r(i); }
 
   /**
    * Resets the feedforward with a specified initial state vector.
    *
    * @param initialState The initial state vector.
    */
-  void Reset(const StateVector& initialState) {
+  constexpr void Reset(const StateVector& initialState) {
     m_r = initialState;
     m_uff.setZero();
   }
@@ -107,7 +107,7 @@ class LinearPlantInversionFeedforward {
   /**
    * Resets the feedforward with a zero initial state vector.
    */
-  void Reset() {
+  constexpr void Reset() {
     m_r.setZero();
     m_uff.setZero();
   }
@@ -125,7 +125,7 @@ class LinearPlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  InputVector Calculate(const StateVector& nextR) {
+  constexpr InputVector Calculate(const StateVector& nextR) {
     return Calculate(m_r, nextR);
   }
 
@@ -137,7 +137,8 @@ class LinearPlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  InputVector Calculate(const StateVector& r, const StateVector& nextR) {
+  constexpr InputVector Calculate(const StateVector& r,
+                                  const StateVector& nextR) {
     // rₖ₊₁ = Arₖ + Buₖ
     // Buₖ = rₖ₊₁ − Arₖ
     // uₖ = B⁺(rₖ₊₁ − Arₖ)

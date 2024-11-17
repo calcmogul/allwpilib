@@ -14,6 +14,7 @@
 #include "frc/spline/QuinticHermiteSpline.h"
 
 namespace frc {
+
 /**
  * Helper class that is used to generate cubic and quintic splines from user
  * provided waypoints.
@@ -29,7 +30,7 @@ class WPILIB_DLLEXPORT SplineHelper {
    * @param end               The ending pose.
    * @return 2 cubic control vectors.
    */
-  static wpi::array<Spline<3>::ControlVector, 2>
+  static constexpr wpi::array<Spline<3>::ControlVector, 2>
   CubicControlVectorsFromWaypoints(
       const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
       const Pose2d& end) {
@@ -55,8 +56,8 @@ class WPILIB_DLLEXPORT SplineHelper {
    * @param waypoints The waypoints
    * @return List of quintic splines.
    */
-  static std::vector<QuinticHermiteSpline> QuinticSplinesFromWaypoints(
-      const std::vector<Pose2d>& waypoints) {
+  static constexpr std::vector<QuinticHermiteSpline>
+  QuinticSplinesFromWaypoints(const std::vector<Pose2d>& waypoints) {
     std::vector<QuinticHermiteSpline> splines;
     splines.reserve(waypoints.size() - 1);
     for (size_t i = 0; i < waypoints.size() - 1; ++i) {
@@ -92,10 +93,10 @@ class WPILIB_DLLEXPORT SplineHelper {
    * @return A vector of cubic hermite splines that interpolate through the
    * provided waypoints.
    */
-  static std::vector<CubicHermiteSpline> CubicSplinesFromControlVectors(
-      const Spline<3>::ControlVector& start,
-      std::vector<Translation2d> waypoints,
-      const Spline<3>::ControlVector& end) {
+  static constexpr std::vector<CubicHermiteSpline>
+  CubicSplinesFromControlVectors(const Spline<3>::ControlVector& start,
+                                 std::vector<Translation2d> waypoints,
+                                 const Spline<3>::ControlVector& end) {
     std::vector<CubicHermiteSpline> splines;
 
     wpi::array<double, 2> xInitial = start.x;
@@ -213,7 +214,8 @@ class WPILIB_DLLEXPORT SplineHelper {
    * @return A vector of quintic hermite splines that interpolate through the
    * provided waypoints.
    */
-  static std::vector<QuinticHermiteSpline> QuinticSplinesFromControlVectors(
+  static constexpr std::vector<QuinticHermiteSpline>
+  QuinticSplinesFromControlVectors(
       const std::vector<Spline<5>::ControlVector>& controlVectors) {
     std::vector<QuinticHermiteSpline> splines;
     for (size_t i = 0; i < controlVectors.size() - 1; ++i) {
@@ -234,7 +236,7 @@ class WPILIB_DLLEXPORT SplineHelper {
    * @param splines A vector of un-optimized quintic splines.
    * @return A vector of optimized quintic splines.
    */
-  static std::vector<QuinticHermiteSpline> OptimizeCurvature(
+  static constexpr std::vector<QuinticHermiteSpline> OptimizeCurvature(
       const std::vector<QuinticHermiteSpline>& splines) {
     // If there's only one spline in the vector, we can't optimize anything so
     // just return that.
@@ -310,14 +312,14 @@ class WPILIB_DLLEXPORT SplineHelper {
   }
 
  private:
-  static Spline<3>::ControlVector CubicControlVector(double scalar,
-                                                     const Pose2d& point) {
+  static constexpr Spline<3>::ControlVector CubicControlVector(
+      double scalar, const Pose2d& point) {
     return {{point.X().value(), scalar * point.Rotation().Cos()},
             {point.Y().value(), scalar * point.Rotation().Sin()}};
   }
 
-  static Spline<5>::ControlVector QuinticControlVector(double scalar,
-                                                       const Pose2d& point) {
+  static constexpr Spline<5>::ControlVector QuinticControlVector(
+      double scalar, const Pose2d& point) {
     return {{point.X().value(), scalar * point.Rotation().Cos(), 0.0},
             {point.Y().value(), scalar * point.Rotation().Sin(), 0.0}};
   }
@@ -331,11 +333,11 @@ class WPILIB_DLLEXPORT SplineHelper {
    * @param d the vector on the rhs
    * @param solutionVector the unknown (solution) vector, modified in-place
    */
-  static void ThomasAlgorithm(const std::vector<double>& a,
-                              const std::vector<double>& b,
-                              const std::vector<double>& c,
-                              const std::vector<double>& d,
-                              std::vector<double>* solutionVector) {
+  static constexpr void ThomasAlgorithm(const std::vector<double>& a,
+                                        const std::vector<double>& b,
+                                        const std::vector<double>& c,
+                                        const std::vector<double>& d,
+                                        std::vector<double>* solutionVector) {
     auto& f = *solutionVector;
     size_t N = d.size();
 
@@ -366,4 +368,5 @@ class WPILIB_DLLEXPORT SplineHelper {
     }
   }
 };
+
 }  // namespace frc

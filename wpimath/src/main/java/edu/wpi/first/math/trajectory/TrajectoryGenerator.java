@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.trajectory;
 
-import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -17,35 +16,14 @@ import edu.wpi.first.math.spline.SplineParameterizer.MalformedSplineException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.Optional;
 
 /** Helper class used to generate trajectories with various constraints. */
 public final class TrajectoryGenerator {
   private static final Transform2d kFlip = new Transform2d(Translation2d.kZero, Rotation2d.kPi);
 
-  private static final Trajectory kDoNothingTrajectory =
-      new Trajectory(List.of(new Trajectory.State()));
-  private static BiConsumer<String, StackTraceElement[]> errorFunc;
-
   /** Private constructor because this is a utility class. */
   private TrajectoryGenerator() {}
-
-  private static void reportError(String error, StackTraceElement[] stackTrace) {
-    if (errorFunc != null) {
-      errorFunc.accept(error, stackTrace);
-    } else {
-      MathSharedStore.reportError(error, stackTrace);
-    }
-  }
-
-  /**
-   * Set error reporting function. By default, DriverStation.reportError() is used.
-   *
-   * @param func Error reporting function, arguments are error and stackTrace.
-   */
-  public static void setErrorHandler(BiConsumer<String, StackTraceElement[]> func) {
-    errorFunc = func;
-  }
 
   /**
    * Generates a trajectory from the given control vectors and config. This method uses clamped
@@ -59,7 +37,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(
+  public static Optional<Trajectory> generateTrajectory(
       Spline.ControlVector initial,
       List<Translation2d> interiorWaypoints,
       Spline.ControlVector end,
@@ -84,8 +62,7 @@ public final class TrajectoryGenerator {
               SplineHelper.getCubicSplinesFromControlVectors(
                   newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd));
     } catch (MalformedSplineException ex) {
-      reportError(ex.getMessage(), ex.getStackTrace());
-      return kDoNothingTrajectory;
+      return Optional.empty();
     }
 
     // Change the points back to their original orientation.
@@ -97,14 +74,15 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(
-        points,
-        config.getConstraints(),
-        config.getStartVelocity(),
-        config.getEndVelocity(),
-        config.getMaxVelocity(),
-        config.getMaxAcceleration(),
-        config.isReversed());
+    return Optional.of(
+        TrajectoryParameterizer.timeParameterizeTrajectory(
+            points,
+            config.getConstraints(),
+            config.getStartVelocity(),
+            config.getEndVelocity(),
+            config.getMaxVelocity(),
+            config.getMaxAcceleration(),
+            config.isReversed()));
   }
 
   /**
@@ -119,7 +97,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(
+  public static Optional<Trajectory> generateTrajectory(
       Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, TrajectoryConfig config) {
     var controlVectors =
         SplineHelper.getCubicControlVectorsFromWaypoints(
@@ -138,7 +116,7 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(
+  public static Optional<Trajectory> generateTrajectory(
       ControlVectorList controlVectors, TrajectoryConfig config) {
     final var newControlVectors = new ArrayList<Spline.ControlVector>(controlVectors.size());
 
@@ -160,8 +138,7 @@ public final class TrajectoryGenerator {
               SplineHelper.getQuinticSplinesFromControlVectors(
                   newControlVectors.toArray(new Spline.ControlVector[] {})));
     } catch (MalformedSplineException ex) {
-      reportError(ex.getMessage(), ex.getStackTrace());
-      return kDoNothingTrajectory;
+      return Optional.empty();
     }
 
     // Change the points back to their original orientation.
@@ -173,14 +150,15 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(
-        points,
-        config.getConstraints(),
-        config.getStartVelocity(),
-        config.getEndVelocity(),
-        config.getMaxVelocity(),
-        config.getMaxAcceleration(),
-        config.isReversed());
+    return Optional.of(
+        TrajectoryParameterizer.timeParameterizeTrajectory(
+            points,
+            config.getConstraints(),
+            config.getStartVelocity(),
+            config.getEndVelocity(),
+            config.getMaxVelocity(),
+            config.getMaxAcceleration(),
+            config.isReversed()));
   }
 
   /**
@@ -192,7 +170,8 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
+  public static Optional<Trajectory> generateTrajectory(
+      List<Pose2d> waypoints, TrajectoryConfig config) {
     List<Pose2d> newWaypoints = new ArrayList<>();
     if (config.isReversed()) {
       for (Pose2d originalWaypoint : waypoints) {
@@ -210,8 +189,7 @@ public final class TrajectoryGenerator {
               SplineHelper.optimizeCurvature(
                   SplineHelper.getQuinticSplinesFromWaypoints(newWaypoints)));
     } catch (MalformedSplineException ex) {
-      reportError(ex.getMessage(), ex.getStackTrace());
-      return kDoNothingTrajectory;
+      return Optional.empty();
     }
 
     // Change the points back to their original orientation.
@@ -223,14 +201,15 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(
-        points,
-        config.getConstraints(),
-        config.getStartVelocity(),
-        config.getEndVelocity(),
-        config.getMaxVelocity(),
-        config.getMaxAcceleration(),
-        config.isReversed());
+    return Optional.of(
+        TrajectoryParameterizer.timeParameterizeTrajectory(
+            points,
+            config.getConstraints(),
+            config.getStartVelocity(),
+            config.getEndVelocity(),
+            config.getMaxVelocity(),
+            config.getMaxAcceleration(),
+            config.isReversed()));
   }
 
   /**

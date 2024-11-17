@@ -12,6 +12,7 @@
 #include "wpimath/MathShared.h"
 
 namespace frc {
+
 /**
  * A class that limits the rate of change of an input value.  Useful for
  * implementing voltage, setpoint, and/or output ramps.  A slew-rate limit
@@ -40,8 +41,8 @@ class SlewRateLimiter {
    *                          to be negative.
    * @param initialValue The initial value of the input.
    */
-  SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
-                  Unit_t initialValue = Unit_t{0})
+  constexpr SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
+                            Unit_t initialValue = Unit_t{0})
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
@@ -54,7 +55,7 @@ class SlewRateLimiter {
    *
    * @param rateLimit The rate-of-change limit.
    */
-  explicit SlewRateLimiter(Rate_t rateLimit)
+  constexpr explicit SlewRateLimiter(Rate_t rateLimit)
       : SlewRateLimiter(rateLimit, -rateLimit) {}
 
   /**
@@ -64,7 +65,7 @@ class SlewRateLimiter {
    * @return The filtered value, which will not change faster than the slew
    * rate.
    */
-  Unit_t Calculate(Unit_t input) {
+  constexpr Unit_t Calculate(Unit_t input) {
     units::second_t currentTime = wpi::math::MathSharedStore::GetTimestamp();
     units::second_t elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
@@ -79,7 +80,7 @@ class SlewRateLimiter {
    *
    * @return The last value.
    */
-  Unit_t LastValue() const { return m_prevVal; }
+  constexpr Unit_t LastValue() const { return m_prevVal; }
 
   /**
    * Resets the slew rate limiter to the specified value; ignores the rate limit
@@ -87,7 +88,7 @@ class SlewRateLimiter {
    *
    * @param value The value to reset to.
    */
-  void Reset(Unit_t value) {
+  constexpr void Reset(Unit_t value) {
     m_prevVal = value;
     m_prevTime = wpi::math::MathSharedStore::GetTimestamp();
   }
@@ -98,4 +99,5 @@ class SlewRateLimiter {
   Unit_t m_prevVal;
   units::second_t m_prevTime;
 };
+
 }  // namespace frc

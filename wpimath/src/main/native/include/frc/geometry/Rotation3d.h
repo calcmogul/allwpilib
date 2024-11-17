@@ -4,17 +4,14 @@
 
 #pragma once
 
-#include <string>
-#include <type_traits>
-
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <Eigen/LU>
 #include <fmt/format.h>
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
-#include "frc/ct_matrix.h"
 #include "frc/fmt/Eigen.h"
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
@@ -79,7 +76,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param angle The rotation around the axis.
    */
   constexpr Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle) {
-    double norm = ct_matrix{axis}.norm();
+    double norm = axis.norm();
     if (norm == 0.0) {
       return;
     }
@@ -99,7 +96,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param rvec The rotation vector.
    */
   constexpr explicit Rotation3d(const Eigen::Vector3d& rvec)
-      : Rotation3d{rvec, units::radian_t{ct_matrix{rvec}.norm()}} {}
+      : Rotation3d{rvec, units::radian_t{rvec.norm()}} {}
 
   /**
    * Constructs a Rotation3d from a rotation matrix.
@@ -108,61 +105,55 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @throws std::domain_error if the rotation matrix isn't special orthogonal.
    */
   constexpr explicit Rotation3d(const Eigen::Matrix3d& rotationMatrix) {
-    auto impl = []<typename Matrix3d>(const Matrix3d& R) -> Quaternion {
-      // Require that the rotation matrix is special orthogonal. This is true if
-      // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
-      if ((R * R.transpose() - Matrix3d::Identity()).norm() > 1e-9) {
-        throw std::domain_error("Rotation matrix isn't orthogonal");
-      }
-      if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
-        throw std::domain_error(
-            "Rotation matrix is orthogonal but not special orthogonal");
-      }
+    const auto& R = rotationMatrix;
 
-      // Turn rotation matrix into a quaternion
-      // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
-      double trace = R(0, 0) + R(1, 1) + R(2, 2);
-      double w;
-      double x;
-      double y;
-      double z;
-
-      if (trace > 0.0) {
-        double s = 0.5 / gcem::sqrt(trace + 1.0);
-        w = 0.25 / s;
-        x = (R(2, 1) - R(1, 2)) * s;
-        y = (R(0, 2) - R(2, 0)) * s;
-        z = (R(1, 0) - R(0, 1)) * s;
-      } else {
-        if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
-          double s = 2.0 * gcem::sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
-          w = (R(2, 1) - R(1, 2)) / s;
-          x = 0.25 * s;
-          y = (R(0, 1) + R(1, 0)) / s;
-          z = (R(0, 2) + R(2, 0)) / s;
-        } else if (R(1, 1) > R(2, 2)) {
-          double s = 2.0 * gcem::sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
-          w = (R(0, 2) - R(2, 0)) / s;
-          x = (R(0, 1) + R(1, 0)) / s;
-          y = 0.25 * s;
-          z = (R(1, 2) + R(2, 1)) / s;
-        } else {
-          double s = 2.0 * gcem::sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
-          w = (R(1, 0) - R(0, 1)) / s;
-          x = (R(0, 2) + R(2, 0)) / s;
-          y = (R(1, 2) + R(2, 1)) / s;
-          z = 0.25 * s;
-        }
-      }
-
-      return Quaternion{w, x, y, z};
-    };
-
-    if (std::is_constant_evaluated()) {
-      m_q = impl(ct_matrix3d{rotationMatrix});
-    } else {
-      m_q = impl(rotationMatrix);
+    // Require that the rotation matrix is special orthogonal. This is true if
+    // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+    if ((R * R.transpose() - Eigen::Matrix3d::Identity()).norm() > 1e-9) {
+      throw std::domain_error("Rotation matrix isn't orthogonal");
     }
+    if (gcem::abs(R.determinant() - 1.0) > 1e-9) {
+      throw std::domain_error(
+          "Rotation matrix is orthogonal but not special orthogonal");
+    }
+
+    // Turn rotation matrix into a quaternion
+    // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+    double trace = R(0, 0) + R(1, 1) + R(2, 2);
+    double w;
+    double x;
+    double y;
+    double z;
+
+    if (trace > 0.0) {
+      double s = 0.5 / gcem::sqrt(trace + 1.0);
+      w = 0.25 / s;
+      x = (R(2, 1) - R(1, 2)) * s;
+      y = (R(0, 2) - R(2, 0)) * s;
+      z = (R(1, 0) - R(0, 1)) * s;
+    } else {
+      if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
+        double s = 2.0 * gcem::sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
+        w = (R(2, 1) - R(1, 2)) / s;
+        x = 0.25 * s;
+        y = (R(0, 1) + R(1, 0)) / s;
+        z = (R(0, 2) + R(2, 0)) / s;
+      } else if (R(1, 1) > R(2, 2)) {
+        double s = 2.0 * gcem::sqrt(1.0 + R(1, 1) - R(0, 0) - R(2, 2));
+        w = (R(0, 2) - R(2, 0)) / s;
+        x = (R(0, 1) + R(1, 0)) / s;
+        y = 0.25 * s;
+        z = (R(1, 2) + R(2, 1)) / s;
+      } else {
+        double s = 2.0 * gcem::sqrt(1.0 + R(2, 2) - R(0, 0) - R(1, 1));
+        w = (R(1, 0) - R(0, 1)) / s;
+        x = (R(0, 2) + R(2, 0)) / s;
+        y = (R(1, 2) + R(2, 1)) / s;
+        z = 0.25 * s;
+      }
+    }
+
+    m_q = Quaternion{w, x, y, z};
   }
 
   /**
@@ -177,8 +168,8 @@ class WPILIB_DLLEXPORT Rotation3d {
    */
   constexpr Rotation3d(const Eigen::Vector3d& initial,
                        const Eigen::Vector3d& final) {
-    double dot = ct_matrix{initial}.dot(ct_matrix{final});
-    double normProduct = ct_matrix{initial}.norm() * ct_matrix{final}.norm();
+    double dot = initial.dot(final);
+    double normProduct = initial.norm() * final.norm();
     double dotNorm = dot / normProduct;
 
     if (dotNorm > 1.0 - 1E-9) {
@@ -214,13 +205,13 @@ class WPILIB_DLLEXPORT Rotation3d {
         }
       }
 
-      auto axis = ct_matrix{initial}.cross(ct_matrix{other});
+      auto axis = initial.cross(other);
 
       double axisNorm = axis.norm();
       m_q = Quaternion{0.0, axis(0) / axisNorm, axis(1) / axisNorm,
                        axis(2) / axisNorm};
     } else {
-      auto axis = ct_matrix{initial}.cross(final);
+      auto axis = initial.cross(final);
 
       // https://stackoverflow.com/a/11741520
       m_q =

@@ -4,10 +4,12 @@
 
 #pragma once
 
-#include <cmath>
-#include <functional>
 #include <limits>
 #include <random>
+#include <utility>
+
+#include <gcem.hpp>
+#include <wpi/function.h>
 
 namespace frc {
 
@@ -40,12 +42,13 @@ class SimulatedAnnealing {
    *     state.
    * @param cost Function that returns the scalar cost of a state.
    */
-  constexpr SimulatedAnnealing(double initialTemperature,
-                               std::function<State(const State&)> neighbor,
-                               std::function<double(const State&)> cost)
+  constexpr SimulatedAnnealing(
+      double initialTemperature,
+      wpi::copyable_function<State(const State&)> neighbor,
+      wpi::copyable_function<double(const State&)> cost)
       : m_initialTemperature{initialTemperature},
-        m_neighbor{neighbor},
-        m_cost{cost} {}
+        m_neighbor{std::move(neighbor)},
+        m_cost{std::move(cost)} {}
 
   /**
    * Runs the Simulated Annealing algorithm.
@@ -72,7 +75,7 @@ class SimulatedAnnealing {
       double proposedCost = m_cost(proposedState);
       double deltaCost = proposedCost - cost;
 
-      double acceptanceProbability = std::exp(-deltaCost / temperature);
+      double acceptanceProbability = gcem::exp(-deltaCost / temperature);
 
       // If cost went down or random number exceeded acceptance probability,
       // accept the proposed state
@@ -94,8 +97,8 @@ class SimulatedAnnealing {
 
  private:
   double m_initialTemperature;
-  std::function<State(const State&)> m_neighbor;
-  std::function<double(const State&)> m_cost;
+  wpi::copyable_function<State(const State&)> m_neighbor;
+  wpi::copyable_function<double(const State&)> m_cost;
 };
 
 }  // namespace frc

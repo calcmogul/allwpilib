@@ -17,7 +17,7 @@ namespace frc {
  * @param x     Vector argument.
  */
 template <int Rows, int Cols, typename F>
-auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
+constexpr auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
   constexpr double kEpsilon = 1e-5;
   Matrixd<Rows, Cols> result;
   result.setZero();
@@ -48,8 +48,8 @@ auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
  * @param args     Remaining arguments to f(x, u, ...).
  */
 template <int Rows, int States, int Inputs, typename F, typename... Args>
-auto NumericalJacobianX(F&& f, const Vectord<States>& x,
-                        const Vectord<Inputs>& u, Args&&... args) {
+constexpr auto NumericalJacobianX(F&& f, const Vectord<States>& x,
+                                  const Vectord<Inputs>& u, Args&&... args) {
   return NumericalJacobian<Rows, States>(
       [&](const Vectord<States>& x) { return f(x, u, args...); }, x);
 }
@@ -68,8 +68,8 @@ auto NumericalJacobianX(F&& f, const Vectord<States>& x,
  * @param args     Remaining arguments to f(x, u, ...).
  */
 template <int Rows, int States, int Inputs, typename F, typename... Args>
-auto NumericalJacobianU(F&& f, const Vectord<States>& x,
-                        const Vectord<Inputs>& u, Args&&... args) {
+constexpr auto NumericalJacobianU(F&& f, const Vectord<States>& x,
+                                  const Vectord<Inputs>& u, Args&&... args) {
   return NumericalJacobian<Rows, Inputs>(
       [&](const Vectord<Inputs>& u) { return f(x, u, args...); }, u);
 }

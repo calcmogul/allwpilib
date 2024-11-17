@@ -5,10 +5,10 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
-#include <functional>
 #include <utility>
 #include <vector>
+
+#include <wpi/function.h>
 
 #include "frc/EigenCore.h"
 #include "units/math.h"
@@ -40,8 +40,9 @@ class KalmanFilterLatencyCompensator {
     /// The local measurements.
     Vectord<Outputs> localMeasurements;
 
-    ObserverSnapshot(const KalmanFilterType& observer, const Vectord<Inputs>& u,
-                     const Vectord<Outputs>& localY)
+    constexpr ObserverSnapshot(const KalmanFilterType& observer,
+                               const Vectord<Inputs>& u,
+                               const Vectord<Outputs>& localY)
         : xHat(observer.Xhat()),
           squareRootErrorCovariances(observer.S()),
           inputs(u),
@@ -51,7 +52,7 @@ class KalmanFilterLatencyCompensator {
   /**
    * Clears the observer snapshot buffer.
    */
-  void Reset() { m_pastObserverSnapshots.clear(); }
+  constexpr void Reset() { m_pastObserverSnapshots.clear(); }
 
   /**
    * Add past observer states to the observer snapshots list.
@@ -61,8 +62,9 @@ class KalmanFilterLatencyCompensator {
    * @param localY    The local output at the timestamp
    * @param timestamp The timestamp of the state.
    */
-  void AddObserverState(const KalmanFilterType& observer, Vectord<Inputs> u,
-                        Vectord<Outputs> localY, units::second_t timestamp) {
+  constexpr void AddObserverState(const KalmanFilterType& observer,
+                                  Vectord<Inputs> u, Vectord<Outputs> localY,
+                                  units::second_t timestamp) {
     // Add the new state into the vector.
     m_pastObserverSnapshots.emplace_back(timestamp,
                                          ObserverSnapshot{observer, u, localY});
@@ -85,9 +87,10 @@ class KalmanFilterLatencyCompensator {
    * @param timestamp                The timestamp of the measurement.
    */
   template <int Rows>
-  void ApplyPastGlobalMeasurement(
+  constexpr void ApplyPastGlobalMeasurement(
       KalmanFilterType* observer, units::second_t nominalDt, Vectord<Rows> y,
-      std::function<void(const Vectord<Inputs>& u, const Vectord<Rows>& y)>
+      wpi::copyable_function<void(const Vectord<Inputs>& u,
+                                  const Vectord<Rows>& y)>
           globalMeasurementCorrect,
       units::second_t timestamp) {
     if (m_pastObserverSnapshots.size() == 0) {

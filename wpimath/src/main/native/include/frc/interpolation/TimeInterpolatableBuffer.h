@@ -5,13 +5,13 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
 #include <optional>
 #include <utility>
 #include <vector>
 
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
+#include <wpi/function.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "units/time.h"
@@ -39,8 +39,9 @@ class TimeInterpolatableBuffer {
    * @param historySize  The history size of the buffer.
    * @param func The function used to interpolate between values.
    */
-  TimeInterpolatableBuffer(units::second_t historySize,
-                           std::function<T(const T&, const T&, double)> func)
+  constexpr TimeInterpolatableBuffer(
+      units::second_t historySize,
+      wpi::copyable_function<T(const T&, const T&, double) const> func)
       : m_historySize(historySize), m_interpolatingFunc(func) {}
 
   /**
@@ -49,7 +50,7 @@ class TimeInterpolatableBuffer {
    *
    * @param historySize  The history size of the buffer.
    */
-  explicit TimeInterpolatableBuffer(units::second_t historySize)
+  constexpr explicit TimeInterpolatableBuffer(units::second_t historySize)
       : m_historySize(historySize),
         m_interpolatingFunc([](const T& start, const T& end, double t) {
           return wpi::Lerp(start, end, t);
@@ -61,7 +62,7 @@ class TimeInterpolatableBuffer {
    * @param time   The timestamp of the sample.
    * @param sample The sample object.
    */
-  void AddSample(units::second_t time, T sample) {
+  constexpr void AddSample(units::second_t time, T sample) {
     // Add the new state into the vector
     if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first) {
       m_pastSnapshots.emplace_back(time, sample);
@@ -90,7 +91,7 @@ class TimeInterpolatableBuffer {
   }
 
   /** Clear all old samples. */
-  void Clear() { m_pastSnapshots.clear(); }
+  constexpr void Clear() { m_pastSnapshots.clear(); }
 
   /**
    * Sample the buffer at the given time. If the buffer is empty, an empty
@@ -98,7 +99,7 @@ class TimeInterpolatableBuffer {
    *
    * @param time The time at which to sample the buffer.
    */
-  std::optional<T> Sample(units::second_t time) const {
+  constexpr std::optional<T> Sample(units::second_t time) const {
     if (m_pastSnapshots.empty()) {
       return {};
     }
@@ -138,26 +139,28 @@ class TimeInterpolatableBuffer {
    * Grant access to the internal sample buffer. Used in Pose Estimation to
    * replay odometry inputs stored within this buffer.
    */
-  std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() {
+  constexpr std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() {
     return m_pastSnapshots;
   }
 
   /**
    * Grant access to the internal sample buffer.
    */
-  const std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() const {
+  constexpr const std::vector<std::pair<units::second_t, T>>&
+  GetInternalBuffer() const {
     return m_pastSnapshots;
   }
 
  private:
   units::second_t m_historySize;
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
-  std::function<T(const T&, const T&, double)> m_interpolatingFunc;
+  wpi::copyable_function<T(const T&, const T&, double) const>
+      m_interpolatingFunc;
 };
 
 // Template specialization to ensure that Pose2d uses pose exponential
 template <>
-inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
+constexpr TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
     units::second_t historySize)
     : m_historySize(historySize),
       m_interpolatingFunc([](const Pose2d& start, const Pose2d& end, double t) {

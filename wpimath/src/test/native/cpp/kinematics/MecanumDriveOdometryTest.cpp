@@ -87,12 +87,14 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingTrajectory) {
   frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
                                      wheelPositions};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  frc::Trajectory trajectory =
+      frc::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{
+              frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 135_deg}, frc::Pose2d{-3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 45_deg}},
+          frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq))
+          .value();
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -150,12 +152,14 @@ TEST_F(MecanumDriveOdometryTest, AccuracyFacingXAxis) {
   frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d{},
                                      wheelPositions};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  frc::Trajectory trajectory =
+      frc::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{
+              frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 135_deg}, frc::Pose2d{-3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 45_deg}},
+          frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq))
+          .value();
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);

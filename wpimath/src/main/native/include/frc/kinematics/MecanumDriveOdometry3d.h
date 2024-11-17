@@ -4,15 +4,16 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
 
-#include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveWheelPositions.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
 #include "frc/kinematics/Odometry3d.h"
-#include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
@@ -36,10 +37,17 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry3d
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit MecanumDriveOdometry3d(
+  constexpr explicit MecanumDriveOdometry3d(
       MecanumDriveKinematics kinematics, const Rotation3d& gyroAngle,
       const MecanumDriveWheelPositions& wheelPositions,
-      const Pose3d& initialPose = Pose3d{});
+      const Pose3d& initialPose = Pose3d{})
+      : Odometry3d(m_kinematicsImpl, gyroAngle, wheelPositions, initialPose),
+        m_kinematicsImpl(kinematics) {
+    if (!std::is_constant_evaluated()) {
+      wpi::math::MathSharedStore::ReportUsage(
+          wpi::math::MathUsageId::kOdometry_MecanumDrive, 1);
+    }
+  }
 
  private:
   MecanumDriveKinematics m_kinematicsImpl;

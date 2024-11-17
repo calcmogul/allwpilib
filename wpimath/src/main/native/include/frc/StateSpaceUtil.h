@@ -241,8 +241,8 @@ constexpr Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
  * @param B Input matrix.
  */
 template <int States, int Inputs>
-bool IsStabilizable(const Matrixd<States, States>& A,
-                    const Matrixd<States, Inputs>& B) {
+constexpr bool IsStabilizable(const Matrixd<States, States>& A,
+                              const Matrixd<States, Inputs>& B) {
   Eigen::EigenSolver<Matrixd<States, States>> es{A, false};
 
   for (int i = 0; i < A.rows(); ++i) {
@@ -300,8 +300,8 @@ IsStabilizable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
  * @param C Output matrix.
  */
 template <int States, int Outputs>
-bool IsDetectable(const Matrixd<States, States>& A,
-                  const Matrixd<Outputs, States>& C) {
+constexpr bool IsDetectable(const Matrixd<States, States>& A,
+                            const Matrixd<Outputs, States>& C) {
   return IsStabilizable<States, Outputs>(A.transpose(), C.transpose());
 }
 
@@ -348,8 +348,8 @@ constexpr Vectord<Inputs> ClampInputMaxMagnitude(const Vectord<Inputs>& u,
  * @return The normalizedInput
  */
 template <int Inputs>
-Vectord<Inputs> DesaturateInputVector(const Vectord<Inputs>& u,
-                                      double maxMagnitude) {
+constexpr Vectord<Inputs> DesaturateInputVector(const Vectord<Inputs>& u,
+                                                double maxMagnitude) {
   double maxValue = u.template lpNorm<Eigen::Infinity>();
 
   if (maxValue > maxMagnitude) {

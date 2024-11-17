@@ -50,11 +50,13 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    * @param rightDistance The distance traveled by the right encoder.
    * @param initialPose The estimated initial pose.
    */
-  DifferentialDrivePoseEstimator(DifferentialDriveKinematics& kinematics,
-                                 const Rotation2d& gyroAngle,
-                                 units::meter_t leftDistance,
-                                 units::meter_t rightDistance,
-                                 const Pose2d& initialPose);
+  constexpr DifferentialDrivePoseEstimator(
+      DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
+      units::meter_t leftDistance, units::meter_t rightDistance,
+      const Pose2d& initialPose)
+      : DifferentialDrivePoseEstimator{
+            kinematics,  gyroAngle,          leftDistance,   rightDistance,
+            initialPose, {0.02, 0.02, 0.01}, {0.1, 0.1, 0.1}} {}
 
   /**
    * Constructs a DifferentialDrivePoseEstimator.
@@ -73,11 +75,16 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  DifferentialDrivePoseEstimator(
+  constexpr DifferentialDrivePoseEstimator(
       DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
       units::meter_t leftDistance, units::meter_t rightDistance,
       const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
-      const wpi::array<double, 3>& visionMeasurementStdDevs);
+      const wpi::array<double, 3>& visionMeasurementStdDevs)
+      : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,
+                      visionMeasurementStdDevs),
+        m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {
+    ResetPose(initialPose);
+  }
 
   /**
    * Resets the robot's position on the field.
@@ -87,8 +94,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    * @param rightDistance The distance traveled by the right encoder.
    * @param pose The estimated pose of the robot on the field.
    */
-  void ResetPosition(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose2d& pose) {
+  constexpr void ResetPosition(const Rotation2d& gyroAngle,
+                               units::meter_t leftDistance,
+                               units::meter_t rightDistance,
+                               const Pose2d& pose) {
     PoseEstimator::ResetPosition(gyroAngle, {leftDistance, rightDistance},
                                  pose);
   }
@@ -103,8 +112,9 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    *
    * @return The estimated pose of the robot.
    */
-  Pose2d Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
-                units::meter_t rightDistance) {
+  constexpr Pose2d Update(const Rotation2d& gyroAngle,
+                          units::meter_t leftDistance,
+                          units::meter_t rightDistance) {
     return PoseEstimator::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
@@ -119,10 +129,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
    *
    * @return The estimated pose of the robot.
    */
-  Pose2d UpdateWithTime(units::second_t currentTime,
-                        const Rotation2d& gyroAngle,
-                        units::meter_t leftDistance,
-                        units::meter_t rightDistance) {
+  constexpr Pose2d UpdateWithTime(units::second_t currentTime,
+                                  const Rotation2d& gyroAngle,
+                                  units::meter_t leftDistance,
+                                  units::meter_t rightDistance) {
     return PoseEstimator::UpdateWithTime(currentTime, gyroAngle,
                                          {leftDistance, rightDistance});
   }

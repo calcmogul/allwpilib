@@ -163,12 +163,14 @@ TEST(DifferentialDrivePoseEstimator3dTest, Accuracy) {
                                                   {0.02, 0.02, 0.02, 0.01},
                                                   {0.1, 0.1, 0.1, 0.1}};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2_mps, 2_mps_sq));
+  frc::Trajectory trajectory =
+      frc::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{
+              frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 135_deg}, frc::Pose2d{-3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 45_deg}},
+          frc::TrajectoryConfig(2_mps, 2_mps_sq))
+          .value();
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
@@ -192,12 +194,14 @@ TEST(DifferentialDrivePoseEstimator3dTest, BadInitialPose) {
                                                   {0.02, 0.02, 0.02, 0.01},
                                                   {0.1, 0.1, 0.1, 0.1}};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2_mps, 2_mps_sq));
+  frc::Trajectory trajectory =
+      frc::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{
+              frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 135_deg}, frc::Pose2d{-3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 45_deg}},
+          frc::TrajectoryConfig(2_mps, 2_mps_sq))
+          .value();
 
   for (units::degree_t offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {

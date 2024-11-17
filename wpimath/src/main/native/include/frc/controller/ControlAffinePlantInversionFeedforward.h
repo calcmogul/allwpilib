@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <array>
-#include <functional>
+#include <utility>
 
 #include <Eigen/QR>
+#include <wpi/function.h>
 
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalJacobian.h"
@@ -53,10 +53,12 @@ class ControlAffinePlantInversionFeedforward {
    *           (of the form f(x) + Bu).
    * @param dt The timestep between calls of calculate().
    */
-  ControlAffinePlantInversionFeedforward(
-      std::function<StateVector(const StateVector&, const InputVector&)> f,
+  constexpr ControlAffinePlantInversionFeedforward(
+      wpi::copyable_function<StateVector(const StateVector&, const InputVector&)
+                                 const>
+          f,
       units::second_t dt)
-      : m_dt(dt), m_f(f) {
+      : m_dt{dt}, m_f{std::move(f)} {
     m_B = NumericalJacobianU<States, States, Inputs>(f, StateVector::Zero(),
                                                      InputVector::Zero());
 
@@ -72,20 +74,20 @@ class ControlAffinePlantInversionFeedforward {
    * @param B  Continuous input matrix of the plant being controlled.
    * @param dt The timestep between calls of calculate().
    */
-  ControlAffinePlantInversionFeedforward(
-      std::function<StateVector(const StateVector&)> f,
+  constexpr ControlAffinePlantInversionFeedforward(
+      wpi::copyable_function<StateVector(const StateVector&) const> f,
       const Matrixd<States, Inputs>& B, units::second_t dt)
-      : m_B(B), m_dt(dt) {
-    m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
-      return f(x);
-    };
-
+      : m_B{B},
+        m_dt{dt},
+        m_f{[=](const StateVector& x, const InputVector& u) -> StateVector {
+          return f(x);
+        }} {
     Reset();
   }
 
-  ControlAffinePlantInversionFeedforward(
+  constexpr ControlAffinePlantInversionFeedforward(
       ControlAffinePlantInversionFeedforward&&) = default;
-  ControlAffinePlantInversionFeedforward& operator=(
+  constexpr ControlAffinePlantInversionFeedforward& operator=(
       ControlAffinePlantInversionFeedforward&&) = default;
 
   /**
@@ -93,7 +95,7 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  const InputVector& Uff() const { return m_uff; }
+  constexpr const InputVector& Uff() const { return m_uff; }
 
   /**
    * Returns an element of the previously calculated feedforward.
@@ -102,14 +104,14 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The row of the calculated feedforward.
    */
-  double Uff(int i) const { return m_uff(i); }
+  constexpr double Uff(int i) const { return m_uff(i); }
 
   /**
    * Returns the current reference vector r.
    *
    * @return The current reference vector.
    */
-  const StateVector& R() const { return m_r; }
+  constexpr const StateVector& R() const { return m_r; }
 
   /**
    * Returns an element of the reference vector r.
@@ -118,14 +120,14 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The row of the current reference vector.
    */
-  double R(int i) const { return m_r(i); }
+  constexpr double R(int i) const { return m_r(i); }
 
   /**
    * Resets the feedforward with a specified initial state vector.
    *
    * @param initialState The initial state vector.
    */
-  void Reset(const StateVector& initialState) {
+  constexpr void Reset(const StateVector& initialState) {
     m_r = initialState;
     m_uff.setZero();
   }
@@ -133,7 +135,7 @@ class ControlAffinePlantInversionFeedforward {
   /**
    * Resets the feedforward with a zero initial state vector.
    */
-  void Reset() {
+  constexpr void Reset() {
     m_r.setZero();
     m_uff.setZero();
   }
@@ -151,7 +153,7 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  InputVector Calculate(const StateVector& nextR) {
+  constexpr InputVector Calculate(const StateVector& nextR) {
     return Calculate(m_r, nextR);
   }
 
@@ -163,7 +165,8 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The calculated feedforward.
    */
-  InputVector Calculate(const StateVector& r, const StateVector& nextR) {
+  constexpr InputVector Calculate(const StateVector& r,
+                                  const StateVector& nextR) {
     StateVector rDot = (nextR - r) / m_dt.value();
 
     // ṙ = f(r) + Bu
@@ -183,7 +186,9 @@ class ControlAffinePlantInversionFeedforward {
   /**
    * The model dynamics.
    */
-  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
+  wpi::copyable_function<StateVector(const StateVector&, const InputVector&)
+                             const>
+      m_f;
 
   // Current reference
   StateVector m_r;

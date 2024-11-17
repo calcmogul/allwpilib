@@ -4,14 +4,12 @@
 
 #pragma once
 
-#include <type_traits>
 #include <utility>
 
 #include <Eigen/Core>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>
 
-#include "frc/ct_matrix.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation3d.h"
@@ -256,25 +254,6 @@ namespace detail {
  * @param rotation The rotation vector.
  * @return The rotation vector as a 3x3 rotation matrix.
  */
-constexpr ct_matrix3d RotationVectorToMatrix(const ct_vector3d& rotation) {
-  // Given a rotation vector <a, b, c>,
-  //         [ 0 -c  b]
-  // Omega = [ c  0 -a]
-  //         [-b  a  0]
-  return ct_matrix3d{{0.0, -rotation(2), rotation(1)},
-                     {rotation(2), 0.0, -rotation(0)},
-                     {-rotation(1), rotation(0), 0.0}};
-}
-
-/**
- * Applies the hat operator to a rotation vector.
- *
- * It takes a rotation vector and returns the corresponding matrix
- * representation of the Lie algebra element (a 3x3 rotation matrix).
- *
- * @param rotation The rotation vector.
- * @return The rotation vector as a 3x3 rotation matrix.
- */
 constexpr Eigen::Matrix3d RotationVectorToMatrix(
     const Eigen::Vector3d& rotation) {
   // Given a rotation vector <a, b, c>,
@@ -306,118 +285,102 @@ constexpr Pose3d Pose3d::RelativeTo(const Pose3d& other) const {
 constexpr Pose3d Pose3d::Exp(const Twist3d& twist) const {
   // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
 
-  auto impl = [this]<typename Matrix3d, typename Vector3d>(
-                  const Twist3d& twist) -> Pose3d {
-    Vector3d u{{twist.dx.value(), twist.dy.value(), twist.dz.value()}};
-    Vector3d rvec{{twist.rx.value(), twist.ry.value(), twist.rz.value()}};
-    Matrix3d omega = detail::RotationVectorToMatrix(rvec);
-    Matrix3d omegaSq = omega * omega;
-    double theta = rvec.norm();
-    double thetaSq = theta * theta;
+  Eigen::Vector3d u{{twist.dx.value(), twist.dy.value(), twist.dz.value()}};
+  Eigen::Vector3d rvec{{twist.rx.value(), twist.ry.value(), twist.rz.value()}};
+  Eigen::Matrix3d omega = detail::RotationVectorToMatrix(rvec);
+  Eigen::Matrix3d omegaSq = omega * omega;
+  double theta = rvec.norm();
+  double thetaSq = theta * theta;
 
-    double A;
-    double B;
-    double C;
-    if (gcem::abs(theta) < 1E-7) {
-      // Taylor Expansions around θ = 0
-      // A = 1/1! - θ²/3! + θ⁴/5!
-      // B = 1/2! - θ²/4! + θ⁴/6!
-      // C = 1/3! - θ²/5! + θ⁴/7!
-      // sources:
-      // A:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
-      // B:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      // C:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
-      B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
-      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
-    } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
-      // C = (1 - A) / θ²
-      A = gcem::sin(theta) / theta;
-      B = (1 - gcem::cos(theta)) / thetaSq;
-      C = (1 - A) / thetaSq;
-    }
-
-    Matrix3d R = Matrix3d::Identity() + A * omega + B * omegaSq;
-    Matrix3d V = Matrix3d::Identity() + B * omega + C * omegaSq;
-
-    Vector3d translation_component = V * u;
-
-    const Transform3d transform{
-        Translation3d{units::meter_t{translation_component(0)},
-                      units::meter_t{translation_component(1)},
-                      units::meter_t{translation_component(2)}},
-        Rotation3d{R}};
-
-    return *this + transform;
-  };
-
-  if (std::is_constant_evaluated()) {
-    return impl.template operator()<ct_matrix3d, ct_vector3d>(twist);
+  double A;
+  double B;
+  double C;
+  if (gcem::abs(theta) < 1E-7) {
+    // Taylor Expansions around θ = 0
+    // A = 1/1! - θ²/3! + θ⁴/5!
+    // B = 1/2! - θ²/4! + θ⁴/6!
+    // C = 1/3! - θ²/5! + θ⁴/7!
+    // sources:
+    // A:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+    // B:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    // C:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+    B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+    C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
   } else {
-    return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>(twist);
+    // A = std::sin(θ)/θ
+    // B = (1 - std::cos(θ)) / θ²
+    // C = (1 - A) / θ²
+    A = gcem::sin(theta) / theta;
+    B = (1 - gcem::cos(theta)) / thetaSq;
+    C = (1 - A) / thetaSq;
   }
+
+  Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + A * omega + B * omegaSq;
+  Eigen::Matrix3d V = Eigen::Matrix3d::Identity() + B * omega + C * omegaSq;
+
+  Eigen::Vector3d translation_component = V * u;
+
+  const Transform3d transform{
+      Translation3d{units::meter_t{translation_component(0)},
+                    units::meter_t{translation_component(1)},
+                    units::meter_t{translation_component(2)}},
+      Rotation3d{R}};
+
+  return *this + transform;
 }
 
 constexpr Twist3d Pose3d::Log(const Pose3d& end) const {
   // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
 
-  auto impl = [this]<typename Matrix3d, typename Vector3d>(
-                  const Pose3d& end) -> Twist3d {
-    const auto transform = end.RelativeTo(*this);
+  const auto transform = end.RelativeTo(*this);
 
-    Vector3d u{
-        {transform.X().value(), transform.Y().value(), transform.Z().value()}};
-    Vector3d rvec = transform.Rotation().GetQuaternion().ToRotationVector();
-    Matrix3d omega = detail::RotationVectorToMatrix(rvec);
-    Matrix3d omegaSq = omega * omega;
-    double theta = rvec.norm();
-    double thetaSq = theta * theta;
+  Eigen::Vector3d u{
+      {transform.X().value(), transform.Y().value(), transform.Z().value()}};
+  Eigen::Vector3d rvec =
+      transform.Rotation().GetQuaternion().ToRotationVector();
+  Eigen::Matrix3d omega = detail::RotationVectorToMatrix(rvec);
+  Eigen::Matrix3d omegaSq = omega * omega;
+  double theta = rvec.norm();
+  double thetaSq = theta * theta;
 
-    double C;
-    if (gcem::abs(theta) < 1E-7) {
-      // Taylor Expansions around θ = 0
-      // A = 1/1! - θ²/3! + θ⁴/5!
-      // B = 1/2! - θ²/4! + θ⁴/6!
-      // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
-      // sources:
-      // A:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
-      // B:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      // C:
-      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
-      C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
-    } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
-      // C = (1 - A/(2*B)) / θ²
-      double A = gcem::sin(theta) / theta;
-      double B = (1 - gcem::cos(theta)) / thetaSq;
-      C = (1 - A / (2 * B)) / thetaSq;
-    }
-
-    Matrix3d V_inv = Matrix3d::Identity() - 0.5 * omega + C * omegaSq;
-
-    Vector3d translation_component = V_inv * u;
-
-    return Twist3d{units::meter_t{translation_component(0)},
-                   units::meter_t{translation_component(1)},
-                   units::meter_t{translation_component(2)},
-                   units::radian_t{rvec(0)},
-                   units::radian_t{rvec(1)},
-                   units::radian_t{rvec(2)}};
-  };
-
-  if (std::is_constant_evaluated()) {
-    return impl.template operator()<ct_matrix3d, ct_vector3d>(end);
+  double C;
+  if (gcem::abs(theta) < 1E-7) {
+    // Taylor Expansions around θ = 0
+    // A = 1/1! - θ²/3! + θ⁴/5!
+    // B = 1/2! - θ²/4! + θ⁴/6!
+    // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+    // sources:
+    // A:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+    // B:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    // C:
+    // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+    C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
   } else {
-    return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>(end);
+    // A = std::sin(θ)/θ
+    // B = (1 - std::cos(θ)) / θ²
+    // C = (1 - A/(2*B)) / θ²
+    double A = gcem::sin(theta) / theta;
+    double B = (1 - gcem::cos(theta)) / thetaSq;
+    C = (1 - A / (2 * B)) / thetaSq;
   }
+
+  Eigen::Matrix3d V_inv =
+      Eigen::Matrix3d::Identity() - 0.5 * omega + C * omegaSq;
+
+  Eigen::Vector3d translation_component = V_inv * u;
+
+  return Twist3d{units::meter_t{translation_component(0)},
+                 units::meter_t{translation_component(1)},
+                 units::meter_t{translation_component(2)},
+                 units::radian_t{rvec(0)},
+                 units::radian_t{rvec(1)},
+                 units::radian_t{rvec(2)}};
 }
 
 }  // namespace frc

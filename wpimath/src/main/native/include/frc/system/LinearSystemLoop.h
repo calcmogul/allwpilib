@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <functional>
+#include <utility>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/function.h>
 
 #include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
@@ -55,16 +56,17 @@ class LinearSystemLoop {
    * @param maxVoltage The maximum voltage that can be applied. Commonly 12.
    * @param dt         The nominal timestep.
    */
-  LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
-                   LinearQuadraticRegulator<States, Inputs>& controller,
-                   KalmanFilter<States, Inputs, Outputs>& observer,
-                   units::volt_t maxVoltage, units::second_t dt)
-      : LinearSystemLoop(
-            plant, controller, observer,
-            [=](const InputVector& u) {
-              return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
-            },
-            dt) {}
+  constexpr LinearSystemLoop(
+      LinearSystem<States, Inputs, Outputs>& plant,
+      LinearQuadraticRegulator<States, Inputs>& controller,
+      KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage,
+      units::second_t dt)
+      : LinearSystemLoop{plant, controller, observer,
+                         [=](const InputVector& u) {
+                           return frc::DesaturateInputVector<Inputs>(
+                               u, maxVoltage.value());
+                         },
+                         dt} {}
 
   /**
    * Constructs a state-space loop with the given plant, controller, and
@@ -78,15 +80,17 @@ class LinearSystemLoop {
    * @param clampFunction The function used to clamp the input vector.
    * @param dt         The nominal timestep.
    */
-  LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
-                   LinearQuadraticRegulator<States, Inputs>& controller,
-                   KalmanFilter<States, Inputs, Outputs>& observer,
-                   std::function<InputVector(const InputVector&)> clampFunction,
-                   units::second_t dt)
-      : LinearSystemLoop(
+  constexpr LinearSystemLoop(
+      LinearSystem<States, Inputs, Outputs>& plant,
+      LinearQuadraticRegulator<States, Inputs>& controller,
+      KalmanFilter<States, Inputs, Outputs>& observer,
+      wpi::copyable_function<InputVector(const InputVector&) const>
+          clampFunction,
+      units::second_t dt)
+      : LinearSystemLoop{
             controller,
             LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
-            observer, clampFunction) {}
+            observer, std::move(clampFunction)} {}
 
   /**
    * Constructs a state-space loop with the given controller, feedforward and
@@ -99,14 +103,14 @@ class LinearSystemLoop {
    * @param maxVoltage  The maximum voltage that can be applied. Assumes
    * that the inputs are voltages.
    */
-  LinearSystemLoop(
+  constexpr LinearSystemLoop(
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
       KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage)
-      : LinearSystemLoop(
+      : LinearSystemLoop{
             controller, feedforward, observer, [=](const InputVector& u) {
               return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
-            }) {}
+            }} {}
 
   /**
    * Constructs a state-space loop with the given controller, feedforward,
@@ -118,50 +122,51 @@ class LinearSystemLoop {
    * @param observer      State-space observer.
    * @param clampFunction The function used to clamp the input vector.
    */
-  LinearSystemLoop(
+  constexpr LinearSystemLoop(
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
       KalmanFilter<States, Inputs, Outputs>& observer,
-      std::function<InputVector(const InputVector&)> clampFunction)
-      : m_controller(&controller),
-        m_feedforward(feedforward),
-        m_observer(&observer),
-        m_clampFunc(clampFunction) {
+      wpi::copyable_function<InputVector(const InputVector&) const>
+          clampFunction)
+      : m_controller{&controller},
+        m_feedforward{feedforward},
+        m_observer{&observer},
+        m_clampFunc{std::move(clampFunction)} {
     m_nextR.setZero();
     Reset(m_nextR);
   }
 
-  LinearSystemLoop(LinearSystemLoop&&) = default;
-  LinearSystemLoop& operator=(LinearSystemLoop&&) = default;
+  constexpr LinearSystemLoop(LinearSystemLoop&&) = default;
+  constexpr LinearSystemLoop& operator=(LinearSystemLoop&&) = default;
 
   /**
    * Returns the observer's state estimate x-hat.
    */
-  const StateVector& Xhat() const { return m_observer->Xhat(); }
+  constexpr const StateVector& Xhat() const { return m_observer->Xhat(); }
 
   /**
    * Returns an element of the observer's state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_observer->Xhat(i); }
+  constexpr double Xhat(int i) const { return m_observer->Xhat(i); }
 
   /**
    * Returns the controller's next reference r.
    */
-  const StateVector& NextR() const { return m_nextR; }
+  constexpr const StateVector& NextR() const { return m_nextR; }
 
   /**
    * Returns an element of the controller's next reference r.
    *
    * @param i Row of r.
    */
-  double NextR(int i) const { return NextR()(i); }
+  constexpr double NextR(int i) const { return NextR()(i); }
 
   /**
    * Returns the controller's calculated control input u.
    */
-  InputVector U() const {
+  constexpr InputVector U() const {
     return ClampInput(m_controller->U() + m_feedforward.Uff());
   }
 
@@ -170,14 +175,14 @@ class LinearSystemLoop {
    *
    * @param i Row of u.
    */
-  double U(int i) const { return U()(i); }
+  constexpr double U(int i) const { return U()(i); }
 
   /**
    * Set the initial state estimate x-hat.
    *
    * @param xHat The initial state estimate x-hat.
    */
-  void SetXhat(const StateVector& xHat) { m_observer->SetXhat(xHat); }
+  constexpr void SetXhat(const StateVector& xHat) { m_observer->SetXhat(xHat); }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -185,19 +190,19 @@ class LinearSystemLoop {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_observer->SetXhat(i, value); }
+  constexpr void SetXhat(int i, double value) { m_observer->SetXhat(i, value); }
 
   /**
    * Set the next reference r.
    *
    * @param nextR Next reference.
    */
-  void SetNextR(const StateVector& nextR) { m_nextR = nextR; }
+  constexpr void SetNextR(const StateVector& nextR) { m_nextR = nextR; }
 
   /**
    * Return the controller used internally.
    */
-  const LinearQuadraticRegulator<States, Inputs>& Controller() const {
+  constexpr const LinearQuadraticRegulator<States, Inputs>& Controller() const {
     return *m_controller;
   }
 
@@ -206,14 +211,15 @@ class LinearSystemLoop {
    *
    * @return the feedforward used internally.
    */
-  const LinearPlantInversionFeedforward<States, Inputs> Feedforward() const {
+  constexpr const LinearPlantInversionFeedforward<States, Inputs> Feedforward()
+      const {
     return m_feedforward;
   }
 
   /**
    * Return the observer used internally.
    */
-  const KalmanFilter<States, Inputs, Outputs>& Observer() const {
+  constexpr const KalmanFilter<States, Inputs, Outputs>& Observer() const {
     return *m_observer;
   }
 
@@ -224,7 +230,7 @@ class LinearSystemLoop {
    *
    * @param initialState The initial state.
    */
-  void Reset(const StateVector& initialState) {
+  constexpr void Reset(const StateVector& initialState) {
     m_nextR.setZero();
     m_controller->Reset();
     m_feedforward.Reset(initialState);
@@ -234,14 +240,16 @@ class LinearSystemLoop {
   /**
    * Returns difference between reference r and current state x-hat.
    */
-  StateVector Error() const { return m_controller->R() - m_observer->Xhat(); }
+  constexpr StateVector Error() const {
+    return m_controller->R() - m_observer->Xhat();
+  }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
    * @param y Measurement vector.
    */
-  void Correct(const OutputVector& y) { m_observer->Correct(U(), y); }
+  constexpr void Correct(const OutputVector& y) { m_observer->Correct(U(), y); }
 
   /**
    * Sets new controller output, projects model forward, and runs observer
@@ -252,7 +260,7 @@ class LinearSystemLoop {
    *
    * @param dt Timestep for model update.
    */
-  void Predict(units::second_t dt) {
+  constexpr void Predict(units::second_t dt) {
     InputVector u =
         ClampInput(m_controller->Calculate(m_observer->Xhat(), m_nextR) +
                    m_feedforward.Calculate(m_nextR));
@@ -265,7 +273,9 @@ class LinearSystemLoop {
    * @param u Input vector to clamp.
    * @return Clamped input vector.
    */
-  InputVector ClampInput(const InputVector& u) const { return m_clampFunc(u); }
+  constexpr InputVector ClampInput(const InputVector& u) const {
+    return m_clampFunc(u);
+  }
 
  protected:
   LinearQuadraticRegulator<States, Inputs>* m_controller;
@@ -275,7 +285,7 @@ class LinearSystemLoop {
   /**
    * Clamping function.
    */
-  std::function<InputVector(const InputVector&)> m_clampFunc;
+  wpi::copyable_function<InputVector(const InputVector&) const> m_clampFunc;
 
   // Reference to go to in the next cycle (used by feedforward controller).
   StateVector m_nextR;

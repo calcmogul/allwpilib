@@ -84,7 +84,7 @@ class LTVDifferentialDriveControllerTest {
     waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
     var config = new TrajectoryConfig(8.8, 0.1);
-    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
+    final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config).get();
 
     var x =
         MatBuilder.fill(

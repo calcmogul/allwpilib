@@ -10,11 +10,8 @@
 #include <wpi/array.h>
 
 #include "frc/estimator/PoseEstimator3d.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveOdometry3d.h"
-#include "units/time.h"
 
 namespace frc {
 
@@ -55,7 +52,7 @@ class SwerveDrivePoseEstimator3d
    *     the swerve modules.
    * @param initialPose The starting pose estimate.
    */
-  SwerveDrivePoseEstimator3d(
+  constexpr SwerveDrivePoseEstimator3d(
       SwerveDriveKinematics<NumModules>& kinematics,
       const Rotation3d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,
@@ -82,7 +79,7 @@ class SwerveDrivePoseEstimator3d
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  SwerveDrivePoseEstimator3d(
+  constexpr SwerveDrivePoseEstimator3d(
       SwerveDriveKinematics<NumModules>& kinematics,
       const Rotation3d& gyroAngle,
       const wpi::array<SwerveModulePosition, NumModules>& modulePositions,

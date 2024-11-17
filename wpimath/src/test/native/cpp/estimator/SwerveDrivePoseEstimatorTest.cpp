@@ -155,12 +155,14 @@ TEST(SwerveDrivePoseEstimatorTest, AccuracyFacingTrajectory) {
       kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.45, 0.45, 0.45}};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2_mps, 2.0_mps_sq));
+  frc::Trajectory trajectory =
+      frc::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{
+              frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 135_deg}, frc::Pose2d{-3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 45_deg}},
+          frc::TrajectoryConfig(2_mps, 2.0_mps_sq))
+          .value();
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
@@ -187,12 +189,14 @@ TEST(SwerveDrivePoseEstimatorTest, BadInitialPose) {
       kinematics,    frc::Rotation2d{}, {fl, fr, bl, br},
       frc::Pose2d{}, {0.1, 0.1, 0.1},   {0.9, 0.9, 0.9}};
 
-  frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2_mps, 2.0_mps_sq));
+  frc::Trajectory trajectory =
+      frc::TrajectoryGenerator::GenerateTrajectory(
+          std::vector{
+              frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 135_deg}, frc::Pose2d{-3_m, 0_m, -90_deg},
+              frc::Pose2d{0_m, 0_m, 45_deg}},
+          frc::TrajectoryConfig(2_mps, 2.0_mps_sq))
+          .value();
 
   for (units::degree_t offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {

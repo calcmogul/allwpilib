@@ -106,14 +106,15 @@ class MecanumDriveOdometryTest {
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                Pose2d.kZero,
-                new Pose2d(20, 20, Rotation2d.kZero),
-                new Pose2d(10, 10, Rotation2d.kPi),
-                new Pose2d(30, 30, Rotation2d.kZero),
-                new Pose2d(20, 20, Rotation2d.kPi),
-                new Pose2d(10, 10, Rotation2d.kZero)),
-            new TrajectoryConfig(0.5, 2));
+                List.of(
+                    Pose2d.kZero,
+                    new Pose2d(20, 20, Rotation2d.kZero),
+                    new Pose2d(10, 10, Rotation2d.kPi),
+                    new Pose2d(30, 30, Rotation2d.kZero),
+                    new Pose2d(20, 20, Rotation2d.kPi),
+                    new Pose2d(10, 10, Rotation2d.kZero)),
+                new TrajectoryConfig(0.5, 2))
+            .get();
 
     var rand = new Random(5190);
 
@@ -195,14 +196,15 @@ class MecanumDriveOdometryTest {
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                Pose2d.kZero,
-                new Pose2d(20, 20, Rotation2d.kZero),
-                new Pose2d(10, 10, Rotation2d.kPi),
-                new Pose2d(30, 30, Rotation2d.kZero),
-                new Pose2d(20, 20, Rotation2d.kPi),
-                new Pose2d(10, 10, Rotation2d.kZero)),
-            new TrajectoryConfig(0.5, 2));
+                List.of(
+                    Pose2d.kZero,
+                    new Pose2d(20, 20, Rotation2d.kZero),
+                    new Pose2d(10, 10, Rotation2d.kPi),
+                    new Pose2d(30, 30, Rotation2d.kZero),
+                    new Pose2d(20, 20, Rotation2d.kPi),
+                    new Pose2d(10, 10, Rotation2d.kZero)),
+                new TrajectoryConfig(0.5, 2))
+            .get();
 
     var rand = new Random(5190);
 

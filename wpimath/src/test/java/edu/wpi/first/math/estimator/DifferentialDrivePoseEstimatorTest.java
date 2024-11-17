@@ -43,13 +43,14 @@ class DifferentialDrivePoseEstimatorTest {
             VecBuilder.fill(0.1, 0.1, 0.1));
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+                List.of(
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                    new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                    new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+                new TrajectoryConfig(2, 2))
+            .get();
 
     testFollowTrajectory(
         kinematics,
@@ -85,13 +86,14 @@ class DifferentialDrivePoseEstimatorTest {
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
-            List.of(
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
-                new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+                List.of(
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                    new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                    new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
+                new TrajectoryConfig(2, 2))
+            .get();
 
     for (int offset_direction_degs = 0; offset_direction_degs < 360; offset_direction_degs += 45) {
       for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs += 45) {

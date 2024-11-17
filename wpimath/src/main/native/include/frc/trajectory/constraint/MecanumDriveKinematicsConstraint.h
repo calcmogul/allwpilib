@@ -23,11 +23,12 @@ namespace frc {
 class WPILIB_DLLEXPORT MecanumDriveKinematicsConstraint
     : public TrajectoryConstraint {
  public:
-  MecanumDriveKinematicsConstraint(const MecanumDriveKinematics& kinematics,
-                                   units::meters_per_second_t maxSpeed)
+  constexpr MecanumDriveKinematicsConstraint(
+      const MecanumDriveKinematics& kinematics,
+      units::meters_per_second_t maxSpeed)
       : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
-  units::meters_per_second_t MaxVelocity(
+  constexpr units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t velocity) const override {
     auto xVelocity = velocity * pose.Rotation().Cos();
@@ -41,8 +42,9 @@ class WPILIB_DLLEXPORT MecanumDriveKinematicsConstraint
     return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
+  constexpr MinMax MinMaxAcceleration(
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t speed) const override {
     return {};
   }
 

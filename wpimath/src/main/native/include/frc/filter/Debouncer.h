@@ -8,6 +8,7 @@
 #include <wpi/timestamp.h>
 
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**
@@ -38,7 +39,19 @@ class WPILIB_DLLEXPORT Debouncer {
    *                     performed on.
    */
   explicit Debouncer(units::second_t debounceTime,
-                     DebounceType type = DebounceType::kRising);
+                     DebounceType type = DebounceType::kRising)
+      : m_debounceTime(debounceTime), m_debounceType(type) {
+    switch (type) {
+      case DebounceType::kBoth:  // fall-through
+      case DebounceType::kRising:
+        m_baseline = false;
+        break;
+      case DebounceType::kFalling:
+        m_baseline = true;
+        break;
+    }
+    ResetTimer();
+  }
 
   /**
    * Applies the debouncer to the input stream.
@@ -46,7 +59,21 @@ class WPILIB_DLLEXPORT Debouncer {
    * @param input The current value of the input stream.
    * @return The debounced value of the input stream.
    */
-  bool Calculate(bool input);
+  bool Calculate(bool input) {
+    if (input == m_baseline) {
+      ResetTimer();
+    }
+
+    if (HasElapsed()) {
+      if (m_debounceType == DebounceType::kBoth) {
+        m_baseline = input;
+        ResetTimer();
+      }
+      return input;
+    } else {
+      return m_baseline;
+    }
+  }
 
  private:
   units::second_t m_debounceTime;
@@ -55,8 +82,12 @@ class WPILIB_DLLEXPORT Debouncer {
 
   units::second_t m_prevTime;
 
-  void ResetTimer();
+  void ResetTimer() { m_prevTime = wpi::math::MathSharedStore::GetTimestamp(); }
 
-  bool HasElapsed() const;
+  bool HasElapsed() const {
+    return wpi::math::MathSharedStore::GetTimestamp() - m_prevTime >=
+           m_debounceTime;
+  }
 };
+
 }  // namespace frc

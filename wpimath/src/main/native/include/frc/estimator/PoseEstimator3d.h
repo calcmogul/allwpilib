@@ -65,10 +65,11 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * in meters, and angle in radians). Increase these numbers to trust the
    * vision pose measurement less.
    */
-  PoseEstimator3d(Kinematics<WheelSpeeds, WheelPositions>& kinematics,
-                  Odometry3d<WheelSpeeds, WheelPositions>& odometry,
-                  const wpi::array<double, 4>& stateStdDevs,
-                  const wpi::array<double, 4>& visionMeasurementStdDevs)
+  constexpr PoseEstimator3d(
+      Kinematics<WheelSpeeds, WheelPositions>& kinematics,
+      Odometry3d<WheelSpeeds, WheelPositions>& odometry,
+      const wpi::array<double, 4>& stateStdDevs,
+      const wpi::array<double, 4>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
     for (size_t i = 0; i < 4; ++i) {
       m_q[i] = stateStdDevs[i] * stateStdDevs[i];
@@ -87,7 +88,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  void SetVisionMeasurementStdDevs(
+  constexpr void SetVisionMeasurementStdDevs(
       const wpi::array<double, 4>& visionMeasurementStdDevs) {
     wpi::array<double, 4> r{wpi::empty_array};
     for (size_t i = 0; i < 4; ++i) {
@@ -119,8 +120,9 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * @param wheelPositions The distances traveled by the encoders.
    * @param pose The estimated pose of the robot on the field.
    */
-  void ResetPosition(const Rotation3d& gyroAngle,
-                     const WheelPositions& wheelPositions, const Pose3d& pose) {
+  constexpr void ResetPosition(const Rotation3d& gyroAngle,
+                               const WheelPositions& wheelPositions,
+                               const Pose3d& pose) {
     // Reset state estimate and error covariance
     m_odometry.ResetPosition(gyroAngle, wheelPositions, pose);
     m_odometryPoseBuffer.Clear();
@@ -133,7 +135,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *
    * @param pose The pose to reset to.
    */
-  void ResetPose(const Pose3d& pose) {
+  constexpr void ResetPose(const Pose3d& pose) {
     m_odometry.ResetPose(pose);
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
@@ -145,7 +147,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *
    * @param translation The pose to translation to.
    */
-  void ResetTranslation(const Translation3d& translation) {
+  constexpr void ResetTranslation(const Translation3d& translation) {
     m_odometry.ResetTranslation(translation);
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
@@ -157,7 +159,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *
    * @param rotation The rotation to reset to.
    */
-  void ResetRotation(const Rotation3d& rotation) {
+  constexpr void ResetRotation(const Rotation3d& rotation) {
     m_odometry.ResetRotation(rotation);
     m_odometryPoseBuffer.Clear();
     m_visionUpdates.clear();
@@ -169,7 +171,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *
    * @return The estimated robot pose in meters.
    */
-  Pose3d GetEstimatedPosition() const { return m_poseEstimate; }
+  constexpr Pose3d GetEstimatedPosition() const { return m_poseEstimate; }
 
   /**
    * Return the pose at a given timestamp, if the buffer is not empty.
@@ -178,7 +180,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * @return The pose at the given timestamp (or std::nullopt if the buffer is
    * empty).
    */
-  std::optional<Pose3d> SampleAt(units::second_t timestamp) const {
+  constexpr std::optional<Pose3d> SampleAt(units::second_t timestamp) const {
     // Step 0: If there are no odometry updates to sample, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty()) {
       return std::nullopt;
@@ -240,8 +242,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *     frc::Timer::GetFPGATimestamp(). This means that you should use
    *     frc::Timer::GetFPGATimestamp() as your time source in this case.
    */
-  void AddVisionMeasurement(const Pose3d& visionRobotPose,
-                            units::second_t timestamp) {
+  constexpr void AddVisionMeasurement(const Pose3d& visionRobotPose,
+                                      units::second_t timestamp) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's
     // timespan, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty() ||
@@ -329,7 +331,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  void AddVisionMeasurement(
+  constexpr void AddVisionMeasurement(
       const Pose3d& visionRobotPose, units::second_t timestamp,
       const wpi::array<double, 4>& visionMeasurementStdDevs) {
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -345,8 +347,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *
    * @return The estimated pose of the robot in meters.
    */
-  Pose3d Update(const Rotation3d& gyroAngle,
-                const WheelPositions& wheelPositions) {
+  constexpr Pose3d Update(const Rotation3d& gyroAngle,
+                          const WheelPositions& wheelPositions) {
     return UpdateWithTime(wpi::math::MathSharedStore::GetTimestamp(), gyroAngle,
                           wheelPositions);
   }
@@ -361,9 +363,9 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *
    * @return The estimated pose of the robot in meters.
    */
-  Pose3d UpdateWithTime(units::second_t currentTime,
-                        const Rotation3d& gyroAngle,
-                        const WheelPositions& wheelPositions) {
+  constexpr Pose3d UpdateWithTime(units::second_t currentTime,
+                                  const Rotation3d& gyroAngle,
+                                  const WheelPositions& wheelPositions) {
     auto odometryEstimate = m_odometry.Update(gyroAngle, wheelPositions);
 
     m_odometryPoseBuffer.AddSample(currentTime, odometryEstimate);
@@ -382,7 +384,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
   /**
    * Removes stale vision updates that won't affect sampling.
    */
-  void CleanUpVisionUpdates() {
+  constexpr void CleanUpVisionUpdates() {
     // Step 0: If there are no odometry samples, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty()) {
       return;
@@ -426,7 +428,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
      * @param pose The pose to compensate.
      * @return The compensated pose.
      */
-    Pose3d Compensate(const Pose3d& pose) const {
+    constexpr Pose3d Compensate(const Pose3d& pose) const {
       auto delta = pose - odometryPose;
       return visionPose + delta;
     }

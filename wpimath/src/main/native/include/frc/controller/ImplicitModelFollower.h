@@ -41,8 +41,9 @@ class ImplicitModelFollower {
    * @param plantRef The plant whose dynamics should be followed.
    */
   template <int Outputs>
-  ImplicitModelFollower(const LinearSystem<States, Inputs, Outputs>& plant,
-                        const LinearSystem<States, Inputs, Outputs>& plantRef)
+  constexpr ImplicitModelFollower(
+      const LinearSystem<States, Inputs, Outputs>& plant,
+      const LinearSystem<States, Inputs, Outputs>& plantRef)
       : ImplicitModelFollower<States, Inputs>(plant.A(), plant.B(),
                                               plantRef.A(), plantRef.B()) {}
 
@@ -54,10 +55,10 @@ class ImplicitModelFollower {
    * @param Aref Continuous system matrix whose dynamics should be followed.
    * @param Bref Continuous input matrix whose dynamics should be followed.
    */
-  ImplicitModelFollower(const Matrixd<States, States>& A,
-                        const Matrixd<States, Inputs>& B,
-                        const Matrixd<States, States>& Aref,
-                        const Matrixd<States, Inputs>& Bref) {
+  constexpr ImplicitModelFollower(const Matrixd<States, States>& A,
+                                  const Matrixd<States, Inputs>& B,
+                                  const Matrixd<States, States>& Aref,
+                                  const Matrixd<States, Inputs>& Bref) {
     // Find u_imf that makes real model match reference model.
     //
     // dx/dt = Ax + Bu_imf
@@ -86,7 +87,7 @@ class ImplicitModelFollower {
    *
    * @return The control input.
    */
-  const InputVector& U() const { return m_u; }
+  constexpr const InputVector& U() const { return m_u; }
 
   /**
    * Returns an element of the control input vector u.
@@ -95,12 +96,12 @@ class ImplicitModelFollower {
    *
    * @return The row of the control input vector.
    */
-  double U(int i) const { return m_u(i); }
+  constexpr double U(int i) const { return m_u(i); }
 
   /**
    * Resets the controller.
    */
-  void Reset() { m_u.setZero(); }
+  constexpr void Reset() { m_u.setZero(); }
 
   /**
    * Returns the next output of the controller.
@@ -108,7 +109,7 @@ class ImplicitModelFollower {
    * @param x The current state x.
    * @param u The current input for the original model.
    */
-  InputVector Calculate(const StateVector& x, const InputVector& u) {
+  constexpr InputVector Calculate(const StateVector& x, const InputVector& u) {
     m_u = m_A * x + m_B * u;
     return m_u;
   }

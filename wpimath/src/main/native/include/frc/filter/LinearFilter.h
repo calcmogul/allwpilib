@@ -163,7 +163,7 @@ class LinearFilter {
    *             slower
    * @throws std::runtime_error if number of taps is less than 1.
    */
-  static LinearFilter<T> MovingAverage(int taps) {
+  static constexpr LinearFilter<T> MovingAverage(int taps) {
     if (taps <= 0) {
       throw std::runtime_error("Number of taps must be greater than zero.");
     }
@@ -190,7 +190,7 @@ class LinearFilter {
    * @param period      The period in seconds between samples taken by the user.
    */
   template <int Derivative, int Samples>
-  static LinearFilter<T> FiniteDifference(
+  static constexpr LinearFilter<T> FiniteDifference(
       const wpi::array<int, Samples>& stencil, units::second_t period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
@@ -257,7 +257,8 @@ class LinearFilter {
    * @param period      The period in seconds between samples taken by the user.
    */
   template <int Derivative, int Samples>
-  static LinearFilter<T> BackwardFiniteDifference(units::second_t period) {
+  static constexpr LinearFilter<T> BackwardFiniteDifference(
+      units::second_t period) {
     // Generate stencil points from -(samples - 1) to 0
     wpi::array<int, Samples> stencil{wpi::empty_array};
     for (int i = 0; i < Samples; ++i) {

@@ -29,7 +29,6 @@
 #pragma once
 
 #include <stack>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -69,9 +68,8 @@ class WPILIB_DLLEXPORT SplineParameterizer {
    * the spline.
    */
   template <int Dim>
-  static std::vector<PoseWithCurvature> Parameterize(const Spline<Dim>& spline,
-                                                     double t0 = 0.0,
-                                                     double t1 = 1.0) {
+  static constexpr std::vector<PoseWithCurvature> Parameterize(
+      const Spline<Dim>& spline, double t0 = 0.0, double t1 = 1.0) {
     constexpr const char* kMalformedSplineExceptionMsg =
         "Could not parameterize a malformed spline. This means that you "
         "probably had two or more adjacent waypoints that were very close "

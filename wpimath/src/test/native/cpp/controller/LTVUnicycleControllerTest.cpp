@@ -25,7 +25,8 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
   auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
                                frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+                        waypoints, {8.8_mps, 0.1_mps_sq})
+                        .value();
 
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {

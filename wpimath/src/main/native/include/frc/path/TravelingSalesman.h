@@ -5,12 +5,12 @@
 #pragma once
 
 #include <cmath>
-#include <functional>
 #include <random>
 #include <utility>
 #include <vector>
 
 #include <wpi/array.h>
+#include <wpi/function.h>
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
@@ -40,7 +40,8 @@ class TravelingSalesman {
    * @param cost Function that returns the cost between two poses. The sum of
    *     the costs for every pair of poses is minimized.
    */
-  explicit TravelingSalesman(std::function<double(Pose2d, Pose2d)> cost)
+  constexpr explicit TravelingSalesman(
+      wpi::copyable_function<double(Pose2d, Pose2d)> cost)
       : m_cost{std::move(cost)} {}
 
   /**
@@ -136,7 +137,7 @@ class TravelingSalesman {
 
  private:
   // Default cost is distance between poses
-  std::function<double(const Pose2d&, const Pose2d&)> m_cost =
+  wpi::copyable_function<double(const Pose2d&, const Pose2d&)> m_cost =
       [](const Pose2d& a, const Pose2d& b) -> double {
     return units::math::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
   };
