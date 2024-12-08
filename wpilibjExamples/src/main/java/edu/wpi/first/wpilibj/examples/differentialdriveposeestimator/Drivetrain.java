@@ -139,13 +139,12 @@ public class Drivetrain {
    * @param speeds The desired wheel speeds.
    */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
-    final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
-    final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
+    final double leftFeedforward = m_feedforward.calculate(speeds.left);
+    final double rightFeedforward = m_feedforward.calculate(speeds.right);
 
-    final double leftOutput =
-        m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
+    final double leftOutput = m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.left);
     final double rightOutput =
-        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
+        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.right);
     m_leftLeader.setVoltage(leftOutput + leftFeedforward);
     m_rightLeader.setVoltage(rightOutput + rightFeedforward);
   }
@@ -253,10 +252,10 @@ public class Drivetrain {
         m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 
-    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
-    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
-    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
-    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
+    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPosition());
+    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocity());
+    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPosition());
+    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocity());
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
   }
 

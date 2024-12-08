@@ -21,16 +21,16 @@ public class MecanumDriveWheelPositions
         ProtobufSerializable,
         StructSerializable {
   /** Distance measured by the front left wheel. */
-  public double frontLeftMeters;
+  public double frontLeft;
 
   /** Distance measured by the front right wheel. */
-  public double frontRightMeters;
+  public double frontRight;
 
   /** Distance measured by the rear left wheel. */
-  public double rearLeftMeters;
+  public double rearLeft;
 
   /** Distance measured by the rear right wheel. */
-  public double rearRightMeters;
+  public double rearRight;
 
   /** MecanumDriveWheelPositions protobuf for serialization. */
   public static final MecanumDriveWheelPositionsProto proto = new MecanumDriveWheelPositionsProto();
@@ -45,20 +45,17 @@ public class MecanumDriveWheelPositions
   /**
    * Constructs a MecanumDriveWheelPositions.
    *
-   * @param frontLeftMeters Distance measured by the front left wheel.
-   * @param frontRightMeters Distance measured by the front right wheel.
-   * @param rearLeftMeters Distance measured by the rear left wheel.
-   * @param rearRightMeters Distance measured by the rear right wheel.
+   * @param frontLeft Distance measured by the front left wheel.
+   * @param frontRight Distance measured by the front right wheel.
+   * @param rearLeft Distance measured by the rear left wheel.
+   * @param rearRight Distance measured by the rear right wheel.
    */
   public MecanumDriveWheelPositions(
-      double frontLeftMeters,
-      double frontRightMeters,
-      double rearLeftMeters,
-      double rearRightMeters) {
-    this.frontLeftMeters = frontLeftMeters;
-    this.frontRightMeters = frontRightMeters;
-    this.rearLeftMeters = rearLeftMeters;
-    this.rearRightMeters = rearRightMeters;
+      double frontLeft, double frontRight, double rearLeft, double rearRight) {
+    this.frontLeft = frontLeft;
+    this.frontRight = frontRight;
+    this.rearLeft = rearLeft;
+    this.rearRight = rearRight;
   }
 
   /**
@@ -77,15 +74,15 @@ public class MecanumDriveWheelPositions
   @Override
   public boolean equals(Object obj) {
     return obj instanceof MecanumDriveWheelPositions other
-        && Math.abs(other.frontLeftMeters - frontLeftMeters) < 1E-9
-        && Math.abs(other.frontRightMeters - frontRightMeters) < 1E-9
-        && Math.abs(other.rearLeftMeters - rearLeftMeters) < 1E-9
-        && Math.abs(other.rearRightMeters - rearRightMeters) < 1E-9;
+        && Math.abs(other.frontLeft - frontLeft) < 1E-9
+        && Math.abs(other.frontRight - frontRight) < 1E-9
+        && Math.abs(other.rearLeft - rearLeft) < 1E-9
+        && Math.abs(other.rearRight - rearRight) < 1E-9;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(frontLeftMeters, frontRightMeters, rearLeftMeters, rearRightMeters);
+    return Objects.hash(frontLeft, frontRight, rearLeft, rearRight);
   }
 
   @Override
@@ -93,15 +90,15 @@ public class MecanumDriveWheelPositions
     return String.format(
         "MecanumDriveWheelPositions(Front Left: %.2f m, Front Right: %.2f m, "
             + "Rear Left: %.2f m, Rear Right: %.2f m)",
-        frontLeftMeters, frontRightMeters, rearLeftMeters, rearRightMeters);
+        frontLeft, frontRight, rearLeft, rearRight);
   }
 
   @Override
   public MecanumDriveWheelPositions interpolate(MecanumDriveWheelPositions endValue, double t) {
     return new MecanumDriveWheelPositions(
-        MathUtil.interpolate(this.frontLeftMeters, endValue.frontLeftMeters, t),
-        MathUtil.interpolate(this.frontRightMeters, endValue.frontRightMeters, t),
-        MathUtil.interpolate(this.rearLeftMeters, endValue.rearLeftMeters, t),
-        MathUtil.interpolate(this.rearRightMeters, endValue.rearRightMeters, t));
+        MathUtil.interpolate(this.frontLeft, endValue.frontLeft, t),
+        MathUtil.interpolate(this.frontRight, endValue.frontRight, t),
+        MathUtil.interpolate(this.rearLeft, endValue.rearLeft, t),
+        MathUtil.interpolate(this.rearRight, endValue.rearRight, t));
   }
 }

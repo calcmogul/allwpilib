@@ -4,17 +4,11 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** Represents a simulated flywheel mechanism. */
@@ -26,7 +20,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
   private final double m_gearing;
 
   // The moment of inertia for the flywheel mechanism.
-  private final double m_jKgMetersSquared;
+  private final double m_j;
 
   /**
    * Creates a simulated flywheel mechanism.
@@ -60,17 +54,17 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
     //
     //   B = GKₜ/(RJ)
     //   J = GKₜ/(RB)
-    m_gearing = -gearbox.KvRadPerSecPerVolt * plant.getA(0, 0) / plant.getB(0, 0);
-    m_jKgMetersSquared = m_gearing * gearbox.KtNMPerAmp / (gearbox.rOhms * plant.getB(0, 0));
+    m_gearing = -gearbox.Kv * plant.getA(0, 0) / plant.getB(0, 0);
+    m_j = m_gearing * gearbox.Kt / (gearbox.R * plant.getB(0, 0));
   }
 
   /**
    * Sets the flywheel's angular velocity.
    *
-   * @param velocityRadPerSec The new velocity in radians per second.
+   * @param velocity The new velocity in radians per second.
    */
-  public void setAngularVelocity(double velocityRadPerSec) {
-    setState(VecBuilder.fill(velocityRadPerSec));
+  public void setAngularVelocity(double velocity) {
+    setState(VecBuilder.fill(velocity));
   }
 
   /**
@@ -87,8 +81,8 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's moment of inertia.
    */
-  public double getJKgMetersSquared() {
-    return m_jKgMetersSquared;
+  public double getJ() {
+    return m_j;
   }
 
   /**
@@ -105,26 +99,8 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's velocity in Radians Per Second.
    */
-  public double getAngularVelocityRadPerSec() {
+  public double getAngularVelocity() {
     return getOutput(0);
-  }
-
-  /**
-   * Returns the flywheel's velocity in RPM.
-   *
-   * @return The flywheel's velocity in RPM.
-   */
-  public double getAngularVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(getAngularVelocityRadPerSec());
-  }
-
-  /**
-   * Returns the flywheel's velocity.
-   *
-   * @return The flywheel's velocity
-   */
-  public AngularVelocity getAngularVelocity() {
-    return RadiansPerSecond.of(getAngularVelocityRadPerSec());
   }
 
   /**
@@ -132,27 +108,18 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's acceleration in Radians Per Second Squared.
    */
-  public double getAngularAccelerationRadPerSecSq() {
+  public double getAngularAcceleration() {
     var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
     return acceleration.get(0, 0);
   }
 
   /**
-   * Returns the flywheel's acceleration.
+   * Returns the flywheel's torque in Newton-meters.
    *
-   * @return The flywheel's acceleration.
+   * @return The flywheel's torque in Newton-meters.
    */
-  public AngularAcceleration getAngularAcceleration() {
-    return RadiansPerSecondPerSecond.of(getAngularAccelerationRadPerSecSq());
-  }
-
-  /**
-   * Returns the flywheel's torque in Newton-Meters.
-   *
-   * @return The flywheel's torque in Newton-Meters.
-   */
-  public double getTorqueNewtonMeters() {
-    return getAngularAccelerationRadPerSecSq() * m_jKgMetersSquared;
+  public double getTorque() {
+    return getAngularAcceleration() * m_j;
   }
 
   /**
@@ -160,7 +127,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *
    * @return The flywheel's current draw.
    */
-  public double getCurrentDrawAmps() {
+  public double getCurrentDraw() {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the flywheel

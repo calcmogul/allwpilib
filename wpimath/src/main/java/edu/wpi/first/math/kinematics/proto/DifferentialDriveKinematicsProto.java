@@ -33,6 +33,6 @@ public class DifferentialDriveKinematicsProto
 
   @Override
   public void pack(ProtobufDifferentialDriveKinematics msg, DifferentialDriveKinematics value) {
-    msg.setTrackWidth(value.trackWidthMeters);
+    msg.setTrackWidth(value.trackWidth);
   }
 }

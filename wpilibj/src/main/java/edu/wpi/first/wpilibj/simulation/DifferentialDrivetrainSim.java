@@ -42,7 +42,7 @@ public class DifferentialDrivetrainSim {
   private final double m_originalGearing;
   private final Matrix<N7, N1> m_measurementStdDevs;
   private double m_currentGearing;
-  private final double m_wheelRadiusMeters;
+  private final double m_wheelRadius;
 
   private Matrix<N2, N1> m_u;
   private Matrix<N7, N1> m_x;
@@ -57,10 +57,11 @@ public class DifferentialDrivetrainSim {
    * @param driveMotor A {@link DCMotor} representing the left side of the drivetrain.
    * @param gearing The gearing ratio between motor and wheel, as output over input. This must be
    *     the same ratio as the ratio used to identify or create the drivetrainPlant.
-   * @param jKgMetersSquared The moment of inertia of the drivetrain about its center.
-   * @param massKg The mass of the drivebase.
-   * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
-   * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
+   * @param j The moment of inertia of the drivetrain about its center in kg-m².
+   * @param mass The mass of the drivebase in kg.
+   * @param wheelRadius The radius of the wheels on the drivetrain in meters.
+   * @param trackWidth The robot's track width, or distance between left and right wheels, in
+   *     meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
    *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
@@ -70,23 +71,18 @@ public class DifferentialDrivetrainSim {
   public DifferentialDrivetrainSim(
       DCMotor driveMotor,
       double gearing,
-      double jKgMetersSquared,
-      double massKg,
-      double wheelRadiusMeters,
-      double trackWidthMeters,
+      double j,
+      double mass,
+      double wheelRadius,
+      double trackWidth,
       Matrix<N7, N1> measurementStdDevs) {
     this(
         LinearSystemId.createDrivetrainVelocitySystem(
-            driveMotor,
-            massKg,
-            wheelRadiusMeters,
-            trackWidthMeters / 2.0,
-            jKgMetersSquared,
-            gearing),
+            driveMotor, mass, wheelRadius, trackWidth / 2.0, j, gearing),
         driveMotor,
         gearing,
-        trackWidthMeters,
-        wheelRadiusMeters,
+        trackWidth,
+        wheelRadius,
         measurementStdDevs);
   }
 
@@ -102,9 +98,9 @@ public class DifferentialDrivetrainSim {
    * @param driveMotor A {@link DCMotor} representing the drivetrain.
    * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
    *     ratio as the ratio used to identify or create the drivetrainPlant.
-   * @param trackWidthMeters The distance between the two sides of the drivetrain. Can be found with
+   * @param trackWidth The distance between the two sides of the drivetrain. Can be found with
    *     SysId.
-   * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
+   * @param wheelRadius The radius of the wheels on the drivetrain, in meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
    *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
@@ -115,15 +111,15 @@ public class DifferentialDrivetrainSim {
       LinearSystem<N2, N2, N2> plant,
       DCMotor driveMotor,
       double gearing,
-      double trackWidthMeters,
-      double wheelRadiusMeters,
+      double trackWidth,
+      double wheelRadius,
       Matrix<N7, N1> measurementStdDevs) {
     this.m_plant = plant;
-    this.m_rb = trackWidthMeters / 2.0;
+    this.m_rb = trackWidth / 2.0;
     this.m_motor = driveMotor;
     this.m_originalGearing = gearing;
     this.m_measurementStdDevs = measurementStdDevs;
-    m_wheelRadiusMeters = wheelRadiusMeters;
+    m_wheelRadius = wheelRadius;
     m_currentGearing = m_originalGearing;
 
     m_x = new Matrix<>(Nat.N7(), Nat.N1());
@@ -145,10 +141,10 @@ public class DifferentialDrivetrainSim {
   /**
    * Update the drivetrain states with the current time difference.
    *
-   * @param dtSeconds the time difference
+   * @param dt the time difference
    */
-  public void update(double dtSeconds) {
-    m_x = NumericalIntegration.rkdp(this::getDynamics, m_x, m_u, dtSeconds);
+  public void update(double dt) {
+    m_x = NumericalIntegration.rkdp(this::getDynamics, m_x, m_u, dt);
     m_y = m_x;
     if (m_measurementStdDevs != null) {
       m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));
@@ -199,7 +195,7 @@ public class DifferentialDrivetrainSim {
    *
    * @return The encoder position.
    */
-  public double getRightPositionMeters() {
+  public double getRightPosition() {
     return getOutput(State.kRightPosition);
   }
 
@@ -208,7 +204,7 @@ public class DifferentialDrivetrainSim {
    *
    * @return The encoder velocity.
    */
-  public double getRightVelocityMetersPerSecond() {
+  public double getRightVelocity() {
     return getOutput(State.kRightVelocity);
   }
 
@@ -217,7 +213,7 @@ public class DifferentialDrivetrainSim {
    *
    * @return The encoder position.
    */
-  public double getLeftPositionMeters() {
+  public double getLeftPosition() {
     return getOutput(State.kLeftPosition);
   }
 
@@ -226,7 +222,7 @@ public class DifferentialDrivetrainSim {
    *
    * @return The encoder velocity.
    */
-  public double getLeftVelocityMetersPerSecond() {
+  public double getLeftVelocity() {
     return getOutput(State.kLeftVelocity);
   }
 
@@ -235,9 +231,9 @@ public class DifferentialDrivetrainSim {
    *
    * @return the drivetrain's left side current draw, in amps
    */
-  public double getLeftCurrentDrawAmps() {
+  public double getLeftCurrentDraw() {
     return m_motor.getCurrent(
-            getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(0, 0))
+            getState(State.kLeftVelocity) * m_currentGearing / m_wheelRadius, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
   }
 
@@ -246,9 +242,9 @@ public class DifferentialDrivetrainSim {
    *
    * @return the drivetrain's right side current draw, in amps
    */
-  public double getRightCurrentDrawAmps() {
+  public double getRightCurrentDraw() {
     return m_motor.getCurrent(
-            getState(State.kRightVelocity) * m_currentGearing / m_wheelRadiusMeters, m_u.get(1, 0))
+            getState(State.kRightVelocity) * m_currentGearing / m_wheelRadius, m_u.get(1, 0))
         * Math.signum(m_u.get(1, 0));
   }
 
@@ -257,8 +253,8 @@ public class DifferentialDrivetrainSim {
    *
    * @return the current draw, in amps
    */
-  public double getCurrentDrawAmps() {
-    return getLeftCurrentDrawAmps() + getRightCurrentDrawAmps();
+  public double getCurrentDraw() {
+    return getLeftCurrentDraw() + getRightCurrentDraw();
   }
 
   /**
@@ -472,8 +468,7 @@ public class DifferentialDrivetrainSim {
    * @param motor The motors installed in the bot.
    * @param gearing The gearing reduction used.
    * @param wheelSize The wheel size.
-   * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
-   *     SysId.
+   * @param j The moment of inertia of the drivebase in kg-m². This can be calculated using SysId.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
    *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
@@ -485,12 +480,12 @@ public class DifferentialDrivetrainSim {
       KitbotMotor motor,
       KitbotGearing gearing,
       KitbotWheelSize wheelSize,
-      double jKgMetersSquared,
+      double j,
       Matrix<N7, N1> measurementStdDevs) {
     return new DifferentialDrivetrainSim(
         motor.value,
         gearing.value,
-        jKgMetersSquared,
+        j,
         Units.lbsToKilograms(60),
         wheelSize.value / 2.0,
         Units.inchesToMeters(26),

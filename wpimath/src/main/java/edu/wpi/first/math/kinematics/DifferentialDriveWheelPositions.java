@@ -17,10 +17,10 @@ import java.util.Objects;
 public class DifferentialDriveWheelPositions
     implements Interpolatable<DifferentialDriveWheelPositions> {
   /** Distance measured by the left side. */
-  public double leftMeters;
+  public double left;
 
   /** Distance measured by the right side. */
-  public double rightMeters;
+  public double right;
 
   /** DifferentialDriveWheelPositions struct for serialization. */
   public static final DifferentialDriveWheelPositionsStruct struct =
@@ -33,12 +33,12 @@ public class DifferentialDriveWheelPositions
   /**
    * Constructs a DifferentialDriveWheelPositions.
    *
-   * @param leftMeters Distance measured by the left side.
-   * @param rightMeters Distance measured by the right side.
+   * @param left Distance measured by the left side.
+   * @param right Distance measured by the right side.
    */
-  public DifferentialDriveWheelPositions(double leftMeters, double rightMeters) {
-    this.leftMeters = leftMeters;
-    this.rightMeters = rightMeters;
+  public DifferentialDriveWheelPositions(double left, double right) {
+    this.left = left;
+    this.right = right;
   }
 
   /**
@@ -54,26 +54,26 @@ public class DifferentialDriveWheelPositions
   @Override
   public boolean equals(Object obj) {
     return obj instanceof DifferentialDriveWheelPositions other
-        && Math.abs(other.leftMeters - leftMeters) < 1E-9
-        && Math.abs(other.rightMeters - rightMeters) < 1E-9;
+        && Math.abs(other.left - left) < 1E-9
+        && Math.abs(other.right - right) < 1E-9;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(leftMeters, rightMeters);
+    return Objects.hash(left, right);
   }
 
   @Override
   public String toString() {
     return String.format(
-        "DifferentialDriveWheelPositions(Left: %.2f m, Right: %.2f m", leftMeters, rightMeters);
+        "DifferentialDriveWheelPositions(Left: %.2f m, Right: %.2f m", left, right);
   }
 
   @Override
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions endValue, double t) {
     return new DifferentialDriveWheelPositions(
-        MathUtil.interpolate(this.leftMeters, endValue.leftMeters, t),
-        MathUtil.interpolate(this.rightMeters, endValue.rightMeters, t));
+        MathUtil.interpolate(this.left, endValue.left, t),
+        MathUtil.interpolate(this.right, endValue.right, t));
   }
 }

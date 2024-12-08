@@ -38,13 +38,12 @@ public class TrajectoryConfig {
   /**
    * Constructs the trajectory configuration class.
    *
-   * @param maxVelocityMetersPerSecond The max velocity for the trajectory.
-   * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
+   * @param maxVelocity The max velocity for the trajectory.
+   * @param maxAcceleration The max acceleration for the trajectory.
    */
-  public TrajectoryConfig(
-      double maxVelocityMetersPerSecond, double maxAccelerationMetersPerSecondSq) {
-    m_maxVelocity = maxVelocityMetersPerSecond;
-    m_maxAcceleration = maxAccelerationMetersPerSecondSq;
+  public TrajectoryConfig(double maxVelocity, double maxAcceleration) {
+    m_maxVelocity = maxVelocity;
+    m_maxAcceleration = maxAcceleration;
     m_constraints = new ArrayList<>();
   }
 
@@ -128,11 +127,11 @@ public class TrajectoryConfig {
   /**
    * Sets the start velocity of the trajectory.
    *
-   * @param startVelocityMetersPerSecond The start velocity of the trajectory.
+   * @param startVelocity The start velocity of the trajectory.
    * @return Instance of the current config object.
    */
-  public TrajectoryConfig setStartVelocity(double startVelocityMetersPerSecond) {
-    m_startVelocity = startVelocityMetersPerSecond;
+  public TrajectoryConfig setStartVelocity(double startVelocity) {
+    m_startVelocity = startVelocity;
     return this;
   }
 
@@ -158,11 +157,11 @@ public class TrajectoryConfig {
   /**
    * Sets the end velocity of the trajectory.
    *
-   * @param endVelocityMetersPerSecond The end velocity of the trajectory.
+   * @param endVelocity The end velocity of the trajectory.
    * @return Instance of the current config object.
    */
-  public TrajectoryConfig setEndVelocity(double endVelocityMetersPerSecond) {
-    m_endVelocity = endVelocityMetersPerSecond;
+  public TrajectoryConfig setEndVelocity(double endVelocity) {
+    m_endVelocity = endVelocity;
     return this;
   }
 

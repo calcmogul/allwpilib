@@ -50,10 +50,10 @@ inline constexpr auto kWheelBase =
 extern const frc::MecanumDriveKinematics kDriveKinematics;
 
 inline constexpr int kEncoderCPR = 1024;
-inline constexpr double kWheelDiameterMeters = 0.15;
+inline constexpr auto kWheelDiameter = 0.15_m;
 inline constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * std::numbers::pi) /
+    (kWheelDiameter.value() * std::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

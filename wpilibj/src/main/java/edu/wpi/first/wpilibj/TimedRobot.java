@@ -32,9 +32,8 @@ public class TimedRobot extends IterativeRobotBase {
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTimeSeconds The common starting point for all callback scheduling in
-     *     microseconds.
-     * @param periodSeconds The period at which to run the callback in microseconds.
+     * @param startTime The common starting point for all callback scheduling in microseconds.
+     * @param period The period at which to run the callback in microseconds.
      * @param offsetSeconds The offset from the common starting time in microseconds.
      */
     Callback(Runnable func, long startTimeUs, long periodUs, long offsetUs) {
@@ -180,10 +179,10 @@ public class TimedRobot extends IterativeRobotBase {
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
-   * @param periodSeconds The period at which to run the callback in seconds.
+   * @param period The period at which to run the callback in seconds.
    */
-  public final void addPeriodic(Runnable callback, double periodSeconds) {
-    m_callbacks.add(new Callback(callback, m_startTimeUs, (long) (periodSeconds * 1e6), 0));
+  public final void addPeriodic(Runnable callback, double period) {
+    m_callbacks.add(new Callback(callback, m_startTimeUs, (long) (period * 1e6), 0));
   }
 
   /**
@@ -193,14 +192,13 @@ public class TimedRobot extends IterativeRobotBase {
    * synchronously. Interactions between them are thread-safe.
    *
    * @param callback The callback to run.
-   * @param periodSeconds The period at which to run the callback in seconds.
+   * @param period The period at which to run the callback in seconds.
    * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
-  public final void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
+  public final void addPeriodic(Runnable callback, double period, double offsetSeconds) {
     m_callbacks.add(
-        new Callback(
-            callback, m_startTimeUs, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6)));
+        new Callback(callback, m_startTimeUs, (long) (period * 1e6), (long) (offsetSeconds * 1e6)));
   }
 
   /**
