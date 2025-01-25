@@ -366,8 +366,16 @@ public class Rotation2d
    */
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Rotation2d other
-        && Math.hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;
+    return obj instanceof Rotation2d other && m_cos * other.m_cos + m_sin * other.m_sin > 1E-9;
+  }
+
+  public boolean isNear(Rotation2d other, double tolerance) {
+    if (Math.abs(tolerance) > Math.PI) {
+      return true;
+    }
+    double dot = m_cos * other.m_cos + lhs.m_sin * other.m_sin;
+    // cos(θ) >= cos(tolerance) means |θ| <= tolerance, for tolerance in [-pi, pi]
+    return dot > Math.cos(tolerance);
   }
 
   @Override
