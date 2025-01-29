@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sat, 8 Feb 2025 13:42:36 -0800
+Subject: [PATCH 5/6] Replace std::views::zip()
+
+---
+ include/sleipnir/autodiff/adjoint_expression_graph.hpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/sleipnir/autodiff/adjoint_expression_graph.hpp b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
+index 7fa5112f44321209f16766469857db7ac053fd6f..daf75f9ac0e6bcfe8bae7f64029627d318908fcd 100644
+--- a/include/sleipnir/autodiff/adjoint_expression_graph.hpp
++++ b/include/sleipnir/autodiff/adjoint_expression_graph.hpp
+@@ -155,7 +155,10 @@ class AdjointExpressionGraph {
+         }
+       }
+     } else {
+-      for (const auto& [col, node] : std::views::zip(m_col_list, m_top_list)) {
++      for (size_t i = 0; i < m_top_list.size(); ++i) {
++        const auto& col = m_col_list[i];
++        const auto& node = m_top_list[i];
++
+         // Append adjoints of wrt to sparse matrix triplets
+         if (col != -1 && node->adjoint != 0.0) {
+           triplets.emplace_back(row, col, node->adjoint);

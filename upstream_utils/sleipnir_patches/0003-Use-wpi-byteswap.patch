@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 28 Jan 2025 22:19:14 -0800
+Subject: [PATCH 3/6] Use wpi::byteswap()
+
+---
+ include/sleipnir/util/spy.hpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/sleipnir/util/spy.hpp b/include/sleipnir/util/spy.hpp
+index 6269c8d3d76aaba3eb91c8941e7a397e975a8671..f3f16e872e2e1399766bb5b46f7f899ffd5188ee 100644
+--- a/include/sleipnir/util/spy.hpp
++++ b/include/sleipnir/util/spy.hpp
+@@ -11,6 +11,7 @@
+ 
+ #include <Eigen/SparseCore>
+ #include <wpi/SmallVector.h>
++#include <wpi/bit.h>
+ 
+ #include "sleipnir/util/symbol_exports.hpp"
+ 
+@@ -114,7 +115,7 @@ class SLEIPNIR_DLLEXPORT Spy {
+    */
+   void write32le(int32_t num) {
+     if constexpr (std::endian::native != std::endian::little) {
+-      num = std::byteswap(num);
++      num = wpi::byteswap(num);
+     }
+     m_file.write(reinterpret_cast<char*>(&num), sizeof(num));
+   }

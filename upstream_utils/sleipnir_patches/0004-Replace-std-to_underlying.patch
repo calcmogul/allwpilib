@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 28 Jan 2025 22:19:31 -0800
+Subject: [PATCH 4/6] Replace std::to_underlying()
+
+---
+ include/sleipnir/optimization/optimization_problem.hpp | 6 +++---
+ src/util/print_diagnostics.hpp                         | 7 +++----
+ 2 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/include/sleipnir/optimization/optimization_problem.hpp b/include/sleipnir/optimization/optimization_problem.hpp
+index 7b6193a6e35ff3734c880a23f56438a2540ee2f7..8d939555283c85636403658e278e801551281288 100644
+--- a/include/sleipnir/optimization/optimization_problem.hpp
++++ b/include/sleipnir/optimization/optimization_problem.hpp
+@@ -291,12 +291,12 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
+       // Print cost function and constraint expression types
+       sleipnir::println(
+           "The cost function is {}.",
+-          EXPR_TYPE_TO_NAME[std::to_underlying(status.cost_function_type)]);
++          EXPR_TYPE_TO_NAME[static_cast<uint8_t>(status.cost_function_type)]);
+       sleipnir::println("The equality constraints are {}.",
+-                        EXPR_TYPE_TO_NAME[std::to_underlying(
++                        EXPR_TYPE_TO_NAME[static_cast<uint8_t>(
+                             status.equality_constraint_type)]);
+       sleipnir::println("The inequality constraints are {}.",
+-                        EXPR_TYPE_TO_NAME[std::to_underlying(
++                        EXPR_TYPE_TO_NAME[static_cast<uint8_t>(
+                             status.inequality_constraint_type)]);
+       sleipnir::println("");
+ 
+diff --git a/src/util/print_diagnostics.hpp b/src/util/print_diagnostics.hpp
+index cf1879a8168ec34a9d450cb3d4e29c459afc63d5..73e9836f6664a68af51701e148c834b8165edd80 100644
+--- a/src/util/print_diagnostics.hpp
++++ b/src/util/print_diagnostics.hpp
+@@ -10,7 +10,6 @@
+ #include <cmath>
+ #include <ranges>
+ #include <string>
+-#include <utility>
+ 
+ #include <wpi/SmallVector.h>
+ 
+@@ -145,9 +144,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
+   sleipnir::println(
+       "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:<5} {:<5} {:.2e} "
+       "{:.2e} {:2d}│",
+-      iterations, ITERATION_TYPES[std::to_underlying(type)], to_ms(time), error,
+-      cost, infeasibility, complementarity, power_of_10(μ), power_of_10(δ),
+-      primal_α, dual_α, backtracks);
++      iterations, ITERATION_TYPES[static_cast<uint8_t>(type)], to_ms(time),
++      error, cost, infeasibility, complementarity, power_of_10(μ),
++      power_of_10(δ), primal_α, dual_α, backtracks);
+ }
+ 
+ /**
