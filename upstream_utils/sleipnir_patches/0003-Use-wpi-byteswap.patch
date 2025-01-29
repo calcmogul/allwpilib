@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 28 Jan 2025 22:19:14 -0800
+Subject: [PATCH 3/7] Use wpi::byteswap()
+
+---
+ include/.styleguide           | 1 +
+ include/sleipnir/util/spy.hpp | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/.styleguide b/include/.styleguide
+index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f1854fbbc523 100644
+--- a/include/.styleguide
++++ b/include/.styleguide
+@@ -13,4 +13,5 @@ licenseUpdateExclude {
+ includeOtherLibs {
+   ^Eigen/
+   ^fmt/
++  ^wpi/
+ }
+diff --git a/include/sleipnir/util/spy.hpp b/include/sleipnir/util/spy.hpp
+index eadafee44d453abd082d1f45814fe0e8a2b1ca03..f557f11d9a7ffb89adcb93d4cb9118e218768316 100644
+--- a/include/sleipnir/util/spy.hpp
++++ b/include/sleipnir/util/spy.hpp
+@@ -10,6 +10,7 @@
+ #include <string_view>
+ 
+ #include <Eigen/SparseCore>
++#include <wpi/bit.h>
+ 
+ #include "sleipnir/util/symbol_exports.hpp"
+ 
+@@ -113,7 +114,7 @@ class SLEIPNIR_DLLEXPORT Spy {
+    */
+   void write32le(int32_t num) {
+     if constexpr (std::endian::native != std::endian::little) {
+-      num = std::byteswap(num);
++      num = wpi::byteswap(num);
+     }
+     m_file.write(reinterpret_cast<char*>(&num), sizeof(num));
+   }
