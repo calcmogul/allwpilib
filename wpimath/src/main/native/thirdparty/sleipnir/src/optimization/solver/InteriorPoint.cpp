@@ -5,15 +5,16 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
-#include <fstream>
+#include <functional>
 #include <limits>
+#include <memory>
+#include <ranges>
 
 #include <Eigen/SparseCholesky>
 #include <wpi/SmallVector.h>
 
 #include "optimization/RegularizedLDLT.hpp"
 #include "optimization/solver/util/ErrorEstimate.hpp"
-#include "optimization/solver/util/FeasibilityRestoration.hpp"
 #include "optimization/solver/util/Filter.hpp"
 #include "optimization/solver/util/FractionToTheBoundaryRule.hpp"
 #include "optimization/solver/util/IsLocallyInfeasible.hpp"
@@ -22,10 +23,16 @@
 #include "sleipnir/autodiff/Hessian.hpp"
 #include "sleipnir/autodiff/Jacobian.hpp"
 #include "sleipnir/optimization/SolverExitCondition.hpp"
+#include "sleipnir/util/ScopedProfiler.hpp"
+#include "sleipnir/util/SetupProfiler.hpp"
+#include "sleipnir/util/SolveProfiler.hpp"
+#include "util/ScopeExit.hpp"
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
 #include "sleipnir/util/Print.hpp"
 #include "sleipnir/util/Spy.hpp"
-#include "util/ScopeExit.hpp"
-#include "util/ToMilliseconds.hpp"
+#include "util/PrintDiagnostics.hpp"
+#endif
 
 // See docs/algorithms.md#Works_cited for citation definitions.
 //
@@ -34,14 +41,18 @@
 
 namespace sleipnir {
 
-void InteriorPoint(std::span<Variable> decisionVariables,
-                   std::span<Variable> equalityConstraints,
-                   std::span<Variable> inequalityConstraints, Variable& f,
-                   function_ref<bool(const SolverIterationInfo& info)> callback,
-                   const SolverConfig& config, bool feasibilityRestoration,
-                   Eigen::VectorXd& x, Eigen::VectorXd& s,
-                   SolverStatus* status) {
-  const auto solveStartTime = std::chrono::system_clock::now();
+void InteriorPoint(
+    std::span<Variable> decisionVariables,
+    std::span<Variable> equalityConstraints,
+    std::span<Variable> inequalityConstraints, Variable& f,
+    std::span<std::function<bool(const SolverIterationInfo& info)>> callbacks,
+    const SolverConfig& config, Eigen::VectorXd& x, SolverStatus* status) {
+  const auto solveStartTime = std::chrono::steady_clock::now();
+
+  wpi::SmallVector<SetupProfiler> setupProfilers;
+  setupProfilers.emplace_back("setup").Start();
+
+  setupProfilers.emplace_back("  ↳ s,y,z setup").Start();
 
   // Map decision variables and constraints to VariableMatrices for Lagrangian
   VariableMatrix xAD{decisionVariables};
@@ -51,7 +62,9 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
   // Create autodiff variables for s, y, and z for Lagrangian
   VariableMatrix sAD(inequalityConstraints.size());
-  sAD.SetValue(s);
+  for (auto& s : sAD) {
+    s.SetValue(1.0);
+  }
   VariableMatrix yAD(equalityConstraints.size());
   for (auto& y : yAD) {
     y.SetValue(0.0);
@@ -61,10 +74,16 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     z.SetValue(1.0);
   }
 
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ L setup").Start();
+
   // Lagrangian L
   //
   // L(xₖ, sₖ, yₖ, zₖ) = f(xₖ) − yₖᵀcₑ(xₖ) − zₖᵀ(cᵢ(xₖ) − sₖ)
   auto L = f - (yAD.T() * c_eAD)(0) - (zAD.T() * (c_iAD - sAD))(0);
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∂cₑ/∂x setup").Start();
 
   // Equality constraint Jacobian Aₑ
   //
@@ -73,7 +92,14 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   //         [    ⋮    ]
   //         [∇ᵀcₑₘ(xₖ)]
   Jacobian jacobianCe{c_eAD, xAD};
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∂cₑ/∂x init solve").Start();
+
   Eigen::SparseMatrix<double> A_e = jacobianCe.Value();
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∂cᵢ/∂x setup").Start();
 
   // Inequality constraint Jacobian Aᵢ
   //
@@ -82,18 +108,40 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   //         [    ⋮    ]
   //         [∇ᵀcᵢₘ(xₖ)]
   Jacobian jacobianCi{c_iAD, xAD};
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∂cᵢ/∂x init solve").Start();
+
   Eigen::SparseMatrix<double> A_i = jacobianCi.Value();
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇f(x) setup").Start();
 
   // Gradient of f ∇f
   Gradient gradientF{f, xAD};
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇f(x) init solve").Start();
+
   Eigen::SparseVector<double> g = gradientF.Value();
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇²ₓₓL setup").Start();
 
   // Hessian of the Lagrangian H
   //
   // Hₖ = ∇²ₓₓL(xₖ, sₖ, yₖ, zₖ)
   Hessian hessianL{L, xAD};
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇²ₓₓL init solve").Start();
+
   Eigen::SparseMatrix<double> H = hessianL.Value();
 
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ precondition ✓").Start();
+
+  Eigen::VectorXd s = sAD.Value();
   Eigen::VectorXd y = yAD.Value();
   Eigen::VectorXd z = zAD.Value();
   Eigen::VectorXd c_e = c_eAD.Value();
@@ -101,6 +149,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
   // Check for overconstrained problem
   if (equalityConstraints.size() > decisionVariables.size()) {
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
     if (config.diagnostics) {
       sleipnir::println("The problem has too few degrees of freedom.");
       sleipnir::println(
@@ -111,6 +160,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
         }
       }
     }
+#endif
 
     status->exitCondition = SolverExitCondition::kTooFewDOFs;
     return;
@@ -123,65 +173,30 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     return;
   }
 
+  setupProfilers.back().Stop();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
   // Sparsity pattern files written when spy flag is set in SolverConfig
-  std::ofstream H_spy;
-  std::ofstream A_e_spy;
-  std::ofstream A_i_spy;
+  std::unique_ptr<Spy> H_spy;
+  std::unique_ptr<Spy> A_e_spy;
+  std::unique_ptr<Spy> A_i_spy;
+  std::unique_ptr<Spy> lhs_spy;
   if (config.spy) {
-    A_e_spy.open("A_e.spy");
-    A_i_spy.open("A_i.spy");
-    H_spy.open("H.spy");
+    H_spy = std::make_unique<Spy>("H.spy", "Hessian", "Decision variables",
+                                  "Decision variables", H.rows(), H.cols());
+    A_e_spy = std::make_unique<Spy>("A_e.spy", "Equality constraint Jacobian",
+                                    "Constraints", "Decision variables",
+                                    A_e.rows(), A_e.cols());
+    A_i_spy = std::make_unique<Spy>("A_i.spy", "Inequality constraint Jacobian",
+                                    "Constraints", "Decision variables",
+                                    A_i.rows(), A_i.cols());
+    lhs_spy = std::make_unique<Spy>(
+        "lhs.spy", "Newton-KKT system left-hand side", "Rows", "Columns",
+        H.rows() + A_e.rows(), H.cols() + A_e.rows());
   }
-
-  if (config.diagnostics && !feasibilityRestoration) {
-    sleipnir::println("Error tolerance: {}\n", config.tolerance);
-  }
-
-  std::chrono::system_clock::time_point iterationsStartTime;
+#endif
 
   int iterations = 0;
-
-  // Prints final diagnostics when the solver exits
-  scope_exit exit{[&] {
-    status->cost = f.Value();
-
-    if (config.diagnostics && !feasibilityRestoration) {
-      auto solveEndTime = std::chrono::system_clock::now();
-
-      sleipnir::println("\nSolve time: {:.3f} ms",
-                        ToMilliseconds(solveEndTime - solveStartTime));
-      sleipnir::println("  ↳ {:.3f} ms (solver setup)",
-                        ToMilliseconds(iterationsStartTime - solveStartTime));
-      if (iterations > 0) {
-        sleipnir::println(
-            "  ↳ {:.3f} ms ({} solver iterations; {:.3f} ms average)",
-            ToMilliseconds(solveEndTime - iterationsStartTime), iterations,
-            ToMilliseconds((solveEndTime - iterationsStartTime) / iterations));
-      }
-      sleipnir::println("");
-
-      sleipnir::println("{:^8}   {:^10}   {:^14}   {:^6}", "autodiff",
-                        "setup (ms)", "avg solve (ms)", "solves");
-      sleipnir::println("{:=^47}", "");
-      constexpr auto format = "{:^8}   {:10.3f}   {:14.3f}   {:6}";
-      sleipnir::println(format, "∇f(x)",
-                        gradientF.GetProfiler().SetupDuration(),
-                        gradientF.GetProfiler().AverageSolveDuration(),
-                        gradientF.GetProfiler().SolveMeasurements());
-      sleipnir::println(format, "∇²ₓₓL", hessianL.GetProfiler().SetupDuration(),
-                        hessianL.GetProfiler().AverageSolveDuration(),
-                        hessianL.GetProfiler().SolveMeasurements());
-      sleipnir::println(format, "∂cₑ/∂x",
-                        jacobianCe.GetProfiler().SetupDuration(),
-                        jacobianCe.GetProfiler().AverageSolveDuration(),
-                        jacobianCe.GetProfiler().SolveMeasurements());
-      sleipnir::println(format, "∂cᵢ/∂x",
-                        jacobianCi.GetProfiler().SetupDuration(),
-                        jacobianCi.GetProfiler().AverageSolveDuration(),
-                        jacobianCi.GetProfiler().SolveMeasurements());
-      sleipnir::println("");
-    }
-  }};
 
   // Barrier parameter minimum
   const double μ_min = config.tolerance / 10.0;
@@ -232,6 +247,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
   // Variables for determining when a step is acceptable
   constexpr double α_red_factor = 0.5;
+  constexpr double α_min = 1e-20;
   int acceptableIterCounter = 0;
 
   int fullStepRejectedCounter = 0;
@@ -240,19 +256,87 @@ void InteriorPoint(std::span<Variable> decisionVariables,
   // Error estimate
   double E_0 = std::numeric_limits<double>::infinity();
 
+  setupProfilers[0].Stop();
+
+  wpi::SmallVector<SolveProfiler> solveProfilers;
+  solveProfilers.emplace_back("solve");
+  solveProfilers.emplace_back("  ↳ feasibility ✓");
+  solveProfilers.emplace_back("  ↳ user callbacks");
+  solveProfilers.emplace_back("  ↳ iter matrix build");
+  solveProfilers.emplace_back("  ↳ iter matrix solve");
+  solveProfilers.emplace_back("  ↳ line search");
+  solveProfilers.emplace_back("    ↳ SOC");
+  solveProfilers.emplace_back("  ↳ spy writes");
+  solveProfilers.emplace_back("  ↳ next iter prep");
+
+  auto& innerIterProf = solveProfilers[0];
+  auto& feasibilityCheckProf = solveProfilers[1];
+  auto& userCallbacksProf = solveProfilers[2];
+  auto& linearSystemBuildProf = solveProfilers[3];
+  auto& linearSystemSolveProf = solveProfilers[4];
+  auto& lineSearchProf = solveProfilers[5];
+  auto& socProf = solveProfilers[6];
+  [[maybe_unused]]
+  auto& spyWritesProf = solveProfilers[7];
+  auto& nextIterPrepProf = solveProfilers[8];
+
+  // Prints final diagnostics when the solver exits
+  scope_exit exit{[&] {
+    status->cost = f.Value();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    if (config.diagnostics) {
+      // Append gradient profilers
+      solveProfilers.push_back(gradientF.GetProfilers()[0]);
+      solveProfilers.back().name = "  ↳ ∇f(x)";
+      for (const auto& profiler :
+           gradientF.GetProfilers() | std::views::drop(1)) {
+        solveProfilers.push_back(profiler);
+      }
+
+      // Append Hessian profilers
+      solveProfilers.push_back(hessianL.GetProfilers()[0]);
+      solveProfilers.back().name = "  ↳ ∇²ₓₓL";
+      for (const auto& profiler :
+           hessianL.GetProfilers() | std::views::drop(1)) {
+        solveProfilers.push_back(profiler);
+      }
+
+      // Append equality constraint Jacobian profilers
+      solveProfilers.push_back(jacobianCe.GetProfilers()[0]);
+      solveProfilers.back().name = "  ↳ ∂cₑ/∂x";
+      for (const auto& profiler :
+           jacobianCe.GetProfilers() | std::views::drop(1)) {
+        solveProfilers.push_back(profiler);
+      }
+
+      // Append inequality constraint Jacobian profilers
+      solveProfilers.push_back(jacobianCi.GetProfilers()[0]);
+      solveProfilers.back().name = "  ↳ ∂cᵢ/∂x";
+      for (const auto& profiler :
+           jacobianCi.GetProfilers() | std::views::drop(1)) {
+        solveProfilers.push_back(profiler);
+      }
+
+      PrintFinalDiagnostics(iterations, setupProfilers, solveProfilers);
+    }
+#endif
+  }};
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
   if (config.diagnostics) {
-    iterationsStartTime = std::chrono::system_clock::now();
+    sleipnir::println("Error tolerance: {}\n", config.tolerance);
   }
+#endif
 
   while (E_0 > config.tolerance &&
          acceptableIterCounter < config.maxAcceptableIterations) {
-    std::chrono::system_clock::time_point innerIterStartTime;
-    if (config.diagnostics) {
-      innerIterStartTime = std::chrono::system_clock::now();
-    }
+    ScopedProfiler innerIterProfiler{innerIterProf};
+    ScopedProfiler feasibilityCheckProfiler{feasibilityCheckProf};
 
     // Check for local equality constraint infeasibility
     if (IsEqualityLocallyInfeasible(A_e, c_e)) {
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       if (config.diagnostics) {
         sleipnir::println(
             "The problem is locally infeasible due to violated equality "
@@ -265,6 +349,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
           }
         }
       }
+#endif
 
       status->exitCondition = SolverExitCondition::kLocallyInfeasible;
       return;
@@ -272,6 +357,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
     // Check for local inequality constraint infeasibility
     if (IsInequalityLocallyInfeasible(A_i, c_i)) {
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       if (config.diagnostics) {
         sleipnir::println(
             "The problem is infeasible due to violated inequality "
@@ -284,6 +370,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
           }
         }
       }
+#endif
 
       status->exitCondition = SolverExitCondition::kLocallyInfeasible;
       return;
@@ -296,44 +383,34 @@ void InteriorPoint(std::span<Variable> decisionVariables,
       return;
     }
 
-    // Write out spy file contents if that's enabled
-    if (config.spy) {
-      // Gap between sparsity patterns
-      if (iterations > 0) {
-        A_e_spy << "\n";
-        A_i_spy << "\n";
-        H_spy << "\n";
+    feasibilityCheckProfiler.Stop();
+    ScopedProfiler userCallbacksProfiler{userCallbacksProf};
+
+    // Call user callbacks
+    for (const auto& callback : callbacks) {
+      if (callback({iterations, x, s, g, H, A_e, A_i})) {
+        status->exitCondition = SolverExitCondition::kCallbackRequestedStop;
+        return;
       }
-
-      Spy(H_spy, H);
-      Spy(A_e_spy, A_e);
-      Spy(A_i_spy, A_i);
     }
 
-    // Call user callback
-    if (callback({iterations, x, s, g, H, A_e, A_i})) {
-      status->exitCondition = SolverExitCondition::kCallbackRequestedStop;
-      return;
-    }
+    userCallbacksProfiler.Stop();
+    ScopedProfiler linearSystemBuildProfiler{linearSystemBuildProf};
 
     //     [s₁ 0 ⋯ 0 ]
     // S = [0  ⋱   ⋮ ]
     //     [⋮    ⋱ 0 ]
     //     [0  ⋯ 0 sₘ]
-    const auto S = s.asDiagonal();
-    Eigen::SparseMatrix<double> Sinv;
-    Sinv = s.cwiseInverse().asDiagonal();
-
+    //
     //     [z₁ 0 ⋯ 0 ]
     // Z = [0  ⋱   ⋮ ]
     //     [⋮    ⋱ 0 ]
     //     [0  ⋯ 0 zₘ]
-    const auto Z = z.asDiagonal();
-    Eigen::SparseMatrix<double> Zinv;
-    Zinv = z.cwiseInverse().asDiagonal();
-
+    //
     // Σ = S⁻¹Z
-    const Eigen::SparseMatrix<double> Σ = Sinv * Z;
+    Eigen::SparseMatrix<double> Sinv;
+    Sinv = s.cwiseInverse().asDiagonal();
+    const Eigen::SparseMatrix<double> Σ = Sinv * z.asDiagonal();
 
     // lhs = [H + AᵢᵀΣAᵢ  Aₑᵀ]
     //       [    Aₑ       0 ]
@@ -363,50 +440,59 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
     const Eigen::VectorXd e = Eigen::VectorXd::Ones(s.rows());
 
-    // rhs = −[∇f − Aₑᵀy + Aᵢᵀ(S⁻¹(Zcᵢ − μe) − z)]
-    //        [                cₑ                ]
+    // rhs = −[∇f − Aₑᵀy − Aᵢᵀ(−Σcᵢ + μS⁻¹e + z)]
+    //        [               cₑ                ]
     Eigen::VectorXd rhs{x.rows() + y.rows()};
     rhs.segment(0, x.rows()) =
-        -(g - A_e.transpose() * y +
-          A_i.transpose() * (Sinv * (Z * c_i - μ * e) - z));
+        -(g - A_e.transpose() * y -
+          A_i.transpose() * (-Σ * c_i + μ * Sinv * e + z));
     rhs.segment(x.rows(), y.rows()) = -c_e;
+
+    linearSystemBuildProfiler.Stop();
+    ScopedProfiler linearSystemSolveProfiler{linearSystemSolveProf};
+
+    Eigen::VectorXd p_x;
+    Eigen::VectorXd p_s;
+    Eigen::VectorXd p_y;
+    Eigen::VectorXd p_z;
+    double α_max = 1.0;
+    double α = 1.0;
+    double α_z = 1.0;
 
     // Solve the Newton-KKT system
     //
     // [H + AᵢᵀΣAᵢ  Aₑᵀ][ pₖˣ] = −[∇f − Aₑᵀy + Aᵢᵀ(S⁻¹(Zcᵢ − μe) − z)]
     // [    Aₑ       0 ][−pₖʸ]    [                cₑ                ]
     solver.Compute(lhs, equalityConstraints.size(), μ);
-    Eigen::VectorXd step{x.rows() + y.rows()};
-    if (solver.Info() == Eigen::Success) {
-      step = solver.Solve(rhs);
-    } else {
-      // The regularization procedure failed due to a rank-deficient equality
-      // constraint Jacobian with linearly dependent constraints. Set the step
-      // length to zero and let second-order corrections attempt to restore
-      // feasibility.
-      step.setZero();
+    if (solver.Info() != Eigen::Success) [[unlikely]] {
+      status->exitCondition = SolverExitCondition::kFactorizationFailed;
+      return;
     }
+
+    Eigen::VectorXd step = solver.Solve(rhs);
+
+    linearSystemSolveProfiler.Stop();
+    ScopedProfiler lineSearchProfiler{lineSearchProf};
 
     // step = [ pₖˣ]
     //        [−pₖʸ]
-    Eigen::VectorXd p_x = step.segment(0, x.rows());
-    Eigen::VectorXd p_y = -step.segment(x.rows(), y.rows());
+    p_x = step.segment(0, x.rows());
+    p_y = -step.segment(x.rows(), y.rows());
+
+    // pₖˢ = cᵢ − s + Aᵢpₖˣ
+    p_s = c_i - s + A_i * p_x;
 
     // pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ
-    Eigen::VectorXd p_z = -Σ * c_i + μ * Sinv * e - Σ * A_i * p_x;
-
-    // pₖˢ = μZ⁻¹e − s − Z⁻¹Spₖᶻ
-    Eigen::VectorXd p_s = μ * Zinv * e - s - Zinv * S * p_z;
+    p_z = -Σ * c_i + μ * Sinv * e - Σ * A_i * p_x;
 
     // αᵐᵃˣ = max(α ∈ (0, 1] : sₖ + αpₖˢ ≥ (1−τⱼ)sₖ)
-    const double α_max = FractionToTheBoundaryRule(s, p_s, τ);
-    double α = α_max;
+    α_max = FractionToTheBoundaryRule(s, p_s, τ);
+    α = α_max;
 
     // αₖᶻ = max(α ∈ (0, 1] : zₖ + αpₖᶻ ≥ (1−τⱼ)zₖ)
-    double α_z = FractionToTheBoundaryRule(z, p_z, τ);
+    α_z = FractionToTheBoundaryRule(z, p_z, τ);
 
-    // Loop until a step is accepted. If a step becomes acceptable, the loop
-    // will exit early.
+    // Loop until a step is accepted
     while (1) {
       Eigen::VectorXd trial_x = x + α * p_x;
       Eigen::VectorXd trial_y = y + α_z * p_y;
@@ -439,7 +525,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
       // Check whether filter accepts trial iterate
       auto entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i, μ);
-      if (filter.TryAdd(entry)) {
+      if (filter.TryAdd(entry, α)) {
         // Accept step
         break;
       }
@@ -465,10 +551,12 @@ void InteriorPoint(std::span<Variable> decisionVariables,
         bool stepAcceptable = false;
         for (int soc_iteration = 0; soc_iteration < 5 && !stepAcceptable;
              ++soc_iteration) {
+          ScopedProfiler socProfiler{socProf};
+
           // Rebuild Newton-KKT rhs with updated constraint values.
           //
-          // rhs = −[∇f − Aₑᵀy + Aᵢᵀ(S⁻¹(Zcᵢ − μe) − z)]
-          //        [              cₑˢᵒᶜ               ]
+          // rhs = −[∇f − Aₑᵀy − Aᵢᵀ(−Σcᵢ + μS⁻¹e + z)]
+          //        [              cₑˢᵒᶜ              ]
           //
           // where cₑˢᵒᶜ = αc(xₖ) + c(xₖ + αpₖˣ)
           c_e_soc = α_soc * c_e_soc + trial_c_e;
@@ -480,11 +568,11 @@ void InteriorPoint(std::span<Variable> decisionVariables,
           p_x_cor = step.segment(0, x.rows());
           p_y_soc = -step.segment(x.rows(), y.rows());
 
+          // pₖˢ = cᵢ − s + Aᵢpₖˣ
+          p_s_soc = c_i - s + A_i * p_x_cor;
+
           // pₖᶻ = −Σcᵢ + μS⁻¹e − ΣAᵢpₖˣ
           p_z_soc = -Σ * c_i + μ * Sinv * e - Σ * A_i * p_x_cor;
-
-          // pₖˢ = μZ⁻¹e − s − Z⁻¹Spₖᶻ
-          p_s_soc = μ * Zinv * e - s - Zinv * S * p_z_soc;
 
           // αˢᵒᶜ = max(α ∈ (0, 1] : sₖ + αpₖˢ ≥ (1−τⱼ)sₖ)
           α_soc = FractionToTheBoundaryRule(s, p_s_soc, τ);
@@ -503,7 +591,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
 
           // Check whether filter accepts trial iterate
           entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i, μ);
-          if (filter.TryAdd(entry)) {
+          if (filter.TryAdd(entry, α)) {
             p_x = p_x_cor;
             p_y = p_y_soc;
             p_z = p_z_soc;
@@ -512,6 +600,19 @@ void InteriorPoint(std::span<Variable> decisionVariables,
             α_z = α_z_soc;
             stepAcceptable = true;
           }
+
+          socProfiler.Stop();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+          if (config.diagnostics) {
+            double E = ErrorEstimate(g, A_e, trial_c_e, trial_y);
+            PrintIterationDiagnostics(
+                iterations, IterationMode::kSecondOrderCorrection,
+                socProfiler.CurrentDuration(), E, f.Value(),
+                trial_c_e.lpNorm<1>() + (trial_c_i - trial_s).lpNorm<1>(),
+                solver.HessianRegularization(), 1.0, 1.0);
+          }
+#endif
         }
 
         if (stepAcceptable) {
@@ -541,19 +642,16 @@ void InteriorPoint(std::span<Variable> decisionVariables,
       // Reduce step size
       α *= α_red_factor;
 
-      // Safety factor for the minimal step size
-      constexpr double α_min_frac = 0.05;
-
       // If step size hit a minimum, check if the KKT error was reduced. If it
-      // wasn't, invoke feasibility restoration.
-      if (α < α_min_frac * Filter::γConstraint) {
+      // wasn't, report bad line search.
+      if (α < α_min) {
         double currentKKTError = KKTError(g, A_e, c_e, A_i, c_i, s, y, z, μ);
 
-        Eigen::VectorXd trial_x = x + α_max * p_x;
-        Eigen::VectorXd trial_s = s + α_max * p_s;
+        trial_x = x + α_max * p_x;
+        trial_s = s + α_max * p_s;
 
-        Eigen::VectorXd trial_y = y + α_z * p_y;
-        Eigen::VectorXd trial_z = z + α_z * p_z;
+        trial_y = y + α_z * p_y;
+        trial_z = z + α_z * p_z;
 
         // Upate autodiff
         xAD.SetValue(trial_x);
@@ -561,8 +659,8 @@ void InteriorPoint(std::span<Variable> decisionVariables,
         yAD.SetValue(trial_y);
         zAD.SetValue(trial_z);
 
-        Eigen::VectorXd trial_c_e = c_eAD.Value();
-        Eigen::VectorXd trial_c_i = c_iAD.Value();
+        trial_c_e = c_eAD.Value();
+        trial_c_i = c_iAD.Value();
 
         double nextKKTError = KKTError(gradientF.Value(), jacobianCe.Value(),
                                        trial_c_e, jacobianCi.Value(), trial_c_i,
@@ -576,130 +674,23 @@ void InteriorPoint(std::span<Variable> decisionVariables,
           break;
         }
 
-        // If the step direction was bad and feasibility restoration is
-        // already running, running it again won't help
-        if (feasibilityRestoration) {
-          status->exitCondition = SolverExitCondition::kLocallyInfeasible;
-          return;
-        }
-
-        auto initialEntry = filter.MakeEntry(s, c_e, c_i, μ);
-
-        // Feasibility restoration phase
-        Eigen::VectorXd fr_x = x;
-        Eigen::VectorXd fr_s = s;
-        SolverStatus fr_status;
-        FeasibilityRestoration(
-            decisionVariables, equalityConstraints, inequalityConstraints, μ,
-            [&](const SolverIterationInfo& info) {
-              Eigen::VectorXd trial_x =
-                  info.x.segment(0, decisionVariables.size());
-              xAD.SetValue(trial_x);
-
-              Eigen::VectorXd trial_s =
-                  info.s.segment(0, inequalityConstraints.size());
-              sAD.SetValue(trial_s);
-
-              Eigen::VectorXd trial_c_e = c_eAD.Value();
-              Eigen::VectorXd trial_c_i = c_iAD.Value();
-
-              // If current iterate is acceptable to normal filter and
-              // constraint violation has sufficiently reduced, stop
-              // feasibility restoration
-              auto entry = filter.MakeEntry(trial_s, trial_c_e, trial_c_i, μ);
-              if (filter.IsAcceptable(entry) &&
-                  entry.constraintViolation <
-                      0.9 * initialEntry.constraintViolation) {
-                return true;
-              }
-
-              return false;
-            },
-            config, fr_x, fr_s, &fr_status);
-
-        if (fr_status.exitCondition ==
-            SolverExitCondition::kCallbackRequestedStop) {
-          p_x = fr_x - x;
-          p_s = fr_s - s;
-
-          // Lagrange mutliplier estimates
-          //
-          //   [y] = (ÂÂᵀ)⁻¹Â[ ∇f]
-          //   [z]           [−μe]
-          //
-          //   where Â = [Aₑ   0]
-          //             [Aᵢ  −S]
-          //
-          // See equation (19.37) of [1].
-          {
-            xAD.SetValue(fr_x);
-            sAD.SetValue(c_iAD.Value());
-
-            A_e = jacobianCe.Value();
-            A_i = jacobianCi.Value();
-            g = gradientF.Value();
-
-            // Â = [Aₑ   0]
-            //     [Aᵢ  −S]
-            triplets.clear();
-            triplets.reserve(A_e.nonZeros() + A_i.nonZeros() + s.rows());
-            for (int col = 0; col < A_e.cols(); ++col) {
-              // Append column of Aₑ in top-left quadrant
-              for (Eigen::SparseMatrix<double>::InnerIterator it{A_e, col}; it;
-                   ++it) {
-                triplets.emplace_back(it.row(), it.col(), it.value());
-              }
-              // Append column of Aᵢ in bottom-left quadrant
-              for (Eigen::SparseMatrix<double>::InnerIterator it{A_i, col}; it;
-                   ++it) {
-                triplets.emplace_back(A_e.rows() + it.row(), it.col(),
-                                      it.value());
-              }
-            }
-            // Append −S in bottom-right quadrant
-            for (int i = 0; i < s.rows(); ++i) {
-              triplets.emplace_back(A_e.rows() + i, A_e.cols() + i, -s(i));
-            }
-            Eigen::SparseMatrix<double> Ahat{A_e.rows() + A_i.rows(),
-                                             A_e.cols() + s.rows()};
-            Ahat.setFromSortedTriplets(
-                triplets.begin(), triplets.end(),
-                [](const auto&, const auto& b) { return b; });
-
-            // lhs = ÂÂᵀ
-            Eigen::SparseMatrix<double> lhs = Ahat * Ahat.transpose();
-
-            // rhs = Â[ ∇f]
-            //        [−μe]
-            Eigen::VectorXd rhsTemp{g.rows() + e.rows()};
-            rhsTemp.block(0, 0, g.rows(), 1) = g;
-            rhsTemp.block(g.rows(), 0, s.rows(), 1) = -μ * e;
-            Eigen::VectorXd rhs = Ahat * rhsTemp;
-
-            Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> yzEstimator{lhs};
-            Eigen::VectorXd sol = yzEstimator.solve(rhs);
-
-            p_y = y - sol.block(0, 0, y.rows(), 1);
-            p_z = z - sol.block(y.rows(), 0, z.rows(), 1);
-          }
-
-          α = 1.0;
-          α_z = 1.0;
-
-          // Accept step
-          break;
-        } else if (fr_status.exitCondition == SolverExitCondition::kSuccess) {
-          status->exitCondition = SolverExitCondition::kLocallyInfeasible;
-          x = fr_x;
-          return;
-        } else {
-          status->exitCondition =
-              SolverExitCondition::kFeasibilityRestorationFailed;
-          x = fr_x;
-          return;
-        }
+        status->exitCondition = SolverExitCondition::kLineSearchFailed;
+        return;
       }
     }
+
+    lineSearchProfiler.Stop();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    // Write out spy file contents if that's enabled
+    if (config.spy) {
+      ScopedProfiler spyWritesProfiler{spyWritesProf};
+      H_spy->Add(H);
+      A_e_spy->Add(A_e);
+      A_i_spy->Add(A_i);
+      lhs_spy->Add(lhs);
+    }
+#endif
 
     // If full step was accepted, reset full-step rejected counter
     if (α == α_max) {
@@ -738,15 +729,12 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     //   zₖ₊₁⁽ⁱ⁾ = max(min(zₖ₊₁⁽ⁱ⁾, κ_Σ μⱼ/sₖ₊₁⁽ⁱ⁾), μⱼ/(κ_Σ sₖ₊₁⁽ⁱ⁾))
     //
     // for some fixed κ_Σ ≥ 1 after each step. See equation (16) of [2].
-    {
+    for (int row = 0; row < z.rows(); ++row) {
       // Barrier parameter scale factor for inequality constraint Lagrange
       // multiplier safeguard
       constexpr double κ_Σ = 1e10;
 
-      for (int row = 0; row < z.rows(); ++row) {
-        z(row) =
-            std::max(std::min(z(row), κ_Σ * μ / s(row)), μ / (κ_Σ * s(row)));
-      }
+      z(row) = std::max(std::min(z(row), κ_Σ * μ / s(row)), μ / (κ_Σ * s(row)));
     }
 
     // Update autodiff for Jacobians and Hessian
@@ -758,6 +746,8 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     A_i = jacobianCi.Value();
     g = gradientF.Value();
     H = hessianL.Value();
+
+    ScopedProfiler nextIterPrepProfiler{nextIterPrepProf};
 
     c_e = c_eAD.Value();
     c_i = c_iAD.Value();
@@ -784,22 +774,18 @@ void InteriorPoint(std::span<Variable> decisionVariables,
       }
     }
 
-    const auto innerIterEndTime = std::chrono::system_clock::now();
+    nextIterPrepProfiler.Stop();
+    innerIterProfiler.Stop();
 
-    // Diagnostics for current iteration
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
     if (config.diagnostics) {
-      if (iterations % 20 == 0) {
-        sleipnir::println("{:^4}   {:^9}  {:^13}  {:^13}  {:^13}", "iter",
-                          "time (ms)", "error", "cost", "infeasibility");
-        sleipnir::println("{:=^61}", "");
-      }
-
-      sleipnir::println("{:4}{}  {:9.3f}  {:13e}  {:13e}  {:13e}", iterations,
-                        feasibilityRestoration ? "r" : " ",
-                        ToMilliseconds(innerIterEndTime - innerIterStartTime),
-                        E_0, f.Value(),
-                        c_e.lpNorm<1>() + (c_i - s).lpNorm<1>());
+      PrintIterationDiagnostics(iterations, IterationMode::kNormal,
+                                innerIterProfiler.CurrentDuration(), E_0,
+                                f.Value(),
+                                c_e.lpNorm<1>() + (c_i - s).lpNorm<1>(),
+                                solver.HessianRegularization(), α, α_z);
     }
+#endif
 
     ++iterations;
 
@@ -810,7 +796,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
     }
 
     // Check for max wall clock time
-    if (innerIterEndTime - solveStartTime > config.timeout) {
+    if (std::chrono::steady_clock::now() - solveStartTime > config.timeout) {
       status->exitCondition = SolverExitCondition::kTimeout;
       return;
     }
@@ -832,6 +818,6 @@ void InteriorPoint(std::span<Variable> decisionVariables,
       continue;
     }
   }
-}  // NOLINT(readability/fn_size)
+}
 
 }  // namespace sleipnir

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <concepts>
 #include <initializer_list>
+#include <optional>
+#include <source_location>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -13,15 +15,21 @@
 #include <wpi/SmallVector.h>
 
 #include "sleipnir/autodiff/Expression.hpp"
-#include "sleipnir/autodiff/ExpressionGraph.hpp"
+#include "sleipnir/autodiff/ValueExpressionGraph.hpp"
 #include "sleipnir/util/Assert.hpp"
 #include "sleipnir/util/Concepts.hpp"
-#include "sleipnir/util/Print.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+#include "sleipnir/util/Print.hpp"
+#endif
 
 namespace sleipnir {
 
 // Forward declarations for friend declarations in Variable
+namespace detail {
+class AdjointExpressionGraph;
+}  // namespace detail
 class SLEIPNIR_DLLEXPORT Hessian;
 class SLEIPNIR_DLLEXPORT Jacobian;
 
@@ -36,11 +44,25 @@ class SLEIPNIR_DLLEXPORT Variable {
   Variable() = default;
 
   /**
-   * Constructs a Variable from a double.
+   * Constructs an empty Variable.
+   */
+  explicit constexpr Variable(std::nullptr_t) : expr{nullptr} {}
+
+  /**
+   * Constructs a Variable from a floating point type.
    *
    * @param value The value of the Variable.
    */
-  Variable(double value) : expr{detail::MakeExpressionPtr(value)} {}  // NOLINT
+  Variable(std::floating_point auto value)  // NOLINT
+      : expr{detail::MakeExpressionPtr<detail::ConstExpression>(value)} {}
+
+  /**
+   * Constructs a Variable from an integral type.
+   *
+   * @param value The value of the Variable.
+   */
+  Variable(std::integral auto value)  // NOLINT
+      : expr{detail::MakeExpressionPtr<detail::ConstExpression>(value)} {}
 
   /**
    * Constructs a Variable pointing to the specified expression.
@@ -54,7 +76,8 @@ class SLEIPNIR_DLLEXPORT Variable {
    *
    * @param expr The autodiff variable.
    */
-  explicit Variable(detail::ExpressionPtr&& expr) : expr{std::move(expr)} {}
+  explicit constexpr Variable(detail::ExpressionPtr&& expr)
+      : expr{std::move(expr)} {}
 
   /**
    * Assignment operator for double.
@@ -62,7 +85,7 @@ class SLEIPNIR_DLLEXPORT Variable {
    * @param value The value of the Variable.
    */
   Variable& operator=(double value) {
-    expr = detail::MakeExpressionPtr(value);
+    expr = detail::MakeExpressionPtr<detail::ConstExpression>(value);
 
     return *this;
   }
@@ -74,16 +97,19 @@ class SLEIPNIR_DLLEXPORT Variable {
    */
   void SetValue(double value) {
     if (expr->IsConstant(0.0)) {
-      expr = detail::MakeExpressionPtr(value);
+      expr = detail::MakeExpressionPtr<detail::ConstExpression>(value);
     } else {
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       // We only need to check the first argument since unary and binary
       // operators both use it
-      if (expr->args[0] != nullptr && !expr->args[0]->IsConstant(0.0)) {
+      if (expr->args[0] != nullptr) {
+        auto location = std::source_location::current();
         sleipnir::println(
             stderr,
-            "WARNING: {}:{}: Modified the value of a dependent variable",
-            __FILE__, __LINE__);
+            "WARNING: {}:{}: {}: Modified the value of a dependent variable",
+            location.file_name(), location.line(), location.function_name());
       }
+#endif
       expr->value = value;
     }
   }
@@ -194,9 +220,10 @@ class SLEIPNIR_DLLEXPORT Variable {
    * Returns the value of this variable.
    */
   double Value() {
-    // Updates the value of this variable based on the values of its dependent
-    // variables
-    detail::ExpressionGraph{expr}.Update();
+    if (!m_graph) {
+      m_graph = detail::ValueExpressionGraph{expr};
+    }
+    m_graph->Update();
 
     return expr->value;
   }
@@ -205,12 +232,16 @@ class SLEIPNIR_DLLEXPORT Variable {
    * Returns the type of this expression (constant, linear, quadratic, or
    * nonlinear).
    */
-  ExpressionType Type() const { return expr->type; }
+  ExpressionType Type() const { return expr->Type(); }
 
  private:
   /// The expression node.
   detail::ExpressionPtr expr =
-      detail::MakeExpressionPtr(0.0, ExpressionType::kLinear);
+      detail::MakeExpressionPtr<detail::DecisionVariableExpression>();
+
+  /// Updates the value of this variable based on the values of its dependent
+  /// variables
+  std::optional<detail::ValueExpressionGraph> m_graph;
 
   friend SLEIPNIR_DLLEXPORT Variable abs(const Variable& x);
   friend SLEIPNIR_DLLEXPORT Variable acos(const Variable& x);
@@ -237,6 +268,7 @@ class SLEIPNIR_DLLEXPORT Variable {
   friend SLEIPNIR_DLLEXPORT Variable hypot(const Variable& x, const Variable& y,
                                            const Variable& z);
 
+  friend class detail::AdjointExpressionGraph;
   friend class SLEIPNIR_DLLEXPORT Hessian;
   friend class SLEIPNIR_DLLEXPORT Jacobian;
 };
@@ -585,9 +617,9 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
    * Implicit conversion operator to bool.
    */
   operator bool() {  // NOLINT
-    return std::all_of(
-        constraints.begin(), constraints.end(),
-        [](auto& constraint) { return constraint.Value() == 0.0; });
+    return std::ranges::all_of(constraints, [](auto& constraint) {
+      return constraint.Value() == 0.0;
+    });
   }
 };
 
@@ -649,9 +681,9 @@ struct SLEIPNIR_DLLEXPORT InequalityConstraints {
    * Implicit conversion operator to bool.
    */
   operator bool() {  // NOLINT
-    return std::all_of(
-        constraints.begin(), constraints.end(),
-        [](auto& constraint) { return constraint.Value() >= 0.0; });
+    return std::ranges::all_of(constraints, [](auto& constraint) {
+      return constraint.Value() >= 0.0;
+    });
   }
 };
 

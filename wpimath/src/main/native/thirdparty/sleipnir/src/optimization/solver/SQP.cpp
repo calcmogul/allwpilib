@@ -5,15 +5,16 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
-#include <fstream>
+#include <functional>
 #include <limits>
+#include <memory>
+#include <ranges>
 
 #include <Eigen/SparseCholesky>
 #include <wpi/SmallVector.h>
 
 #include "optimization/RegularizedLDLT.hpp"
 #include "optimization/solver/util/ErrorEstimate.hpp"
-#include "optimization/solver/util/FeasibilityRestoration.hpp"
 #include "optimization/solver/util/Filter.hpp"
 #include "optimization/solver/util/IsLocallyInfeasible.hpp"
 #include "optimization/solver/util/KKTError.hpp"
@@ -21,20 +22,32 @@
 #include "sleipnir/autodiff/Hessian.hpp"
 #include "sleipnir/autodiff/Jacobian.hpp"
 #include "sleipnir/optimization/SolverExitCondition.hpp"
+#include "sleipnir/util/ScopedProfiler.hpp"
+#include "sleipnir/util/SetupProfiler.hpp"
+#include "sleipnir/util/SolveProfiler.hpp"
+#include "util/ScopeExit.hpp"
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
 #include "sleipnir/util/Print.hpp"
 #include "sleipnir/util/Spy.hpp"
-#include "util/ScopeExit.hpp"
-#include "util/ToMilliseconds.hpp"
+#include "util/PrintDiagnostics.hpp"
+#endif
 
 // See docs/algorithms.md#Works_cited for citation definitions.
 
 namespace sleipnir {
 
-void SQP(std::span<Variable> decisionVariables,
-         std::span<Variable> equalityConstraints, Variable& f,
-         function_ref<bool(const SolverIterationInfo& info)> callback,
-         const SolverConfig& config, Eigen::VectorXd& x, SolverStatus* status) {
-  const auto solveStartTime = std::chrono::system_clock::now();
+void SQP(
+    std::span<Variable> decisionVariables,
+    std::span<Variable> equalityConstraints, Variable& f,
+    std::span<std::function<bool(const SolverIterationInfo& info)>> callbacks,
+    const SolverConfig& config, Eigen::VectorXd& x, SolverStatus* status) {
+  const auto solveStartTime = std::chrono::steady_clock::now();
+
+  wpi::SmallVector<SetupProfiler> setupProfilers;
+  setupProfilers.emplace_back("setup").Start();
+
+  setupProfilers.emplace_back("  ↳ y setup").Start();
 
   // Map decision variables and constraints to VariableMatrices for Lagrangian
   VariableMatrix xAD{decisionVariables};
@@ -47,10 +60,16 @@ void SQP(std::span<Variable> decisionVariables,
     y.SetValue(0.0);
   }
 
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ L setup").Start();
+
   // Lagrangian L
   //
   // L(xₖ, yₖ) = f(xₖ) − yₖᵀcₑ(xₖ)
   auto L = f - (yAD.T() * c_eAD)(0);
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∂cₑ/∂x setup").Start();
 
   // Equality constraint Jacobian Aₑ
   //
@@ -59,23 +78,45 @@ void SQP(std::span<Variable> decisionVariables,
   //         [    ⋮    ]
   //         [∇ᵀcₑₘ(xₖ)]
   Jacobian jacobianCe{c_eAD, xAD};
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∂cₑ/∂x init solve").Start();
+
   Eigen::SparseMatrix<double> A_e = jacobianCe.Value();
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇f(x) setup").Start();
 
   // Gradient of f ∇f
   Gradient gradientF{f, xAD};
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇f(x) init solve").Start();
+
   Eigen::SparseVector<double> g = gradientF.Value();
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇²ₓₓL setup").Start();
 
   // Hessian of the Lagrangian H
   //
   // Hₖ = ∇²ₓₓL(xₖ, yₖ)
   Hessian hessianL{L, xAD};
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ ∇²ₓₓL init solve").Start();
+
   Eigen::SparseMatrix<double> H = hessianL.Value();
+
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ precondition ✓").Start();
 
   Eigen::VectorXd y = yAD.Value();
   Eigen::VectorXd c_e = c_eAD.Value();
 
   // Check for overconstrained problem
   if (equalityConstraints.size() > decisionVariables.size()) {
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
     if (config.diagnostics) {
       sleipnir::println("The problem has too few degrees of freedom.");
       sleipnir::println(
@@ -86,6 +127,7 @@ void SQP(std::span<Variable> decisionVariables,
         }
       }
     }
+#endif
 
     status->exitCondition = SolverExitCondition::kTooFewDOFs;
     return;
@@ -98,59 +140,29 @@ void SQP(std::span<Variable> decisionVariables,
     return;
   }
 
+  setupProfilers.back().Stop();
+  setupProfilers.emplace_back("  ↳ spy setup").Start();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
   // Sparsity pattern files written when spy flag is set in SolverConfig
-  std::ofstream H_spy;
-  std::ofstream A_e_spy;
+  std::unique_ptr<Spy> H_spy;
+  std::unique_ptr<Spy> A_e_spy;
+  std::unique_ptr<Spy> lhs_spy;
   if (config.spy) {
-    A_e_spy.open("A_e.spy");
-    H_spy.open("H.spy");
+    H_spy = std::make_unique<Spy>("H.spy", "Hessian", "Decision variables",
+                                  "Decision variables", H.rows(), H.cols());
+    A_e_spy = std::make_unique<Spy>("A_e.spy", "Equality constraint Jacobian",
+                                    "Constraints", "Decision variables",
+                                    A_e.rows(), A_e.cols());
+    lhs_spy = std::make_unique<Spy>(
+        "lhs.spy", "Newton-KKT system left-hand side", "Rows", "Columns",
+        H.rows() + A_e.rows(), H.cols() + A_e.rows());
   }
+#endif
 
-  if (config.diagnostics) {
-    sleipnir::println("Error tolerance: {}\n", config.tolerance);
-  }
-
-  std::chrono::system_clock::time_point iterationsStartTime;
+  setupProfilers.back().Stop();
 
   int iterations = 0;
-
-  // Prints final diagnostics when the solver exits
-  scope_exit exit{[&] {
-    status->cost = f.Value();
-
-    if (config.diagnostics) {
-      auto solveEndTime = std::chrono::system_clock::now();
-
-      sleipnir::println("\nSolve time: {:.3f} ms",
-                        ToMilliseconds(solveEndTime - solveStartTime));
-      sleipnir::println("  ↳ {:.3f} ms (solver setup)",
-                        ToMilliseconds(iterationsStartTime - solveStartTime));
-      if (iterations > 0) {
-        sleipnir::println(
-            "  ↳ {:.3f} ms ({} solver iterations; {:.3f} ms average)",
-            ToMilliseconds(solveEndTime - iterationsStartTime), iterations,
-            ToMilliseconds((solveEndTime - iterationsStartTime) / iterations));
-      }
-      sleipnir::println("");
-
-      sleipnir::println("{:^8}   {:^10}   {:^14}   {:^6}", "autodiff",
-                        "setup (ms)", "avg solve (ms)", "solves");
-      sleipnir::println("{:=^47}", "");
-      constexpr auto format = "{:^8}   {:10.3f}   {:14.3f}   {:6}";
-      sleipnir::println(format, "∇f(x)",
-                        gradientF.GetProfiler().SetupDuration(),
-                        gradientF.GetProfiler().AverageSolveDuration(),
-                        gradientF.GetProfiler().SolveMeasurements());
-      sleipnir::println(format, "∇²ₓₓL", hessianL.GetProfiler().SetupDuration(),
-                        hessianL.GetProfiler().AverageSolveDuration(),
-                        hessianL.GetProfiler().SolveMeasurements());
-      sleipnir::println(format, "∂cₑ/∂x",
-                        jacobianCe.GetProfiler().SetupDuration(),
-                        jacobianCe.GetProfiler().AverageSolveDuration(),
-                        jacobianCe.GetProfiler().SolveMeasurements());
-      sleipnir::println("");
-    }
-  }};
 
   Filter filter{f};
 
@@ -161,6 +173,7 @@ void SQP(std::span<Variable> decisionVariables,
 
   // Variables for determining when a step is acceptable
   constexpr double α_red_factor = 0.5;
+  constexpr double α_min = 1e-20;
   int acceptableIterCounter = 0;
 
   int fullStepRejectedCounter = 0;
@@ -168,19 +181,79 @@ void SQP(std::span<Variable> decisionVariables,
   // Error estimate
   double E_0 = std::numeric_limits<double>::infinity();
 
+  setupProfilers[0].Stop();
+
+  wpi::SmallVector<SolveProfiler> solveProfilers;
+  solveProfilers.emplace_back("solve");
+  solveProfilers.emplace_back("  ↳ feasibility ✓");
+  solveProfilers.emplace_back("  ↳ user callbacks");
+  solveProfilers.emplace_back("  ↳ iter matrix build");
+  solveProfilers.emplace_back("  ↳ iter matrix solve");
+  solveProfilers.emplace_back("  ↳ line search");
+  solveProfilers.emplace_back("    ↳ SOC");
+  solveProfilers.emplace_back("  ↳ spy writes");
+  solveProfilers.emplace_back("  ↳ next iter prep");
+
+  auto& innerIterProf = solveProfilers[0];
+  auto& feasibilityCheckProf = solveProfilers[1];
+  auto& userCallbacksProf = solveProfilers[2];
+  auto& linearSystemBuildProf = solveProfilers[3];
+  auto& linearSystemSolveProf = solveProfilers[4];
+  auto& lineSearchProf = solveProfilers[5];
+  auto& socProf = solveProfilers[6];
+  [[maybe_unused]]
+  auto& spyWritesProf = solveProfilers[7];
+  auto& nextIterPrepProf = solveProfilers[8];
+
+  // Prints final diagnostics when the solver exits
+  scope_exit exit{[&] {
+    status->cost = f.Value();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    if (config.diagnostics) {
+      // Append gradient profilers
+      solveProfilers.push_back(gradientF.GetProfilers()[0]);
+      solveProfilers.back().name = "  ↳ ∇f(x)";
+      for (const auto& profiler :
+           gradientF.GetProfilers() | std::views::drop(1)) {
+        solveProfilers.push_back(profiler);
+      }
+
+      // Append Hessian profilers
+      solveProfilers.push_back(hessianL.GetProfilers()[0]);
+      solveProfilers.back().name = "  ↳ ∇²ₓₓL";
+      for (const auto& profiler :
+           hessianL.GetProfilers() | std::views::drop(1)) {
+        solveProfilers.push_back(profiler);
+      }
+
+      // Append equality constraint Jacobian profilers
+      solveProfilers.push_back(jacobianCe.GetProfilers()[0]);
+      solveProfilers.back().name = "  ↳ ∂cₑ/∂x";
+      for (const auto& profiler :
+           jacobianCe.GetProfilers() | std::views::drop(1)) {
+        solveProfilers.push_back(profiler);
+      }
+
+      PrintFinalDiagnostics(iterations, setupProfilers, solveProfilers);
+    }
+#endif
+  }};
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
   if (config.diagnostics) {
-    iterationsStartTime = std::chrono::system_clock::now();
+    sleipnir::println("Error tolerance: {}\n", config.tolerance);
   }
+#endif
 
   while (E_0 > config.tolerance &&
          acceptableIterCounter < config.maxAcceptableIterations) {
-    std::chrono::system_clock::time_point innerIterStartTime;
-    if (config.diagnostics) {
-      innerIterStartTime = std::chrono::system_clock::now();
-    }
+    ScopedProfiler innerIterProfiler{innerIterProf};
+    ScopedProfiler feasibilityCheckProfiler{feasibilityCheckProf};
 
     // Check for local equality constraint infeasibility
     if (IsEqualityLocallyInfeasible(A_e, c_e)) {
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
       if (config.diagnostics) {
         sleipnir::println(
             "The problem is locally infeasible due to violated equality "
@@ -193,6 +266,7 @@ void SQP(std::span<Variable> decisionVariables,
           }
         }
       }
+#endif
 
       status->exitCondition = SolverExitCondition::kLocallyInfeasible;
       return;
@@ -204,24 +278,20 @@ void SQP(std::span<Variable> decisionVariables,
       return;
     }
 
-    // Write out spy file contents if that's enabled
-    if (config.spy) {
-      // Gap between sparsity patterns
-      if (iterations > 0) {
-        A_e_spy << "\n";
-        H_spy << "\n";
+    feasibilityCheckProfiler.Stop();
+    ScopedProfiler userCallbacksProfiler{userCallbacksProf};
+
+    // Call user callbacks
+    for (const auto& callback : callbacks) {
+      if (callback({iterations, x, Eigen::VectorXd::Zero(0), g, H, A_e,
+                    Eigen::SparseMatrix<double>{}})) {
+        status->exitCondition = SolverExitCondition::kCallbackRequestedStop;
+        return;
       }
-
-      Spy(H_spy, H);
-      Spy(A_e_spy, A_e);
     }
 
-    // Call user callback
-    if (callback({iterations, x, Eigen::VectorXd::Zero(0), g, H, A_e,
-                  Eigen::SparseMatrix<double>{}})) {
-      status->exitCondition = SolverExitCondition::kCallbackRequestedStop;
-      return;
-    }
+    userCallbacksProfiler.Stop();
+    ScopedProfiler linearSystemBuildProfiler{linearSystemBuildProf};
 
     // lhs = [H   Aₑᵀ]
     //       [Aₑ   0 ]
@@ -232,7 +302,7 @@ void SQP(std::span<Variable> decisionVariables,
     triplets.clear();
     triplets.reserve(topLeft.nonZeros() + A_e.nonZeros());
     for (int col = 0; col < H.cols(); ++col) {
-      // Append column of H + AᵢᵀΣAᵢ lower triangle in top-left quadrant
+      // Append column of H lower triangle in top-left quadrant
       for (Eigen::SparseMatrix<double>::InnerIterator it{topLeft, col}; it;
            ++it) {
         triplets.emplace_back(it.row(), it.col(), it.value());
@@ -254,31 +324,37 @@ void SQP(std::span<Variable> decisionVariables,
     rhs.segment(0, x.rows()) = -(g - A_e.transpose() * y);
     rhs.segment(x.rows(), y.rows()) = -c_e;
 
+    linearSystemBuildProfiler.Stop();
+    ScopedProfiler linearSystemSolveProfiler{linearSystemSolveProf};
+
+    Eigen::VectorXd p_x;
+    Eigen::VectorXd p_y;
+    constexpr double α_max = 1.0;
+    double α = 1.0;
+
     // Solve the Newton-KKT system
     //
     // [H   Aₑᵀ][ pₖˣ] = −[∇f − Aₑᵀy]
     // [Aₑ   0 ][−pₖʸ]    [   cₑ    ]
     solver.Compute(lhs, equalityConstraints.size(), config.tolerance / 10.0);
-    Eigen::VectorXd step{x.rows() + y.rows()};
-    if (solver.Info() == Eigen::Success) {
-      step = solver.Solve(rhs);
-    } else {
-      // The regularization procedure failed due to a rank-deficient equality
-      // constraint Jacobian with linearly dependent constraints
-      status->exitCondition = SolverExitCondition::kLocallyInfeasible;
+    if (solver.Info() != Eigen::Success) [[unlikely]] {
+      status->exitCondition = SolverExitCondition::kFactorizationFailed;
       return;
     }
 
+    Eigen::VectorXd step = solver.Solve(rhs);
+
+    linearSystemSolveProfiler.Stop();
+    ScopedProfiler lineSearchProfiler{lineSearchProf};
+
     // step = [ pₖˣ]
     //        [−pₖʸ]
-    Eigen::VectorXd p_x = step.segment(0, x.rows());
-    Eigen::VectorXd p_y = -step.segment(x.rows(), y.rows());
+    p_x = step.segment(0, x.rows());
+    p_y = -step.segment(x.rows(), y.rows());
 
-    constexpr double α_max = 1.0;
-    double α = α_max;
+    α = α_max;
 
-    // Loop until a step is accepted. If a step becomes acceptable, the loop
-    // will exit early.
+    // Loop until a step is accepted
     while (1) {
       Eigen::VectorXd trial_x = x + α * p_x;
       Eigen::VectorXd trial_y = y + α * p_y;
@@ -297,7 +373,7 @@ void SQP(std::span<Variable> decisionVariables,
 
       // Check whether filter accepts trial iterate
       auto entry = filter.MakeEntry(trial_c_e);
-      if (filter.TryAdd(entry)) {
+      if (filter.TryAdd(entry, α)) {
         // Accept step
         break;
       }
@@ -320,6 +396,8 @@ void SQP(std::span<Variable> decisionVariables,
         bool stepAcceptable = false;
         for (int soc_iteration = 0; soc_iteration < 5 && !stepAcceptable;
              ++soc_iteration) {
+          ScopedProfiler socProfiler{socProf};
+
           // Rebuild Newton-KKT rhs with updated constraint values.
           //
           // rhs = −[∇f − Aₑᵀy]
@@ -344,12 +422,25 @@ void SQP(std::span<Variable> decisionVariables,
 
           // Check whether filter accepts trial iterate
           entry = filter.MakeEntry(trial_c_e);
-          if (filter.TryAdd(entry)) {
+          if (filter.TryAdd(entry, α)) {
             p_x = p_x_cor;
             p_y = p_y_soc;
             α = α_soc;
             stepAcceptable = true;
           }
+
+          socProfiler.Stop();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+          if (config.diagnostics) {
+            double E = ErrorEstimate(g, A_e, trial_c_e, trial_y);
+            PrintIterationDiagnostics(iterations,
+                                      IterationMode::kSecondOrderCorrection,
+                                      socProfiler.CurrentDuration(), E,
+                                      f.Value(), trial_c_e.lpNorm<1>(),
+                                      solver.HessianRegularization(), 1.0, 1.0);
+          }
+#endif
         }
 
         if (stepAcceptable) {
@@ -379,22 +470,19 @@ void SQP(std::span<Variable> decisionVariables,
       // Reduce step size
       α *= α_red_factor;
 
-      // Safety factor for the minimal step size
-      constexpr double α_min_frac = 0.05;
-
       // If step size hit a minimum, check if the KKT error was reduced. If it
-      // wasn't, report infeasible.
-      if (α < α_min_frac * Filter::γConstraint) {
+      // wasn't, report bad line search.
+      if (α < α_min) {
         double currentKKTError = KKTError(g, A_e, c_e, y);
 
-        Eigen::VectorXd trial_x = x + α_max * p_x;
-        Eigen::VectorXd trial_y = y + α_max * p_y;
+        trial_x = x + α_max * p_x;
+        trial_y = y + α_max * p_y;
 
         // Upate autodiff
         xAD.SetValue(trial_x);
         yAD.SetValue(trial_y);
 
-        Eigen::VectorXd trial_c_e = c_eAD.Value();
+        trial_c_e = c_eAD.Value();
 
         double nextKKTError =
             KKTError(gradientF.Value(), jacobianCe.Value(), trial_c_e, trial_y);
@@ -407,76 +495,22 @@ void SQP(std::span<Variable> decisionVariables,
           break;
         }
 
-        auto initialEntry = filter.MakeEntry(c_e);
-
-        // Feasibility restoration phase
-        Eigen::VectorXd fr_x = x;
-        SolverStatus fr_status;
-        FeasibilityRestoration(
-            decisionVariables, equalityConstraints,
-            [&](const SolverIterationInfo& info) {
-              trial_x = info.x.segment(0, decisionVariables.size());
-              xAD.SetValue(trial_x);
-
-              trial_c_e = c_eAD.Value();
-
-              // If current iterate is acceptable to normal filter and
-              // constraint violation has sufficiently reduced, stop
-              // feasibility restoration
-              entry = filter.MakeEntry(trial_c_e);
-              if (filter.IsAcceptable(entry) &&
-                  entry.constraintViolation <
-                      0.9 * initialEntry.constraintViolation) {
-                return true;
-              }
-
-              return false;
-            },
-            config, fr_x, &fr_status);
-
-        if (fr_status.exitCondition ==
-            SolverExitCondition::kCallbackRequestedStop) {
-          p_x = fr_x - x;
-
-          // Lagrange mutliplier estimates
-          //
-          //   y = (AₑAₑᵀ)⁻¹Aₑ∇f
-          //
-          // See equation (19.37) of [1].
-          {
-            xAD.SetValue(fr_x);
-
-            A_e = jacobianCe.Value();
-            g = gradientF.Value();
-
-            // lhs = AₑAₑᵀ
-            Eigen::SparseMatrix<double> lhs = A_e * A_e.transpose();
-
-            // rhs = Aₑ∇f
-            Eigen::VectorXd rhs = A_e * g;
-
-            Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> yEstimator{lhs};
-            Eigen::VectorXd sol = yEstimator.solve(rhs);
-
-            p_y = y - sol.block(0, 0, y.rows(), 1);
-          }
-
-          α = 1.0;
-
-          // Accept step
-          break;
-        } else if (fr_status.exitCondition == SolverExitCondition::kSuccess) {
-          status->exitCondition = SolverExitCondition::kLocallyInfeasible;
-          x = fr_x;
-          return;
-        } else {
-          status->exitCondition =
-              SolverExitCondition::kFeasibilityRestorationFailed;
-          x = fr_x;
-          return;
-        }
+        status->exitCondition = SolverExitCondition::kLineSearchFailed;
+        return;
       }
     }
+
+    lineSearchProfiler.Stop();
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    // Write out spy file contents if that's enabled
+    if (config.spy) {
+      ScopedProfiler spyWritesProfiler{spyWritesProf};
+      H_spy->Add(H);
+      A_e_spy->Add(A_e);
+      lhs_spy->Add(lhs);
+    }
+#endif
 
     // If full step was accepted, reset full-step rejected counter
     if (α == α_max) {
@@ -508,6 +542,8 @@ void SQP(std::span<Variable> decisionVariables,
     g = gradientF.Value();
     H = hessianL.Value();
 
+    ScopedProfiler nextIterPrepProfiler{nextIterPrepProf};
+
     c_e = c_eAD.Value();
 
     // Update the error estimate
@@ -518,20 +554,17 @@ void SQP(std::span<Variable> decisionVariables,
       acceptableIterCounter = 0;
     }
 
-    const auto innerIterEndTime = std::chrono::system_clock::now();
+    nextIterPrepProfiler.Stop();
+    innerIterProfiler.Stop();
 
-    // Diagnostics for current iteration
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
     if (config.diagnostics) {
-      if (iterations % 20 == 0) {
-        sleipnir::println("{:^4}   {:^9}  {:^13}  {:^13}  {:^13}", "iter",
-                          "time (ms)", "error", "cost", "infeasibility");
-        sleipnir::println("{:=^61}", "");
-      }
-
-      sleipnir::println("{:4}   {:9.3f}  {:13e}  {:13e}  {:13e}", iterations,
-                        ToMilliseconds(innerIterEndTime - innerIterStartTime),
-                        E_0, f.Value(), c_e.lpNorm<1>());
+      PrintIterationDiagnostics(iterations, IterationMode::kNormal,
+                                innerIterProfiler.CurrentDuration(), E_0,
+                                f.Value(), c_e.lpNorm<1>(),
+                                solver.HessianRegularization(), α, α);
     }
+#endif
 
     ++iterations;
 
@@ -542,7 +575,7 @@ void SQP(std::span<Variable> decisionVariables,
     }
 
     // Check for max wall clock time
-    if (innerIterEndTime - solveStartTime > config.timeout) {
+    if (std::chrono::steady_clock::now() - solveStartTime > config.timeout) {
       status->exitCondition = SolverExitCondition::kTimeout;
       return;
     }

@@ -1,26 +1,29 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sun, 16 Jun 2024 12:08:49 -0700
-Subject: [PATCH 2/3] Use wpi::SmallVector
+Subject: [PATCH 2/6] Use wpi::SmallVector
 
 ---
- include/.styleguide                            |  1 +
- include/sleipnir/autodiff/Expression.hpp       | 13 +++++++------
- include/sleipnir/autodiff/ExpressionGraph.hpp  | 15 ++++++++-------
- include/sleipnir/autodiff/Hessian.hpp          |  4 ++--
- include/sleipnir/autodiff/Jacobian.hpp         | 10 +++++-----
- include/sleipnir/autodiff/Variable.hpp         | 10 +++++-----
- include/sleipnir/autodiff/VariableMatrix.hpp   |  4 ++--
- include/sleipnir/optimization/Multistart.hpp   |  7 ++++---
- .../optimization/OptimizationProblem.hpp       |  8 ++++----
- include/sleipnir/util/Pool.hpp                 |  7 ++++---
- include/sleipnir/util/Spy.hpp                  |  4 ++--
- src/.styleguide                                |  1 +
- src/optimization/solver/InteriorPoint.cpp      |  4 ++--
- src/optimization/solver/SQP.cpp                |  4 ++--
- .../solver/util/FeasibilityRestoration.hpp     | 18 +++++++++---------
- src/optimization/solver/util/Filter.hpp        |  4 ++--
- 16 files changed, 60 insertions(+), 54 deletions(-)
+ include/.styleguide                             |  1 +
+ .../autodiff/AdjointExpressionGraph.hpp         | 12 ++++++------
+ include/sleipnir/autodiff/Expression.hpp        | 13 +++++++------
+ include/sleipnir/autodiff/Gradient.hpp          |  4 ++--
+ include/sleipnir/autodiff/Hessian.hpp           |  4 ++--
+ include/sleipnir/autodiff/Jacobian.hpp          | 12 ++++++------
+ .../sleipnir/autodiff/ValueExpressionGraph.hpp  |  7 ++++---
+ include/sleipnir/autodiff/Variable.hpp          | 10 +++++-----
+ include/sleipnir/autodiff/VariableMatrix.hpp    | 17 +++++++++--------
+ include/sleipnir/optimization/Multistart.hpp    |  7 ++++---
+ .../optimization/OptimizationProblem.hpp        | 10 +++++-----
+ include/sleipnir/util/Pool.hpp                  |  7 ++++---
+ include/sleipnir/util/Spy.hpp                   |  1 +
+ src/.styleguide                                 |  1 +
+ src/optimization/solver/InteriorPoint.cpp       |  8 ++++----
+ src/optimization/solver/Newton.cpp              |  4 ++--
+ src/optimization/solver/SQP.cpp                 |  8 ++++----
+ src/optimization/solver/util/Filter.hpp         |  4 ++--
+ src/util/PrintDiagnostics.hpp                   |  9 +++++----
+ 19 files changed, 74 insertions(+), 65 deletions(-)
 
 diff --git a/include/.styleguide b/include/.styleguide
 index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f1854fbbc523 100644
@@ -32,11 +35,62 @@ index 6a7f8ed28f9cb037c9746a7e0ef5e110481d9825..efa36cee1fb593ae810032340c64f185
    ^fmt/
 +  ^wpi/
  }
+diff --git a/include/sleipnir/autodiff/AdjointExpressionGraph.hpp b/include/sleipnir/autodiff/AdjointExpressionGraph.hpp
+index ecad2f0e625f48c084c5a3cd79f37e76ded70899..c2f65e8588f296a0ad8dee9c364a06f9b244b63f 100644
+--- a/include/sleipnir/autodiff/AdjointExpressionGraph.hpp
++++ b/include/sleipnir/autodiff/AdjointExpressionGraph.hpp
+@@ -6,10 +6,10 @@
+ #include <utility>
+ 
+ #include <Eigen/SparseCore>
++#include <wpi/SmallVector.h>
+ 
+ #include "sleipnir/autodiff/Variable.hpp"
+ #include "sleipnir/autodiff/VariableMatrix.hpp"
+-#include "sleipnir/util/small_vector.hpp"
+ 
+ namespace sleipnir::detail {
+ 
+@@ -32,7 +32,7 @@ class AdjointExpressionGraph {
+     }
+ 
+     // Stack of nodes to explore
+-    small_vector<Expression*> stack;
++    wpi::SmallVector<Expression*> stack;
+ 
+     // Enumerate incoming edges for each node via depth-first search
+     stack.emplace_back(root.expr.Get());
+@@ -160,7 +160,7 @@ class AdjointExpressionGraph {
+    * @param triplets The sparse matrix triplets.
+    * @param row The row of wrt.
+    */
+-  void AppendAdjointTriplets(small_vector<Eigen::Triplet<double>>& triplets,
++  void AppendAdjointTriplets(wpi::SmallVector<Eigen::Triplet<double>>& triplets,
+                              int row) const {
+     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
+     // for background on reverse accumulation automatic differentiation.
+@@ -206,13 +206,13 @@ class AdjointExpressionGraph {
+ 
+  private:
+   // List that maps nodes to their respective column
+-  small_vector<int> m_colList;
++  wpi::SmallVector<int> m_colList;
+ 
+   // List for updating adjoints
+-  small_vector<Expression*> m_adjointList;
++  wpi::SmallVector<Expression*> m_adjointList;
+ 
+   // List for updating values
+-  small_vector<Expression*> m_valueList;
++  wpi::SmallVector<Expression*> m_valueList;
+ };
+ 
+ }  // namespace sleipnir::detail
 diff --git a/include/sleipnir/autodiff/Expression.hpp b/include/sleipnir/autodiff/Expression.hpp
-index dd53755ccae88e3975d1b5e6b13ac464bd4efcce..ef9a15bf69d8cae6b2196513b72ec4b359cc8752 100644
+index 734f8305ce98d730925eb10f2152b18e03c80c03..ce23ece4beb9f776e942be9ed1f83e2056b1a040 100644
 --- a/include/sleipnir/autodiff/Expression.hpp
 +++ b/include/sleipnir/autodiff/Expression.hpp
-@@ -11,11 +11,12 @@
+@@ -11,10 +11,11 @@
  #include <numbers>
  #include <utility>
  
@@ -45,14 +99,13 @@ index dd53755ccae88e3975d1b5e6b13ac464bd4efcce..ef9a15bf69d8cae6b2196513b72ec4b3
  #include "sleipnir/autodiff/ExpressionType.hpp"
  #include "sleipnir/util/IntrusiveSharedPtr.hpp"
  #include "sleipnir/util/Pool.hpp"
- #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  
  namespace sleipnir::detail {
  
-@@ -29,8 +30,8 @@ inline constexpr bool kUsePoolAllocator = true;
+@@ -28,8 +29,8 @@ inline constexpr bool kUsePoolAllocator = true;
  
- struct SLEIPNIR_DLLEXPORT Expression;
+ struct Expression;
  
 -inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr);
 -inline constexpr void IntrusiveSharedPtrDecRefCount(Expression* expr);
@@ -61,7 +114,7 @@ index dd53755ccae88e3975d1b5e6b13ac464bd4efcce..ef9a15bf69d8cae6b2196513b72ec4b3
  
  /**
   * Typedef for intrusive shared pointer to Expression.
-@@ -418,7 +419,7 @@ SLEIPNIR_DLLEXPORT inline ExpressionPtr sqrt(const ExpressionPtr& x);
+@@ -624,7 +625,7 @@ inline ExpressionPtr sqrt(const ExpressionPtr& x);
   *
   * @param expr The shared pointer's managed object.
   */
@@ -70,7 +123,7 @@ index dd53755ccae88e3975d1b5e6b13ac464bd4efcce..ef9a15bf69d8cae6b2196513b72ec4b3
    ++expr->refCount;
  }
  
-@@ -427,12 +428,12 @@ inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
+@@ -633,12 +634,12 @@ inline constexpr void IntrusiveSharedPtrIncRefCount(Expression* expr) {
   *
   * @param expr The shared pointer's managed object.
   */
@@ -85,130 +138,98 @@ index dd53755ccae88e3975d1b5e6b13ac464bd4efcce..ef9a15bf69d8cae6b2196513b72ec4b3
    stack.emplace_back(expr);
  
    while (!stack.empty()) {
-diff --git a/include/sleipnir/autodiff/ExpressionGraph.hpp b/include/sleipnir/autodiff/ExpressionGraph.hpp
-index c614195d82ad022dfd0c3f6f8240b042c0056c2f..714bcbb82907e754138347334c7fca8a7ccf055d 100644
---- a/include/sleipnir/autodiff/ExpressionGraph.hpp
-+++ b/include/sleipnir/autodiff/ExpressionGraph.hpp
-@@ -4,10 +4,11 @@
- 
- #include <span>
- 
-+#include <wpi/SmallVector.h>
-+
- #include "sleipnir/autodiff/Expression.hpp"
- #include "sleipnir/util/FunctionRef.hpp"
- #include "sleipnir/util/SymbolExports.hpp"
--#include "sleipnir/util/small_vector.hpp"
- 
- namespace sleipnir::detail {
- 
-@@ -36,7 +37,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
-     // https://en.wikipedia.org/wiki/Breadth-first_search
- 
-     // BFS list sorted from parent to child.
--    small_vector<Expression*> stack;
-+    wpi::SmallVector<Expression*> stack;
- 
-     stack.emplace_back(root.Get());
- 
-@@ -119,7 +120,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
-    *
-    * @param wrt Variables with respect to which to compute the gradient.
-    */
--  small_vector<ExpressionPtr> GenerateGradientTree(
-+  wpi::SmallVector<ExpressionPtr> GenerateGradientTree(
-       std::span<const ExpressionPtr> wrt) const {
-     // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
-     // for background on reverse accumulation automatic differentiation.
-@@ -128,7 +129,7 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
-       wrt[row]->row = row;
-     }
- 
--    small_vector<ExpressionPtr> grad;
-+    wpi::SmallVector<ExpressionPtr> grad;
-     grad.reserve(wrt.size());
-     for (size_t row = 0; row < wrt.size(); ++row) {
-       grad.emplace_back(MakeExpressionPtr());
-@@ -231,13 +232,13 @@ class SLEIPNIR_DLLEXPORT ExpressionGraph {
- 
-  private:
-   // List that maps nodes to their respective row.
--  small_vector<int> m_rowList;
-+  wpi::SmallVector<int> m_rowList;
- 
-   // List for updating adjoints
--  small_vector<Expression*> m_adjointList;
-+  wpi::SmallVector<Expression*> m_adjointList;
- 
-   // List for updating values
--  small_vector<Expression*> m_valueList;
-+  wpi::SmallVector<Expression*> m_valueList;
- };
- 
- }  // namespace sleipnir::detail
-diff --git a/include/sleipnir/autodiff/Hessian.hpp b/include/sleipnir/autodiff/Hessian.hpp
-index 4563aa234bd7b0ec22e12d2fc0b6f4569bee7f39..2e60d89e95280bdac422b0d7dab955ba111b0059 100644
---- a/include/sleipnir/autodiff/Hessian.hpp
-+++ b/include/sleipnir/autodiff/Hessian.hpp
-@@ -6,6 +6,7 @@
- 
- #include <Eigen/Core>
- #include <Eigen/SparseCore>
-+#include <wpi/SmallVector.h>
- 
- #include "sleipnir/autodiff/ExpressionGraph.hpp"
- #include "sleipnir/autodiff/Jacobian.hpp"
-@@ -13,7 +14,6 @@
- #include "sleipnir/autodiff/Variable.hpp"
- #include "sleipnir/autodiff/VariableMatrix.hpp"
- #include "sleipnir/util/SymbolExports.hpp"
--#include "sleipnir/util/small_vector.hpp"
- 
- namespace sleipnir {
- 
-@@ -36,7 +36,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
-   Hessian(Variable variable, const VariableMatrix& wrt) noexcept
-       : m_jacobian{
-             [&] {
--              small_vector<detail::ExpressionPtr> wrtVec;
-+              wpi::SmallVector<detail::ExpressionPtr> wrtVec;
-               wrtVec.reserve(wrt.size());
-               for (auto& elem : wrt) {
-                 wrtVec.emplace_back(elem.expr);
-diff --git a/include/sleipnir/autodiff/Jacobian.hpp b/include/sleipnir/autodiff/Jacobian.hpp
-index ac00c11ef8c947cbe95c58081bdbfb42bf901051..0c660156c80f94539383b8f0d01d7853e41e0297 100644
---- a/include/sleipnir/autodiff/Jacobian.hpp
-+++ b/include/sleipnir/autodiff/Jacobian.hpp
+diff --git a/include/sleipnir/autodiff/Gradient.hpp b/include/sleipnir/autodiff/Gradient.hpp
+index 4be87600596edf2e64fe9e1728cdbb48143f2e4d..b2624a3fa50f6bc9db063ba98a7d8adedb7ac365 100644
+--- a/include/sleipnir/autodiff/Gradient.hpp
++++ b/include/sleipnir/autodiff/Gradient.hpp
 @@ -5,13 +5,13 @@
  #include <utility>
  
  #include <Eigen/SparseCore>
 +#include <wpi/SmallVector.h>
  
- #include "sleipnir/autodiff/ExpressionGraph.hpp"
- #include "sleipnir/autodiff/Profiler.hpp"
+ #include "sleipnir/autodiff/Jacobian.hpp"
  #include "sleipnir/autodiff/Variable.hpp"
  #include "sleipnir/autodiff/VariableMatrix.hpp"
+ #include "sleipnir/util/SolveProfiler.hpp"
  #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  
  namespace sleipnir {
  
-@@ -81,7 +81,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
-   VariableMatrix Get() const {
-     VariableMatrix result{m_variables.Rows(), m_wrt.Rows()};
+@@ -63,7 +63,7 @@ class SLEIPNIR_DLLEXPORT Gradient {
+   /**
+    * Returns the profiler.
+    */
+-  const small_vector<SolveProfiler>& GetProfilers() const {
++  const wpi::SmallVector<SolveProfiler>& GetProfilers() const {
+     return m_jacobian.GetProfilers();
+   }
  
--    small_vector<detail::ExpressionPtr> wrtVec;
-+    wpi::SmallVector<detail::ExpressionPtr> wrtVec;
-     wrtVec.reserve(m_wrt.size());
-     for (auto& elem : m_wrt) {
-       wrtVec.emplace_back(elem.expr);
-@@ -138,16 +138,16 @@ class SLEIPNIR_DLLEXPORT Jacobian {
+diff --git a/include/sleipnir/autodiff/Hessian.hpp b/include/sleipnir/autodiff/Hessian.hpp
+index eff995629e10758a04fe28d8fa3f4b0ae100d756..3673c5549655e048c0d2ffa8f69f3d0fb43192d3 100644
+--- a/include/sleipnir/autodiff/Hessian.hpp
++++ b/include/sleipnir/autodiff/Hessian.hpp
+@@ -3,6 +3,7 @@
+ #pragma once
+ 
+ #include <Eigen/SparseCore>
++#include <wpi/SmallVector.h>
+ 
+ #include "sleipnir/autodiff/AdjointExpressionGraph.hpp"
+ #include "sleipnir/autodiff/Jacobian.hpp"
+@@ -10,7 +11,6 @@
+ #include "sleipnir/autodiff/VariableMatrix.hpp"
+ #include "sleipnir/util/SolveProfiler.hpp"
+ #include "sleipnir/util/SymbolExports.hpp"
+-#include "sleipnir/util/small_vector.hpp"
+ 
+ namespace sleipnir {
+ 
+@@ -53,7 +53,7 @@ class SLEIPNIR_DLLEXPORT Hessian {
+   /**
+    * Returns the profilers.
+    */
+-  const small_vector<SolveProfiler>& GetProfilers() const {
++  const wpi::SmallVector<SolveProfiler>& GetProfilers() const {
+     return m_jacobian.GetProfilers();
+   }
+ 
+diff --git a/include/sleipnir/autodiff/Jacobian.hpp b/include/sleipnir/autodiff/Jacobian.hpp
+index aa429d88b77da233872e43d3ea58bfcc6620e0c4..4b78692ccb3645196458e18381a57417ebf2d3d7 100644
+--- a/include/sleipnir/autodiff/Jacobian.hpp
++++ b/include/sleipnir/autodiff/Jacobian.hpp
+@@ -5,6 +5,7 @@
+ #include <utility>
+ 
+ #include <Eigen/SparseCore>
++#include <wpi/SmallVector.h>
+ 
+ #include "sleipnir/autodiff/AdjointExpressionGraph.hpp"
+ #include "sleipnir/autodiff/Variable.hpp"
+@@ -12,7 +13,6 @@
+ #include "sleipnir/util/ScopedProfiler.hpp"
+ #include "sleipnir/util/SolveProfiler.hpp"
+ #include "sleipnir/util/SymbolExports.hpp"
+-#include "sleipnir/util/small_vector.hpp"
+ 
+ namespace sleipnir {
+ 
+@@ -144,7 +144,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
+   /**
+    * Returns the profilers.
+    */
+-  const small_vector<SolveProfiler>& GetProfilers() const {
++  const wpi::SmallVector<SolveProfiler>& GetProfilers() const {
+     return m_profilers;
+   }
+ 
+@@ -152,18 +152,18 @@ class SLEIPNIR_DLLEXPORT Jacobian {
    VariableMatrix m_variables;
    VariableMatrix m_wrt;
  
--  small_vector<detail::ExpressionGraph> m_graphs;
-+  wpi::SmallVector<detail::ExpressionGraph> m_graphs;
+-  small_vector<detail::AdjointExpressionGraph> m_graphs;
++  wpi::SmallVector<detail::AdjointExpressionGraph> m_graphs;
  
    Eigen::SparseMatrix<double> m_J{m_variables.Rows(), m_wrt.Rows()};
  
@@ -221,29 +242,64 @@ index ac00c11ef8c947cbe95c58081bdbfb42bf901051..0c660156c80f94539383b8f0d01d7853
 -  small_vector<int> m_nonlinearRows;
 +  wpi::SmallVector<int> m_nonlinearRows;
  
-   Profiler m_profiler;
+-  small_vector<SolveProfiler> m_profilers;
++  wpi::SmallVector<SolveProfiler> m_profilers;
  };
+ 
+ }  // namespace sleipnir
+diff --git a/include/sleipnir/autodiff/ValueExpressionGraph.hpp b/include/sleipnir/autodiff/ValueExpressionGraph.hpp
+index deb4322d11c92a03cde9669b18b87478eea9aeb3..0af513753340af427b9c074c73e0a50b8532da48 100644
+--- a/include/sleipnir/autodiff/ValueExpressionGraph.hpp
++++ b/include/sleipnir/autodiff/ValueExpressionGraph.hpp
+@@ -4,8 +4,9 @@
+ 
+ #include <ranges>
+ 
++#include <wpi/SmallVector.h>
++
+ #include "sleipnir/autodiff/Expression.hpp"
+-#include "sleipnir/util/small_vector.hpp"
+ 
+ namespace sleipnir::detail {
+ 
+@@ -28,7 +29,7 @@ class ValueExpressionGraph {
+     }
+ 
+     // Stack of nodes to explore
+-    small_vector<Expression*> stack;
++    wpi::SmallVector<Expression*> stack;
+ 
+     // Enumerate incoming edges for each node via depth-first search
+     stack.emplace_back(root.Get());
+@@ -94,7 +95,7 @@ class ValueExpressionGraph {
+ 
+  private:
+   // List for updating values
+-  small_vector<Expression*> m_valueList;
++  wpi::SmallVector<Expression*> m_valueList;
+ };
+ 
+ }  // namespace sleipnir::detail
 diff --git a/include/sleipnir/autodiff/Variable.hpp b/include/sleipnir/autodiff/Variable.hpp
-index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5e84ca34e 100644
+index 73439d9ecc213370c628c20425fb9bd159c38d68..d254bae5bdf13bc3e9705fd34d1647bc7ef3971b 100644
 --- a/include/sleipnir/autodiff/Variable.hpp
 +++ b/include/sleipnir/autodiff/Variable.hpp
-@@ -10,6 +10,7 @@
+@@ -12,13 +12,13 @@
  #include <vector>
  
  #include <Eigen/Core>
 +#include <wpi/SmallVector.h>
  
  #include "sleipnir/autodiff/Expression.hpp"
- #include "sleipnir/autodiff/ExpressionGraph.hpp"
-@@ -17,7 +18,6 @@
+ #include "sleipnir/autodiff/ValueExpressionGraph.hpp"
+ #include "sleipnir/util/Assert.hpp"
  #include "sleipnir/util/Concepts.hpp"
- #include "sleipnir/util/Print.hpp"
  #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  
- namespace sleipnir {
- 
-@@ -445,8 +445,8 @@ template <typename LHS, typename RHS>
+ #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+ #include "sleipnir/util/Print.hpp"
+@@ -477,8 +477,8 @@ template <typename LHS, typename RHS>
            (ScalarLike<std::decay_t<RHS>> || MatrixLike<std::decay_t<RHS>>) &&
            (!std::same_as<std::decay_t<LHS>, double> ||
             !std::same_as<std::decay_t<RHS>, double>)
@@ -254,7 +310,7 @@ index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5
  
    if constexpr (ScalarLike<std::decay_t<LHS>> &&
                  ScalarLike<std::decay_t<RHS>>) {
-@@ -534,7 +534,7 @@ small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
+@@ -566,7 +566,7 @@ small_vector<Variable> MakeConstraints(LHS&& lhs, RHS&& rhs) {
   */
  struct SLEIPNIR_DLLEXPORT EqualityConstraints {
    /// A vector of scalar equality constraints.
@@ -263,7 +319,7 @@ index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5
  
    /**
     * Concatenates multiple equality constraints.
-@@ -596,7 +596,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
+@@ -628,7 +628,7 @@ struct SLEIPNIR_DLLEXPORT EqualityConstraints {
   */
  struct SLEIPNIR_DLLEXPORT InequalityConstraints {
    /// A vector of scalar inequality constraints.
@@ -273,7 +329,7 @@ index c04d629f482efe59497570ca1fd9b09a4af2ae1e..d192fb96e7984b7c0ca30262668c41e5
    /**
     * Concatenates multiple inequality constraints.
 diff --git a/include/sleipnir/autodiff/VariableMatrix.hpp b/include/sleipnir/autodiff/VariableMatrix.hpp
-index 47452b8988b3a1a96a78d28644200b1c4cdc89c9..57b09913d15e9590873ad7bf62e2baff9fbc5df9 100644
+index 73bc588a24151905ee58b309158afc5f88e706c1..091bd720d815f74d1d2b0858c1b63acda69d4095 100644
 --- a/include/sleipnir/autodiff/VariableMatrix.hpp
 +++ b/include/sleipnir/autodiff/VariableMatrix.hpp
 @@ -11,6 +11,7 @@
@@ -292,7 +348,59 @@ index 47452b8988b3a1a96a78d28644200b1c4cdc89c9..57b09913d15e9590873ad7bf62e2baff
  
  namespace sleipnir {
  
-@@ -946,7 +946,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+@@ -842,7 +842,8 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+ 
+     constexpr iterator() noexcept = default;
+ 
+-    explicit constexpr iterator(small_vector<Variable>::iterator it) noexcept
++    explicit constexpr iterator(
++        wpi::SmallVector<Variable>::iterator it) noexcept
+         : m_it{it} {}
+ 
+     constexpr iterator& operator++() noexcept {
+@@ -861,7 +862,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+     constexpr reference operator*() const noexcept { return *m_it; }
+ 
+    private:
+-    small_vector<Variable>::iterator m_it;
++    wpi::SmallVector<Variable>::iterator m_it;
+   };
+ 
+   class const_iterator {
+@@ -875,7 +876,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+     constexpr const_iterator() noexcept = default;
+ 
+     explicit constexpr const_iterator(
+-        small_vector<Variable>::const_iterator it) noexcept
++        wpi::SmallVector<Variable>::const_iterator it) noexcept
+         : m_it{it} {}
+ 
+     constexpr const_iterator& operator++() noexcept {
+@@ -894,7 +895,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+     constexpr const_reference operator*() const noexcept { return *m_it; }
+ 
+    private:
+-    small_vector<Variable>::const_iterator m_it;
++    wpi::SmallVector<Variable>::const_iterator m_it;
+   };
+ 
+   /**
+@@ -920,12 +921,12 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
+   /**
+    * Returns begin iterator.
+    */
+-  const_iterator cbegin() const { return const_iterator{m_storage.cbegin()}; }
++  const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
+ 
+   /**
+    * Returns end iterator.
+    */
+-  const_iterator cend() const { return const_iterator{m_storage.cend()}; }
++  const_iterator cend() const { return const_iterator{m_storage.end()}; }
+ 
+   /**
+    * Returns number of elements in matrix.
+@@ -965,7 +966,7 @@ class SLEIPNIR_DLLEXPORT VariableMatrix {
    }
  
   private:
@@ -302,7 +410,7 @@ index 47452b8988b3a1a96a78d28644200b1c4cdc89c9..57b09913d15e9590873ad7bf62e2baff
    int m_cols = 0;
  };
 diff --git a/include/sleipnir/optimization/Multistart.hpp b/include/sleipnir/optimization/Multistart.hpp
-index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d80c68cec 100644
+index f803edb17467e5f29e20392766ac2cae682ab959..ca6945d269182a5f6b20c639a727a4f79d21092f 100644
 --- a/include/sleipnir/optimization/Multistart.hpp
 +++ b/include/sleipnir/optimization/Multistart.hpp
 @@ -6,9 +6,10 @@
@@ -335,10 +443,10 @@ index 8055713a2492a9c8473f047a2fb9fe7ca57753c3..09b1b2f3bf33c35ae0aeddb9b5d47c0d
  
    for (auto& future : futures) {
 diff --git a/include/sleipnir/optimization/OptimizationProblem.hpp b/include/sleipnir/optimization/OptimizationProblem.hpp
-index 569dcdee507881ceb412585ca811927072552c15..66883fed98ad087010fb153bd91effce6e047928 100644
+index 240cb755e924ca10f1b84bd57f4711c1178cdc8e..7bcff73587fce3b98c4ef407c354a16e962c5827 100644
 --- a/include/sleipnir/optimization/OptimizationProblem.hpp
 +++ b/include/sleipnir/optimization/OptimizationProblem.hpp
-@@ -11,6 +11,7 @@
+@@ -10,6 +10,7 @@
  #include <utility>
  
  #include <Eigen/Core>
@@ -346,15 +454,15 @@ index 569dcdee507881ceb412585ca811927072552c15..66883fed98ad087010fb153bd91effce
  
  #include "sleipnir/autodiff/Variable.hpp"
  #include "sleipnir/autodiff/VariableMatrix.hpp"
-@@ -22,7 +23,6 @@
+@@ -21,7 +22,6 @@
+ #include "sleipnir/optimization/solver/Newton.hpp"
  #include "sleipnir/optimization/solver/SQP.hpp"
- #include "sleipnir/util/Print.hpp"
  #include "sleipnir/util/SymbolExports.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  
- namespace sleipnir {
- 
-@@ -364,16 +364,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
+ #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+ #include <array>
+@@ -378,19 +378,19 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
   private:
    // The list of decision variables, which are the root of the problem's
    // expression tree
@@ -373,7 +481,11 @@ index 569dcdee507881ceb412585ca811927072552c15..66883fed98ad087010fb153bd91effce
 +  wpi::SmallVector<Variable> m_inequalityConstraints;
  
    // The user callback
-   std::function<bool(const SolverIterationInfo& info)> m_callback =
+-  small_vector<std::function<bool(const SolverIterationInfo& info)>>
++  wpi::SmallVector<std::function<bool(const SolverIterationInfo& info)>>
+       m_callbacks;
+ 
+   // The solver status
 diff --git a/include/sleipnir/util/Pool.hpp b/include/sleipnir/util/Pool.hpp
 index 441fa701d4972bc14973c6269d56d4a124deaee5..1951bd1ee8f3bee8d4a3c044c99354b0fd10031d 100644
 --- a/include/sleipnir/util/Pool.hpp
@@ -401,29 +513,17 @@ index 441fa701d4972bc14973c6269d56d4a124deaee5..1951bd1ee8f3bee8d4a3c044c99354b0
  
    /**
 diff --git a/include/sleipnir/util/Spy.hpp b/include/sleipnir/util/Spy.hpp
-index cb9b4e191545e96c2bade5f8f99b0bec376b656b..7f526a2d9968e76b385a0ddfb2edf5bab7274fb0 100644
+index 1abeb469a43d3d644efc1ad0e06e43928149ed0a..3cc5fef0674772d28206f82e7f71b94db0af17b0 100644
 --- a/include/sleipnir/util/Spy.hpp
 +++ b/include/sleipnir/util/Spy.hpp
-@@ -7,9 +7,9 @@
+@@ -10,6 +10,7 @@
  #include <string_view>
  
  #include <Eigen/SparseCore>
 +#include <wpi/SmallVector.h>
  
  #include "sleipnir/util/SymbolExports.hpp"
--#include "sleipnir/util/small_vector.hpp"
  
- namespace sleipnir {
- 
-@@ -32,7 +32,7 @@ SLEIPNIR_DLLEXPORT inline void Spy(std::ostream& file,
-   const int cells_width = mat.cols() + 1;
-   const int cells_height = mat.rows();
- 
--  small_vector<uint8_t> cells;
-+  wpi::SmallVector<uint8_t> cells;
- 
-   // Allocate space for matrix of characters plus trailing newlines
-   cells.reserve(cells_width * cells_height);
 diff --git a/src/.styleguide b/src/.styleguide
 index f3b2f0cf9e60b3a86b9654ff2b381f9c48734ff6..ad739cea6dce6f6cb586f538d1d30b92503484c1 100644
 --- a/src/.styleguide
@@ -435,26 +535,35 @@ index f3b2f0cf9e60b3a86b9654ff2b381f9c48734ff6..ad739cea6dce6f6cb586f538d1d30b92
 +  ^wpi/
  }
 diff --git a/src/optimization/solver/InteriorPoint.cpp b/src/optimization/solver/InteriorPoint.cpp
-index a09d9866d05731c8ce53122b3d1a850803883df4..d3981c59d163927e3e5ba602c3323f6e1429c475 100644
+index af2115b2090dd828bb0dcef48ff27fe3cdf3eac5..0abc539fed840d7f113c2b27f39c7a9f14345b89 100644
 --- a/src/optimization/solver/InteriorPoint.cpp
 +++ b/src/optimization/solver/InteriorPoint.cpp
-@@ -9,6 +9,7 @@
- #include <limits>
+@@ -11,6 +11,7 @@
+ #include <ranges>
  
  #include <Eigen/SparseCholesky>
 +#include <wpi/SmallVector.h>
  
  #include "optimization/RegularizedLDLT.hpp"
  #include "optimization/solver/util/ErrorEstimate.hpp"
-@@ -23,7 +24,6 @@
- #include "sleipnir/optimization/SolverExitCondition.hpp"
- #include "sleipnir/util/Print.hpp"
- #include "sleipnir/util/Spy.hpp"
+@@ -25,7 +26,6 @@
+ #include "sleipnir/util/ScopedProfiler.hpp"
+ #include "sleipnir/util/SetupProfiler.hpp"
+ #include "sleipnir/util/SolveProfiler.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  #include "util/ScopeExit.hpp"
- #include "util/ToMilliseconds.hpp"
  
-@@ -226,7 +226,7 @@ void InteriorPoint(std::span<Variable> decisionVariables,
+ #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+@@ -49,7 +49,7 @@ void InteriorPoint(
+     const SolverConfig& config, Eigen::VectorXd& x, SolverStatus* status) {
+   const auto solveStartTime = std::chrono::steady_clock::now();
+ 
+-  small_vector<SetupProfiler> setupProfilers;
++  wpi::SmallVector<SetupProfiler> setupProfilers;
+   setupProfilers.emplace_back("setup").Start();
+ 
+   setupProfilers.emplace_back("  ↳ s,y,z setup").Start();
+@@ -241,7 +241,7 @@ void InteriorPoint(
    };
  
    // Kept outside the loop so its storage can be reused
@@ -463,27 +572,67 @@ index a09d9866d05731c8ce53122b3d1a850803883df4..d3981c59d163927e3e5ba602c3323f6e
  
    RegularizedLDLT solver;
  
+@@ -258,7 +258,7 @@ void InteriorPoint(
+ 
+   setupProfilers[0].Stop();
+ 
+-  small_vector<SolveProfiler> solveProfilers;
++  wpi::SmallVector<SolveProfiler> solveProfilers;
+   solveProfilers.emplace_back("solve");
+   solveProfilers.emplace_back("  ↳ feasibility ✓");
+   solveProfilers.emplace_back("  ↳ user callbacks");
+diff --git a/src/optimization/solver/Newton.cpp b/src/optimization/solver/Newton.cpp
+index 7656ba683dbe062e31391c3cd210690b7bfc0616..185d3abb5b4ca03b6e0f72af2846927d2c223210 100644
+--- a/src/optimization/solver/Newton.cpp
++++ b/src/optimization/solver/Newton.cpp
+@@ -40,7 +40,7 @@ void Newton(
+     const SolverConfig& config, Eigen::VectorXd& x, SolverStatus* status) {
+   const auto solveStartTime = std::chrono::steady_clock::now();
+ 
+-  small_vector<SetupProfiler> setupProfilers;
++  wpi::SmallVector<SetupProfiler> setupProfilers;
+   setupProfilers.emplace_back("setup").Start();
+ 
+   // Map decision variables and constraints to VariableMatrices for Lagrangian
+@@ -123,7 +123,7 @@ void Newton(
+ 
+   setupProfilers[0].Stop();
+ 
+-  small_vector<SolveProfiler> solveProfilers;
++  wpi::SmallVector<SolveProfiler> solveProfilers;
+   solveProfilers.emplace_back("solve");
+   solveProfilers.emplace_back("  ↳ feasibility ✓");
+   solveProfilers.emplace_back("  ↳ user callbacks");
 diff --git a/src/optimization/solver/SQP.cpp b/src/optimization/solver/SQP.cpp
-index 77b9632e1da37361c995a8579d1d83a2756d6d88..662abc2fb6e311767b0fbb3a61121ce78549a3f6 100644
+index e5f32b6b93f13e904085d0323fbda77726c0a873..b40c0708754f7540b262d04d6effe7b3ec2ab48f 100644
 --- a/src/optimization/solver/SQP.cpp
 +++ b/src/optimization/solver/SQP.cpp
-@@ -9,6 +9,7 @@
- #include <limits>
+@@ -11,6 +11,7 @@
+ #include <ranges>
  
  #include <Eigen/SparseCholesky>
 +#include <wpi/SmallVector.h>
  
  #include "optimization/RegularizedLDLT.hpp"
  #include "optimization/solver/util/ErrorEstimate.hpp"
-@@ -22,7 +23,6 @@
- #include "sleipnir/optimization/SolverExitCondition.hpp"
- #include "sleipnir/util/Print.hpp"
- #include "sleipnir/util/Spy.hpp"
+@@ -24,7 +25,6 @@
+ #include "sleipnir/util/ScopedProfiler.hpp"
+ #include "sleipnir/util/SetupProfiler.hpp"
+ #include "sleipnir/util/SolveProfiler.hpp"
 -#include "sleipnir/util/small_vector.hpp"
  #include "util/ScopeExit.hpp"
- #include "util/ToMilliseconds.hpp"
  
-@@ -155,7 +155,7 @@ void SQP(std::span<Variable> decisionVariables,
+ #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+@@ -44,7 +44,7 @@ void SQP(
+     const SolverConfig& config, Eigen::VectorXd& x, SolverStatus* status) {
+   const auto solveStartTime = std::chrono::steady_clock::now();
+ 
+-  small_vector<SetupProfiler> setupProfilers;
++  wpi::SmallVector<SetupProfiler> setupProfilers;
+   setupProfilers.emplace_back("setup").Start();
+ 
+   setupProfilers.emplace_back("  ↳ y setup").Start();
+@@ -167,7 +167,7 @@ void SQP(
    Filter filter{f};
  
    // Kept outside the loop so its storage can be reused
@@ -492,100 +641,17 @@ index 77b9632e1da37361c995a8579d1d83a2756d6d88..662abc2fb6e311767b0fbb3a61121ce7
  
    RegularizedLDLT solver;
  
-diff --git a/src/optimization/solver/util/FeasibilityRestoration.hpp b/src/optimization/solver/util/FeasibilityRestoration.hpp
-index feefe137adf0832b094a36d61201b15962138ded..79b5d99ae27de6049ba098888a965291e6b677fa 100644
---- a/src/optimization/solver/util/FeasibilityRestoration.hpp
-+++ b/src/optimization/solver/util/FeasibilityRestoration.hpp
-@@ -8,6 +8,7 @@
- #include <span>
+@@ -183,7 +183,7 @@ void SQP(
  
- #include <Eigen/Core>
-+#include <wpi/SmallVector.h>
+   setupProfilers[0].Stop();
  
- #include "sleipnir/autodiff/Variable.hpp"
- #include "sleipnir/autodiff/VariableMatrix.hpp"
-@@ -16,7 +17,6 @@
- #include "sleipnir/optimization/SolverStatus.hpp"
- #include "sleipnir/optimization/solver/InteriorPoint.hpp"
- #include "sleipnir/util/FunctionRef.hpp"
--#include "sleipnir/util/small_vector.hpp"
- 
- namespace sleipnir {
- 
-@@ -57,7 +57,7 @@ inline void FeasibilityRestoration(
-   constexpr double ρ = 1000.0;
-   double μ = config.tolerance / 10.0;
- 
--  small_vector<Variable> fr_decisionVariables;
-+  wpi::SmallVector<Variable> fr_decisionVariables;
-   fr_decisionVariables.reserve(decisionVariables.size() +
-                                2 * equalityConstraints.size());
- 
-@@ -70,7 +70,7 @@ inline void FeasibilityRestoration(
-     fr_decisionVariables.emplace_back();
-   }
- 
--  auto it = fr_decisionVariables.cbegin();
-+  auto it = fr_decisionVariables.begin();
- 
-   VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
-   it += decisionVariables.size();
-@@ -128,7 +128,7 @@ inline void FeasibilityRestoration(
-   }
- 
-   // cₑ(x) - pₑ + nₑ = 0
--  small_vector<Variable> fr_equalityConstraints;
-+  wpi::SmallVector<Variable> fr_equalityConstraints;
-   fr_equalityConstraints.assign(equalityConstraints.begin(),
-                                 equalityConstraints.end());
-   for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
-@@ -137,7 +137,7 @@ inline void FeasibilityRestoration(
-   }
- 
-   // cᵢ(x) - s - pᵢ + nᵢ = 0
--  small_vector<Variable> fr_inequalityConstraints;
-+  wpi::SmallVector<Variable> fr_inequalityConstraints;
- 
-   // pₑ ≥ 0
-   std::copy(p_e.begin(), p_e.end(),
-@@ -227,7 +227,7 @@ inline void FeasibilityRestoration(
- 
-   constexpr double ρ = 1000.0;
- 
--  small_vector<Variable> fr_decisionVariables;
-+  wpi::SmallVector<Variable> fr_decisionVariables;
-   fr_decisionVariables.reserve(decisionVariables.size() +
-                                2 * equalityConstraints.size() +
-                                2 * inequalityConstraints.size());
-@@ -243,7 +243,7 @@ inline void FeasibilityRestoration(
-     fr_decisionVariables.emplace_back();
-   }
- 
--  auto it = fr_decisionVariables.cbegin();
-+  auto it = fr_decisionVariables.begin();
- 
-   VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
-   it += decisionVariables.size();
-@@ -319,7 +319,7 @@ inline void FeasibilityRestoration(
-   }
- 
-   // cₑ(x) - pₑ + nₑ = 0
--  small_vector<Variable> fr_equalityConstraints;
-+  wpi::SmallVector<Variable> fr_equalityConstraints;
-   fr_equalityConstraints.assign(equalityConstraints.begin(),
-                                 equalityConstraints.end());
-   for (size_t row = 0; row < fr_equalityConstraints.size(); ++row) {
-@@ -328,7 +328,7 @@ inline void FeasibilityRestoration(
-   }
- 
-   // cᵢ(x) - s - pᵢ + nᵢ = 0
--  small_vector<Variable> fr_inequalityConstraints;
-+  wpi::SmallVector<Variable> fr_inequalityConstraints;
-   fr_inequalityConstraints.assign(inequalityConstraints.begin(),
-                                   inequalityConstraints.end());
-   for (size_t row = 0; row < fr_inequalityConstraints.size(); ++row) {
+-  small_vector<SolveProfiler> solveProfilers;
++  wpi::SmallVector<SolveProfiler> solveProfilers;
+   solveProfilers.emplace_back("solve");
+   solveProfilers.emplace_back("  ↳ feasibility ✓");
+   solveProfilers.emplace_back("  ↳ user callbacks");
 diff --git a/src/optimization/solver/util/Filter.hpp b/src/optimization/solver/util/Filter.hpp
-index f19236928c59623bc0a3ce87b659f0756997f821..0c14efd7b8afa6cef398f5a7d383c54dbf64ec68 100644
+index 3c63661b1264db346df05bf5db86bae72b5dd4a5..ba625b5a85c195cfe8e7b5f1f26bc25ec7b4e867 100644
 --- a/src/optimization/solver/util/Filter.hpp
 +++ b/src/optimization/solver/util/Filter.hpp
 @@ -8,9 +8,9 @@
@@ -599,12 +665,49 @@ index f19236928c59623bc0a3ce87b659f0756997f821..0c14efd7b8afa6cef398f5a7d383c54d
  
  // See docs/algorithms.md#Works_cited for citation definitions.
  
-@@ -177,7 +177,7 @@ class Filter {
+@@ -189,7 +189,7 @@ class Filter {
+   static constexpr double γConstraint = 1e-5;
  
-  private:
    Variable* m_f = nullptr;
 -  small_vector<FilterEntry> m_filter;
 +  wpi::SmallVector<FilterEntry> m_filter;
  };
  
  }  // namespace sleipnir
+diff --git a/src/util/PrintDiagnostics.hpp b/src/util/PrintDiagnostics.hpp
+index 4289e41c63e5eee182945ca745854694e03f9990..5124773d966143cd5b1f30d16f957b538d7cf401 100644
+--- a/src/util/PrintDiagnostics.hpp
++++ b/src/util/PrintDiagnostics.hpp
+@@ -11,10 +11,11 @@
+ #include <string>
+ #include <utility>
+ 
++#include <wpi/SmallVector.h>
++
+ #include "sleipnir/util/Print.hpp"
+ #include "sleipnir/util/SetupProfiler.hpp"
+ #include "sleipnir/util/SolveProfiler.hpp"
+-#include "sleipnir/util/small_vector.hpp"
+ #include "util/ToMs.hpp"
+ 
+ namespace sleipnir {
+@@ -73,7 +74,7 @@ void PrintIterationDiagnostics(int iterations, IterationMode mode,
+     } else {
+       // Gather regularization exponent digits
+       int n = std::abs(exponent);
+-      small_vector<int> digits;
++      wpi::SmallVector<int> digits;
+       do {
+         digits.emplace_back(n % 10);
+         n /= 10;
+@@ -142,8 +143,8 @@ inline std::string Histogram(double value) {
+  * @param solveProfilers Solve profilers.
+  */
+ inline void PrintFinalDiagnostics(
+-    int iterations, const small_vector<SetupProfiler>& setupProfilers,
+-    const small_vector<SolveProfiler>& solveProfilers) {
++    int iterations, const wpi::SmallVector<SetupProfiler>& setupProfilers,
++    const wpi::SmallVector<SolveProfiler>& solveProfilers) {
+   // Print total time
+   auto setupDuration = ToMs(setupProfilers[0].Duration());
+   auto solveDuration = ToMs(solveProfilers[0].TotalDuration());

@@ -3,7 +3,6 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <concepts>
 #include <functional>
 #include <iterator>
@@ -20,9 +19,14 @@
 #include "sleipnir/optimization/SolverIterationInfo.hpp"
 #include "sleipnir/optimization/SolverStatus.hpp"
 #include "sleipnir/optimization/solver/InteriorPoint.hpp"
+#include "sleipnir/optimization/solver/Newton.hpp"
 #include "sleipnir/optimization/solver/SQP.hpp"
-#include "sleipnir/util/Print.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+#include <array>
+#include "sleipnir/util/Print.hpp"
+#endif
 
 namespace sleipnir {
 
@@ -192,8 +196,8 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
 
     m_equalityConstraints.reserve(m_equalityConstraints.size() +
                                   constraint.constraints.size());
-    std::copy(constraint.constraints.begin(), constraint.constraints.end(),
-              std::back_inserter(m_equalityConstraints));
+    std::ranges::copy(constraint.constraints,
+                      std::back_inserter(m_equalityConstraints));
   }
 
   /**
@@ -211,8 +215,8 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
 
     m_equalityConstraints.reserve(m_equalityConstraints.size() +
                                   constraint.constraints.size());
-    std::copy(constraint.constraints.begin(), constraint.constraints.end(),
-              std::back_inserter(m_equalityConstraints));
+    std::ranges::copy(constraint.constraints,
+                      std::back_inserter(m_equalityConstraints));
   }
 
   /**
@@ -230,8 +234,8 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
 
     m_inequalityConstraints.reserve(m_inequalityConstraints.size() +
                                     constraint.constraints.size());
-    std::copy(constraint.constraints.begin(), constraint.constraints.end(),
-              std::back_inserter(m_inequalityConstraints));
+    std::ranges::copy(constraint.constraints,
+                      std::back_inserter(m_inequalityConstraints));
   }
 
   /**
@@ -249,8 +253,8 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
 
     m_inequalityConstraints.reserve(m_inequalityConstraints.size() +
                                     constraint.constraints.size());
-    std::copy(constraint.constraints.begin(), constraint.constraints.end(),
-              std::back_inserter(m_inequalityConstraints));
+    std::ranges::copy(constraint.constraints,
+                      std::back_inserter(m_inequalityConstraints));
   }
 
   /**
@@ -273,6 +277,7 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
       m_f = Variable();
     }
 
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
     if (config.diagnostics) {
       constexpr std::array kExprTypeToName{"empty", "constant", "linear",
                                            "quadratic", "nonlinear"};
@@ -297,6 +302,7 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
       sleipnir::println("Number of inequality constraints: {}\n",
                         m_inequalityConstraints.size());
     }
+#endif
 
     // If the problem is empty or constant, there's nothing to do
     if (status.costFunctionType <= ExpressionType::kConstant &&
@@ -306,19 +312,22 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
     }
 
     // Solve the optimization problem
-    if (m_inequalityConstraints.empty()) {
-      SQP(m_decisionVariables, m_equalityConstraints, m_f.value(), m_callback,
+    if (m_equalityConstraints.empty() && m_inequalityConstraints.empty()) {
+      Newton(m_decisionVariables, m_f.value(), m_callbacks, config, x, &status);
+    } else if (m_inequalityConstraints.empty()) {
+      SQP(m_decisionVariables, m_equalityConstraints, m_f.value(), m_callbacks,
           config, x, &status);
     } else {
-      Eigen::VectorXd s = Eigen::VectorXd::Ones(m_inequalityConstraints.size());
       InteriorPoint(m_decisionVariables, m_equalityConstraints,
-                    m_inequalityConstraints, m_f.value(), m_callback, config,
-                    false, x, s, &status);
+                    m_inequalityConstraints, m_f.value(), m_callbacks, config,
+                    x, &status);
     }
 
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
     if (config.diagnostics) {
       sleipnir::println("Exit condition: {}", ToMessage(status.exitCondition));
     }
+#endif
 
     // Assign the solution to the original Variable instances
     VariableMatrix{m_decisionVariables}.SetValue(x);
@@ -327,7 +336,7 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
   }
 
   /**
-   * Sets a callback to be called at each solver iteration.
+   * Adds a callback to be called at each solver iteration.
    *
    * The callback for this overload should return void.
    *
@@ -337,16 +346,16 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
     requires requires(F callback, const SolverIterationInfo& info) {
       { callback(info) } -> std::same_as<void>;
     }
-  void Callback(F&& callback) {
-    m_callback = [=, callback = std::forward<F>(callback)](
-                     const SolverIterationInfo& info) {
+  void AddCallback(F&& callback) {
+    m_callbacks.emplace_back([=, callback = std::forward<F>(callback)](
+                                 const SolverIterationInfo& info) {
       callback(info);
       return false;
-    };
+    });
   }
 
   /**
-   * Sets a callback to be called at each solver iteration.
+   * Adds a callback to be called at each solver iteration.
    *
    * The callback for this overload should return bool.
    *
@@ -357,9 +366,14 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
     requires requires(F callback, const SolverIterationInfo& info) {
       { callback(info) } -> std::same_as<bool>;
     }
-  void Callback(F&& callback) {
-    m_callback = std::forward<F>(callback);
+  void AddCallback(F&& callback) {
+    m_callbacks.emplace_back(std::forward<F>(callback));
   }
+
+  /**
+   * Clears the registered callbacks.
+   */
+  void ClearCallbacks() { m_callbacks.clear(); }
 
  private:
   // The list of decision variables, which are the root of the problem's
@@ -376,8 +390,8 @@ class SLEIPNIR_DLLEXPORT OptimizationProblem {
   wpi::SmallVector<Variable> m_inequalityConstraints;
 
   // The user callback
-  std::function<bool(const SolverIterationInfo& info)> m_callback =
-      [](const SolverIterationInfo&) { return false; };
+  wpi::SmallVector<std::function<bool(const SolverIterationInfo& info)>>
+      m_callbacks;
 
   // The solver status
   SolverStatus status;

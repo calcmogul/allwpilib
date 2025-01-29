@@ -2,17 +2,14 @@
 
 #pragma once
 
-#include <utility>
-
-#include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <wpi/SmallVector.h>
 
-#include "sleipnir/autodiff/ExpressionGraph.hpp"
+#include "sleipnir/autodiff/AdjointExpressionGraph.hpp"
 #include "sleipnir/autodiff/Jacobian.hpp"
-#include "sleipnir/autodiff/Profiler.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
+#include "sleipnir/util/SolveProfiler.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -34,25 +31,11 @@ class SLEIPNIR_DLLEXPORT Hessian {
    *   Hessian.
    */
   Hessian(Variable variable, const VariableMatrix& wrt) noexcept
-      : m_jacobian{
-            [&] {
-              wpi::SmallVector<detail::ExpressionPtr> wrtVec;
-              wrtVec.reserve(wrt.size());
-              for (auto& elem : wrt) {
-                wrtVec.emplace_back(elem.expr);
-              }
-
-              auto grad =
-                  detail::ExpressionGraph{variable.expr}.GenerateGradientTree(
-                      wrtVec);
-
-              VariableMatrix ret{wrt.Rows()};
-              for (int row = 0; row < ret.Rows(); ++row) {
-                ret(row) = Variable{std::move(grad[row])};
-              }
-              return ret;
-            }(),
-            wrt} {}
+      : m_jacobian{[&] {
+                     return detail::AdjointExpressionGraph{variable}
+                         .GenerateGradientTree(wrt);
+                   }(),
+                   wrt} {}
 
   /**
    * Returns the Hessian as a VariableMatrix.
@@ -68,9 +51,11 @@ class SLEIPNIR_DLLEXPORT Hessian {
   const Eigen::SparseMatrix<double>& Value() { return m_jacobian.Value(); }
 
   /**
-   * Returns the profiler.
+   * Returns the profilers.
    */
-  Profiler& GetProfiler() { return m_jacobian.GetProfiler(); }
+  const wpi::SmallVector<SolveProfiler>& GetProfilers() const {
+    return m_jacobian.GetProfilers();
+  }
 
  private:
   Jacobian m_jacobian;

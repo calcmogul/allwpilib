@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sat, 1 Feb 2025 16:45:32 -0800
+Subject: [PATCH 6/6] Replace std::views::zip()
+
+---
+ include/sleipnir/autodiff/AdjointExpressionGraph.hpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/sleipnir/autodiff/AdjointExpressionGraph.hpp b/include/sleipnir/autodiff/AdjointExpressionGraph.hpp
+index c2f65e8588f296a0ad8dee9c364a06f9b244b63f..e0d761b34a8eed61d3cf2f00e41763d4e9f3c418 100644
+--- a/include/sleipnir/autodiff/AdjointExpressionGraph.hpp
++++ b/include/sleipnir/autodiff/AdjointExpressionGraph.hpp
+@@ -176,7 +176,10 @@ class AdjointExpressionGraph {
+     // multiplied by dy/dx. If there are multiple "paths" from the root node to
+     // variable; the variable's adjoint is the sum of each path's adjoint
+     // contribution.
+-    for (const auto& [node, col] : std::views::zip(m_adjointList, m_colList)) {
++    for (size_t i = 0; i < m_adjointList.size(); ++i) {
++      const auto& node = m_adjointList[i];
++      const auto& col = m_colList[i];
++
+       auto& lhs = node->args[0];
+       auto& rhs = node->args[1];
+ 

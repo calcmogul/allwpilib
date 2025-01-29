@@ -45,9 +45,6 @@ struct FilterEntry {
  */
 class Filter {
  public:
-  static constexpr double γCost = 1e-8;
-  static constexpr double γConstraint = 1e-5;
-
   double maxConstraintViolation = 1e4;
 
   /**
@@ -73,6 +70,11 @@ class Filter {
     m_filter.emplace_back(std::numeric_limits<double>::infinity(),
                           maxConstraintViolation);
   }
+
+  /**
+   * Creates a new Newton's method filter entry.
+   */
+  FilterEntry MakeEntry() { return FilterEntry{m_f->Value(), 0.0}; }
 
   /**
    * Creates a new Sequential Quadratic Programming filter entry.
@@ -131,9 +133,10 @@ class Filter {
    * Returns true if the given iterate is accepted by the filter.
    *
    * @param entry The entry to attempt adding to the filter.
+   * @param α The step size (0, 1].
    */
-  bool TryAdd(const FilterEntry& entry) {
-    if (IsAcceptable(entry)) {
+  bool TryAdd(const FilterEntry& entry, double α) {
+    if (IsAcceptable(entry, α)) {
       Add(entry);
       return true;
     } else {
@@ -145,9 +148,10 @@ class Filter {
    * Returns true if the given iterate is accepted by the filter.
    *
    * @param entry The entry to attempt adding to the filter.
+   * @param α The step size (0, 1].
    */
-  bool TryAdd(FilterEntry&& entry) {
-    if (IsAcceptable(entry)) {
+  bool TryAdd(FilterEntry&& entry, double α) {
+    if (IsAcceptable(entry, α)) {
       Add(std::move(entry));
       return true;
     } else {
@@ -159,23 +163,31 @@ class Filter {
    * Returns true if the given entry is acceptable to the filter.
    *
    * @param entry The entry to check.
+   * @param α The step size (0, 1].
    */
-  bool IsAcceptable(const FilterEntry& entry) {
+  bool IsAcceptable(const FilterEntry& entry, double α) {
     if (!std::isfinite(entry.cost) ||
         !std::isfinite(entry.constraintViolation)) {
       return false;
     }
 
+    double ϕ = std::pow(α, 1.5);
+
     // If current filter entry is better than all prior ones in some respect,
-    // accept it
-    return std::all_of(m_filter.begin(), m_filter.end(), [&](const auto& elem) {
-      return entry.cost <= elem.cost - γCost * elem.constraintViolation ||
+    // accept it.
+    //
+    // See equation (2.13) of [4].
+    return std::ranges::all_of(m_filter, [&](const auto& elem) {
+      return entry.cost <= elem.cost - ϕ * γCost * elem.constraintViolation ||
              entry.constraintViolation <=
-                 (1.0 - γConstraint) * elem.constraintViolation;
+                 (1.0 - ϕ * γConstraint) * elem.constraintViolation;
     });
   }
 
  private:
+  static constexpr double γCost = 1e-8;
+  static constexpr double γConstraint = 1e-5;
+
   Variable* m_f = nullptr;
   wpi::SmallVector<FilterEntry> m_filter;
 };

@@ -7,10 +7,11 @@
 #include <Eigen/SparseCore>
 #include <wpi/SmallVector.h>
 
-#include "sleipnir/autodiff/ExpressionGraph.hpp"
-#include "sleipnir/autodiff/Profiler.hpp"
+#include "sleipnir/autodiff/AdjointExpressionGraph.hpp"
 #include "sleipnir/autodiff/Variable.hpp"
 #include "sleipnir/autodiff/VariableMatrix.hpp"
+#include "sleipnir/util/ScopedProfiler.hpp"
+#include "sleipnir/util/SolveProfiler.hpp"
 #include "sleipnir/util/SymbolExports.hpp"
 
 namespace sleipnir {
@@ -33,27 +34,25 @@ class SLEIPNIR_DLLEXPORT Jacobian {
    */
   Jacobian(const VariableMatrix& variables, const VariableMatrix& wrt) noexcept
       : m_variables{std::move(variables)}, m_wrt{std::move(wrt)} {
-    m_profiler.StartSetup();
-
-    for (int row = 0; row < m_wrt.Rows(); ++row) {
-      m_wrt(row).expr->row = row;
+    // Initialize column each expression's adjoint occupies in the Jacobian
+    for (size_t col = 0; col < m_wrt.size(); ++col) {
+      m_wrt(col).expr->col = col;
     }
 
-    for (Variable variable : m_variables) {
-      m_graphs.emplace_back(variable.expr);
+    for (auto& variable : m_variables) {
+      m_graphs.emplace_back(variable);
     }
-
-    // Reserve triplet space for 99% sparsity
-    m_cachedTriplets.reserve(m_variables.Rows() * m_wrt.Rows() * 0.01);
 
     for (int row = 0; row < m_variables.Rows(); ++row) {
+      if (m_variables(row).expr == nullptr) {
+        continue;
+      }
+
       if (m_variables(row).Type() == ExpressionType::kLinear) {
         // If the row is linear, compute its gradient once here and cache its
         // triplets. Constant rows are ignored because their gradients have no
         // nonzero triplets.
-        m_graphs[row].ComputeAdjoints([&](int col, double adjoint) {
-          m_cachedTriplets.emplace_back(row, col, adjoint);
-        });
+        m_graphs[row].AppendAdjointTriplets(m_cachedTriplets, row);
       } else if (m_variables(row).Type() > ExpressionType::kLinear) {
         // If the row is quadratic or nonlinear, add it to the list of nonlinear
         // rows to be recomputed in Value().
@@ -61,15 +60,19 @@ class SLEIPNIR_DLLEXPORT Jacobian {
       }
     }
 
-    for (int row = 0; row < m_wrt.Rows(); ++row) {
-      m_wrt(row).expr->row = -1;
+    // Reset col to -1
+    for (auto& node : m_wrt) {
+      node.expr->col = -1;
     }
 
     if (m_nonlinearRows.empty()) {
       m_J.setFromTriplets(m_cachedTriplets.begin(), m_cachedTriplets.end());
     }
 
-    m_profiler.StopSetup();
+    m_profilers.emplace_back("");
+    m_profilers.emplace_back("    ↳ graph update");
+    m_profilers.emplace_back("    ↳ adjoints");
+    m_profilers.emplace_back("    ↳ matrix build");
   }
 
   /**
@@ -79,18 +82,17 @@ class SLEIPNIR_DLLEXPORT Jacobian {
    * them.
    */
   VariableMatrix Get() const {
-    VariableMatrix result{m_variables.Rows(), m_wrt.Rows()};
-
-    wpi::SmallVector<detail::ExpressionPtr> wrtVec;
-    wrtVec.reserve(m_wrt.size());
-    for (auto& elem : m_wrt) {
-      wrtVec.emplace_back(elem.expr);
-    }
+    VariableMatrix result{VariableMatrix::empty, m_variables.Rows(),
+                          m_wrt.Rows()};
 
     for (int row = 0; row < m_variables.Rows(); ++row) {
-      auto grad = m_graphs[row].GenerateGradientTree(wrtVec);
+      auto grad = m_graphs[row].GenerateGradientTree(m_wrt);
       for (int col = 0; col < m_wrt.Rows(); ++col) {
-        result(row, col) = Variable{std::move(grad[col])};
+        if (grad(col).expr != nullptr) {
+          result(row, col) = std::move(grad(col));
+        } else {
+          result(row, col) = Variable{0.0};
+        }
       }
     }
 
@@ -101,15 +103,20 @@ class SLEIPNIR_DLLEXPORT Jacobian {
    * Evaluates the Jacobian at wrt's value.
    */
   const Eigen::SparseMatrix<double>& Value() {
+    ScopedProfiler valueProfiler{m_profilers[0]};
+
     if (m_nonlinearRows.empty()) {
       return m_J;
     }
 
-    m_profiler.StartSolve();
+    ScopedProfiler graphUpdateProfiler{m_profilers[1]};
 
     for (auto& graph : m_graphs) {
       graph.Update();
     }
+
+    graphUpdateProfiler.Stop();
+    ScopedProfiler adjointsProfiler{m_profilers[2]};
 
     // Copy the cached triplets so triplets added for the nonlinear rows are
     // thrown away at the end of the function
@@ -117,28 +124,35 @@ class SLEIPNIR_DLLEXPORT Jacobian {
 
     // Compute each nonlinear row of the Jacobian
     for (int row : m_nonlinearRows) {
-      m_graphs[row].ComputeAdjoints([&](int col, double adjoint) {
-        triplets.emplace_back(row, col, adjoint);
-      });
+      m_graphs[row].AppendAdjointTriplets(triplets, row);
     }
 
-    m_J.setFromTriplets(triplets.begin(), triplets.end());
+    adjointsProfiler.Stop();
+    ScopedProfiler matrixBuildProfiler{m_profilers[3]};
 
-    m_profiler.StopSolve();
+    if (!triplets.empty()) {
+      m_J.setFromTriplets(triplets.begin(), triplets.end());
+    } else {
+      // setFromTriplets() is a no-op on empty triplets, so explicitly zero out
+      // the storage
+      m_J.setZero();
+    }
 
     return m_J;
   }
 
   /**
-   * Returns the profiler.
+   * Returns the profilers.
    */
-  Profiler& GetProfiler() { return m_profiler; }
+  const wpi::SmallVector<SolveProfiler>& GetProfilers() const {
+    return m_profilers;
+  }
 
  private:
   VariableMatrix m_variables;
   VariableMatrix m_wrt;
 
-  wpi::SmallVector<detail::ExpressionGraph> m_graphs;
+  wpi::SmallVector<detail::AdjointExpressionGraph> m_graphs;
 
   Eigen::SparseMatrix<double> m_J{m_variables.Rows(), m_wrt.Rows()};
 
@@ -149,7 +163,7 @@ class SLEIPNIR_DLLEXPORT Jacobian {
   // Value()
   wpi::SmallVector<int> m_nonlinearRows;
 
-  Profiler m_profiler;
+  wpi::SmallVector<SolveProfiler> m_profilers;
 };
 
 }  // namespace sleipnir

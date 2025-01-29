@@ -16,20 +16,17 @@
 namespace sleipnir {
 
 /**
-Finds the optimal solution to a nonlinear program using Sequential Quadratic
-Programming (SQP).
+Finds the optimal solution to a nonlinear program using Newton's method.
 
 A nonlinear program has the form:
 
 @verbatim
      min_x f(x)
-subject to cₑ(x) = 0
 @endverbatim
 
-where f(x) is the cost function and cₑ(x) are the equality constraints.
+where f(x) is the cost function.
 
 @param[in] decisionVariables The list of decision variables.
-@param[in] equalityConstraints The list of equality constraints.
 @param[in] f The cost function.
 @param[in] callbacks The list of user callbacks.
 @param[in] config Configuration options for the solver.
@@ -37,9 +34,8 @@ where f(x) is the cost function and cₑ(x) are the equality constraints.
   variables.
 @param[out] status The solver status.
 */
-SLEIPNIR_DLLEXPORT void SQP(
-    std::span<Variable> decisionVariables,
-    std::span<Variable> equalityConstraints, Variable& f,
+SLEIPNIR_DLLEXPORT void Newton(
+    std::span<Variable> decisionVariables, Variable& f,
     std::span<std::function<bool(const SolverIterationInfo& info)>> callbacks,
     const SolverConfig& config, Eigen::VectorXd& x, SolverStatus* status);
 
