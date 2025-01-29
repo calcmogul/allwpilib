@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Tue, 28 Jan 2025 22:19:31 -0800
+Subject: [PATCH 4/6] Replace std::to_underlying()
+
+---
+ src/util/print_diagnostics.hpp | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/util/print_diagnostics.hpp b/src/util/print_diagnostics.hpp
+index 134728c42eb95a818d1d66d7930d8a0903dd2c55..77a0a7e58194a88276ba22540a22b96be06d84f0 100644
+--- a/src/util/print_diagnostics.hpp
++++ b/src/util/print_diagnostics.hpp
+@@ -10,7 +10,6 @@
+ #include <cmath>
+ #include <ranges>
+ #include <string>
+-#include <utility>
+ 
+ #include <wpi/SmallVector.h>
+ 
+@@ -146,9 +145,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
+   sleipnir::println(
+       "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:<5} {:<5} {:.2e} "
+       "{:.2e} {:2d}│",
+-      iterations, ITERATION_TYPES[std::to_underlying(type)], to_ms(time), error,
+-      cost, infeasibility, complementarity, power_of_10(μ), power_of_10(δ),
+-      primal_α, dual_α, backtracks);
++      iterations, ITERATION_TYPES[static_cast<uint8_t>(type)], to_ms(time),
++      error, cost, infeasibility, complementarity, power_of_10(μ),
++      power_of_10(δ), primal_α, dual_α, backtracks);
+ }
+ 
+ /**

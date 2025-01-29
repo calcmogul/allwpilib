@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Mon, 10 Feb 2025 11:37:02 -0800
+Subject: [PATCH 6/6] Suppress clang-tidy false positives
+
+---
+ include/sleipnir/autodiff/variable.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/sleipnir/autodiff/variable.hpp b/include/sleipnir/autodiff/variable.hpp
+index 11794c925a17abb6538b61f365f072c6175ae85d..26d82f1f49adee19fdf4f4c413499e0113c4afdb 100644
+--- a/include/sleipnir/autodiff/variable.hpp
++++ b/include/sleipnir/autodiff/variable.hpp
+@@ -607,7 +607,7 @@ struct SLEIPNIR_DLLEXPORT InequalityConstraints {
+    * @param inequality_constraints The list of InequalityConstraints to
+    * concatenate.
+    */
+-  InequalityConstraints(
++  InequalityConstraints(  // NOLINT
+       std::initializer_list<InequalityConstraints> inequality_constraints) {
+     for (const auto& elem : inequality_constraints) {
+       constraints.insert(constraints.end(), elem.constraints.begin(),

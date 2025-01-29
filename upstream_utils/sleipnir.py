@@ -48,8 +48,8 @@ def copy_upstream_src(wpilib_root):
 def main():
     name = "sleipnir"
     url = "https://github.com/SleipnirGroup/Sleipnir"
-    # main on 2024-12-07
-    tag = "01206ab17d741f4c45a7faeb56b8a5442df1681c"
+    # main on 2025-02-24
+    tag = "8054d4c41642bbca5162a7de4f5f86e88553aba7"
 
     sleipnir = Lib(name, url, tag, copy_upstream_src)
     sleipnir.main()
