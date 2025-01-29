@@ -44,12 +44,35 @@ def copy_upstream_src(wpilib_root):
             os.path.join(wpimath, "src/main/native/thirdparty/sleipnir", filename),
         )
 
+    # Write shim for wpi::SmallVector
+    with open(
+        os.path.join(
+            wpimath,
+            "src/main/native/thirdparty/sleipnir/include/sleipnir/util/small_vector.hpp",
+        ),
+        "w",
+    ) as f:
+        f.write(
+            """
+#pragma once
+
+#include <wpi/SmallVector.h>
+
+namespace slp {
+
+template <typename T>
+using small_vector = wpi::SmallVector<T>;
+
+}  // namespace slp
+"""
+        )
+
 
 def main():
     name = "sleipnir"
     url = "https://github.com/SleipnirGroup/Sleipnir"
-    # main on 2024-12-07
-    tag = "01206ab17d741f4c45a7faeb56b8a5442df1681c"
+    # main on 2025-03-23
+    tag = "18f02cfb09f8a89a110d3b6feb4f40852fe307d7"
 
     sleipnir = Lib(name, url, tag, copy_upstream_src)
     sleipnir.main()
