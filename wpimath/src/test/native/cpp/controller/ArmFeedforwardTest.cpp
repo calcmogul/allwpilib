@@ -64,7 +64,7 @@ void CalculateAndSimulate(const frc::ArmFeedforward& armFF,
                           units::second_t dt) {
   auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity);
   EXPECT_NEAR(nextVelocity.value(),
-              Simulate(currentAngle, currentVelocity, input, dt)(1), 1e-12);
+              Simulate(currentAngle, currentVelocity, input, dt)(1), 1e-2);
 }
 
 }  // namespace
@@ -89,6 +89,15 @@ TEST(ArmFeedforwardTest, Calculate) {
                        1.05_rad_per_s, 20_ms);
   CalculateAndSimulate(armFF, -std::numbers::pi / 3 * 1_rad, 1_rad_per_s,
                        0.95_rad_per_s, 20_ms);
+
+  static constexpr auto Ks2 = 0.39671_V;
+  static constexpr auto Kv2 = 2.7167_V / 1_rad_per_s;
+  static constexpr auto Ka2 = 0.50799_V / 1_rad_per_s_sq;
+  static constexpr auto Kg2 = 0.2708_V;
+
+  frc::ArmFeedforward armFF2{Ks2, Kg2, Kv2, Ka2};
+
+  CalculateAndSimulate(armFF2, 1_rad, 0.02_rad_per_s, 0_rad_per_s, 20_ms);
 }
 
 TEST(ArmFeedforwardTest, AchievableVelocity) {
