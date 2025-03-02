@@ -66,9 +66,10 @@ SquareRootUnscentedTransform(
                                   .householderQr()
                                   .matrixQR()
                                   .template block<CovDim, CovDim>(0, 0)
-                                  .template triangularView<Eigen::Upper>();
+                                  .template triangularView<Eigen::Upper>()
+                                  .transpose();
 
-  Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
+  Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(
       S, residualFunc(sigmas.template block<CovDim, 1>(0, 0), x), Wc[0]);
 
   return std::make_tuple(x, S);

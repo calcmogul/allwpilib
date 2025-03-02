@@ -189,7 +189,7 @@ class UnscentedKalmanFilter {
   /**
    * Returns the reconstructed error covariance matrix P.
    */
-  StateMatrix P() const { return m_S.transpose() * m_S; }
+  StateMatrix P() const { return m_S * m_S.transpose(); }
 
   /**
    * Set the current square-root error covariance matrix S by taking the square
@@ -197,7 +197,7 @@ class UnscentedKalmanFilter {
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const StateMatrix& P) { m_S = P.llt().matrixU(); }
+  void SetP(const StateMatrix& P) { m_S = P.llt().matrixL(); }
 
   /**
    * Returns the state estimate x-hat.
@@ -407,7 +407,7 @@ class UnscentedKalmanFilter {
 
     Matrixd<States, Rows> U = K * Sy;
     for (int i = 0; i < Rows; i++) {
-      Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
+      Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(
           m_S, U.template block<States, 1>(0, i), -1);
     }
   }
