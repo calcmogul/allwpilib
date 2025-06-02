@@ -248,6 +248,15 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
     return maxAchievableAcceleration(-maxVoltage, velocity);
   }
 
+  public static SimpleMotorFeedforward fromTheoretical(double minMovingVoltage,
+      double testVoltage, double steadyStateVelocityAtTestVoltage,
+      double accelerationFromRest) {
+    double k_s = minMovingVoltage;
+    double k_v = (testVoltage - k_s) / steadyStateVelocityAtTestVoltage;
+    double k_a = (testVoltage - k_s) / accelerationFromRest;
+    return new SimpleMotorFeedforward(k_s, k_v, k_a);
+  }
+
   /** SimpleMotorFeedforward struct for serialization. */
   public static final SimpleMotorFeedforwardStruct struct = new SimpleMotorFeedforwardStruct();
 
