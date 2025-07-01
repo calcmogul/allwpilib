@@ -15,6 +15,11 @@ file(
     src/main/native/cpp/jni/StateSpaceUtilJNI.cpp
     src/main/native/cpp/jni/Transform3dJNI.cpp
     src/main/native/cpp/jni/Twist3dJNI.cpp
+    src/main/native/cpp/jni/autodiff/GradientJNI.cpp
+    src/main/native/cpp/jni/autodiff/HessianJNI.cpp
+    src/main/native/cpp/jni/autodiff/JacobianJNI.cpp
+    src/main/native/cpp/jni/autodiff/VariableJNI.cpp
+    src/main/native/cpp/jni/optimization/ProblemJNI.cpp
 )
 
 # Java bindings
