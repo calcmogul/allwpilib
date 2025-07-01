@@ -15,6 +15,8 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
+
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
@@ -973,6 +975,21 @@ struct JExceptionInit {
   const char* name;
   JException* cls;
 };
+
+/**
+ * Looks up a Java enum field and returns an instance of it.
+ *
+ * @param env JNI environment.
+ * @param enumName The enum name.
+ * @param fieldName The enum field name.
+ */
+inline jobject GetEnumField(JNIEnv* env, const char* enumName,
+                            const char* fieldName) {
+  jclass enumClass = env->FindClass(enumName);
+  jfieldID fieldID = env->GetStaticFieldID(
+      enumClass, fieldName, fmt::format("L{};", enumName).c_str());
+  return env->GetStaticObjectField(enumClass, fieldID);
+}
 
 }  // namespace wpi::java
 
