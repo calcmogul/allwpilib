@@ -52,8 +52,8 @@ using small_vector = wpi::SmallVector<T>;
 def main():
     name = "sleipnir"
     url = "https://github.com/SleipnirGroup/Sleipnir"
-    # main on 2025-09-19
-    tag = "7f89d5547702a09e3617bc31fe5bafe6add04fab"
+    # main on 2025-10-11
+    tag = "c775a0b6e5cb0319cd0ea42d822b5b0dcc73d47d"
 
     sleipnir = Lib(name, url, tag, copy_upstream_src)
     sleipnir.main()
