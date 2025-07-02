@@ -17,7 +17,7 @@ This reverts commit f9b2c450bbbf6f14b194b8b81708d032a6431ee0.
  8 files changed, 118 insertions(+), 182 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
-index 4ad097a8117dac47566a3c6896d281004147be70..8b048ab3ba0d671397cfdadcd137ac67bef1b441 100644
+index 9504fcbad3e25b81cbca80cafcc5f34c77d5e309..36de5c292046d317cbf5d9324f62f86377f4493e 100644
 --- a/include/sleipnir/autodiff/hessian.hpp
 +++ b/include/sleipnir/autodiff/hessian.hpp
 @@ -103,9 +103,9 @@ class SLEIPNIR_DLLEXPORT Hessian {
@@ -33,7 +33,7 @@ index 4ad097a8117dac47566a3c6896d281004147be70..8b048ab3ba0d671397cfdadcd137ac67
        }
      }
 diff --git a/include/sleipnir/autodiff/jacobian.hpp b/include/sleipnir/autodiff/jacobian.hpp
-index 787fca8ccd3fd6e46c5d31ab980704e6a5e99402..7e7e1340d065d35412f43b27fac7d8a719b7e5b5 100644
+index 01669de7772d11137b21d42a89b71a6ca367349d..48bcd93d8fc57c7737456d2d418a4d9e4c9ad010 100644
 --- a/include/sleipnir/autodiff/jacobian.hpp
 +++ b/include/sleipnir/autodiff/jacobian.hpp
 @@ -95,9 +95,9 @@ class SLEIPNIR_DLLEXPORT Jacobian {

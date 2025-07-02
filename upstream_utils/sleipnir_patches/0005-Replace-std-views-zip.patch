@@ -25,7 +25,7 @@ index 4b4f3303faed766d3ac39829870514f50d9a582f..4576e19c9695caf4407fbbb592afe32d
          if (col != -1 && node->adjoint != 0.0) {
            triplets.emplace_back(row, col, node->adjoint);
 diff --git a/src/optimization/problem.cpp b/src/optimization/problem.cpp
-index c3319fc0a927cf452871a2db08d5edff87ac8eea..5532b3962409e2140132e79241da4fba0f36bc78 100644
+index 7e306d59999593b72ad5597e4aeb046152c2e715..c5462f639015ca0fef691fe832d996423464ba87 100644
 --- a/src/optimization/problem.cpp
 +++ b/src/optimization/problem.cpp
 @@ -6,7 +6,6 @@
@@ -36,7 +36,7 @@ index c3319fc0a927cf452871a2db08d5edff87ac8eea..5532b3962409e2140132e79241da4fba
  
  #include <Eigen/Core>
  #include <Eigen/SparseCore>
-@@ -363,9 +362,11 @@ void Problem::print_problem_analysis() {
+@@ -364,9 +363,11 @@ void Problem::print_problem_analysis() {
          for (const auto& constraint : constraints) {
            ++counts[static_cast<uint8_t>(constraint.type())];
          }
