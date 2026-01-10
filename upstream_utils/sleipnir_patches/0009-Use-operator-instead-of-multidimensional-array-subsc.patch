@@ -15,7 +15,7 @@ Subject: [PATCH 9/9] Use operator() instead of multidimensional array
  7 files changed, 135 insertions(+), 135 deletions(-)
 
 diff --git a/include/sleipnir/autodiff/hessian.hpp b/include/sleipnir/autodiff/hessian.hpp
-index 5c8d18b41c4025f4492e7216f94299785a513552..b52371b182b755f87f4d038dbeb1795704ab730e 100644
+index 13da0946e2fbc28cb91bfba3fbee9d5c7a9be341..fe1c8f822e3e29631d64480be0b2ebc9b204580a 100644
 --- a/include/sleipnir/autodiff/hessian.hpp
 +++ b/include/sleipnir/autodiff/hessian.hpp
 @@ -98,9 +98,9 @@ class Hessian {
@@ -31,7 +31,7 @@ index 5c8d18b41c4025f4492e7216f94299785a513552..b52371b182b755f87f4d038dbeb17957
        }
      }
 diff --git a/include/sleipnir/autodiff/jacobian.hpp b/include/sleipnir/autodiff/jacobian.hpp
-index bb3a0319880bd240497e1e27ca26f0105b50b803..082a6cf6782f376cbb6ce05809e62e8021feb321 100644
+index f1915a0d08c509f4eb4d032d4e6a5e6099b68ebc..edd949eefd018af1b1e091b4b2780fc1a0a492cf 100644
 --- a/include/sleipnir/autodiff/jacobian.hpp
 +++ b/include/sleipnir/autodiff/jacobian.hpp
 @@ -104,9 +104,9 @@ class Jacobian {
@@ -959,7 +959,7 @@ index 091d985234ac8be5c177b9269c7608036f0daddb..e906c194e93a9e26b9cb5c20b720b878
        if (m_dynamics_type == DynamicsType::EXPLICIT_ODE) {
          x_end = rk4<const decltype(m_dynamics)&, VariableMatrix<Scalar>,
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 70955fdc7148e5af737d3094a5602024df790b3d..4243d13c9d04eeee948f8e0e7a21d72b6ef0eaa6 100644
+index 406569e211dd38a6e662fd1621c0854ec3933edf..412d478261204600f3debb25807adb579fe70421 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
 @@ -92,7 +92,7 @@ class Problem {
