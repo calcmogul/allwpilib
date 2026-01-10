@@ -17,7 +17,8 @@
 #include "sleipnir/optimization/solver/interior_point_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/iteration_info.hpp"
 #include "sleipnir/optimization/solver/options.hpp"
-#include "sleipnir/optimization/solver/util/error_estimate.hpp"
+#include "sleipnir/optimization/solver/util/all_finite.hpp"
+#include "sleipnir/optimization/solver/util/append_as_triplets.hpp"
 #include "sleipnir/optimization/solver/util/filter.hpp"
 #include "sleipnir/optimization/solver/util/fraction_to_the_boundary_rule.hpp"
 #include "sleipnir/optimization/solver/util/is_locally_infeasible.hpp"
@@ -25,9 +26,8 @@
 #include "sleipnir/optimization/solver/util/regularized_ldlt.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/print_diagnostics.hpp"
+#include "sleipnir/util/profiler.hpp"
 #include "sleipnir/util/scope_exit.hpp"
-#include "sleipnir/util/scoped_profiler.hpp"
-#include "sleipnir/util/solve_profiler.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
 // See docs/algorithms.md#Works_cited for citation definitions.
@@ -70,17 +70,76 @@ ExitStatus interior_point(
 #endif
     Eigen::Vector<Scalar, Eigen::Dynamic>& x) {
   using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+
+  DenseVector s =
+      DenseVector::Ones(matrix_callbacks.num_inequality_constraints);
+  DenseVector y = DenseVector::Zero(matrix_callbacks.num_equality_constraints);
+  DenseVector z =
+      DenseVector::Ones(matrix_callbacks.num_inequality_constraints);
+  Scalar μ(0.1);
+
+  return interior_point(matrix_callbacks, iteration_callbacks, options,
+#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
+                        bound_constraint_mask,
+#endif
+                        x, s, y, z, μ);
+}
+
+/// Finds the optimal solution to a nonlinear program using the interior-point
+/// method.
+///
+/// A nonlinear program has the form:
+///
+/// ```
+///      min_x f(x)
+/// subject to cₑ(x) = 0
+///            cᵢ(x) ≥ 0
+/// ```
+///
+/// where f(x) is the cost function, cₑ(x) are the equality constraints, and
+/// cᵢ(x) are the inequality constraints.
+///
+/// @tparam Scalar Scalar type.
+/// @param[in] matrix_callbacks Matrix callbacks.
+/// @param[in] iteration_callbacks The list of callbacks to call at the
+///     beginning of each iteration.
+/// @param[in] options Solver options.
+/// @param[in,out] x The initial guess and output location for the decision
+///     variables.
+/// @param[in,out] s The initial guess and output location for the inequality
+///     constraint slack variables.
+/// @param[in,out] y The initial guess and output location for the equality
+///     constraint dual variables.
+/// @param[in,out] z The initial guess and output location for the inequality
+///     constraint dual variables.
+/// @param[in,out] μ The initial guess and output location for the barrier
+///     parameter.
+/// @return The exit status.
+template <typename Scalar>
+ExitStatus interior_point(
+    const InteriorPointMatrixCallbacks<Scalar>& matrix_callbacks,
+    std::span<std::function<bool(const IterationInfo<Scalar>& info)>>
+        iteration_callbacks,
+    const Options& options,
+#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
+    const Eigen::ArrayX<bool>& bound_constraint_mask,
+#endif
+    Eigen::Vector<Scalar, Eigen::Dynamic>& x,
+    Eigen::Vector<Scalar, Eigen::Dynamic>& s,
+    Eigen::Vector<Scalar, Eigen::Dynamic>& y,
+    Eigen::Vector<Scalar, Eigen::Dynamic>& z, Scalar& μ) {
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
   using SparseMatrix = Eigen::SparseMatrix<Scalar>;
   using SparseVector = Eigen::SparseVector<Scalar>;
 
   /// Interior-point method step direction.
   struct Step {
-    /// Primal step.
+    /// Decision variable primal step.
     DenseVector p_x;
+    /// Inequality constraint slack variable primal step.
+    DenseVector p_s;
     /// Equality constraint dual step.
     DenseVector p_y;
-    /// Inequality constraint slack variable step.
-    DenseVector p_s;
     /// Inequality constraint dual step.
     DenseVector p_z;
   };
@@ -132,6 +191,9 @@ ExitStatus interior_point(
   auto& A_i_prof = solve_profilers[17];
 
   InteriorPointMatrixCallbacks<Scalar> matrices{
+      matrix_callbacks.num_decision_variables,
+      matrix_callbacks.num_equality_constraints,
+      matrix_callbacks.num_inequality_constraints,
       [&](const DenseVector& x) -> Scalar {
         ScopedProfiler prof{f_prof};
         return matrix_callbacks.f(x);
@@ -169,15 +231,26 @@ ExitStatus interior_point(
   setup_prof.start();
 
   Scalar f = matrices.f(x);
+  SparseVector g = matrices.g(x);
+  SparseMatrix H = matrices.H(x, y, z);
   DenseVector c_e = matrices.c_e(x);
+  SparseMatrix A_e = matrices.A_e(x);
   DenseVector c_i = matrices.c_i(x);
+  SparseMatrix A_i = matrices.A_i(x);
 
-  int num_decision_variables = x.rows();
-  int num_equality_constraints = c_e.rows();
-  int num_inequality_constraints = c_i.rows();
+  // Ensure matrix callback dimensions are consistent
+  slp_assert(g.rows() == matrices.num_decision_variables);
+  slp_assert(H.rows() == matrices.num_decision_variables);
+  slp_assert(H.cols() == matrices.num_decision_variables);
+  slp_assert(c_e.rows() == matrices.num_equality_constraints);
+  slp_assert(A_e.rows() == matrices.num_equality_constraints);
+  slp_assert(A_e.cols() == matrices.num_decision_variables);
+  slp_assert(c_i.rows() == matrices.num_inequality_constraints);
+  slp_assert(A_i.rows() == matrices.num_inequality_constraints);
+  slp_assert(A_i.cols() == matrices.num_decision_variables);
 
   // Check for overconstrained problem
-  if (num_equality_constraints > num_decision_variables) {
+  if (matrices.num_equality_constraints > matrices.num_decision_variables) {
     if (options.diagnostics) {
       print_too_few_dofs_error(c_e);
     }
@@ -185,41 +258,21 @@ ExitStatus interior_point(
     return ExitStatus::TOO_FEW_DOFS;
   }
 
-  SparseVector g = matrices.g(x);
-  SparseMatrix A_e = matrices.A_e(x);
-  SparseMatrix A_i = matrices.A_i(x);
+  // Check whether initial guess has finite cost, constraints, and derivatives
+  if (!isfinite(f) || !all_finite(g) || !all_finite(H) || !c_e.allFinite() ||
+      !all_finite(A_e) || !c_i.allFinite() || !all_finite(A_i)) {
+    return ExitStatus::NONFINITE_INITIAL_GUESS;
+  }
 
-  DenseVector s = DenseVector::Ones(num_inequality_constraints);
 #ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
   // We set sʲ = cᵢʲ(x) for each bound inequality constraint index j
   s = bound_constraint_mask.select(c_i, s);
 #endif
-  DenseVector y = DenseVector::Zero(num_equality_constraints);
-  DenseVector z = DenseVector::Ones(num_inequality_constraints);
-
-  SparseMatrix H = matrices.H(x, y, z);
-
-  // Ensure matrix callback dimensions are consistent
-  slp_assert(g.rows() == num_decision_variables);
-  slp_assert(A_e.rows() == num_equality_constraints);
-  slp_assert(A_e.cols() == num_decision_variables);
-  slp_assert(A_i.rows() == num_inequality_constraints);
-  slp_assert(A_i.cols() == num_decision_variables);
-  slp_assert(H.rows() == num_decision_variables);
-  slp_assert(H.cols() == num_decision_variables);
-
-  // Check whether initial guess has finite f(xₖ), cₑ(xₖ), and cᵢ(xₖ)
-  if (!isfinite(f) || !c_e.allFinite() || !c_i.allFinite()) {
-    return ExitStatus::NONFINITE_INITIAL_COST_OR_CONSTRAINTS;
-  }
 
   int iterations = 0;
 
   // Barrier parameter minimum
   const Scalar μ_min = Scalar(options.tolerance) / Scalar(10);
-
-  // Barrier parameter μ
-  Scalar μ(0.1);
 
   // Fraction-to-the-boundary rule scale factor minimum
   constexpr Scalar τ_min(0.99);
@@ -229,8 +282,8 @@ ExitStatus interior_point(
 
   Filter<Scalar> filter;
 
-  // This should be run when the error estimate is below a desired threshold for
-  // the current barrier parameter
+  // This should be run when the error is below a desired threshold for the
+  // current barrier parameter
   auto update_barrier_parameter_and_reset_filter = [&] {
     // Barrier parameter linear decrease power in "κ_μ μ". Range of (0, 1).
     constexpr Scalar κ_μ(0.2);
@@ -261,8 +314,8 @@ ExitStatus interior_point(
   // Kept outside the loop so its storage can be reused
   gch::small_vector<Eigen::Triplet<Scalar>> triplets;
 
-  RegularizedLDLT<Scalar> solver{num_decision_variables,
-                                 num_equality_constraints};
+  RegularizedLDLT<Scalar> solver{matrices.num_decision_variables,
+                                 matrices.num_equality_constraints};
 
   // Variables for determining when a step is acceptable
   constexpr Scalar α_reduction_factor(0.5);
@@ -270,7 +323,7 @@ ExitStatus interior_point(
 
   int full_step_rejected_counter = 0;
 
-  // Error estimate
+  // Error
   Scalar E_0 = std::numeric_limits<Scalar>::infinity();
 
   setup_prof.stop();
@@ -319,7 +372,7 @@ ExitStatus interior_point(
 
     // Call iteration callbacks
     for (const auto& callback : iteration_callbacks) {
-      if (callback({iterations, x, g, H, A_e, A_i})) {
+      if (callback({iterations, x, s, y, z, g, H, A_e, A_i})) {
         return ExitStatus::CALLBACK_REQUESTED_STOP;
       }
     }
@@ -340,18 +393,10 @@ ExitStatus interior_point(
         H + (A_i.transpose() * Σ * A_i).template triangularView<Eigen::Lower>();
     triplets.clear();
     triplets.reserve(top_left.nonZeros() + A_e.nonZeros());
-    for (int col = 0; col < H.cols(); ++col) {
-      // Append column of H + AᵢᵀΣAᵢ lower triangle in top-left quadrant
-      for (typename SparseMatrix::InnerIterator it{top_left, col}; it; ++it) {
-        triplets.emplace_back(it.row(), it.col(), it.value());
-      }
-      // Append column of Aₑ in bottom-left quadrant
-      for (typename SparseMatrix::InnerIterator it{A_e, col}; it; ++it) {
-        triplets.emplace_back(H.rows() + it.row(), it.col(), it.value());
-      }
-    }
-    SparseMatrix lhs(num_decision_variables + num_equality_constraints,
-                     num_decision_variables + num_equality_constraints);
+    append_as_triplets(triplets, 0, 0, {top_left, A_e});
+    SparseMatrix lhs(
+        matrices.num_decision_variables + matrices.num_equality_constraints,
+        matrices.num_decision_variables + matrices.num_equality_constraints);
     lhs.setFromSortedTriplets(triplets.begin(), triplets.end());
 
     // rhs = −[∇f − Aₑᵀy − Aᵢᵀ(−Σcᵢ + μS⁻¹e + z)]
@@ -484,7 +529,10 @@ ExitStatus interior_point(
                   step_acceptable ? IterationType::ACCEPTED_SOC
                                   : IterationType::REJECTED_SOC,
                   soc_profiler.current_duration(),
-                  error_estimate<Scalar>(g, A_e, trial_c_e, trial_y), trial_f,
+                  kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(
+                      g, A_e, trial_c_e, A_i, trial_c_i, trial_s, trial_y,
+                      trial_z, Scalar(0)),
+                  trial_f,
                   trial_c_e.template lpNorm<1>() +
                       (trial_c_i - trial_s).template lpNorm<1>(),
                   trial_s.dot(trial_z), μ, solver.hessian_regularization(),
@@ -571,8 +619,8 @@ ExitStatus interior_point(
       // If step size hit a minimum, check if the KKT error was reduced. If it
       // wasn't, report line search failure.
       if (α < α_min) {
-        Scalar current_kkt_error =
-            kkt_error<Scalar>(g, A_e, c_e, A_i, c_i, s, y, z, μ);
+        Scalar current_kkt_error = kkt_error<Scalar, KKTErrorType::ONE_NORM>(
+            g, A_e, c_e, A_i, c_i, s, y, z, μ);
 
         trial_x = x + α_max * step.p_x;
         trial_s = s + α_max * step.p_s;
@@ -583,7 +631,7 @@ ExitStatus interior_point(
         trial_c_e = matrices.c_e(trial_x);
         trial_c_i = matrices.c_i(trial_x);
 
-        Scalar next_kkt_error = kkt_error<Scalar>(
+        Scalar next_kkt_error = kkt_error<Scalar, KKTErrorType::ONE_NORM>(
             matrices.g(trial_x), matrices.A_e(trial_x), matrices.c_e(trial_x),
             matrices.A_i(trial_x), trial_c_i, trial_s, trial_y, trial_z, μ);
 
@@ -646,20 +694,23 @@ ExitStatus interior_point(
     c_e = matrices.c_e(x);
     c_i = matrices.c_i(x);
 
-    // Update the error estimate
-    E_0 = error_estimate<Scalar>(g, A_e, c_e, A_i, c_i, s, y, z, Scalar(0));
+    // Update the error
+    E_0 = kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(
+        g, A_e, c_e, A_i, c_i, s, y, z, Scalar(0));
 
     // Update the barrier parameter if necessary
     if (E_0 > Scalar(options.tolerance)) {
       // Barrier parameter scale factor for tolerance checks
       constexpr Scalar κ_ε(10);
 
-      // While the error estimate is below the desired threshold for this
-      // barrier parameter value, decrease the barrier parameter further
-      Scalar E_μ = error_estimate<Scalar>(g, A_e, c_e, A_i, c_i, s, y, z, μ);
+      // While the error is below the desired threshold for this barrier
+      // parameter value, decrease the barrier parameter further
+      Scalar E_μ = kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(
+          g, A_e, c_e, A_i, c_i, s, y, z, μ);
       while (μ > μ_min && E_μ <= κ_ε * μ) {
         update_barrier_parameter_and_reset_filter();
-        E_μ = error_estimate<Scalar>(g, A_e, c_e, A_i, c_i, s, y, z, μ);
+        E_μ = kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(g, A_e, c_e, A_i,
+                                                               c_i, s, y, z, μ);
       }
     }
 
