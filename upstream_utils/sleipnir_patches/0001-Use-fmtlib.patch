@@ -50,7 +50,7 @@ index 200324a2c38c58dbe07e96c061658c9e65aacce6..2fde6bdf3cf72f46fb633b72e29e6620
 +  fmt::formatter<const char*> m_underlying;
  };
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index 59acc732dbc5bfe520745089abd156da9a8a2e51..ba45ead1500b45616b74e1d108959127484cf4d6 100644
+index a4f5cb0df7513e25d0f9df714857e0c7dd7b3710..094086bad32db1bf4361aa30df179c68e42d9b12 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
 @@ -15,6 +15,7 @@

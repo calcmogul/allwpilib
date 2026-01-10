@@ -9,10 +9,10 @@ Subject: [PATCH 4/9] Replace std::to_underlying()
  2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/include/sleipnir/optimization/problem.hpp b/include/sleipnir/optimization/problem.hpp
-index ba45ead1500b45616b74e1d108959127484cf4d6..22e7cdaa945648e2b9effcc30533d6602c839c22 100644
+index 094086bad32db1bf4361aa30df179c68e42d9b12..44ad2b6a2019fc6de1a59b150c1638c441499cfb 100644
 --- a/include/sleipnir/optimization/problem.hpp
 +++ b/include/sleipnir/optimization/problem.hpp
-@@ -657,11 +657,11 @@ class Problem {
+@@ -665,11 +665,11 @@ class Problem {
      // Print problem structure
      slp::println("\nProblem structure:");
      slp::println("  ↳ {} cost function",
@@ -27,7 +27,7 @@ index ba45ead1500b45616b74e1d108959127484cf4d6..22e7cdaa945648e2b9effcc30533d660
  
      if (m_decision_variables.size() == 1) {
        slp::print("\n1 decision variable\n");
-@@ -673,7 +673,7 @@ class Problem {
+@@ -681,7 +681,7 @@ class Problem {
          [](const gch::small_vector<Variable<Scalar>>& constraints) {
            std::array<size_t, 5> counts{};
            for (const auto& constraint : constraints) {
@@ -37,10 +37,10 @@ index ba45ead1500b45616b74e1d108959127484cf4d6..22e7cdaa945648e2b9effcc30533d660
            for (const auto& [count, name] :
                 std::views::zip(counts, std::array{"empty", "constant", "linear",
 diff --git a/include/sleipnir/util/print_diagnostics.hpp b/include/sleipnir/util/print_diagnostics.hpp
-index 54277542c46e9490a9ef01c43dc8572e9367c97e..c50d7e171bc90ea47108de90471e7d778885f6af 100644
+index d0b7e4a69ef1ce95a20c2aec30646d24b8f59ac0..c340452e61cbcdc2bf58682ebec22ee509e32d67 100644
 --- a/include/sleipnir/util/print_diagnostics.hpp
 +++ b/include/sleipnir/util/print_diagnostics.hpp
-@@ -238,9 +238,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
+@@ -237,9 +237,9 @@ void print_iteration_diagnostics(int iterations, IterationType type,
    slp::println(
        "│{:4} {:4} {:9.3f} {:12e} {:13e} {:12e} {:12e} {:.2e} {:<5} {:.2e} "
        "{:.2e} {:2d}│",
