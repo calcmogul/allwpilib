@@ -11,7 +11,7 @@ Subject: [PATCH 6/9] Replace std::unreachable()
  create mode 100644 include/sleipnir/util/unreachable.hpp
 
 diff --git a/include/sleipnir/autodiff/expression_type.hpp b/include/sleipnir/autodiff/expression_type.hpp
-index 2fde6bdf3cf72f46fb633b72e29e66209e9f6a83..8a2ae457808b1ae505c19c8f65a5c68e6e11a082 100644
+index a6f715803cc41c8ee4879bbc8778b25606fa523f..c4f34a36bf71fe77e2ba92ab6ab249de6138deb5 100644
 --- a/include/sleipnir/autodiff/expression_type.hpp
 +++ b/include/sleipnir/autodiff/expression_type.hpp
 @@ -4,10 +4,10 @@
@@ -27,7 +27,7 @@ index 2fde6bdf3cf72f46fb633b72e29e66209e9f6a83..8a2ae457808b1ae505c19c8f65a5c68e
  namespace slp {
  
  /// Expression type.
-@@ -61,7 +61,7 @@ struct fmt::formatter<slp::ExpressionType> {
+@@ -64,7 +64,7 @@ struct fmt::formatter<slp::ExpressionType> {
        case NONLINEAR:
          return m_underlying.format("nonlinear", ctx);
        default:
@@ -37,7 +37,7 @@ index 2fde6bdf3cf72f46fb633b72e29e66209e9f6a83..8a2ae457808b1ae505c19c8f65a5c68e
    }
  
 diff --git a/include/sleipnir/optimization/solver/exit_status.hpp b/include/sleipnir/optimization/solver/exit_status.hpp
-index c1e4d319c197bdad2ace19500fb3a0426060e87b..4d43cea244afd6c8b0235b84e9140359451fbf2f 100644
+index 700445f7e773a4ade2d8878501ca1391de38eafc..6cac82c10ce167a431d01a5a0ac4fb2753b7f6e4 100644
 --- a/include/sleipnir/optimization/solver/exit_status.hpp
 +++ b/include/sleipnir/optimization/solver/exit_status.hpp
 @@ -4,10 +4,10 @@
@@ -53,7 +53,7 @@ index c1e4d319c197bdad2ace19500fb3a0426060e87b..4d43cea244afd6c8b0235b84e9140359
  namespace slp {
  
  /// Solver exit status. Negative values indicate failure.
-@@ -88,7 +88,7 @@ struct fmt::formatter<slp::ExitStatus> {
+@@ -92,7 +92,7 @@ struct fmt::formatter<slp::ExitStatus> {
        case TIMEOUT:
          return m_underlying.format("timeout", ctx);
        default:
