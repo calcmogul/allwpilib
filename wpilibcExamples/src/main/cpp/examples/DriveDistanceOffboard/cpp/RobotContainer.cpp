@@ -24,8 +24,8 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // While holding the shoulder button, drive at half speed
-  m_driverController.RightShoulder()
+  // While holding the bumper button, drive at half speed
+  m_driverController.RightBumper()
       .OnTrue(m_driveHalfSpeed.get())
       .OnFalse(m_driveFullSpeed.get());
 

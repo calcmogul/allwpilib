@@ -46,9 +46,9 @@ void RobotContainer::ConfigureButtonBindings() {
   // Release the hatch when the 'East Face' button is pressed.
   wpi::cmd::JoystickButton(&m_driverController, wpi::Gamepad::Button::kEastFace)
       .OnTrue(ReleaseHatch(&m_hatch).ToPtr());
-  // While holding the shoulder button, drive at half speed
+  // While holding the bumper button, drive at half speed
   wpi::cmd::JoystickButton(&m_driverController,
-                           wpi::Gamepad::Button::kRightShoulder)
+                           wpi::Gamepad::Button::kRightBumper)
       .WhileTrue(HalveDriveSpeed(&m_drive).ToPtr());
 }
 
