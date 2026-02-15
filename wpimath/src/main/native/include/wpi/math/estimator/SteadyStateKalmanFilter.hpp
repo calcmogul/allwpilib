@@ -148,6 +148,7 @@ class SteadyStateKalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage("KalmanFilter", "");
   }
 
   SteadyStateKalmanFilter(SteadyStateKalmanFilter&&) = default;

@@ -117,6 +117,7 @@ class KalmanFilter {
     }
 
     Reset();
+    wpi::math::MathSharedStore::ReportUsage("KalmanFilter", "");
   }
 
   /**
