@@ -272,6 +272,18 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "DCMotorInputErrorEstimator",
+            yml_file = "semiwrap/DCMotorInputErrorEstimator.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/estimator/DCMotorInputErrorEstimator.hpp",
+            tmpl_class_names = [
+                ("DCMotorInputErrorEstimator_tmpl1", "DCMotorInputErrorEstimator"),
+            ],
+            trampolines = [
+                ("wpi::math::DCMotorInputErrorEstimator", "wpi__math__DCMotorInputErrorEstimator.hpp"),
+            ],
+        ),
+        struct(
             class_name = "DifferentialDrivePoseEstimator",
             yml_file = "semiwrap/DifferentialDrivePoseEstimator.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
