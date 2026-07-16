@@ -1,0 +1,17 @@
+classes:
+  wpi::math::DCMotorInputErrorEstimator:
+    template_params:
+    - Distance
+    typealias:
+    - typename wpi::math::DCMotorInputErrorEstimator<Distance>::Velocity
+    - typename wpi::math::DCMotorInputErrorEstimator<Distance>::Velocity_t
+    methods:
+      Calculate:
+      DCMotorInputErrorEstimator:
+      Reset:
+
+templates:
+  DCMotorInputErrorEstimator:
+    qualname: wpi::math::DCMotorInputErrorEstimator
+    params:
+    - wpi::units::dimensionless::scalar
