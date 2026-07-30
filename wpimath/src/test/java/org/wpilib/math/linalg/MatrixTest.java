@@ -157,6 +157,28 @@ class MatrixTest {
   }
 
   @Test
+  void testPow() {
+    var mat1 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.973995, 0.00652299, -1.95311, -0.0121722);
+    var sqrt_mat1 = mat1.pow(0.5);
+    assertTrue(mat1.isEqual(sqrt_mat1.times(sqrt_mat1), 1E-9));
+
+    var mat2 = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 2.0, 3.0, 4.0);
+    assertTrue(mat2.times(mat2).isEqual(mat2.pow(2.0), 1E-9));
+
+    // Matrix with imaginary eigenvalues and eigenvectors
+    var mat3 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, -1.0, 0.0);
+    var expected3 =
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            1.0 / Math.sqrt(2.0),
+            1.0 / Math.sqrt(2.0),
+            -1.0 / Math.sqrt(2.0),
+            1.0 / Math.sqrt(2.0));
+    assertEquals(expected3, mat3.pow(0.5));
+  }
+
+  @Test
   void testInverse() {
     var mat = MatBuilder.fill(Nat.N3(), Nat.N3(), 1.0, 3.0, 2.0, 5.0, 2.0, 1.5, 0.0, 1.3, 2.5);
 
