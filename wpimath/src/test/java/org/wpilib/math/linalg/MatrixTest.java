@@ -118,6 +118,45 @@ class MatrixTest {
   }
 
   @Test
+  void testLog() {
+    var A1 = MatBuilder.fill(Nat.N1(), Nat.N1(), 4.0);
+    var A1_exp = A1.exp();
+    assertTrue(A1_exp.log().isEqual(A1, 1E-14 * A1_exp.maxAbs()));
+
+    var A2 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, -0.5);
+    var A2_exp = A2.exp();
+    assertTrue(A2_exp.log().isEqual(A2, 1E-10 * A2_exp.maxAbs()));
+
+    var A3 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, 10.0);
+    var A3_exp = A3.exp();
+    assertTrue(A3_exp.log().isEqual(A3, 1E-3 * A3_exp.maxAbs()));
+
+    var A4 = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 10.0, 0.0, 0.0);
+    var A4_exp = A4.exp();
+    assertTrue(A4_exp.log().isEqual(A4, 1E-3 * A4_exp.maxAbs()));
+
+    var A5 = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 3.0, 4.0, 5.0);
+    var A5_exp = A5.exp();
+    assertTrue(A5_exp.log().isEqual(A5, 1E-2 * A5_exp.maxAbs()));
+
+    // Pascal matrix
+    //
+    //    ([0  0  0  0  0  0  0])   [1  0   0   0   0  0  0]
+    //    ([1  0  0  0  0  0  0])   [1  1   0   0   0  0  0]
+    //    ([0  2  0  0  0  0  0])   [1  2   1   0   0  0  0]
+    // exp([0  0  3  0  0  0  0]) = [1  3   3   1   0  0  0]
+    //    ([0  0  0  4  0  0  0])   [1  4   6   4   1  0  0]
+    //    ([0  0  0  0  5  0  0])   [1  5  10  10   5  1  0]
+    //    ([0  0  0  0  0  6  0])   [1  6  15  20  15  6  1]
+    var pascal = new Matrix<>(Nat.N7(), Nat.N7());
+    for (int col = 0; col < 6; ++col) {
+      pascal.set(col + 1, col, col + 1);
+    }
+    var pascal_exp = pascal.exp();
+    assertTrue(pascal_exp.log().isEqual(pascal, 1E-0 * pascal_exp.maxAbs()));
+  }
+
+  @Test
   void testInverse() {
     var mat = MatBuilder.fill(Nat.N3(), Nat.N3(), 1.0, 3.0, 2.0, 5.0, 2.0, 1.5, 0.0, 1.3, 2.5);
 

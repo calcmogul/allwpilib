@@ -478,6 +478,124 @@ public class Matrix<R extends Num, C extends Num>
     return new Matrix<>(exp_A_scaled);
   }
 
+  // Coefficients for (13, 13) Padé approximant of log(A) are from the following program:
+  //
+  // #!/usr/bin/env python
+  //
+  // import mpmath as mp
+  //
+  // # https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
+  // mp.mp.prec = 53  # double precision
+  //
+  // L = 13
+  // M = 13
+  // p, q = mp.pade(mp.taylor(mp.log, 1, L + M), L, M)
+  //
+  // print("private static final double[] log_pade_p = {")
+  // for p_k in p:
+  //     print(f"{p_k},")
+  // print("};")
+  // print("private static final double[] log_pade_q = {")
+  // for q_k in q:
+  //     print(f"{q_k},")
+  // print("};")
+  private static final int LOG_PADE_NUM_COEFFS = 14;
+  private static final double[] log_pade_p = {
+    0.0,
+    1.0,
+    14.4859928428484,
+    62.5563157428024,
+    135.709680963018,
+    174.90512247794,
+    143.788366352617,
+    77.5155054429644,
+    27.4051836420307,
+    6.20142811797801,
+    0.851052304905072,
+    0.0640339491063136,
+    0.002167958945244,
+    2.03506675606348e-05,
+  };
+  private static final double[] log_pade_q = {
+    1.0,
+    14.9859928428484,
+    69.7159788308932,
+    165.822339430849,
+    238.124130793779,
+    222.174781411711,
+    139.095383306711,
+    58.864653321833,
+    16.6272652229453,
+    3.02985989074339,
+    0.334288839490145,
+    0.0199343189362892,
+    0.000514602203493533,
+    3.27440454401995e-06,
+  };
+
+  static {
+    assert log_pade_p.length == LOG_PADE_NUM_COEFFS;
+    assert log_pade_q.length == LOG_PADE_NUM_COEFFS;
+  }
+
+  /**
+   * Computes the matrix logarithm. This method only works for square matrices, and will otherwise
+   * throw an {@link MatrixDimensionException}.
+   *
+   * @return The logarithm of A.
+   */
+  public final Matrix<R, C> log() {
+    if (this.getNumRows() != this.getNumCols()) {
+      throw new MatrixDimensionException(
+          "Non-square matrices cannot be logarithmed! "
+              + "This matrix is "
+              + this.getNumRows()
+              + " x "
+              + this.getNumCols());
+    }
+
+    // Scale down A
+    //
+    //   A_scaled = A⋅2⁻ⁿ
+    final int n = (int) Math.max(0.0, Math.ceil(Math.log(this.normIndP1()) / Math.log(2.0)));
+    var A_scaled = this.m_storage.scale(Math.pow(2.0, -n));
+
+    //     13
+    // P = Σ pₖ(A_scaled - I)ᵏ
+    //    k=0
+    //
+    //     13
+    // Q = Σ qₖ(A_scaled - I)ᵏ
+    //    k=0
+    var P = SimpleMatrix.identity(this.getNumRows()).scale(log_pade_p[0]);
+    var Q = SimpleMatrix.identity(this.getNumRows()).scale(log_pade_q[0]);
+    var A_scaled_minus_I = A_scaled.minus(SimpleMatrix.identity(this.getNumRows()));
+    var A_scaled_minus_I_pow = A_scaled_minus_I;
+    for (int k = 1; k < LOG_PADE_NUM_COEFFS; ++k) {
+      P = P.plus(A_scaled_minus_I_pow.scale(log_pade_p[k]));
+      Q = Q.plus(A_scaled_minus_I_pow.scale(log_pade_q[k]));
+      A_scaled_minus_I_pow = A_scaled_minus_I_pow.mult(A_scaled_minus_I);
+    }
+
+    // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade
+    // defines the Padé approximant as log(A_scaled)Q ≈ P, so:
+    //
+    //   log(A_scaled) ≈ P / Q
+    //   log(A_scaled) ≈ (Qᵀ \ Pᵀ)ᵀ
+    var log_A_scaled = Q.transpose().solve(P.transpose()).transpose();
+
+    // Unscale
+    //
+    //   log(A⋅2⁻ⁿ) = log(A_scaled)
+    //   log(A) + I⋅log(2⁻ⁿ) = log(A_scaled)
+    //   log(A) - I⋅(n log(2)) = log(A_scaled)
+    //   log(A) = log(A_scaled) + I⋅(n log(2))
+    var I = SimpleMatrix.identity(this.getNumRows());
+    log_A_scaled = log_A_scaled.plus(I.scale(n * Math.log(2.0)));
+
+    return new Matrix<>(log_A_scaled);
+  }
+
   /**
    * Computes the matrix power using Eigen's solver. This method only works for square matrices, and
    * will otherwise throw an {@link MatrixDimensionException}.
