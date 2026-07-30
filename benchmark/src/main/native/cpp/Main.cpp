@@ -5,9 +5,11 @@
 #include <benchmark/benchmark.h>
 
 #include "CartPoleBenchmark.hpp"
+#include "MatrixPowBenchmark.hpp"
 #include "TravelingSalesmanBenchmark.hpp"
 
 BENCHMARK(BM_CartPole);
+BENCHMARK(BM_MatrixPow);
 BENCHMARK(BM_TravelingSalesman_Transform);
 BENCHMARK(BM_TravelingSalesman_Twist);
 
