@@ -75,6 +75,122 @@ class MatrixTest {
   }
 
   @Test
+  void testPow() {
+    var mat1 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.973995, 0.00652299, -1.95311, -0.0121722);
+    var sqrt_mat1 = mat1.pow(0.5);
+
+    // Expected value from scipy.linalg.sqrtm()
+    var expected_sqrt =
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            0.9932116506431227,
+            0.00645460308333368,
+            -1.9326336278439615,
+            0.01738341086311966);
+    assertTrue(expected_sqrt.isEqual(sqrt_mat1, 1E-9));
+
+    assertTrue(mat1.isEqual(sqrt_mat1.times(sqrt_mat1), 1E-9));
+
+    var mat2 = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 2.0, 3.0, 4.0);
+    assertTrue(mat2.times(mat2).isEqual(mat2.pow(2.0), 1E-9));
+
+    // Matrix with imaginary eigenvalues and eigenvectors
+    var mat3 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, -1.0, 0.0);
+    var expected3 =
+        MatBuilder.fill(
+            Nat.N2(),
+            Nat.N2(),
+            1.0 / Math.sqrt(2.0),
+            1.0 / Math.sqrt(2.0),
+            -1.0 / Math.sqrt(2.0),
+            1.0 / Math.sqrt(2.0));
+    assertTrue(expected3.isEqual(mat3.pow(0.5), 1E-9));
+
+    assertTrue(Matrix.eye(Nat.N2()).isEqual(mat2.pow(0.0), 1E-9));
+    assertTrue(mat2.inv().isEqual(mat2.pow(-1.0), 1E-9));
+  }
+
+  @Test
+  void testPowLarge() {
+    // Exercises the Padé approximant and repeated square roots
+    var mat1 = MatBuilder.fill(Nat.N3(), Nat.N3(), 4.0, 1.0, 0.5, 0.2, 3.0, -1.0, 0.1, 0.3, 2.0);
+
+    // Expected values from scipy.linalg.fractional_matrix_power()
+    var expected1 =
+        MatBuilder.fill(
+            Nat.N3(),
+            Nat.N3(),
+            1.9951178638230906,
+            0.2637485790193646,
+            0.17093788519753594,
+            0.05597401259080675,
+            1.7363297413990089,
+            -0.3195537157162982,
+            0.02773898346563964,
+            0.09264181792795527,
+            1.4229765964268148);
+    assertTrue(expected1.isEqual(mat1.pow(0.5), 1E-9));
+
+    var expected2 =
+        MatBuilder.fill(
+            Nat.N3(),
+            Nat.N3(),
+            43.603232423855886,
+            23.523972413321644,
+            3.976796586130955,
+            4.0622074028745665,
+            19.090664503165325,
+            -12.402272955421836,
+            2.0805334768057264,
+            4.363268966416317,
+            5.452647163532402);
+    assertTrue(expected2.isEqual(mat1.pow(2.7), 1E-9));
+
+    var expected3 =
+        MatBuilder.fill(
+            Nat.N3(),
+            Nat.N3(),
+            0.17151170992605277,
+            -0.06569204773021536,
+            -0.10286792285193706,
+            -0.018917994859241692,
+            0.22831208794365465,
+            0.16572333199711448,
+            -0.0090144139439902,
+            -0.04393741428593575,
+            0.38292083280000266);
+    assertTrue(expected3.isEqual(mat1.pow(-1.3), 1E-9));
+
+    // Complex eigenvalues and a repeated eigenvalue
+    var mat2 =
+        MatBuilder.fill(
+            Nat.N4(), Nat.N4(), 1.0, 2.0, 0.0, 0.0, -2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0, 0.0,
+            0.0, 0.0, 3.0);
+    var expected4 =
+        MatBuilder.fill(
+            Nat.N4(),
+            Nat.N4(),
+            1.2034718425850495,
+            0.415104951545639,
+            0.0,
+            0.0,
+            -0.415104951545639,
+            1.2034718425850495,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.3903891703159106,
+            0.13903891703159102,
+            0.0,
+            0.0,
+            0.0,
+            1.3903891703159106);
+    assertTrue(expected4.isEqual(mat2.pow(0.3), 1E-9));
+  }
+
+  @Test
   void testInverse() {
     var mat = MatBuilder.fill(Nat.N3(), Nat.N3(), 1.0, 3.0, 2.0, 5.0, 2.0, 1.5, 0.0, 1.3, 2.5);
 

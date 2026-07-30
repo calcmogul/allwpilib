@@ -6,6 +6,7 @@ package org.wpilib.math.filter.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.wpilib.math.util.Complex;
 
 /**
  * Analog low-pass prototype ZPK constructions for the four classical IIR families. Cutoff is
@@ -89,12 +90,12 @@ final class AnalogPrototypes {
       double theta = Math.PI * m / (2.0 * order);
       Complex pole = new Complex(mu, theta).sinh().negate();
       out.poles.add(pole);
-      prodNegP = prodNegP.mul(pole.negate());
+      prodNegP = prodNegP.times(pole.negate());
     }
 
     // Gain: forces |H(j0)| = 1 for odd N, 1/sqrt(1+eps^2) for even N (the
     // ripple trough at DC).
-    double k = prodNegP.real();
+    double k = prodNegP.getReal();
     if (order % 2 == 0) {
       k /= Math.sqrt(1.0 + eps * eps);
     }
@@ -130,7 +131,7 @@ final class AnalogPrototypes {
       double theta = Math.PI * m1 / (2.0 * order);
       Complex pole = Complex.ONE.div(new Complex(mu, theta).sinh()).negate();
       out.poles.add(pole);
-      prodNegP = prodNegP.mul(pole.negate());
+      prodNegP = prodNegP.times(pole.negate());
     }
 
     // Zeros at z_k = j / sin(theta_k). For odd order the m=0 entry would give
@@ -144,10 +145,10 @@ final class AnalogPrototypes {
       }
       Complex zero = new Complex(0.0, 1.0 / Math.sin(Math.PI * m / (2.0 * order)));
       out.zeros.add(zero);
-      prodNegZ = prodNegZ.mul(zero.negate());
+      prodNegZ = prodNegZ.times(zero.negate());
     }
 
-    out.gain = prodNegP.div(prodNegZ).real();
+    out.gain = prodNegP.div(prodNegZ).getReal();
     return out;
   }
 
@@ -261,7 +262,7 @@ final class AnalogPrototypes {
         out.poles.add(p);
       }
       for (Complex p : polesUpper) {
-        if (Math.abs(p.imag()) > COEF_EPS) {
+        if (Math.abs(p.getImag()) > COEF_EPS) {
           out.poles.add(p.conj());
         }
       }
@@ -278,13 +279,13 @@ final class AnalogPrototypes {
     // sits at the ripple trough, matching scipy's convention.
     Complex prodNegP = Complex.ONE;
     for (Complex p : out.poles) {
-      prodNegP = prodNegP.mul(p.negate());
+      prodNegP = prodNegP.times(p.negate());
     }
     Complex prodNegZ = Complex.ONE;
     for (Complex z : out.zeros) {
-      prodNegZ = prodNegZ.mul(z.negate());
+      prodNegZ = prodNegZ.times(z.negate());
     }
-    double k = prodNegP.div(prodNegZ).real();
+    double k = prodNegP.div(prodNegZ).getReal();
     if (order % 2 == 0) {
       k /= Math.sqrt(1.0 + epsSq);
     }

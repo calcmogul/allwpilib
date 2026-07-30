@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.wpilib.math.filter.BiquadFilter;
+import org.wpilib.math.util.Complex;
 
 /**
  * Zeros/poles/gain representation of a rational transfer function.
@@ -67,11 +68,11 @@ final class Zpk {
       }
       matched[i] = true;
       Complex r = roots.get(i);
-      if (Math.abs(r.imag()) < IMAG_TOLERANCE) {
-        out.realRoots.add(r.real());
+      if (Math.abs(r.getImag()) < IMAG_TOLERANCE) {
+        out.realRoots.add(r.getReal());
         continue;
       }
-      Complex rep = r.imag() > 0 ? r : r.conj();
+      Complex rep = r.getImag() > 0 ? r : r.conj();
       // Find unmatched conjugate in the remaining list. Callers pass
       // conjugate-symmetric inputs; if no partner is found the input violated
       // that invariant (or drifted numerically past IMAG_TOLERANCE), and the
@@ -82,8 +83,8 @@ final class Zpk {
           continue;
         }
         Complex rj = roots.get(j);
-        if (Math.abs(rj.imag() + r.imag()) < IMAG_TOLERANCE
-            && Math.abs(rj.real() - r.real()) < IMAG_TOLERANCE) {
+        if (Math.abs(rj.getImag() + r.getImag()) < IMAG_TOLERANCE
+            && Math.abs(rj.getReal() - r.getReal()) < IMAG_TOLERANCE) {
           matched[j] = true;
           found = true;
           break;
@@ -111,8 +112,8 @@ final class Zpk {
   // bw/(2·r) for BS) so this helper just solves the unified quadratic
   //   s² - 2·rScaled·s + wo² = 0  →  rScaled ± sqrt(rScaled² - wo²).
   private static Complex[] bpRoots(Complex rScaled, double wo) {
-    Complex disc = rScaled.mul(rScaled).sub(wo * wo).sqrt();
-    return new Complex[] {rScaled.add(disc), rScaled.sub(disc)};
+    Complex disc = rScaled.times(rScaled).minus(wo * wo).sqrt();
+    return new Complex[] {rScaled.plus(disc), rScaled.minus(disc)};
   }
 
   /** Analog LP→LP transform: cutoff 1 rad/s → cutoff {@code wo} rad/s. */
@@ -120,10 +121,10 @@ final class Zpk {
     Zpk out = new Zpk();
     out.gain = p.gain;
     for (Complex z : p.zeros) {
-      out.zeros.add(z.mul(wo));
+      out.zeros.add(z.times(wo));
     }
     for (Complex pole : p.poles) {
-      out.poles.add(pole.mul(wo));
+      out.poles.add(pole.times(wo));
     }
     out.gain *= Math.pow(wo, relativeDegree(p));
     return out;
@@ -138,17 +139,17 @@ final class Zpk {
     Complex pProd = Complex.ONE;
     for (Complex z : p.zeros) {
       out.zeros.add(new Complex(wo, 0).div(z));
-      zProd = zProd.mul(z.negate());
+      zProd = zProd.times(z.negate());
     }
     for (Complex pole : p.poles) {
       out.poles.add(new Complex(wo, 0).div(pole));
-      pProd = pProd.mul(pole.negate());
+      pProd = pProd.times(pole.negate());
     }
     int degree = relativeDegree(p);
     for (int i = 0; i < degree; i++) {
       out.zeros.add(new Complex(0.0, 0.0));
     }
-    out.gain = p.gain * zProd.div(pProd).real();
+    out.gain = p.gain * zProd.div(pProd).getReal();
     return out;
   }
 
@@ -160,12 +161,12 @@ final class Zpk {
   static Zpk analogLpToBp(Zpk p, double wo, double bw) {
     Zpk out = new Zpk();
     for (Complex z : p.zeros) {
-      Complex[] zs = bpRoots(z.mul(bw * 0.5), wo);
+      Complex[] zs = bpRoots(z.times(bw * 0.5), wo);
       out.zeros.add(zs[0]);
       out.zeros.add(zs[1]);
     }
     for (Complex pole : p.poles) {
-      Complex[] ps = bpRoots(pole.mul(bw * 0.5), wo);
+      Complex[] ps = bpRoots(pole.times(bw * 0.5), wo);
       out.poles.add(ps[0]);
       out.poles.add(ps[1]);
     }
@@ -190,13 +191,13 @@ final class Zpk {
       Complex[] zs = bpRoots(halfBw.div(z), wo);
       out.zeros.add(zs[0]);
       out.zeros.add(zs[1]);
-      zProd = zProd.mul(z.negate());
+      zProd = zProd.times(z.negate());
     }
     for (Complex pole : p.poles) {
       Complex[] ps = bpRoots(halfBw.div(pole), wo);
       out.poles.add(ps[0]);
       out.poles.add(ps[1]);
-      pProd = pProd.mul(pole.negate());
+      pProd = pProd.times(pole.negate());
     }
     int degree = relativeDegree(p);
     Complex jwo = new Complex(0.0, wo);
@@ -204,7 +205,7 @@ final class Zpk {
       out.zeros.add(jwo);
       out.zeros.add(jwo.negate());
     }
-    out.gain = p.gain * zProd.div(pProd).real();
+    out.gain = p.gain * zProd.div(pProd).getReal();
     return out;
   }
 
@@ -228,7 +229,7 @@ final class Zpk {
 
     // Least-aggressive (smallest |pole|) sections go first, so scipy-style
     // golden values line up and the numerically tightest biquad sits last.
-    polePart.complexPairs.sort(Comparator.comparingDouble(Complex::normSq));
+    polePart.complexPairs.sort(Comparator.comparingDouble(Complex::abs2));
 
     // Pre-assign complex zeros to complex poles using scipy's 'nearest' pairing:
     // process from worst pole (largest |p|, last in ascending sort) to best,
@@ -243,7 +244,7 @@ final class Zpk {
       int bestIdx = 0;
       double bestDist = Double.POSITIVE_INFINITY;
       for (int j = 0; j < zeroPart.complexPairs.size(); j++) {
-        double d = zeroPart.complexPairs.get(j).sub(p).normSq();
+        double d = zeroPart.complexPairs.get(j).minus(p).abs2();
         if (d < bestDist) {
           bestDist = d;
           bestIdx = j;
@@ -262,16 +263,16 @@ final class Zpk {
 
     for (int i = 0; i < numCplxPoles; i++) {
       Complex p = polePart.complexPairs.get(i);
-      double a1 = -2.0 * p.real();
-      double a2 = p.normSq();
+      double a1 = -2.0 * p.getReal();
+      double a2 = p.abs2();
       double b0;
       double b1;
       double b2;
       if (hasCplxZero[i]) {
         Complex z = cplxZeroForPole[i];
         b0 = 1.0;
-        b1 = -2.0 * z.real();
-        b2 = z.normSq();
+        b1 = -2.0 * z.getReal();
+        b2 = z.abs2();
       } else if (zeroPart.realRoots.size() >= 2) {
         double z1 = zeroPart.realRoots.remove(zeroPart.realRoots.size() - 1);
         double z2 = zeroPart.realRoots.remove(zeroPart.realRoots.size() - 1);

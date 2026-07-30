@@ -6,6 +6,7 @@ package org.wpilib.math.filter.internal;
 
 import java.util.List;
 import org.wpilib.math.filter.BiquadFilter;
+import org.wpilib.math.util.Complex;
 
 /**
  * Bilinear transform plus the kind-specific dispatch shared by every classical IIR factory.
@@ -52,14 +53,14 @@ final class BilinearTransform {
     Complex zNumProd = Complex.ONE;
     Complex zDenProd = Complex.ONE;
     for (Complex z : analog.zeros) {
-      Complex denom = new Complex(fs2, 0).sub(z);
-      out.zeros.add(new Complex(fs2, 0).add(z).div(denom));
-      zNumProd = zNumProd.mul(denom);
+      Complex denom = new Complex(fs2, 0).minus(z);
+      out.zeros.add(new Complex(fs2, 0).plus(z).div(denom));
+      zNumProd = zNumProd.times(denom);
     }
     for (Complex p : analog.poles) {
-      Complex denom = new Complex(fs2, 0).sub(p);
-      out.poles.add(new Complex(fs2, 0).add(p).div(denom));
-      zDenProd = zDenProd.mul(denom);
+      Complex denom = new Complex(fs2, 0).minus(p);
+      out.poles.add(new Complex(fs2, 0).plus(p).div(denom));
+      zDenProd = zDenProd.times(denom);
     }
     // Analog filters with fewer zeros than poles have `degree` zeros at s=∞.
     // The bilinear maps s=∞ to z=-1 (Nyquist), so materialize them here. This
@@ -69,7 +70,7 @@ final class BilinearTransform {
     for (int i = 0; i < degree; i++) {
       out.zeros.add(new Complex(-1.0, 0.0));
     }
-    out.gain = analog.gain * zNumProd.div(zDenProd).real();
+    out.gain = analog.gain * zNumProd.div(zDenProd).getReal();
     return out;
   }
 

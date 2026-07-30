@@ -37,27 +37,6 @@ Java_org_wpilib_math_jni_EigenJNI_exp
 
 /*
  * Class:     org_wpilib_math_jni_EigenJNI
- * Method:    pow
- * Signature: ([DID[D)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_math_jni_EigenJNI_pow
-  (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdouble exponent,
-   jdoubleArray dst)
-{
-  JSpan<const jdouble> arrayBody{env, src};
-
-  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                 Eigen::RowMajor>>
-      Amat{arrayBody.data(), rows, rows};
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Apow =
-      Amat.pow(exponent);
-
-  env->SetDoubleArrayRegion(dst, 0, rows * rows, Apow.data());
-}
-
-/*
- * Class:     org_wpilib_math_jni_EigenJNI
  * Method:    rankUpdate
  * Signature: ([DI[DDZ)V
  */

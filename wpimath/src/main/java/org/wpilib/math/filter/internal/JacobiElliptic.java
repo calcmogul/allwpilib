@@ -6,6 +6,7 @@ package org.wpilib.math.filter.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.wpilib.math.util.Complex;
 
 /**
  * Elliptic-integral / Jacobi elliptic function helpers used by the elliptic filter prototype.
@@ -53,7 +54,7 @@ final class JacobiElliptic {
 
   private static Complex complement(Complex k) {
     Complex one = Complex.ONE;
-    return one.sub(k).mul(one.add(k)).sqrt();
+    return one.minus(k).times(one.plus(k)).sqrt();
   }
 
   /**
@@ -177,13 +178,14 @@ final class JacobiElliptic {
     for (int i = 0; i + 1 < ks.size(); i++) {
       Complex wn = wns.get(wns.size() - 1);
       Complex denom =
-          new Complex(1.0 + ks.get(i + 1), 0).mul(Complex.ONE.add(complement(wn.mul(ks.get(i)))));
-      Complex wnext = wn.mul(2.0).div(denom);
+          new Complex(1.0 + ks.get(i + 1), 0)
+              .times(Complex.ONE.plus(complement(wn.times(ks.get(i)))));
+      Complex wnext = wn.times(2.0).div(denom);
       wns.add(wnext);
     }
 
-    Complex u = wns.get(wns.size() - 1).asin().mul(2.0 / Math.PI);
-    return u.mul(K);
+    Complex u = wns.get(wns.size() - 1).asin().times(2.0 / Math.PI);
+    return u.times(K);
   }
 
   /**
@@ -194,7 +196,7 @@ final class JacobiElliptic {
     // sc(z, 1-m) = -j · sn(j·z, m), so sc(z, 1-m) = w → sn(j·z, m) = j·w →
     // j·z = arcsn(j·w, m). The result is purely imaginary; return its imag part.
     Complex z = inverseJacobiSn(new Complex(0.0, w), m);
-    return z.imag();
+    return z.getImag();
   }
 
   /**
