@@ -351,9 +351,69 @@ public class Matrix<R extends Num, C extends Num>
     return new Matrix<>(this.m_storage.solve(Objects.requireNonNull(b).m_storage));
   }
 
+  // Coefficients for (13, 13) Padé approximant of exp(A) are from the following program:
+  //
+  // #!/usr/bin/env python
+  //
+  // import mpmath as mp
+  //
+  // # https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
+  // mp.mp.prec = 53  # double precision
+  //
+  // L = 13
+  // M = 13
+  // p, q = mp.pade(mp.taylor(mp.exp, 0, L + M), L, M)
+  //
+  // print("final double[] exp_pade_p = {")
+  // for p_k in p:
+  //     print(f"{p_k},")
+  // print("};")
+  // print("final double[] exp_pade_q = {")
+  // for q_k in q:
+  //     print(f"{q_k},")
+  // print("};")
+  private static final int EXP_PADE_NUM_COEFFS = 14;
+  private static final double[] exp_pade_p = {
+    1.0,
+    0.499990230081164,
+    0.119995046409932,
+    0.0183321303805272,
+    0.00199256821044989,
+    0.000163023228899284,
+    1.03503116756581e-05,
+    5.17494197262237e-07,
+    2.04264137492554e-08,
+    6.30408624558965e-10,
+    1.48321142940355e-11,
+    2.52798500184321e-13,
+    2.80856861084989e-15,
+    1.542952427598e-17,
+  };
+  private static final double[] exp_pade_q = {
+    1.0,
+    -0.500009769918836,
+    0.120004816328768,
+    -0.0183344676554892,
+    0.00199292268802792,
+    -0.00016306127289381,
+    1.03533632064684e-05,
+    -5.17682297838286e-07,
+    2.04354204459939e-08,
+    -6.30742323603127e-10,
+    1.48414840237133e-11,
+    -2.52988721915697e-13,
+    2.81109127187942e-15,
+    -1.54461768813769e-17,
+  };
+
+  static {
+    assert exp_pade_p.length == EXP_PADE_NUM_COEFFS;
+    assert exp_pade_q.length == EXP_PADE_NUM_COEFFS;
+  }
+
   /**
-   * Computes the matrix exponential using Eigen's solver. This method only works for square
-   * matrices, and will otherwise throw an {@link MatrixDimensionException}.
+   * Computes the matrix exponential. This method only works for square matrices, and will otherwise
+   * throw an {@link MatrixDimensionException}.
    *
    * @return The exponential of A.
    */
@@ -366,22 +426,311 @@ public class Matrix<R extends Num, C extends Num>
               + " x "
               + this.getNumCols());
     }
-    Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
-    EigenJNI.exp(
-        this.m_storage.getDDRM().getData(),
-        this.getNumRows(),
-        toReturn.m_storage.getDDRM().getData());
-    return toReturn;
+
+    // Scale down A
+    //
+    //   A_scaled = A⋅2⁻ⁿ
+    final int n = (int) Math.max(0.0, Math.ceil(Math.log(this.normIndP1()) / Math.log(2.0)));
+    var A_scaled = this.m_storage.scale(Math.pow(2.0, -n));
+
+    //     13
+    // P = Σ pₖA_scaledᵏ
+    //    k=0
+    //
+    //     13
+    // Q = Σ qₖA_scaledᵏ
+    //    k=0
+    var P = SimpleMatrix.identity(this.getNumRows());
+    CommonOps_DDRM.scale(exp_pade_p[0], P.getDDRM());
+    var Q = SimpleMatrix.identity(this.getNumRows());
+    CommonOps_DDRM.scale(exp_pade_q[0], Q.getDDRM());
+    var A_scaled_pow = A_scaled;
+    for (int k = 1; k < EXP_PADE_NUM_COEFFS; ++k) {
+      // P += A_scaled_pow * exp_pade_p[k]
+      CommonOps_DDRM.add(P.getDDRM(), A_scaled_pow.scale(exp_pade_p[k]).getDDRM(), P.getDDRM());
+      // Q += A_scaled_pow * exp_pade_q[k]
+      CommonOps_DDRM.add(Q.getDDRM(), A_scaled_pow.scale(exp_pade_q[k]).getDDRM(), Q.getDDRM());
+      A_scaled_pow = A_scaled_pow.mult(A_scaled);
+    }
+
+    // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade
+    // defines the Padé approximant as exp(A_scaled)Q ≈ P, so:
+    //
+    //   exp(A_scaled) ≈ P / Q
+    //   exp(A_scaled) ≈ (Qᵀ \ Pᵀ)ᵀ
+    CommonOps_DDRM.transpose(Q.getDDRM());
+    CommonOps_DDRM.transpose(P.getDDRM());
+    var exp_A_scaled = Q.solve(P);
+    CommonOps_DDRM.transpose(exp_A_scaled.getDDRM());
+
+    // Unscale via repeated squaring
+    //
+    //   exp(A⋅2⁻ⁿ) = exp(A_scaled)
+    //   exp(A)^2⁻ⁿ = exp(A_scaled)
+    //   exp(A) = exp(A_scaled)^2ⁿ
+    for (int i = 0; i < n; ++i) {
+      exp_A_scaled = exp_A_scaled.mult(exp_A_scaled);
+    }
+
+    return new Matrix<>(exp_A_scaled);
+  }
+
+  // Coefficients for (13, 13) Padé approximant of log(A) are from the following program:
+  //
+  // #!/usr/bin/env python
+  //
+  // import mpmath as mp
+  //
+  // # https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
+  // mp.mp.prec = 53  # double precision
+  //
+  // L = 13
+  // M = 13
+  // p, q = mp.pade(mp.taylor(mp.log, 1, L + M), L, M)
+  //
+  // print("private static final double[] log_pade_p = {")
+  // for p_k in p:
+  //     print(f"{p_k},")
+  // print("};")
+  // print("private static final double[] log_pade_q = {")
+  // for q_k in q:
+  //     print(f"{q_k},")
+  // print("};")
+  private static final int LOG_PADE_NUM_COEFFS = 14;
+  private static final double[] log_pade_p = {
+    0.0,
+    1.0,
+    14.4859928428484,
+    62.5563157428024,
+    135.709680963018,
+    174.90512247794,
+    143.788366352617,
+    77.5155054429644,
+    27.4051836420307,
+    6.20142811797801,
+    0.851052304905072,
+    0.0640339491063136,
+    0.002167958945244,
+    2.03506675606348e-05,
+  };
+  private static final double[] log_pade_q = {
+    1.0,
+    14.9859928428484,
+    69.7159788308932,
+    165.822339430849,
+    238.124130793779,
+    222.174781411711,
+    139.095383306711,
+    58.864653321833,
+    16.6272652229453,
+    3.02985989074339,
+    0.334288839490145,
+    0.0199343189362892,
+    0.000514602203493533,
+    3.27440454401995e-06,
+  };
+
+  static {
+    assert log_pade_p.length == LOG_PADE_NUM_COEFFS;
+    assert log_pade_q.length == LOG_PADE_NUM_COEFFS;
   }
 
   /**
-   * Computes the matrix power using Eigen's solver. This method only works for square matrices, and
-   * will otherwise throw an {@link MatrixDimensionException}.
+   * Returns true if the matrix is upper triangular.
+   *
+   * @param A Matrix to check.
+   * @return True if the matrix is upper triangular.
+   */
+  private static boolean isUpperTriangular(SimpleMatrix A) {
+    for (int row = 1; row < A.getNumRows(); ++row) {
+      for (int col = 0; col < row - 1; ++col) {
+        if (Math.abs(A.get(row, col)) > 1e-10) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Performs the Schur decomposition UTUᵀ of a real square matrix A where U is an orthogonal matrix
+   * and T is an upper triangular matrix.
+   *
+   * @param A Matrix to decompose.
+   * @param T Storage for T.
+   * @param U Storage for U.
+   * @return True if decomposition succeeded.
+   */
+  private static boolean schur(SimpleMatrix A, SimpleMatrix T, SimpleMatrix U) {
+    // Compute A = UTUᵀ via QR algorithm
+    //
+    // See Algorithm 4.1 of
+    // https://people.inf.ethz.ch/arbenz/ewp/Lnotes/chapter4.pdf
+
+    if (A.getNumRows() != A.getNumCols()) {
+      return false;
+    }
+
+    T.setTo(A.copy());
+    U.setTo(SimpleMatrix.identity(A.getNumRows()));
+    var Q = new SimpleMatrix(A.getNumRows(), A.getNumCols());
+    var R = new SimpleMatrix(A.getNumRows(), A.getNumCols());
+
+    for (int i = 0; i < 100; ++i) {
+      var qr = DecompositionFactory_DDRM.qr();
+      if (!qr.decompose(T.getDDRM())) {
+        return false;
+      }
+      qr.getQ(Q.getDDRM(), false);
+      qr.getR(R.getDDRM(), false);
+
+      T.setTo(R.mult(Q));
+      U.setTo(U.mult(Q));
+
+      if (isUpperTriangular(T)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Performs the square root of the real square matrix A such that B² = A.
+   *
+   * @param A Matrix to decompose.
+   * @param B Storage for B.
+   * @return True if square root succeeded.
+   */
+  private static boolean squareRoot(SimpleMatrix A, SimpleMatrix B) {
+    // [1] Å. Björck and S. Hammarling, "A Schur method for the square root of a
+    //     matrix," Linear Algebra and its Applications, vol. 52–53,
+    //     pp. 127–140, Jul. 1983.
+    //     DOI: 10.1016/0024-3795(83)80010-X
+
+    if (A.getNumRows() != A.getNumCols()) {
+      return false;
+    }
+
+    // A = UTUᵀ
+    var T = new SimpleMatrix(A.getNumRows(), A.getNumCols());
+    var U = new SimpleMatrix(A.getNumRows(), A.getNumCols());
+    if (!schur(A, T, U)) {
+      return false;
+    }
+
+    // b_i,j = (t_i,j - b_i,i+1 b_i+1,j - b_i,i+2 b_i_2,j - … - b_i,j-1 b_j-1,j)/
+    //     (b_i,i + b_j,j)
+    //
+    // https://en.wikipedia.org/wiki/Square_root_of_a_matrix#Upper_triangular_matrices
+    for (int i = 0; i < T.getNumRows(); ++i) {
+      B.set(i, i, Math.sqrt(T.get(i, i)));
+    }
+    for (int j = 1; j < T.getNumCols(); ++j) {
+      for (int i = j - 1; i >= 0; --i) {
+        double tmp = 0.0;
+        for (int k = i + 1; k < j - i - 1; ++k) {
+          tmp += T.get(i, k) * T.get(k, j);
+        }
+        B.set(i, j, (T.get(i, j) - tmp) / (B.get(i, i) + B.get(j, j)));
+      }
+    }
+
+    B.setTo(U.mult(B).mult(U.transpose()));
+
+    return true;
+  }
+
+  /**
+   * Computes the matrix logarithm. This method only works for square matrices, and will otherwise
+   * throw an {@link MatrixDimensionException}.
+   *
+   * @return The logarithm of A.
+   */
+  public final Matrix<R, C> log() {
+    if (this.getNumRows() != this.getNumCols()) {
+      throw new MatrixDimensionException(
+          "Non-square matrices cannot be logarithmed! "
+              + "This matrix is "
+              + this.getNumRows()
+              + " x "
+              + this.getNumCols());
+    }
+
+    var A_scaled = this.m_storage.copy();
+    int n = 0;
+    boolean zerosOnDiagonal = false;
+    for (int row = 0; row < A_scaled.getNumRows(); ++row) {
+      if (A_scaled.get(row, row) == 0.0) {
+        zerosOnDiagonal = true;
+        break;
+      }
+    }
+
+    // Scale down A
+    //
+    //   A_scaled = A^2⁻ⁿ
+    if (!zerosOnDiagonal) {
+      var I = SimpleMatrix.identity(A_scaled.getNumRows());
+      while (NormOps_DDRM.inducedP1(A_scaled.minus(I).getDDRM()) > 2e-1) {
+        var result = new SimpleMatrix(getNumRows(), getNumCols());
+        if (!squareRoot(A_scaled, result)) {
+          A_scaled = this.m_storage.copy();
+          n = 0;
+          break;
+        }
+        A_scaled = result;
+        ++n;
+      }
+    }
+
+    //     13
+    // P = Σ pₖ(A_scaled - I)ᵏ
+    //    k=0
+    //
+    //     13
+    // Q = Σ qₖ(A_scaled - I)ᵏ
+    //    k=0
+    var P = SimpleMatrix.identity(this.getNumRows()).scale(log_pade_p[0]);
+    var Q = SimpleMatrix.identity(this.getNumRows()).scale(log_pade_q[0]);
+    var A_scaled_minus_I = A_scaled.minus(SimpleMatrix.identity(this.getNumRows()));
+    var A_scaled_minus_I_pow = A_scaled_minus_I;
+    for (int k = 1; k < LOG_PADE_NUM_COEFFS; ++k) {
+      P = P.plus(A_scaled_minus_I_pow.scale(log_pade_p[k]));
+      Q = Q.plus(A_scaled_minus_I_pow.scale(log_pade_q[k]));
+      A_scaled_minus_I_pow = A_scaled_minus_I_pow.mult(A_scaled_minus_I);
+    }
+
+    // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade
+    // defines the Padé approximant as log(A_scaled)Q ≈ P, so:
+    //
+    //   log(A_scaled) ≈ P / Q
+    //   log(A_scaled) ≈ (Qᵀ \ Pᵀ)ᵀ
+    var log_A_scaled = Q.transpose().solve(P.transpose()).transpose();
+
+    // Unscale
+    //
+    //   log(A^2⁻ⁿ) = log(A_scaled)
+    //   log(A)⋅2⁻ⁿ = log(A_scaled)
+    //   log(A) = log(A_scaled)⋅2ⁿ
+    log_A_scaled = log_A_scaled.scale(Math.pow(2.0, n));
+
+    return new Matrix<>(log_A_scaled);
+  }
+
+  /**
+   * Computes the matrix power. This method only works for square matrices, and will otherwise throw
+   * an {@link MatrixDimensionException}.
    *
    * @param exponent The exponent.
    * @return The power of A.
    */
   public final Matrix<R, C> pow(double exponent) {
+    // [1] N. J. Higham and L. Lin, "A Schur–Padé Algorithm for Fractional
+    //     Powers of a Matrix," SIAM Journal on Matrix Analysis and
+    //     Applications, vol. 32, no. 3, pp. 1056–1078, Jul. 2011.
+    //     DOI: 10.1137/10081232X
+
     if (this.getNumRows() != this.getNumCols()) {
       throw new MatrixDimensionException(
           "Non-square matrices cannot be raised to a power! "
@@ -390,13 +739,12 @@ public class Matrix<R extends Num, C extends Num>
               + " x "
               + this.getNumCols());
     }
-    Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
-    EigenJNI.pow(
-        this.m_storage.getDDRM().getData(),
-        this.getNumRows(),
-        exponent,
-        toReturn.m_storage.getDDRM().getData());
-    return toReturn;
+
+    if (exponent == 0.0) {
+      return new Matrix<>(this.m_storage.copy());
+    }
+
+    return new Matrix<>(this.log().times(exponent).exp());
   }
 
   /**
