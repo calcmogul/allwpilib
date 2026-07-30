@@ -6,7 +6,6 @@ include(AddTest)
 
 file(
     GLOB wpimath_jni_src
-    src/main/native/cpp/jni/EigenJNI.cpp
     src/main/native/cpp/jni/autodiff/GradientJNI.cpp
     src/main/native/cpp/jni/autodiff/HessianJNI.cpp
     src/main/native/cpp/jni/autodiff/JacobianJNI.cpp

@@ -14,7 +14,6 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.dense.row.misc.TransposeAlgs_DDRM;
 import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
-import org.wpilib.math.jni.EigenJNI;
 import org.wpilib.math.linalg.proto.MatrixProto;
 import org.wpilib.math.linalg.struct.MatrixStruct;
 import org.wpilib.math.numbers.N1;
@@ -484,8 +483,8 @@ public class Matrix<R extends Num, C extends Num>
   }
 
   /**
-   * Computes the matrix power using Eigen's solver. This method only works for square matrices, and
-   * will otherwise throw an {@link MatrixDimensionException}.
+   * Computes the matrix power. This method only works for square matrices, and will otherwise throw
+   * an {@link MatrixDimensionException}.
    *
    * @param exponent The exponent.
    * @return The power of A.
@@ -499,13 +498,8 @@ public class Matrix<R extends Num, C extends Num>
               + " x "
               + this.getNumCols());
     }
-    Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
-    EigenJNI.pow(
-        this.m_storage.getDDRM().getData(),
-        this.getNumRows(),
-        exponent,
-        toReturn.m_storage.getDDRM().getData());
-    return toReturn;
+
+    return new Matrix<>(MatrixPower.pow(this.m_storage, exponent));
   }
 
   /**

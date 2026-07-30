@@ -114,6 +114,13 @@ public class Main {
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public Matrix<N7, N7> matrixPow() {
+    return MatrixPowBenchmark.matrixPow();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public Pose2d[] travelingSalesmanTransform() {
     return TravelingSalesmanBenchmark.transform();
   }
