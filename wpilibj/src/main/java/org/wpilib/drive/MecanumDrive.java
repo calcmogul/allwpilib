@@ -44,9 +44,6 @@ import org.wpilib.util.UsageReporting;
  * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#DEFAULT_DEADBAND} will be set to
  * 0, and larger values will be scaled so that the full range is still used. This deadband value can
  * be changed with {@link #setDeadband}.
- *
- * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The driveCartesian or
- * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
 public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
   private final DoubleConsumer m_frontLeftMotor;
@@ -196,8 +193,6 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
     m_frontRightMotor.accept(m_frontRightOutput);
     m_rearLeftMotor.accept(m_rearLeftOutput);
     m_rearRightMotor.accept(m_rearRightOutput);
-
-    feed();
   }
 
   /**
@@ -273,26 +268,6 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
         wheelVelocities[MotorType.FRONT_RIGHT.value],
         wheelVelocities[MotorType.REAR_LEFT.value],
         wheelVelocities[MotorType.REAR_RIGHT.value]);
-  }
-
-  @Override
-  public void stopMotor() {
-    m_frontLeftOutput = 0.0;
-    m_frontRightOutput = 0.0;
-    m_rearLeftOutput = 0.0;
-    m_rearRightOutput = 0.0;
-
-    m_frontLeftMotor.accept(0.0);
-    m_frontRightMotor.accept(0.0);
-    m_rearLeftMotor.accept(0.0);
-    m_rearRightMotor.accept(0.0);
-
-    feed();
-  }
-
-  @Override
-  public String getDescription() {
-    return "MecanumDrive";
   }
 
   @Override

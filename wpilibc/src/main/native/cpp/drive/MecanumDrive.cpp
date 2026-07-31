@@ -58,8 +58,6 @@ void MecanumDrive::DriveCartesian(double xVelocity, double yVelocity,
   m_frontRightMotor(m_frontRightOutput);
   m_rearLeftMotor(m_rearLeftOutput);
   m_rearRightMotor(m_rearRightOutput);
-
-  Feed();
 }
 
 void MecanumDrive::DrivePolar(double magnitude, wpi::math::Rotation2d angle,
@@ -71,20 +69,6 @@ void MecanumDrive::DrivePolar(double magnitude, wpi::math::Rotation2d angle,
 
   DriveCartesian(magnitude * angle.Cos(), magnitude * angle.Sin(), zRotation,
                  0_rad);
-}
-
-void MecanumDrive::StopMotor() {
-  m_frontLeftOutput = 0.0;
-  m_frontRightOutput = 0.0;
-  m_rearLeftOutput = 0.0;
-  m_rearRightOutput = 0.0;
-
-  m_frontLeftMotor(0.0);
-  m_frontRightMotor(0.0);
-  m_rearLeftMotor(0.0);
-  m_rearRightMotor(0.0);
-
-  Feed();
 }
 
 MecanumDrive::WheelVelocities MecanumDrive::DriveCartesianIK(
@@ -114,10 +98,6 @@ MecanumDrive::WheelVelocities MecanumDrive::DriveCartesianIK(
           wheelVelocities[static_cast<int>(MotorType::FRONT_RIGHT)],
           wheelVelocities[static_cast<int>(MotorType::REAR_LEFT)],
           wheelVelocities[static_cast<int>(MotorType::REAR_RIGHT)]};
-}
-
-std::string MecanumDrive::GetDescription() const {
-  return "MecanumDrive";
 }
 
 void MecanumDrive::LogTo(wpi::telemetry::TelemetryTable& table) const {

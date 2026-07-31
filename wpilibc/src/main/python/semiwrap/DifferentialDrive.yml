@@ -17,8 +17,6 @@ classes:
       ArcadeDriveIK:
       CurvatureDriveIK:
       TankDriveIK:
-      StopMotor:
-      GetDescription:
       LogTo:
       GetTelemetryType:
     doc: |
