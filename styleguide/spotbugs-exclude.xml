@@ -124,10 +124,6 @@
     <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
   </Match>
   <Match>
-    <Bug pattern="SC_START_IN_CTOR" />
-    <Class name="org.wpilib.hardware.motor.MotorSafety" />
-  </Match>
-  <Match>
     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
     <Class name="org.wpilib.vision.stream.CameraServer$PropertyPublisher" />
   </Match>

@@ -35,9 +35,6 @@ public class RomiDrivetrain {
 
     // Invert right side since motor is flipped
     rightMotor.setInverted(true);
-
-    // Disable motor safety
-    diffDrive.setSafetyEnabled(false);
   }
 
   public void arcadeDrive(double xaxisVelocity, double zaxisRotate) {

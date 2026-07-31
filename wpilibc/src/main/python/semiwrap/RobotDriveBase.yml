@@ -15,7 +15,4 @@ classes:
       RobotDriveBase:
       SetDeadband:
       SetMaxOutput:
-      FeedWatchdog:
-      StopMotor:
-      GetDescription:
       Desaturate:

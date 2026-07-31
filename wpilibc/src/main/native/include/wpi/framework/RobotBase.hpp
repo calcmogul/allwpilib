@@ -26,9 +26,6 @@ namespace wpi {
 int RunHALInitialization();
 
 namespace impl {
-#ifndef __FIRST_SYSTEMCORE__
-void ResetMotorSafety();
-#endif
 
 template <class Robot>
 void RunRobot(wpi::util::mutex& m, Robot** robot) {
@@ -126,9 +123,6 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
-#ifndef __FIRST_SYSTEMCORE__
-  wpi::impl::ResetMotorSafety();
-#endif
   HAL_Shutdown();
 
   return 0;

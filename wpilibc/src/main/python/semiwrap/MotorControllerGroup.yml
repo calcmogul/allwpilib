@@ -38,5 +38,4 @@ classes:
       GetThrottle:
       SetInverted:
       GetInverted:
-      Disable:
       InitSendable:

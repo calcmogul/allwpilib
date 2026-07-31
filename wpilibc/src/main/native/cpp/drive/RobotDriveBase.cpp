@@ -9,20 +9,12 @@
 
 using namespace wpi;
 
-RobotDriveBase::RobotDriveBase() {
-  SetSafetyEnabled(true);
-}
-
 void RobotDriveBase::SetDeadband(double deadband) {
   m_deadband = deadband;
 }
 
 void RobotDriveBase::SetMaxOutput(double maxOutput) {
   m_maxOutput = maxOutput;
-}
-
-void RobotDriveBase::FeedWatchdog() {
-  Feed();
 }
 
 void RobotDriveBase::Desaturate(std::span<double> wheelVelocities) {

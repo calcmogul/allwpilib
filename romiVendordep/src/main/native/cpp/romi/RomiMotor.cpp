@@ -45,15 +45,3 @@ void RomiMotor::SetInverted(bool isInverted) {
 bool RomiMotor::GetInverted() const {
   return m_inverted;
 }
-
-void RomiMotor::Disable() {
-  SetThrottle(0.0);
-}
-
-void RomiMotor::StopMotor() {
-  SetThrottle(0.0);
-}
-
-std::string RomiMotor::GetDescription() const {
-  return m_deviceName;
-}

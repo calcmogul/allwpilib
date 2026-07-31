@@ -16,8 +16,7 @@ import org.wpilib.util.sendable.SendableRegistry;
 
 /** Common base class for all PWM Motor Controllers. */
 @SuppressWarnings("removal")
-public abstract class PWMMotorController extends MotorSafety
-    implements MotorController, Sendable, AutoCloseable {
+public abstract class PWMMotorController implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final ArrayList<PWMMotorController> m_followers = new ArrayList<>();
 
@@ -170,8 +169,6 @@ public abstract class PWMMotorController extends MotorSafety
     for (var follower : m_followers) {
       follower.setThrottle(throttle);
     }
-
-    feed();
   }
 
   @Override
@@ -196,29 +193,6 @@ public abstract class PWMMotorController extends MotorSafety
   @Override
   public boolean getInverted() {
     return m_isInverted;
-  }
-
-  @Override
-  public void disable() {
-    m_pwm.setDisabled();
-
-    if (m_simThrottle != null) {
-      m_simThrottle.set(0.0);
-    }
-
-    for (var follower : m_followers) {
-      follower.disable();
-    }
-  }
-
-  @Override
-  public void stopMotor() {
-    disable();
-  }
-
-  @Override
-  public String getDescription() {
-    return "PWM " + getChannel();
   }
 
   /**
