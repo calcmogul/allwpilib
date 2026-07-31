@@ -4,9 +4,6 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
-#include <format>
-#include <string>
-
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
@@ -25,8 +22,6 @@ void PWMMotorController::SetThrottle(double throttle) {
   for (auto& follower : m_owningFollowers) {
     follower->SetThrottle(throttle);
   }
-
-  Feed();
 }
 
 double PWMMotorController::GetThrottle() const {
@@ -43,29 +38,6 @@ void PWMMotorController::SetInverted(bool isInverted) {
 
 bool PWMMotorController::GetInverted() const {
   return m_isInverted;
-}
-
-void PWMMotorController::Disable() {
-  m_pwm.SetDisabled();
-
-  if (m_simThrottle) {
-    m_simThrottle.Set(0.0);
-  }
-
-  for (auto& follower : m_nonowningFollowers) {
-    follower->Disable();
-  }
-  for (auto& follower : m_owningFollowers) {
-    follower->Disable();
-  }
-}
-
-void PWMMotorController::StopMotor() {
-  Disable();
-}
-
-std::string PWMMotorController::GetDescription() const {
-  return std::format("PWM {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {

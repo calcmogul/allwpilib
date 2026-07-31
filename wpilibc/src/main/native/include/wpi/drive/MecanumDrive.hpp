@@ -5,7 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <string>
 
 #include "wpi/drive/RobotDriveBase.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
@@ -45,9 +44,6 @@ class MotorController;
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
- *
- * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
- * methods should be called periodically to avoid Motor Safety timeouts.
  */
 class MecanumDrive : public RobotDriveBase,
                      public wpi::util::Sendable,
@@ -157,12 +153,6 @@ class MecanumDrive : public RobotDriveBase,
   static WheelVelocities DriveCartesianIK(
       double xVelocity, double yVelocity, double zRotation,
       wpi::math::Rotation2d gyroAngle = 0_rad);
-
-  /**
-   * @Common This is one of the commonly used methods for this class
-   */
-  void StopMotor() override;
-  std::string GetDescription() const override;
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

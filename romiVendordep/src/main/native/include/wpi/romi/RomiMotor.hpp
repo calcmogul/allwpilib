@@ -8,7 +8,6 @@
 
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
-#include "wpi/hardware/motor/MotorSafety.hpp"
 
 namespace wpi::romi {
 
@@ -22,7 +21,7 @@ namespace wpi::romi {
  *
  * <p>A SimDevice based motor controller representing the motors on a Romi robot
  */
-class RomiMotor : public wpi::MotorController, public wpi::MotorSafety {
+class RomiMotor : public wpi::MotorController {
  public:
   /**
    * Constructs a RomiMotor.
@@ -37,11 +36,6 @@ class RomiMotor : public wpi::MotorController, public wpi::MotorSafety {
 
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
-
-  void Disable() override;
-
-  void StopMotor() override;
-  std::string GetDescription() const override;
 
  private:
   hal::SimDevice m_simDevice;

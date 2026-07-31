@@ -130,18 +130,9 @@ class RobotStarter:
             th.join(1)
             if th.is_alive():
                 self.logger.warning("robot thread didn't die, crash may occur next!")
-            retval = rval[0]
+            return rval[0]
         else:
-            retval = self.start(robot_cls)
-
-        from wpilib import RobotBase
-
-        if RobotBase.is_simulation():
-            import wpilib.simulation
-
-            wpilib.simulation._simulation._reset_motor_safety()
-
-        return retval
+            return self.start(robot_cls)
 
     def start(self, robot_cls: wpilib.RobotBase) -> bool:
         try:

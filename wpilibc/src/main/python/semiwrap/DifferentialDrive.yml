@@ -20,8 +20,6 @@ classes:
       ArcadeDriveIK:
       CurvatureDriveIK:
       TankDriveIK:
-      StopMotor:
-      GetDescription:
       InitSendable:
     doc: |
       A class for driving differential drive/skid-steer drive platforms such as

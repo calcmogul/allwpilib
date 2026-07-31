@@ -44,12 +44,6 @@ bool PyMotorControllerGroup::GetInverted() const {
   return m_isInverted;
 }
 
-void PyMotorControllerGroup::Disable() {
-  for (auto motorController : m_motorControllers) {
-    motorController->Disable();
-  }
-}
-
 void PyMotorControllerGroup::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);

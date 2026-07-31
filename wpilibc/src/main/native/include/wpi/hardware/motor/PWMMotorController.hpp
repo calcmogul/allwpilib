@@ -15,7 +15,6 @@
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
-#include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -27,7 +26,6 @@ namespace wpi {
  */
 class PWMMotorController
     : public MotorController,
-      public MotorSafety,
       public wpi::util::Sendable,
       public wpi::util::SendableHelper<PWMMotorController> {
  public:
@@ -50,12 +48,6 @@ class PWMMotorController
   void SetInverted(bool isInverted) override;
 
   bool GetInverted() const override;
-
-  void Disable() override;
-
-  // MotorSafety interface
-  void StopMotor() override;
-  std::string GetDescription() const override;
 
   int GetChannel() const;
 

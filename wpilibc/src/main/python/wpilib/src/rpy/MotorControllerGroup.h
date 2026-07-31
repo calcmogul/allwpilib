@@ -32,7 +32,6 @@ class PyMotorControllerGroup
   double GetThrottle() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
-  void Disable() override;
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 

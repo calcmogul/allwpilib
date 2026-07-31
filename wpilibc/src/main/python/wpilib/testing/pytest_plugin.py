@@ -93,9 +93,6 @@ class RobotTestingPlugin:
             self._saved_robot = robot
             return
 
-        # HACK: avoid motor safety deadlock
-        wpilib.simulation._simulation._reset_motor_safety()
-
         del robot
 
         if commands2 is not None:
@@ -117,7 +114,7 @@ class RobotTestingPlugin:
         nt_inst._reset()
 
         # Cleanup WPILib globals
-        # -> preferences, SmartDashboard, MotorSafety
+        # -> preferences, SmartDashboard
         wpilib.simulation._simulation._reset_wpilib_simulation_data()
         wpilib._wpilib._clear_smart_dashboard_data()
 
