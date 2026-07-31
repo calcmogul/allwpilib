@@ -45,10 +45,6 @@ import org.wpilib.util.UsageReporting;
  * <p>Inputs smaller then {@value org.wpilib.drive.RobotDriveBase#DEFAULT_DEADBAND} will be set to
  * 0, and larger values will be scaled so that the full range is still used. This deadband value can
  * be changed with {@link #setDeadband}.
- *
- * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The tankDrive,
- * arcadeDrive, or curvatureDrive methods should be called periodically to avoid Motor Safety
- * timeouts.
  */
 public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggable {
   private final DoubleConsumer m_leftMotor;
@@ -157,8 +153,6 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
 
     m_leftMotor.accept(m_leftOutput);
     m_rightMotor.accept(m_rightOutput);
-
-    feed();
   }
 
   /**
@@ -188,8 +182,6 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
 
     m_leftMotor.accept(m_leftOutput);
     m_rightMotor.accept(m_rightOutput);
-
-    feed();
   }
 
   /**
@@ -230,8 +222,6 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
 
     m_leftMotor.accept(m_leftOutput);
     m_rightMotor.accept(m_rightOutput);
-
-    feed();
   }
 
   /**
@@ -333,22 +323,6 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
     }
 
     return new WheelVelocities(leftVelocity, rightVelocity);
-  }
-
-  @Override
-  public void stopMotor() {
-    m_leftOutput = 0.0;
-    m_rightOutput = 0.0;
-
-    m_leftMotor.accept(0.0);
-    m_rightMotor.accept(0.0);
-
-    feed();
-  }
-
-  @Override
-  public String getDescription() {
-    return "DifferentialDrive";
   }
 
   @Override

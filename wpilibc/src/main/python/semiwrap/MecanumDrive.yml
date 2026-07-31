@@ -24,8 +24,6 @@ classes:
         param_override:
           gyroAngle:
             default: wpi::math::Rotation2d(0_rad)
-      StopMotor:
-      GetDescription:
       LogTo:
       GetTelemetryType:
   wpi::MecanumDrive::WheelVelocities:

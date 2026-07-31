@@ -8,12 +8,6 @@
 
 #include "wpi/hal/HAL.h"
 
-#ifndef __FIRST_SYSTEMCORE__
-namespace wpi::impl {
-void ResetMotorSafety();
-}
-#endif
-
 namespace {
 
 bool IsCatchListCommand(int argc, char** argv) {
@@ -33,9 +27,5 @@ int main(int argc, char** argv) {
   if (!IsCatchListCommand(argc, argv)) {
     HAL_Initialize();
   }
-  int ret = Catch::Session().run(argc, argv);
-#ifndef __FIRST_SYSTEMCORE__
-  wpi::impl::ResetMotorSafety();
-#endif
-  return ret;
+  return Catch::Session().run(argc, argv);
 }
