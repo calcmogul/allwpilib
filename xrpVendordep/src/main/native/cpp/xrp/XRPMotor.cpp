@@ -78,15 +78,3 @@ bool XRPMotor::GetInverted() const {
 
   return false;
 }
-
-void XRPMotor::Disable() {
-  SetThrottle(0.0);
-}
-
-void XRPMotor::StopMotor() {
-  SetThrottle(0.0);
-}
-
-std::string XRPMotor::GetDescription() const {
-  return m_deviceName;
-}
