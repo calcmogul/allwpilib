@@ -44,12 +44,6 @@ class Robot : public wpi::TimedRobot {
 
     // show motor inversion
     motor.SetInverted(true);
-
-    // show motor safety features
-    motor.SetSafetyEnabled(true);
-    motor.SetSafetyEnabled(false);
-    motor.SetExpiration(0.1_s);
-    motor.Feed();
   }
 
  private:

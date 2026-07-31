@@ -99,9 +99,6 @@ class RobotTestingPlugin(OpModeTestingPlugin):
             self._saved_robot = robot
             return
 
-        # HACK: avoid motor safety deadlock
-        wpilib.simulation._simulation._reset_motor_safety()
-
         del robot
 
         if commands2 is not None:
@@ -127,7 +124,7 @@ class RobotTestingPlugin(OpModeTestingPlugin):
         wpilib.RobotState.clear_opmodes()
 
         # Cleanup WPILib globals
-        # -> preferences and MotorSafety
+        # -> preferences
         wpilib.simulation._simulation._reset_wpilib_simulation_data()
 
         # Cancel all periodic callbacks

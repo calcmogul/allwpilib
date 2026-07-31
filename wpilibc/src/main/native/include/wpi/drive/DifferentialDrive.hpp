@@ -5,7 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <string>
 
 #include "wpi/drive/RobotDriveBase.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
@@ -47,10 +46,6 @@ class MotorController;
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
- *
- * MotorSafety is enabled by default. The tankDrive, arcadeDrive,
- * or curvatureDrive methods should be called periodically to avoid Motor
- * Safety timeouts.
  */
 class DifferentialDrive : public RobotDriveBase,
                           public wpi::telemetry::TelemetryLoggable {
@@ -194,9 +189,6 @@ class DifferentialDrive : public RobotDriveBase,
    */
   static WheelVelocities TankDriveIK(double leftVelocity, double rightVelocity,
                                      bool squareInputs = true);
-
-  void StopMotor() override;
-  std::string GetDescription() const override;
 
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 

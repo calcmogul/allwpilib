@@ -5,18 +5,13 @@
 #pragma once
 
 #include <span>
-#include <string>
-
-#include "wpi/hardware/motor/MotorSafety.hpp"
 
 namespace wpi {
 
 /**
  * Common base class for drive platforms.
- *
- * MotorSafety is enabled by default.
  */
-class RobotDriveBase : public MotorSafety {
+class RobotDriveBase {
  public:
   /**
    * The location of a motor on the robot for the purpose of driving.
@@ -38,8 +33,8 @@ class RobotDriveBase : public MotorSafety {
     BACK = 2
   };
 
-  RobotDriveBase();
-  ~RobotDriveBase() override = default;
+  RobotDriveBase() = default;
+  virtual ~RobotDriveBase() = default;
 
   RobotDriveBase(RobotDriveBase&&) = default;
   RobotDriveBase& operator=(RobotDriveBase&&) = default;
@@ -63,17 +58,6 @@ class RobotDriveBase : public MotorSafety {
    *     drive functions.
    */
   void SetMaxOutput(double maxOutput);
-
-  /**
-   * Feed the motor safety object. Resets the timer that will stop the motors if
-   * it completes.
-   *
-   * @see MotorSafetyHelper::Feed()
-   */
-  void FeedWatchdog();
-
-  void StopMotor() override = 0;
-  std::string GetDescription() const override = 0;
 
  protected:
   /// Default input deadband.

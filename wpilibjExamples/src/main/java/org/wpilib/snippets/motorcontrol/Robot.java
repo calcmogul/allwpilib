@@ -45,12 +45,6 @@ public class Robot extends TimedRobot {
 
     // show motor inversion
     motor.setInverted(true);
-
-    // show motor safety features
-    motor.setSafetyEnabled(true);
-    motor.setSafetyEnabled(false);
-    motor.setExpiration(0.1);
-    motor.feed();
   }
 
   /*

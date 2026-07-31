@@ -4,14 +4,8 @@
 
 package org.wpilib.drive;
 
-import org.wpilib.hardware.motor.MotorSafety;
-
-/**
- * Common base class for drive platforms.
- *
- * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default.
- */
-public abstract class RobotDriveBase extends MotorSafety {
+/** Common base class for drive platforms. */
+public class RobotDriveBase {
   /** Default input deadband. */
   public static final double DEFAULT_DEADBAND = 0.02;
 
@@ -50,10 +44,7 @@ public abstract class RobotDriveBase extends MotorSafety {
   }
 
   /** RobotDriveBase constructor. */
-  @SuppressWarnings("this-escape")
-  public RobotDriveBase() {
-    setSafetyEnabled(true);
-  }
+  public RobotDriveBase() {}
 
   /**
    * Sets the deadband applied to the drive inputs (e.g., joystick values).
@@ -79,21 +70,6 @@ public abstract class RobotDriveBase extends MotorSafety {
   public void setMaxOutput(double maxOutput) {
     m_maxOutput = maxOutput;
   }
-
-  /**
-   * Feed the motor safety object. Resets the timer that will stop the motors if it completes.
-   *
-   * @see MotorSafety#feed()
-   */
-  public void feedWatchdog() {
-    feed();
-  }
-
-  @Override
-  public abstract void stopMotor();
-
-  @Override
-  public abstract String getDescription();
 
   /**
    * Normalize all wheel velocities if the magnitude of any wheel is greater than 1.0.

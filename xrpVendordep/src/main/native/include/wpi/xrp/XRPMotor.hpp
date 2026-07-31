@@ -10,7 +10,6 @@
 
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
-#include "wpi/hardware/motor/MotorSafety.hpp"
 
 namespace wpi::xrp {
 
@@ -24,7 +23,7 @@ namespace wpi::xrp {
  *
  * <p>A SimDevice based motor controller representing the motors on an XRP robot
  */
-class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
+class XRPMotor : public wpi::MotorController {
  public:
   /**
    * Constructs an XRPMotor.
@@ -38,11 +37,6 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
 
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
-
-  void Disable() override;
-
-  void StopMotor() override;
-  std::string GetDescription() const override;
 
  private:
   hal::SimDevice m_simDevice;

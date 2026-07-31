@@ -785,16 +785,6 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "MotorSafety",
-            yml_file = "semiwrap/MotorSafety.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/motor/MotorSafety.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::MotorSafety", "wpi__MotorSafety.hpp"),
-            ],
-        ),
-        struct(
             class_name = "PWMMotorController",
             yml_file = "semiwrap/PWMMotorController.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
