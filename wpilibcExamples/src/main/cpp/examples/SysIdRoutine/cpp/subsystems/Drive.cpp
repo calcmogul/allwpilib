@@ -16,8 +16,6 @@ Drive::Drive() {
       constants::drive::ENCODER_DISTANCE_PER_PULSE.value());
   rightEncoder.SetDistancePerPulse(
       constants::drive::ENCODER_DISTANCE_PER_PULSE.value());
-
-  drive.SetSafetyEnabled(false);
 }
 
 wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,

@@ -47,12 +47,6 @@ class MyRobot(wpilib.TimedRobot):
         # show motor inversion
         self.motor.set_inverted(True)
 
-        # show motor safety features
-        self.motor.set_safety_enabled(True)
-        self.motor.set_safety_enabled(False)
-        self.motor.set_expiration(0.1)
-        self.motor.feed()
-
     def robot_periodic(self):
         """The robot_periodic function is called every control packet no matter the robot mode."""
         telemetry.log("Encoder", self.encoder.get_distance())

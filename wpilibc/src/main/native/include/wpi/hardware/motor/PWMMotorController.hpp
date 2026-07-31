@@ -14,7 +14,6 @@
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
-#include "wpi/hardware/motor/MotorSafety.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/voltage.hpp"
 
@@ -24,7 +23,6 @@ namespace wpi {
  * Common base class for all PWM Motor Controllers.
  */
 class PWMMotorController : public MotorController,
-                           public MotorSafety,
                            public wpi::telemetry::TelemetryLoggable {
  public:
   PWMMotorController(PWMMotorController&&) = default;
@@ -46,12 +44,6 @@ class PWMMotorController : public MotorController,
   void SetInverted(bool isInverted) override;
 
   bool GetInverted() const override;
-
-  void Disable() override;
-
-  // MotorSafety interface
-  void StopMotor() override;
-  std::string GetDescription() const override;
 
   int GetChannel() const;
 

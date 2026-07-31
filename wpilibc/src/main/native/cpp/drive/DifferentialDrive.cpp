@@ -44,8 +44,6 @@ void DifferentialDrive::ArcadeDrive(double xVelocity, double zRotation,
 
   m_leftMotor(m_leftOutput);
   m_rightMotor(m_rightOutput);
-
-  Feed();
 }
 
 void DifferentialDrive::CurvatureDrive(double xVelocity, double zRotation,
@@ -66,8 +64,6 @@ void DifferentialDrive::CurvatureDrive(double xVelocity, double zRotation,
 
   m_leftMotor(m_leftOutput);
   m_rightMotor(m_rightOutput);
-
-  Feed();
 }
 
 void DifferentialDrive::TankDrive(double leftVelocity, double rightVelocity,
@@ -88,8 +84,6 @@ void DifferentialDrive::TankDrive(double leftVelocity, double rightVelocity,
 
   m_leftMotor(m_leftOutput);
   m_rightMotor(m_rightOutput);
-
-  Feed();
 }
 
 DifferentialDrive::WheelVelocities DifferentialDrive::ArcadeDriveIK(
@@ -161,20 +155,6 @@ DifferentialDrive::WheelVelocities DifferentialDrive::TankDriveIK(
   }
 
   return {leftVelocity, rightVelocity};
-}
-
-void DifferentialDrive::StopMotor() {
-  m_leftOutput = 0.0;
-  m_rightOutput = 0.0;
-
-  m_leftMotor(0.0);
-  m_rightMotor(0.0);
-
-  Feed();
-}
-
-std::string DifferentialDrive::GetDescription() const {
-  return "DifferentialDrive";
 }
 
 void DifferentialDrive::LogTo(wpi::telemetry::TelemetryTable& table) const {

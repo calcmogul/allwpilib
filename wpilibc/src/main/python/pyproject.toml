@@ -194,7 +194,6 @@ LEDPattern = "wpi/hardware/led/LEDPattern.hpp"
 
 # wpi/hardware/motor
 MotorController = "wpi/hardware/motor/MotorController.hpp"
-MotorSafety = "wpi/hardware/motor/MotorSafety.hpp"
 PWMMotorController = "wpi/hardware/motor/PWMMotorController.hpp"
 
 # wpi/hardware/pneumatic
