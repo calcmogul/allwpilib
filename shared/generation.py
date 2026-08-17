@@ -20,13 +20,14 @@ def make_arg_parser(
 ) -> argparse.ArgumentParser:
     """Creates an ArgumentParser configured for QuickBuffers or nanopb generation.
 
-    Keyword arguments:
-    subproject_root -- Path to the subproject root. Determines default output and proto directories.
-    repo_root -- Path to the repo root. Used to find the nanopb generator.
-    types -- Flagset of all the types of generators arguments are neede for.
+    Args:
+        subproject_root: Path to the subproject root. Determines default output
+            and proto directories.
+        repo_root: Path to the repo root. Used to find the nanopb generator.
+        types: Flagset of all the types of generators arguments are neede for.
 
     Returns:
-    The ArgumentParser with the necessary arguments.
+        The ArgumentParser with the necessary arguments.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -69,10 +70,12 @@ def add_jinja_args(
 ) -> None:
     """Configures an ArgumentParser for Jinja generation.
 
-    Keyword arguments:
-    parser -- The ArgumentParser to configure.
-    subproject_root -- Path to the subproject root. Determines default template directory.
-    default_schema_file -- The path to the schema file, or None to skip using a schema file.
+    Args:
+        parser: The ArgumentParser to configure.
+        subproject_root: Path to the subproject root. Determines default
+            template directory.
+        default_schema_file: The path to the schema file, or None to skip using
+            a schema file.
     """
     parser.add_argument(
         "--template_root",
@@ -92,10 +95,10 @@ def add_jinja_args(
 def write_file(output_dir: Path, outfn: str, contents: str) -> None:
     """Writes contents to a file.
 
-    Keyword arguments:
-    output_dir -- The output directory.
-    outfn -- The output file name.
-    contents -- The contents of the file.
+    Args:
+        output_dir: The output directory.
+        outfn: The output file name.
+        contents: The contents of the file.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / outfn
@@ -107,11 +110,12 @@ def generate_quickbuf(
 ) -> None:
     """Generates QuickBuffers files.
 
-    Keyword arguments:
-    protoc -- The Protocol Buffers compiler.
-    quickbuf_plugin -- The QuickBuffers protoc plugin, or None if using protoc-quickbuf.
-    output_directory -- The base output directory to write generated files to.
-    proto_dir -- The base directory with protobuf files.
+    Args:
+        protoc: The Protocol Buffers compiler.
+        quickbuf_plugin: The QuickBuffers protoc plugin, or None if using
+            protoc-quickbuf.
+        output_directory: The base output directory to write generated files to.
+        proto_dir: The base directory with protobuf files.
     """
     # Wipe away all protobuf files (and only protobuf files) first to ensure correctness
     for file in output_directory.glob("**/Protobuf*.java"):
@@ -150,11 +154,11 @@ def generate_nanopb(
 ) -> None:
     """Generates QuickBuffers files.
 
-    Keyword arguments:
-    nanopb -- The nanopb generator.
-    output_directory -- The base output directory to write generated files to.
-    proto_dir -- The base directory with protobuf files.
-    extra_search_dirs -- Extra directories to search for protobuf files.,
+    Args:
+        nanopb: The nanopb generator.
+        output_directory: The base output directory to write generated files to.
+        proto_dir: The base directory with protobuf files.
+        extra_search_dirs: Extra directories to search for protobuf files.
     """
     # Wipe away all protobuf files (and only protobuf files) first to ensure correctness
     for file in output_directory.glob("**/*.npb.*"):

@@ -15,9 +15,9 @@ def eigen_inclusions(dp: Path, f: str):
     """Returns true if the given file in the "Eigen" include directory of the
     Eigen git repo should be copied into allwpilib
 
-    Keyword arguments:
-    dp -- directory path
-    f -- filename
+    Args:
+        dp: Directory path.
+        f: Filename.
     """
     if not has_prefix(dp, Path("Eigen")):
         return False
@@ -91,9 +91,9 @@ def unsupported_inclusions(dp: Path, f: str):
     """Returns true if the given file in the "unsupported" include directory of
     the Eigen git repo should be copied into allwpilib
 
-    Keyword arguments:
-    dp -- directory path
-    f -- filename
+    Args:
+        dp: Directory path.
+        f: Filename.
     """
     if not has_prefix(dp, Path("unsupported")):
         return False
