@@ -25,10 +25,10 @@ def walk_if(top: Path, pred: Callable[[Path, str], bool]):
     """Walks the current directory, then returns a list of files for which the
     given predicate is true.
 
-    Keyword arguments:
-    top -- the top directory to walk
-    pred -- a function that takes a directory path and a filename, then returns
-            True if the file should be included in the output list
+    Args:
+        top: The top directory to walk.
+        pred: A function that takes a directory path and a filename, then
+            returns True if the file should be included in the output list.
     """
     return [dp / f for dp, dn, fn in top.walk() for f in fn if pred(dp, f)]
 
@@ -39,13 +39,13 @@ def copy_to(files: list[Path], root: Path, rename_c_to_cpp=False):
 
     The leading directories of root will be created if they don't yet exist.
 
-    Keyword arguments:
-    files -- list of files to copy
-    root -- destination
-    rename_c_to_cpp -- whether to rename .c files to .cpp (default: False)
+    Args:
+        files: List of files to copy.
+        root: Destination.
+        rename_c_to_cpp: Whether to rename .c files to .cpp (default: False).
 
     Returns:
-    The list of files in their destination.
+        The list of files in their destination.
     """
     if not root.exists():
         root.mkdir(parents=True)
@@ -80,14 +80,14 @@ def walk_cwd_and_copy_if(
 
     The leading directories of root will be created if they don't yet exist.
 
-    Keyword arguments:
-    pred -- a function that takes a directory path and a filename, then returns
-            True if the file should be included in the output list
-    root -- destination
-    rename_c_to_cpp -- whether to rename .c files to .cpp (default: False)
+    Args:
+        pred: A function that takes a directory path and a filename, then
+            returns True if the file should be included in the output list.
+        root: Destination.
+        rename_c_to_cpp: Whether to rename .c files to .cpp (default: False).
 
     Returns:
-    The list of files in their destination.
+        The list of files in their destination.
     """
     files = walk_if(Path("."), pred)
     files = copy_to(files, root, rename_c_to_cpp)
@@ -97,9 +97,9 @@ def walk_cwd_and_copy_if(
 def comment_out_invalid_includes(filename: Path, include_roots: list[Path]):
     """Comment out #include directives that include a nonexistent file
 
-    Keyword arguments:
-    filename -- file to search for includes
-    include_roots -- list of search paths for includes
+    Args:
+        filename: File to search for includes.
+        include_roots: List of search paths for includes.
     """
     # Read header
     with open(filename) as f:
@@ -136,12 +136,12 @@ def comment_out_invalid_includes(filename: Path, include_roots: list[Path]):
 def has_prefix(path: Path, prefix: Path):
     """Checks if a path has a certain prefix.
 
-    Keyword arguments:
-    path -- path to check if it begins with the prefix
-    prefix -- prefix to use
+    Args:
+        path: Path to check if it begins with the prefix.
+        prefix: Prefix to use.
 
     Returns:
-    True if the path begins with the prefix, False otherwise.
+        True if the path begins with the prefix, False otherwise.
     """
     return len(path.parts) >= len(prefix.parts) and all(
         p1 == p2 for p1, p2 in zip(path.parts, prefix.parts)
@@ -151,10 +151,10 @@ def has_prefix(path: Path, prefix: Path):
 def git_am(patch: Path, use_threeway=False, ignore_whitespace=False):
     """Apply patch to a Git repository in the current directory using "git am".
 
-    Keyword arguments:
-    patch -- patch file relative to the root
-    use_threeway -- use a three-way merge when applying the patch
-    ignore_whitespace -- ignore whitespace in the patch file
+    Args:
+        patch: Patch file relative to the root.
+        use_threeway: Use a three-way merge when applying the patch.
+        ignore_whitespace: Ignore whitespace in the patch file.
     """
     args = ["git", "am"]
     if use_threeway:
@@ -169,11 +169,11 @@ def has_git_rev(rev: str):
     """Checks whether the Git repository in the current directory has the given
     revision.
 
-    Keyword arguments:
-    rev -- The revision to check
+    Args:
+        rev: The revision to check.
 
     Returns:
-    True if the revision exists, otherwise False.
+        True if the revision exists, otherwise False.
     """
     return (
         subprocess.run(
@@ -197,23 +197,20 @@ class Lib:
     ):
         """Initializes a Lib instance.
 
-        Keyword arguments:
-        name -- The name of the library.
-        url -- The URL of the upstream repository.
-        tag -- The tag in the upstream repository to use. Can be any
-               <commit-ish> (e.g., commit hash or tag).
-        copy_upstream_src -- A callable that takes the path to the wpilib root
-                             and copies the files from the clone of the upstream
-                             into the appropriate thirdparty directory. Will
-                             only be called when the current directory is the
-                             upstream clone.
-        patch_options -- The dictionary of options to use when applying patches.
-                         Corresponds to the parameters of git_am.
-
-        Keyword-only arguments:
-        pre_patch_hook -- Optional callable taking no parameters that will be
-                          called before applying patches.
-        pre_patch_commits -- Number of commits added by pre_patch_hook.
+        Args:
+            name: The name of the library.
+            url: The URL of the upstream repository.
+            tag: The tag in the upstream repository to use. Can be any
+                <commit-ish> (e.g., commit hash or tag).
+            copy_upstream_src: A callable that takes the path to the wpilib root
+                and copies the files from the clone of the upstream into the
+                appropriate thirdparty directory. Will only be called when the
+                current directory is the upstream clone.
+            patch_options: The dictionary of options to use when applying
+                patches. Corresponds to the parameters of git_am.
+            pre_patch_hook: Optional callable taking no parameters that will be
+                called before applying patches.
+            pre_patch_commits: Number of commits added by pre_patch_hook.
         """
         self.name = name
         self.url = url
@@ -227,13 +224,13 @@ class Lib:
     def get_repo_path(self, tempdir: str | None = None):
         """Returns the path to the clone of the upstream repository.
 
-        Keyword argument:
-        tempdir -- The path to the temporary directory to use. If None (the
-                   default), uses tempfile.gettempdir().
+        Args:
+            tempdir: The path to the temporary directory to use. If None (the
+                default), uses tempfile.gettempdir().
 
         Returns:
-        The path to the clone of the upstream repository. Will be absolute if
-        tempdir is absolute.
+            The path to the clone of the upstream repository. Will be absolute
+            if tempdir is absolute.
         """
         if tempdir is None:
             tempdir = tempfile.gettempdir()
@@ -247,10 +244,10 @@ class Lib:
         err_msg_if_absent is not None and the upstream repository does not
         exist, the program exits with return code 1.
 
-        Keyword-only argument:
-        err_msg_if_absent -- The error message to print to stderr if the
-        upstream repository does not exist. If None, the upstream repository
-        will be cloned without emitting any warnings.
+        Args:
+            err_msg_if_absent: The error message to print to stderr if the
+                upstream repository does not exist. If None, the upstream
+                repository will be cloned without emitting any warnings.
         """
         os.chdir(tempfile.gettempdir())
 
@@ -303,8 +300,8 @@ class Lib:
     def set_root_tag(self, tag: str):
         """Sets the root tag, deleting any potential candidates first.
 
-        Keyword argument:
-        tag -- The tag to set as the root tag.
+        Args:
+            tag: The tag to set as the root tag.
         """
         root_tags = self.get_root_tags()
 
@@ -350,8 +347,8 @@ class Lib:
     def replace_tag(self, tag: str):
         """Replaces the tag in the script.
 
-        Keyword argument:
-        tag -- The tag to replace the script tag with.
+        Args:
+            tag: The tag to replace the script tag with.
         """
         path = self.wpilib_root / f"upstream_utils/{self.name}.py"
         with open(path, "r") as file:
@@ -407,8 +404,8 @@ class Lib:
     def rebase(self, new_tag: str):
         """Rebases the patches.
 
-        Keyword argument:
-        new_tag -- The tag to rebase onto.
+        Args:
+            new_tag: The tag to rebase onto.
         """
         self.open_repo(
             err_msg_if_absent='There\'s nothing to rebase. Run the "clone" command first.'
