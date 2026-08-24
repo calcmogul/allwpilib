@@ -57,6 +57,8 @@
     -->
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
     <Or>
+      <Class name="org.wpilib.math.kinematics.MecanumDriveOdometry3dTest" />
+      <Class name="org.wpilib.math.kinematics.MecanumDriveOdometryTest" />
       <Class name="org.wpilib.math.kinematics.SwerveDriveOdometry3dTest" />
       <Class name="org.wpilib.math.kinematics.SwerveDriveOdometryTest" />
       <Class name="org.wpilib.math.filter.LinearFilterTest" />

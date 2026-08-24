@@ -5,6 +5,7 @@
 #include "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
 
 #include <cstddef>
+#include <format>
 #include <functional>
 #include <limits>
 #include <numbers>
@@ -14,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
@@ -23,13 +25,14 @@
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectory.hpp"
+#include "wpi/math/trajectory/UnicycleTrajectoryGenerator.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
@@ -41,11 +44,10 @@
 void testFollowTrajectory(
     const wpi::math::SwerveDriveKinematics<4>& kinematics,
     wpi::math::SwerveDrivePoseEstimator<4>& estimator,
-    const wpi::math::DrivetrainSplineTrajectory& trajectory,
-    std::function<
-        wpi::math::ChassisVelocities(wpi::math::DrivetrainSplineSample&)>
+    const wpi::math::HolonomicTrajectory& trajectory,
+    std::function<wpi::math::ChassisVelocities(wpi::math::HolonomicSample&)>
         chassisVelocitiesGenerator,
-    std::function<wpi::math::Pose2d(wpi::math::DrivetrainSplineSample&)>
+    std::function<wpi::math::Pose2d(wpi::math::HolonomicSample&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
     const wpi::units::second_t dt,
@@ -76,7 +78,7 @@ void testFollowTrajectory(
   }
 
   while (t < trajectory.Duration()) {
-    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+    wpi::math::HolonomicSample groundTruthState = trajectory.SampleAt(t);
 
     // We are due for a new vision measurement if it's been `visionUpdateRate`
     // seconds since the last vision measurement
@@ -185,23 +187,25 @@ TEST_CASE("SwerveDrivePoseEstimatorTest AccuracyFacingTrajectory",
       kinematics,          wpi::math::Rotation2d{}, {fl, fr, bl, br},
       wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.45, 0.45, 0.45}};
 
-  wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
-                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(2_mps, 2.0_mps_sq));
+  auto result = wpi::math::UnicycleTrajectoryGenerator::Generate(
+      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                  wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+      2_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
-      [&](wpi::math::DrivetrainSplineSample& state) {
-        return wpi::math::ChassisVelocities{
-            state.ForwardVelocity(), 0_mps,
-            state.ForwardVelocity() * state.curvature};
+      [&](wpi::math::HolonomicSample& state) {
+        return state.velocity.ToRobotRelative(state.pose.Rotation());
       },
-      [&](wpi::math::DrivetrainSplineSample& state) { return state.pose; },
+      [&](wpi::math::HolonomicSample& state) { return state.pose; },
       {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
       {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms, 100_ms, 250_ms, true,
       false);
@@ -222,14 +226,18 @@ TEST_CASE("SwerveDrivePoseEstimatorTest BadInitialPose", "[wpimath]") {
       kinematics,          wpi::math::Rotation2d{}, {fl, fr, bl, br},
       wpi::math::Pose2d{}, {0.1, 0.1, 0.1},         {0.9, 0.9, 0.9}};
 
-  wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
-                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
-                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
-                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(2_mps, 2.0_mps_sq));
+  auto result = wpi::math::UnicycleTrajectoryGenerator::Generate(
+      std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                  wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                  wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                  wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                  wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+      2_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
   for (wpi::units::degree_t offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
@@ -246,12 +254,10 @@ TEST_CASE("SwerveDrivePoseEstimatorTest BadInitialPose", "[wpimath]") {
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
-          [&](wpi::math::DrivetrainSplineSample& state) {
-            return wpi::math::ChassisVelocities{
-                state.ForwardVelocity(), 0_mps,
-                state.ForwardVelocity() * state.curvature};
+          [&](wpi::math::HolonomicSample& state) {
+            return state.velocity.ToRobotRelative(state.pose.Rotation());
           },
-          [&](wpi::math::DrivetrainSplineSample& state) { return state.pose; },
+          [&](wpi::math::HolonomicSample& state) { return state.pose; },
           initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
           100_ms, 250_ms, false, false);
     }

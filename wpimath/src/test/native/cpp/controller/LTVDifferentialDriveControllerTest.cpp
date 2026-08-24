@@ -6,9 +6,11 @@
 
 #include <cmath>
 #include <cstddef>
+#include <format>
 #include <numbers>
 #include <vector>
 
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
@@ -17,10 +19,12 @@
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/UnicycleTrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
@@ -86,15 +90,20 @@ TEST_CASE("LTVDifferentialDriveControllerTest ReachesReference", "[wpimath]") {
 
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+  auto result = wpi::math::UnicycleTrajectoryGenerator::Generate(
+      waypoints, 8.8_mps, 1.0_rad_per_s, 0.1_mps_sq, 1.0_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
   wpi::math::Vectord<5> x = wpi::math::Vectord<5>::Zero();
   x(State::X) = robotPose.X().value();
   x(State::Y) = robotPose.Y().value();
   x(State::HEADING) = robotPose.Rotation().Radians().value();
 
-  auto duration = trajectory.Duration();
+  auto duration = trajectory.Duration() + 750_ms;
   for (size_t i = 0; i < (duration / DT).value(); ++i) {
     wpi::math::DifferentialSample state{trajectory.SampleAt(DT * i),
                                         kinematics};

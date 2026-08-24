@@ -52,5 +52,6 @@ robotpy_py_test(
         "//wpimath:robotpy-wpimath",
         requirement("numpy"),
         requirement("pytest"),
+        requirement("sleipnirgroup-jormungandr"),
     ],
 )
