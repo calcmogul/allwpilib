@@ -22,8 +22,7 @@ import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.trajectory.DifferentialSample;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
-import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.HolonomicTrajectoryGenerator;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Nat;
 
@@ -87,8 +86,7 @@ class LTVDifferentialDriveControllerTest {
     final var waypoints = new ArrayList<Pose2d>();
     waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.ZERO));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
-    var config = new TrajectoryConfig(8.8, 0.1);
-    final var trajectory = DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
+    final var trajectory = HolonomicTrajectoryGenerator.generate(waypoints, 8.8, 1.0, 0.1, 1.0);
 
     var x =
         MatBuilder.fill(

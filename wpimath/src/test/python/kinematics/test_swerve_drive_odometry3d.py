@@ -1,10 +1,7 @@
 import pytest
-import math
 import random
 
 from wpimath import (
-    ChassisVelocities,
-    DrivetrainSplineTrajectoryGenerator,
     Pose3d,
     Pose2d,
     Rotation2d,
@@ -12,9 +9,10 @@ from wpimath import (
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry3d,
     SwerveModulePosition,
-    TrajectoryConfig,
     Translation2d,
 )
+
+from trajectory.holonomic_trajectory_generator import generate_from_poses
 
 EPSILON = 0.01
 
@@ -164,7 +162,7 @@ def test_accuracy_facing_x_axis():
     bl = SwerveModulePosition()
     br = SwerveModulePosition()
 
-    trajectory = DrivetrainSplineTrajectoryGenerator.generate(
+    trajectory = generate_from_poses(
         [
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
             Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),
@@ -172,7 +170,10 @@ def test_accuracy_facing_x_axis():
             Pose2d(x=-3, y=0, rotation=Rotation2d.from_degrees(-90)),
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
         ],
-        TrajectoryConfig(max_velocity=5.0, max_acceleration=2.0),
+        5.0,
+        1.0,
+        2.0,
+        1.0,
     )
 
     random.seed(4915)

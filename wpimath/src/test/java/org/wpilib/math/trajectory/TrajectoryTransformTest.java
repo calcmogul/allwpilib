@@ -16,10 +16,9 @@ import org.wpilib.math.geometry.Translation2d;
 class TrajectoryTransformTest {
   @Test
   void testTransformBy() {
-    var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
-            Pose2d.ZERO, List.of(), new Pose2d(1, 1, Rotation2d.CCW_PI_2), config);
+        HolonomicTrajectoryGenerator.generate(
+            Pose2d.ZERO, List.of(), new Pose2d(1, 1, Rotation2d.CCW_PI_2), 3, 1, 3, 1);
 
     var transformedTrajectory =
         trajectory.transformBy(
@@ -35,13 +34,15 @@ class TrajectoryTransformTest {
 
   @Test
   void testRelativeTo() {
-    var config = new TrajectoryConfig(3, 3);
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
             List.of(),
             new Pose2d(5, 7, Rotation2d.CCW_PI_2),
-            config);
+            3,
+            1,
+            3,
+            1);
 
     var transformedTrajectory = trajectory.relativeTo(new Pose2d(1, 2, Rotation2d.fromDegrees(30)));
 
@@ -55,19 +56,19 @@ class TrajectoryTransformTest {
   // A rigid transform rotates both the heading and the field-relative velocity/acceleration by the
   // same amount, so the heading-relative forward scalars (and curvature) are invariant. This would
   // fail if transformBy/relativeTo rotated the pose but not the velocity/acceleration.
-  void testSameForwardScalars(
-      List<DrivetrainSplineSample> statesA, List<DrivetrainSplineSample> statesB) {
+  void testSameForwardScalars(List<HolonomicSample> statesA, List<HolonomicSample> statesB) {
     assertEquals(statesA.size(), statesB.size());
     for (int i = 0; i < statesA.size(); i++) {
-      assertEquals(statesA.get(i).forwardVelocity(), statesB.get(i).forwardVelocity(), 1e-9);
-      assertEquals(
-          statesA.get(i).forwardAcceleration(), statesB.get(i).forwardAcceleration(), 1e-9);
-      assertEquals(statesA.get(i).curvature, statesB.get(i).curvature, 1e-9);
+      assertEquals(statesA.get(i).velocity.vx, statesB.get(i).velocity.vx, 1e-9);
+      assertEquals(statesA.get(i).velocity.vy, statesB.get(i).velocity.vy, 1e-9);
+      assertEquals(statesA.get(i).velocity.omega, statesB.get(i).velocity.omega, 1e-9);
+      assertEquals(statesA.get(i).acceleration.ax, statesB.get(i).acceleration.ax, 1e-9);
+      assertEquals(statesA.get(i).acceleration.ay, statesB.get(i).acceleration.ay, 1e-9);
+      assertEquals(statesA.get(i).acceleration.alpha, statesB.get(i).acceleration.alpha, 1e-9);
     }
   }
 
-  void testSameShapedTrajectory(
-      List<DrivetrainSplineSample> statesA, List<DrivetrainSplineSample> statesB) {
+  void testSameShapedTrajectory(List<HolonomicSample> statesA, List<HolonomicSample> statesB) {
     for (int i = 0; i < statesA.size() - 1; i++) {
       var a1 = statesA.get(i).pose;
       var a2 = statesA.get(i + 1).pose;

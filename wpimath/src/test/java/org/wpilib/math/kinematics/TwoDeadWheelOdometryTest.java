@@ -14,8 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
-import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.HolonomicTrajectoryGenerator;
 
 class TwoDeadWheelOdometryTest {
   private static final double m_xWheelYPos = 1;
@@ -117,7 +116,7 @@ class TwoDeadWheelOdometryTest {
     var yWheelPos = 0.0;
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 Pose2d.ZERO,
                 new Pose2d(20, 20, Rotation2d.fromDegrees(45)),
@@ -125,7 +124,10 @@ class TwoDeadWheelOdometryTest {
                 new Pose2d(30, 30, Rotation2d.fromDegrees(135)),
                 new Pose2d(20, 20, Rotation2d.fromDegrees(-90)),
                 new Pose2d(10, 10, Rotation2d.ZERO)),
-            new TrajectoryConfig(0.5, 2));
+            0.5,
+            1.0,
+            2.0,
+            1.0);
 
     var odometry =
         new TwoDeadWheelOdometry(
@@ -148,18 +150,16 @@ class TwoDeadWheelOdometryTest {
     while (t <= trajectory.duration) {
       var groundTruthState = trajectory.sampleAt(t);
 
-      trajectoryDistanceTravelled +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+      var robot_vel =
+          groundTruthState.velocity.toRobotRelative(groundTruthState.pose.getRotation());
+      var robot_accel =
+          groundTruthState.acceleration.toRobotRelative(groundTruthState.pose.getRotation());
+
+      trajectoryDistanceTravelled += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
 
       var wheelVelocities =
           m_inverseKinematicsMatrix.mult(
-              new SimpleMatrix(
-                  new double[][] {
-                    {groundTruthState.forwardVelocity()},
-                    {0},
-                    {groundTruthState.forwardVelocity() * groundTruthState.curvature}
-                  }));
+              new SimpleMatrix(new double[][] {{robot_vel.vx}, {0}, {robot_vel.omega}}));
 
       var xWheelVel = wheelVelocities.get(0, 0) + rand.nextGaussian() * 0.05;
       var yWheelVel = wheelVelocities.get(1, 0) + rand.nextGaussian() * 0.05;
@@ -208,7 +208,7 @@ class TwoDeadWheelOdometryTest {
     var yWheelPos = 0.0;
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 Pose2d.ZERO,
                 new Pose2d(20, 20, Rotation2d.fromDegrees(45)),
@@ -216,7 +216,10 @@ class TwoDeadWheelOdometryTest {
                 new Pose2d(30, 30, Rotation2d.fromDegrees(135)),
                 new Pose2d(20, 20, Rotation2d.fromDegrees(-90)),
                 new Pose2d(10, 10, Rotation2d.ZERO)),
-            new TrajectoryConfig(0.5, 2));
+            0.5,
+            1.0,
+            2.0,
+            1.0);
 
     var odometry =
         new TwoDeadWheelOdometry(
@@ -234,23 +237,18 @@ class TwoDeadWheelOdometryTest {
     while (t <= trajectory.duration) {
       var groundTruthState = trajectory.sampleAt(t);
 
-      trajectoryDistanceTravelled +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+      var robot_vel =
+          groundTruthState.velocity.toRobotRelative(groundTruthState.pose.getRotation());
+      var robot_accel =
+          groundTruthState.acceleration.toRobotRelative(groundTruthState.pose.getRotation());
+
+      trajectoryDistanceTravelled += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
 
       var wheelVelocities =
           m_inverseKinematicsMatrix.mult(
               new SimpleMatrix(
                   new double[][] {
-                    {
-                      groundTruthState.forwardVelocity()
-                          * groundTruthState.pose.getRotation().getCos()
-                    },
-                    {
-                      groundTruthState.forwardVelocity()
-                          * groundTruthState.pose.getRotation().getSin()
-                    },
-                    {0}
+                    {groundTruthState.velocity.vx}, {groundTruthState.velocity.vy}, {0}
                   }));
 
       var xWheelVel = wheelVelocities.get(0, 0) + rand.nextGaussian() * 0.05;

@@ -1,7 +1,6 @@
 extra_includes:
 - geometryToString.h
 - wpi/math/trajectory/DifferentialSample.hpp
-- wpi/math/trajectory/DrivetrainSplineSample.hpp
 
 classes:
   wpi::math::Trajectory:
@@ -34,10 +33,6 @@ templates:
     qualname: wpi::math::Trajectory
     params:
     - wpi::math::DifferentialSample
-  DrivetrainSplineTrajectoryBase:
-    qualname: wpi::math::Trajectory
-    params:
-    - wpi::math::DrivetrainSplineSample
   HolonomicTrajectoryBase:
     qualname: wpi::math::Trajectory
     params:

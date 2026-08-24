@@ -96,7 +96,6 @@ scan_headers_ignore = [
     "wpi/math/util/MathShared.hpp",
 
     "geometryToString.h",
-    "PyTrajectoryConstraint.h",
     "_units_base_type_caster.h",
 ]
 
@@ -1588,25 +1587,9 @@ NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 # wpi/math/trajectory
 DifferentialSample = "wpi/math/trajectory/DifferentialSample.hpp"
 DifferentialTrajectory = "wpi/math/trajectory/DifferentialTrajectory.hpp"
-DrivetrainSplineSample = "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-DrivetrainSplineTrajectory = "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-DrivetrainSplineTrajectoryGenerator = "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-DrivetrainSplineTrajectoryParameterizer = "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
 HolonomicSample = "wpi/math/trajectory/HolonomicSample.hpp"
 HolonomicTrajectory = "wpi/math/trajectory/HolonomicTrajectory.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
-TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
 TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
-
-# wpi/math/trajectory/constraint
-CentripetalAccelerationConstraint = "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
-DifferentialDriveKinematicsConstraint = "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
-DifferentialDriveVoltageConstraint = "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
-EllipticalRegionConstraint = "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
-MaxVelocityConstraint = "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
-MecanumDriveKinematicsConstraint = "wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.hpp"
-RectangularRegionConstraint = "wpi/math/trajectory/constraint/RectangularRegionConstraint.hpp"
-SwerveDriveKinematicsConstraint = "wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.hpp"
-TrajectoryConstraint = "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"

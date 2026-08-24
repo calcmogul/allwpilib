@@ -2,13 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <format>
+
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
-#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/TestHolonomicTrajectory.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
@@ -17,14 +19,13 @@
 using namespace wpi::math;
 
 TEST_CASE("SampleJsonTest TestBaseSample", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
+  auto trajectory = TestHolonomicTrajectory::GetTrajectory(12_fps, 12_fps_sq);
+  if (!trajectory.has_value()) {
+    UNSCOPED_INFO(std::format("{}", trajectory.error()));
+  }
+  REQUIRE(trajectory.has_value());
 
-  for (const auto& splineSample : splineTrajectory.Samples()) {
-    // Convert DrivetrainSplineSample to HolonomicSample
-    HolonomicSample sample{splineSample.time, splineSample.pose,
-                           splineSample.velocity, splineSample.acceleration};
-
+  for (const auto& sample : trajectory.value().Samples()) {
     wpi::util::json json;
     to_json(json, sample);
 
@@ -38,14 +39,13 @@ TEST_CASE("SampleJsonTest TestBaseSample", "[wpimath]") {
 }
 
 TEST_CASE("SampleJsonTest TestFromJson", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
+  auto trajectory = TestHolonomicTrajectory::GetTrajectory(12_fps, 12_fps_sq);
+  if (!trajectory.has_value()) {
+    UNSCOPED_INFO(std::format("{}", trajectory.error()));
+  }
+  REQUIRE(trajectory.has_value());
 
-  for (const auto& splineSample : splineTrajectory.Samples()) {
-    // Convert DrivetrainSplineSample to HolonomicSample
-    HolonomicSample sample{splineSample.time, splineSample.pose,
-                           splineSample.velocity, splineSample.acceleration};
-
+  for (const auto& sample : trajectory.value().Samples()) {
     wpi::util::json json;
     to_json(json, sample);
 
@@ -59,18 +59,17 @@ TEST_CASE("SampleJsonTest TestFromJson", "[wpimath]") {
 }
 
 TEST_CASE("SampleJsonTest TestDifferentialSamples", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
+  auto trajectory = TestHolonomicTrajectory::GetTrajectory(12_fps, 12_fps_sq);
+  if (!trajectory.has_value()) {
+    UNSCOPED_INFO(std::format("{}", trajectory.error()));
+  }
+  REQUIRE(trajectory.has_value());
 
   DifferentialDriveKinematics kinematics{0.5_m};
 
-  for (const auto& splineSample : splineTrajectory.Samples()) {
-    // Convert DrivetrainSplineSample to HolonomicSample
-    HolonomicSample trajectorySample{splineSample.time, splineSample.pose,
-                                     splineSample.velocity,
-                                     splineSample.acceleration};
+  for (const auto& holonomicSample : trajectory.value().Samples()) {
     // Convert HolonomicSample to DifferentialSample
-    DifferentialSample sample{trajectorySample, kinematics};
+    DifferentialSample sample{holonomicSample, kinematics};
 
     wpi::util::json json;
     to_json(json, sample);

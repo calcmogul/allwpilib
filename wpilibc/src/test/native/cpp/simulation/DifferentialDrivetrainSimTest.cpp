@@ -4,21 +4,34 @@
 
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 
+#include <format>
+
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectoryGenerator.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/current.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 TEST_CASE("DifferentialDrivetrainSimTest Convergence",
           "[wpilibc][simulation]") {
@@ -43,12 +56,14 @@ TEST_CASE("DifferentialDrivetrainSimTest Convergence",
   // Ground truth.
   wpi::math::Vectord<7> groundTruthX = wpi::math::Vectord<7>::Zero();
 
-  wpi::math::TrajectoryConfig config{1_mps, 1_mps_sq};
-  config.AddConstraint(
-      wpi::math::DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
-
-  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      wpi::math::Pose2d{}, {}, wpi::math::Pose2d{2_m, 2_m, 0_rad}, config);
+  auto result = wpi::math::HolonomicTrajectoryGenerator::Generate(
+      wpi::math::Pose2d{}, {}, wpi::math::Pose2d{2_m, 2_m, 0_rad}, 1_mps,
+      1_rad_per_s, 1_mps_sq, 1_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
   for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
     auto state = trajectory.SampleAt(t);
