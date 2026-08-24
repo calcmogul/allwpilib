@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
@@ -26,10 +27,9 @@ import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.Models;
-import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
-import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.DifferentialSample;
+import org.wpilib.math.trajectory.UnicycleTrajectoryGenerator;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -140,75 +140,79 @@ class S3UKFTest {
         List.of(
             new Pose2d(2.75, 22.521, Rotation2d.ZERO),
             new Pose2d(24.73, 19.68, Rotation2d.fromRadians(5.846)));
-    var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(waypoints, new TrajectoryConfig(8.8, 0.1));
+    var trajectory = UnicycleTrajectoryGenerator.generate(waypoints, 8.8, 1.0, 0.1, 1.0);
 
-    Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
-    Matrix<N2, N1> u = new Matrix<>(Nat.N2(), Nat.N1());
-
-    var B =
-        NumericalJacobian.numericalJacobianU(
-            Nat.N5(),
-            Nat.N2(),
-            S3UKFTest::driveDynamics,
-            new Matrix<>(Nat.N5(), Nat.N1()),
-            new Matrix<>(Nat.N2(), Nat.N1()));
-
-    observer.setXhat(
+    Matrix<N5, N1> r =
         VecBuilder.fill(
             trajectory.start().pose.getTranslation().getX(),
             trajectory.start().pose.getTranslation().getY(),
             trajectory.start().pose.getRotation().getRadians(),
             0.0,
-            0.0));
+            0.0);
+    Matrix<N2, N1> u = new Matrix<>(Nat.N2(), Nat.N1());
 
-    var trueXhat = observer.getXhat();
+    Matrix<N2, N2> A =
+        NumericalJacobian.numericalJacobianX(
+                Nat.N5(),
+                Nat.N5(),
+                S3UKFTest::driveDynamics,
+                new Matrix<>(Nat.N5(), Nat.N1()),
+                new Matrix<>(Nat.N2(), Nat.N1()))
+            .block(Nat.N2(), Nat.N2(), 3, 3);
+    Matrix<N2, N2> B =
+        NumericalJacobian.numericalJacobianU(
+                Nat.N5(),
+                Nat.N2(),
+                S3UKFTest::driveDynamics,
+                new Matrix<>(Nat.N5(), Nat.N1()),
+                new Matrix<>(Nat.N2(), Nat.N1()))
+            .block(Nat.N2(), Nat.N2(), 3, 0);
+    var discABPair = Discretization.discretizeAB(A, B, dt);
+    var discA = discABPair.getFirst();
+    var discB = discABPair.getSecond();
+
+    observer.setXhat(r);
+
+    var kinematics = new DifferentialDriveKinematics(rb);
 
     double duration = trajectory.duration;
     for (int i = 0; i < (duration / dt); ++i) {
-      var ref = trajectory.sampleAt(dt * i);
-      double vl = ref.forwardVelocity() * (1 - (ref.curvature * rb));
-      double vr = ref.forwardVelocity() * (1 + (ref.curvature * rb));
-
+      var nextSample = new DifferentialSample(trajectory.sampleAt(dt * (i + 1)), kinematics);
       var nextR =
           VecBuilder.fill(
-              ref.pose.getTranslation().getX(),
-              ref.pose.getTranslation().getY(),
-              ref.pose.getRotation().getRadians(),
-              vl,
-              vr);
+              nextSample.pose.getTranslation().getX(),
+              nextSample.pose.getTranslation().getY(),
+              nextSample.pose.getRotation().getRadians(),
+              nextSample.leftVelocity,
+              nextSample.rightVelocity);
 
       Matrix<N3, N1> localY =
-          driveLocalMeasurementModel(trueXhat, new Matrix<>(Nat.N2(), Nat.N1()));
+          driveLocalMeasurementModel(observer.getXhat(), new Matrix<>(Nat.N2(), Nat.N1()));
       var noiseStdDev = VecBuilder.fill(0.0001, 0.5, 0.5);
-
       observer.correct(u, localY.plus(Normal.normal(noiseStdDev)));
 
-      var rdot = nextR.minus(r).div(dt);
-      u = new Matrix<>(B.solve(rdot.minus(driveDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
+      var globalY = driveGlobalMeasurementModel(r, u);
+      var R =
+          StateSpaceUtil.covarianceMatrix(Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+      observer.correct(
+          Nat.N5(),
+          u,
+          globalY,
+          S3UKFTest::driveGlobalMeasurementModel,
+          R,
+          AngleStatistics.angleMean(2),
+          AngleStatistics.angleResidual(2),
+          AngleStatistics.angleResidual(2),
+          AngleStatistics.angleAdd(2));
+
+      Matrix<N2, N1> nextVelocities = nextR.block(Nat.N2(), Nat.N1(), 3, 0);
+      Matrix<N2, N1> velocities = r.block(Nat.N2(), Nat.N1(), 3, 0);
+      u = discB.solve(nextVelocities.minus(discA.times(velocities)));
 
       observer.predict(u, dt);
 
       r = nextR;
-      trueXhat = NumericalIntegration.rk4(S3UKFTest::driveDynamics, trueXhat, u, dt);
     }
-
-    var localY = driveLocalMeasurementModel(trueXhat, u);
-    observer.correct(u, localY);
-
-    var globalY = driveGlobalMeasurementModel(trueXhat, u);
-    var R =
-        StateSpaceUtil.covarianceMatrix(Nat.N5(), VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
-    observer.correct(
-        Nat.N5(),
-        u,
-        globalY,
-        S3UKFTest::driveGlobalMeasurementModel,
-        R,
-        AngleStatistics.angleMean(2),
-        AngleStatistics.angleResidual(2),
-        AngleStatistics.angleResidual(2),
-        AngleStatistics.angleAdd(2));
 
     final var finalPosition = trajectory.sampleAt(trajectory.duration);
 

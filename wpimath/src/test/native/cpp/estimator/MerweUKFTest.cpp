@@ -7,10 +7,13 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <format>
 #include <numbers>
 #include <vector>
 
+#include <Eigen/Core>
 #include <Eigen/QR>
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
@@ -18,17 +21,17 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/Models.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/DifferentialSample.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectory.hpp"
+#include "wpi/math/trajectory/UnicycleTrajectoryGenerator.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
@@ -135,60 +138,64 @@ TEST_CASE("MerweUKFTest DriveConvergence", "[wpimath]") {
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
       wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+  auto result = wpi::math::UnicycleTrajectoryGenerator::Generate(
+      waypoints, 8.8_mps, 1.0_rad_per_s, 0.1_mps_sq, 1.0_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
-  wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
+  wpi::math::Vectord<5> r{trajectory.InitialPose().Translation().X().value(),
+                          trajectory.InitialPose().Translation().Y().value(),
+                          trajectory.InitialPose().Rotation().Radians().value(),
+                          0.0, 0.0};
   wpi::math::Vectord<2> u = wpi::math::Vectord<2>::Zero();
 
-  auto B = wpi::math::NumericalJacobianU<5, 5, 2>(
-      DriveDynamics, wpi::math::Vectord<5>::Zero(),
-      wpi::math::Vectord<2>::Zero());
+  Eigen::Matrix2d A = wpi::math::NumericalJacobianX<5, 5, 2>(
+                          DriveDynamics, Eigen::Vector<double, 5>::Zero(),
+                          Eigen::Vector2d::Zero())
+                          .bottomRightCorner<2, 2>();
+  Eigen::Matrix2d B = wpi::math::NumericalJacobianU<5, 5, 2>(
+                          DriveDynamics, Eigen::Vector<double, 5>::Zero(),
+                          Eigen::Vector2d::Zero())
+                          .bottomRightCorner<2, 2>();
+  Eigen::Matrix2d A_d;
+  Eigen::Matrix2d B_d;
+  wpi::math::DiscretizeAB(A, B, dt, &A_d, &B_d);
 
-  observer.SetXhat(wpi::math::Vectord<5>{
-      trajectory.InitialPose().Translation().X().value(),
-      trajectory.InitialPose().Translation().Y().value(),
-      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
+  observer.SetXhat(r);
 
-  auto trueXhat = observer.Xhat();
+  wpi::math::DifferentialDriveKinematics kinematics{rb};
 
   auto duration = trajectory.Duration();
   for (size_t i = 0; i < (duration / dt).value(); ++i) {
-    auto ref = trajectory.SampleAt(dt * i);
-    wpi::units::meters_per_second_t vl =
-        ref.ForwardVelocity() * (1 - (ref.curvature * rb).value());
-    wpi::units::meters_per_second_t vr =
-        ref.ForwardVelocity() * (1 + (ref.curvature * rb).value());
+    wpi::math::DifferentialSample nextSample{trajectory.SampleAt(dt * (i + 1)),
+                                             kinematics};
+    wpi::math::Vectord<5> nextR{nextSample.pose.Translation().X().value(),
+                                nextSample.pose.Translation().Y().value(),
+                                nextSample.pose.Rotation().Radians().value(),
+                                nextSample.leftVelocity.value(),
+                                nextSample.rightVelocity.value()};
 
-    wpi::math::Vectord<5> nextR{
-        ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
-        ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
-
-    auto localY =
-        DriveLocalMeasurementModel(trueXhat, wpi::math::Vectord<2>::Zero());
+    auto localY = DriveLocalMeasurementModel(observer.Xhat(),
+                                             wpi::math::Vectord<2>::Zero());
     observer.Correct(u, localY + wpi::math::Normal(0.0001, 0.5, 0.5));
 
-    wpi::math::Vectord<5> rdot = (nextR - r) / dt.value();
-    u = B.householderQr().solve(
-        rdot - DriveDynamics(r, wpi::math::Vectord<2>::Zero()));
+    auto globalY = DriveGlobalMeasurementModel(r, u);
+    auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
+    observer.Correct<5>(
+        u, globalY, DriveGlobalMeasurementModel, R,
+        wpi::math::AngleMean<5, 2 * 5 + 1>(2), wpi::math::AngleResidual<5>(2),
+        wpi::math::AngleResidual<5>(2), wpi::math::AngleAdd<5>(2));
+
+    u = B_d.householderQr().solve(nextR.bottomRows<2>() -
+                                  A_d * r.bottomRows<2>());
 
     observer.Predict(u, dt);
 
     r = nextR;
-    trueXhat = wpi::math::RK4(DriveDynamics, trueXhat, u, dt);
   }
-
-  auto localY = DriveLocalMeasurementModel(trueXhat, u);
-  observer.Correct(u, localY);
-
-  auto globalY = DriveGlobalMeasurementModel(trueXhat, u);
-  auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
-  observer.Correct<5>(u, globalY, DriveGlobalMeasurementModel, R,
-                      wpi::math::AngleMean<5, 2 * 5 + 1>(2),
-                      wpi::math::AngleResidual<5>(2),
-                      wpi::math::AngleResidual<5>(2), wpi::math::AngleAdd<5>(2)
-
-  );
 
   auto finalPosition = trajectory.SampleAt(trajectory.Duration());
   CHECK_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),

@@ -6,21 +6,26 @@
 
 #include <cmath>
 #include <cstddef>
+#include <format>
 #include <vector>
 
 #include <Eigen/QR>
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/UnicycleTrajectoryGenerator.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
@@ -108,8 +113,13 @@ TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
       wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+  auto result = wpi::math::UnicycleTrajectoryGenerator::Generate(
+      waypoints, 8.8_mps, 1_rad_per_s, 0.1_mps_sq, 1_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
   wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
   wpi::math::Vectord<2> u = wpi::math::Vectord<2>::Zero();
@@ -122,13 +132,13 @@ TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
       trajectory.InitialPose().Translation().Y().value(),
       trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
 
-  auto duration = trajectory.Duration();
+  wpi::math::DifferentialDriveKinematics kinematics{rb};
+
+  auto duration = trajectory.Duration() + 750_ms;
   for (size_t i = 0; i < (duration / dt).value(); ++i) {
     auto ref = trajectory.SampleAt(dt * i);
-    wpi::units::meters_per_second_t vl =
-        ref.ForwardVelocity() * (1 - (ref.curvature * rb).value());
-    wpi::units::meters_per_second_t vr =
-        ref.ForwardVelocity() * (1 + (ref.curvature * rb).value());
+    auto [vl, vr] = kinematics.ToWheelVelocities(
+        ref.velocity.ToRobotRelative(ref.pose.Rotation()));
 
     wpi::math::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),

@@ -3,21 +3,36 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstddef>
+#include <format>
 
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/UnicycleTrajectoryGenerator.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
 
 TEST_CASE("TrajectoryConcatenateTest Samples", "[wpimath]") {
-  auto t1 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
-  auto t2 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq});
+  auto result1 = wpi::math::UnicycleTrajectoryGenerator::Generate(
+      {}, {}, {1_m, 1_m, 0_deg}, 2_mps, 1_rad_per_s, 2_mps_sq, 1_rad_per_s_sq);
+  if (!result1.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result1.error()));
+  }
+  REQUIRE(result1.has_value());
+  auto t1 = result1.value();
+
+  auto result2 = wpi::math::UnicycleTrajectoryGenerator::Generate(
+      {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, 2_mps, 1_rad_per_s, 2_mps_sq,
+      1_rad_per_s_sq);
+  if (!result2.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result2.error()));
+  }
+  REQUIRE(result2.has_value());
+  auto t2 = result2.value();
 
   auto t = t1 + t2;
 
