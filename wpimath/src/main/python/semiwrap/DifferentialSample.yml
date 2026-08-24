@@ -30,7 +30,6 @@ classes:
           :
           const HolonomicSample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
           const HolonomicSample&, const DifferentialDriveKinematics&:
-          const DrivetrainSplineSample&, const DifferentialDriveKinematics&:
       Transform:
       RelativeTo:
       operator==:

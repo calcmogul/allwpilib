@@ -57,7 +57,6 @@ open module wpilib.math {
   exports org.wpilib.math.system.proto.detail;
   exports org.wpilib.math.system.struct;
   exports org.wpilib.math.trajectory;
-  exports org.wpilib.math.trajectory.constraint;
   exports org.wpilib.math.trajectory.proto;
   exports org.wpilib.math.trajectory.proto.detail;
   exports org.wpilib.math.trajectory.struct;

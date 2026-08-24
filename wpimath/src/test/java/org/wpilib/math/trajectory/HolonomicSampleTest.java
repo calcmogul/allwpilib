@@ -430,36 +430,6 @@ class HolonomicSampleTest {
   }
 
   @Test
-  void testDrivetrainSplineSampleStoresFieldRelativeVelocity() {
-    // A DrivetrainSplineSample is built from path-relative (forward) scalars but stores
-    // velocity/acceleration in the field frame. For a robot facing +90 degrees
-    // moving forward, the field velocity should point along +y.
-    double forwardVelocity = 2.0;
-    double forwardAcceleration = 1.5;
-    double curvature = 0.25;
-    var sample =
-        new DrivetrainSplineSample(
-            0.0,
-            new Pose2d(0, 0, Rotation2d.CCW_PI_2),
-            forwardVelocity,
-            forwardAcceleration,
-            curvature);
-
-    // Field-relative: forward speed rotated into +y.
-    assertEquals(0.0, sample.velocity.vx, EPSILON);
-    assertEquals(forwardVelocity, sample.velocity.vy, EPSILON);
-    // Omega is frame-invariant and equals forward * curvature.
-    assertEquals(forwardVelocity * curvature, sample.velocity.omega, EPSILON);
-
-    assertEquals(0.0, sample.acceleration.ax, EPSILON);
-    assertEquals(forwardAcceleration, sample.acceleration.ay, EPSILON);
-
-    // The projection accessors recover the path-relative scalars.
-    assertEquals(forwardVelocity, sample.forwardVelocity(), EPSILON);
-    assertEquals(forwardAcceleration, sample.forwardAcceleration(), EPSILON);
-  }
-
-  @Test
   void testTransformRotatesVelocityAndAcceleration() {
     // Field-relative velocity/acceleration must rotate with the transform's rotation.
     var sample =
@@ -511,25 +481,6 @@ class HolonomicSampleTest {
     assertEquals(2.0, relative.acceleration.ax, EPSILON);
     assertEquals(0.0, relative.acceleration.ay, EPSILON);
     assertEquals(0.3, relative.acceleration.alpha, EPSILON);
-  }
-
-  @Test
-  void testDrivetrainSplineSampleTransformPreservesForwardScalars() {
-    // Rotating the sample rotates both the heading and the field velocity, so the
-    // heading-relative forward scalars (and curvature) are invariant.
-    var sample =
-        new DrivetrainSplineSample(
-            0.0, new Pose2d(1, 2, Rotation2d.fromDegrees(20)), 2.0, 1.5, 0.25);
-
-    var transformed =
-        sample.transform(new Transform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(35)));
-    var relative = sample.relativeTo(new Pose2d(0, 0, Rotation2d.fromDegrees(-15)));
-
-    for (var s : new DrivetrainSplineSample[] {transformed, relative}) {
-      assertEquals(2.0, s.forwardVelocity(), EPSILON);
-      assertEquals(1.5, s.forwardAcceleration(), EPSILON);
-      assertEquals(0.25, s.curvature, EPSILON);
-    }
   }
 
   @Test

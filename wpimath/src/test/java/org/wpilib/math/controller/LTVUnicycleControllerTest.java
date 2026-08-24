@@ -13,8 +13,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
-import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.HolonomicTrajectoryGenerator;
 import org.wpilib.math.util.MathUtil;
 
 class LTVUnicycleControllerTest {
@@ -33,8 +32,7 @@ class LTVUnicycleControllerTest {
     final var waypoints = new ArrayList<Pose2d>();
     waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.ZERO));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
-    var config = new TrajectoryConfig(8.8, 0.1);
-    final var trajectory = DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
+    final var trajectory = HolonomicTrajectoryGenerator.generate(waypoints, 8.8, 1.0, 0.1, 1.0);
 
     final var duration = trajectory.duration;
     for (int i = 0; i < (duration / DT); ++i) {

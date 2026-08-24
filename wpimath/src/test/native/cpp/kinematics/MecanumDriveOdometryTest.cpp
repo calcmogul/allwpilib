@@ -16,12 +16,12 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectory.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectoryGenerator.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
@@ -112,14 +112,14 @@ TEST_CASE_METHOD(MecanumDriveOdometryTest,
   wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
                                            wheelPositions};
 
-  wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
+  wpi::math::HolonomicTrajectory trajectory =
+      wpi::math::HolonomicTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
                       wpi::math::Pose2d{-3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+          5.0_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -131,7 +131,7 @@ TEST_CASE_METHOD(MecanumDriveOdometryTest,
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+    wpi::math::HolonomicSample groundTruthState = trajectory.SampleAt(t);
 
     auto wheelVelocities =
         kinematics.ToWheelVelocities(groundTruthState.velocity.ToRobotRelative(
@@ -179,14 +179,14 @@ TEST_CASE_METHOD(MecanumDriveOdometryTest,
   wpi::math::MecanumDriveOdometry odometry{kinematics, wpi::math::Rotation2d{},
                                            wheelPositions};
 
-  wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
+  wpi::math::HolonomicTrajectory trajectory =
+      wpi::math::HolonomicTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
                       wpi::math::Pose2d{-3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+          5.0_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -198,14 +198,10 @@ TEST_CASE_METHOD(MecanumDriveOdometryTest,
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+    wpi::math::HolonomicSample groundTruthState = trajectory.SampleAt(t);
 
-    auto wheelVelocities = kinematics.ToWheelVelocities(
-        {groundTruthState.ForwardVelocity() *
-             groundTruthState.pose.Rotation().Cos(),
-         groundTruthState.ForwardVelocity() *
-             groundTruthState.pose.Rotation().Sin(),
-         0_rad_per_s});
+    auto wheelVelocities =
+        kinematics.ToWheelVelocities(groundTruthState.velocity);
 
     wheelVelocities.frontLeft += distribution(generator) * 0.1_mps;
     wheelVelocities.frontRight += distribution(generator) * 0.1_mps;

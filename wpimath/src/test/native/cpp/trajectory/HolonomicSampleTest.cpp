@@ -16,7 +16,6 @@
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/DifferentialSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -245,34 +244,6 @@ TEST_CASE("HolonomicSampleTest KinematicInterpolateZeroTime", "[wpimath]") {
   CHECK_NEAR_UNITS(0_s, interpolated.time, 1e-9_s);
 }
 
-TEST_CASE("HolonomicSampleTest SplineSampleStoresFieldRelativeVelocity",
-          "[wpimath]") {
-  // A DrivetrainSplineSample is built from path-relative (forward) scalars but
-  // stores velocity/acceleration in the field frame. For a robot facing +90
-  // degrees moving forward, the field velocity should point along +y.
-  wpi::units::meters_per_second_t forwardVelocity{2.0};
-  wpi::units::meters_per_second_squared_t forwardAcceleration{1.5};
-  wpi::units::curvature_t curvature{0.25};
-  wpi::math::DrivetrainSplineSample sample{
-      0_s, wpi::math::Pose2d{0_m, 0_m, 90_deg}, forwardVelocity,
-      forwardAcceleration, curvature};
-
-  // Field-relative: forward speed rotated into +y.
-  CHECK_NEAR_UNITS(0_mps, sample.velocity.vx, 1e-9_mps);
-  CHECK_NEAR_UNITS(forwardVelocity, sample.velocity.vy, 1e-9_mps);
-  // Omega is frame-invariant and equals forward * curvature.
-  CHECK_NEAR_UNITS(forwardVelocity * curvature, sample.velocity.omega,
-                   1e-9_rad_per_s);
-
-  CHECK_NEAR_UNITS(0_mps_sq, sample.acceleration.ax, 1e-9_mps_sq);
-  CHECK_NEAR_UNITS(forwardAcceleration, sample.acceleration.ay, 1e-9_mps_sq);
-
-  // The projection accessors recover the path-relative scalars.
-  CHECK_NEAR_UNITS(forwardVelocity, sample.ForwardVelocity(), 1e-9_mps);
-  CHECK_NEAR_UNITS(forwardAcceleration, sample.ForwardAcceleration(),
-                   1e-9_mps_sq);
-}
-
 TEST_CASE("HolonomicSampleTest TransformRotatesVelocityAndAcceleration",
           "[wpimath]") {
   // Field-relative velocity/acceleration must rotate with the transform's
@@ -326,25 +297,6 @@ TEST_CASE("HolonomicSampleTest RelativeToRotatesVelocityAndAcceleration",
   CHECK_NEAR_UNITS(0_mps_sq, relative.acceleration.ay, 1e-9_mps_sq);
   CHECK_NEAR_UNITS(0.3_rad_per_s_sq, relative.acceleration.alpha,
                    1e-9_rad_per_s_sq);
-}
-
-TEST_CASE("HolonomicSampleTest SplineSampleTransformPreservesForwardScalars",
-          "[wpimath]") {
-  // Rotating the sample rotates both the heading and the field velocity, so the
-  // heading-relative forward scalars (and curvature) are invariant.
-  wpi::math::DrivetrainSplineSample sample{0_s,
-                                           wpi::math::Pose2d{1_m, 2_m, 20_deg},
-                                           2_mps, 1.5_mps_sq, 0.25_rad / 1_m};
-
-  auto transformed = sample.Transform(
-      wpi::math::Transform2d{wpi::math::Translation2d{3_m, 4_m}, 35_deg});
-  auto relative = sample.RelativeTo(wpi::math::Pose2d{0_m, 0_m, -15_deg});
-
-  for (const auto& s : {transformed, relative}) {
-    CHECK_NEAR_UNITS(2_mps, s.ForwardVelocity(), 1e-9_mps);
-    CHECK_NEAR_UNITS(1.5_mps_sq, s.ForwardAcceleration(), 1e-9_mps_sq);
-    CHECK_NEAR_UNITS(0.25_rad / 1_m, s.curvature, 1e-9_rad / 1_m);
-  }
 }
 
 TEST_CASE("HolonomicSampleTest DifferentialSampleTransformPreservesWheelSpeeds",

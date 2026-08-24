@@ -13,8 +13,7 @@
 #include "wpi/math/trajectory/DifferentialTrajectory.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
-#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/TestHolonomicTrajectory.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
@@ -23,16 +22,7 @@
 using namespace wpi::math;
 
 TEST_CASE("TrajectorySerializationTest TestJsonSerialization", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
-
-  // Convert DrivetrainSplineTrajectory to HolonomicTrajectory
-  std::vector<HolonomicSample> samples;
-  for (const auto& splineSample : splineTrajectory.Samples()) {
-    samples.emplace_back(splineSample.time, splineSample.pose,
-                         splineSample.velocity, splineSample.acceleration);
-  }
-  HolonomicTrajectory trajectory{std::move(samples)};
+  auto trajectory = TestHolonomicTrajectory::GetTrajectory(12_fps, 12_fps_sq);
 
   // Serialize to JSON
   wpi::util::json json;
@@ -59,15 +49,12 @@ TEST_CASE("TrajectorySerializationTest TestJsonSerialization", "[wpimath]") {
 
 TEST_CASE("TrajectorySerializationTest TestDifferentialSerialization",
           "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
-  auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
+  auto holonomicTrajectory =
+      TestHolonomicTrajectory::GetTrajectory(12_fps, 12_fps_sq);
 
   DifferentialDriveKinematics kinematics{0.5_m};
   std::vector<DifferentialSample> samples;
-  for (const auto& splineSample : splineTrajectory.Samples()) {
-    HolonomicSample holonomicSample{splineSample.time, splineSample.pose,
-                                    splineSample.velocity,
-                                    splineSample.acceleration};
+  for (const auto& holonomicSample : holonomicTrajectory.Samples()) {
     samples.emplace_back(holonomicSample, kinematics);
   }
 

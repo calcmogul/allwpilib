@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
-import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.HolonomicTrajectoryGenerator;
 
 class MecanumDriveOdometryTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -105,7 +104,7 @@ class MecanumDriveOdometryTest {
         new MecanumDriveOdometry(kinematics, Rotation2d.ZERO, wheelPositions, Pose2d.ZERO);
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 Pose2d.ZERO,
                 new Pose2d(20, 20, Rotation2d.ZERO),
@@ -113,7 +112,10 @@ class MecanumDriveOdometryTest {
                 new Pose2d(30, 30, Rotation2d.ZERO),
                 new Pose2d(20, 20, Rotation2d.PI),
                 new Pose2d(10, 10, Rotation2d.ZERO)),
-            new TrajectoryConfig(0.5, 2));
+            0.5,
+            1.0,
+            2,
+            1.0);
 
     var rand = new Random(5190);
 
@@ -128,15 +130,15 @@ class MecanumDriveOdometryTest {
       var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.velocity.toRobotRelative(groundTruthState.pose.getRotation()).vx * dt
+              + 0.5
+                  * groundTruthState.acceleration.toRobotRelative(
+                          groundTruthState.pose.getRotation())
+                      .ax
+                  * dt
+                  * dt;
 
-      var wheelVelocities =
-          kinematics.toWheelVelocities(
-              new ChassisVelocities(
-                  groundTruthState.forwardVelocity(),
-                  0,
-                  groundTruthState.forwardVelocity() * groundTruthState.curvature));
+      var wheelVelocities = kinematics.toWheelVelocities(groundTruthState.velocity);
 
       wheelVelocities.frontLeft += rand.nextGaussian() * 0.1;
       wheelVelocities.frontRight += rand.nextGaussian() * 0.1;
@@ -188,7 +190,7 @@ class MecanumDriveOdometryTest {
         new MecanumDriveOdometry(kinematics, Rotation2d.ZERO, wheelPositions, Pose2d.ZERO);
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 Pose2d.ZERO,
                 new Pose2d(20, 20, Rotation2d.ZERO),
@@ -196,7 +198,10 @@ class MecanumDriveOdometryTest {
                 new Pose2d(30, 30, Rotation2d.ZERO),
                 new Pose2d(20, 20, Rotation2d.PI),
                 new Pose2d(10, 10, Rotation2d.ZERO)),
-            new TrajectoryConfig(0.5, 2));
+            0.5,
+            1.0,
+            2,
+            1.0);
 
     var rand = new Random(5190);
 
@@ -211,15 +216,15 @@ class MecanumDriveOdometryTest {
       var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+          groundTruthState.velocity.toRobotRelative(groundTruthState.pose.getRotation()).vx * dt
+              + 0.5
+                  * groundTruthState.acceleration.toRobotRelative(
+                          groundTruthState.pose.getRotation())
+                      .ax
+                  * dt
+                  * dt;
 
-      var wheelVelocities =
-          kinematics.toWheelVelocities(
-              new ChassisVelocities(
-                  groundTruthState.forwardVelocity() * groundTruthState.pose.getRotation().getCos(),
-                  groundTruthState.forwardVelocity() * groundTruthState.pose.getRotation().getSin(),
-                  0));
+      var wheelVelocities = kinematics.toWheelVelocities(groundTruthState.velocity);
 
       wheelVelocities.frontLeft += rand.nextGaussian() * 0.1;
       wheelVelocities.frontRight += rand.nextGaussian() * 0.1;

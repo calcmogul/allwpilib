@@ -16,8 +16,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
-import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.HolonomicTrajectoryGenerator;
 import org.wpilib.math.util.Units;
 
 class SwerveDriveOdometry3dTest {
@@ -142,14 +141,17 @@ class SwerveDriveOdometry3dTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
                 new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+            0.5,
+            1.0,
+            2,
+            1.0);
 
     var rand = new Random(4915);
 
@@ -163,10 +165,7 @@ class SwerveDriveOdometry3dTest {
 
       var moduleVelocities =
           kinematics.toSwerveModuleVelocities(
-              new ChassisVelocities(
-                  groundTruthState.forwardVelocity(),
-                  0.0,
-                  groundTruthState.forwardVelocity() * groundTruthState.curvature));
+              groundTruthState.velocity.toRobotRelative(groundTruthState.pose.getRotation()));
       for (var moduleVelocity : moduleVelocities) {
         moduleVelocity.angle =
             moduleVelocity.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
@@ -236,14 +235,17 @@ class SwerveDriveOdometry3dTest {
     SwerveModulePosition br = new SwerveModulePosition();
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
                 new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(0.5, 2));
+            0.5,
+            1.0,
+            2,
+            1.0);
 
     var rand = new Random(4915);
 
@@ -255,18 +257,14 @@ class SwerveDriveOdometry3dTest {
     while (t <= trajectory.duration) {
       var groundTruthState = trajectory.sampleAt(t);
 
-      fl.distance +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
-      fr.distance +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
-      bl.distance +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
-      br.distance +=
-          groundTruthState.forwardVelocity() * dt
-              + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
+      var robot_vel =
+          groundTruthState.velocity.toRobotRelative(groundTruthState.pose.getRotation());
+      var robot_accel =
+          groundTruthState.acceleration.toRobotRelative(groundTruthState.pose.getRotation());
+      fl.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
+      fr.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
+      bl.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
+      br.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
 
       fl.angle = groundTruthState.pose.getRotation();
       fr.angle = groundTruthState.pose.getRotation();

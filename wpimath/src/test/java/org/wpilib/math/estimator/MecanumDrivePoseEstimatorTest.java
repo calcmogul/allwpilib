@@ -22,10 +22,9 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.trajectory.DrivetrainSplineSample;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
+import org.wpilib.math.trajectory.HolonomicSample;
+import org.wpilib.math.trajectory.HolonomicTrajectoryGenerator;
 import org.wpilib.math.trajectory.Trajectory;
-import org.wpilib.math.trajectory.TrajectoryConfig;
 
 class MecanumDrivePoseEstimatorTest {
   private static final double EPSILON = 1e-9;
@@ -49,14 +48,17 @@ class MecanumDrivePoseEstimatorTest {
             VecBuilder.fill(0.45, 0.45, 0.1));
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
                 new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+            2,
+            1,
+            2,
+            1);
 
     testFollowTrajectory(
         kinematics,
@@ -91,14 +93,17 @@ class MecanumDrivePoseEstimatorTest {
             VecBuilder.fill(0.45, 0.45, 0.1));
 
     var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
                 new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
-            new TrajectoryConfig(2, 2));
+            2,
+            1,
+            2,
+            1);
 
     for (int offset_direction_degs = 0; offset_direction_degs < 360; offset_direction_degs += 45) {
       for (int offset_heading_degs = 0; offset_heading_degs < 360; offset_heading_degs += 45) {
@@ -133,9 +138,9 @@ class MecanumDrivePoseEstimatorTest {
   void testFollowTrajectory(
       final MecanumDriveKinematics kinematics,
       final MecanumDrivePoseEstimator estimator,
-      final Trajectory<DrivetrainSplineSample> trajectory,
-      final Function<DrivetrainSplineSample, ChassisVelocities> chassisVelocitiesGenerator,
-      final Function<DrivetrainSplineSample, Pose2d> visionMeasurementGenerator,
+      final Trajectory<HolonomicSample> trajectory,
+      final Function<HolonomicSample, ChassisVelocities> chassisVelocitiesGenerator,
+      final Function<HolonomicSample, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
       final double dt,
