@@ -5,44 +5,19 @@
 package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
 
 class TrajectorySampleAtTest {
-  private static DrivetrainSplineSample splineSample(
-      double time, double x, double velocity, double acceleration) {
-    return new DrivetrainSplineSample(
-        time, new Pose2d(x, 0.0, Rotation2d.ZERO), velocity, acceleration, 0.0);
-  }
-
   private static HolonomicSample holonomicSample(double time, double ax) {
     return new HolonomicSample(
         time, Pose2d.ZERO, new ChassisVelocities(), new ChassisAccelerations(ax, 0.0, 0.0));
-  }
-
-  @Test
-  void testExactTimestampReturnsStoredSample() {
-    // Waits at x = 0 from 0 s to 1 s, then accelerates to x = 1 at 2 s. The first segment has
-    // zero length, so interpolating to its far end divides by zero.
-    var trajectory =
-        new DrivetrainSplineTrajectory(
-            List.of(
-                splineSample(0.0, 0.0, 0.0, 0.0),
-                splineSample(1.0, 0.0, 0.0, 2.0),
-                splineSample(2.0, 1.0, 2.0, 0.0)));
-
-    var sample = trajectory.sampleAt(1.0);
-
-    assertFalse(Double.isNaN(sample.pose.getX()));
-    assertEquals(trajectory.getSamples().get(1), sample);
   }
 
   @Test

@@ -4,10 +4,12 @@
 
 #include "wpi/math/kinematics/SwerveDriveOdometry.hpp"
 
+#include <format>
 #include <limits>
 #include <random>
 #include <vector>
 
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
@@ -16,13 +18,14 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/UnicycleTrajectoryGenerator.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -145,12 +148,16 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   SwerveModulePosition bl;
   SwerveModulePosition br;
 
-  DrivetrainSplineTrajectory trajectory =
-      DrivetrainSplineTrajectoryGenerator::Generate(
-          std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
-                      Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
-                      Pose2d{0_m, 0_m, 45_deg}},
-          TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  auto result = UnicycleTrajectoryGenerator::Generate(
+      std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 45_deg}},
+      5.0_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -162,7 +169,7 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+    HolonomicSample groundTruthState = trajectory.SampleAt(t);
 
     auto moduleVelocities = kinematics.ToSwerveModuleVelocities(
         groundTruthState.velocity.ToRobotRelative(
@@ -212,12 +219,16 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   SwerveModulePosition bl;
   SwerveModulePosition br;
 
-  DrivetrainSplineTrajectory trajectory =
-      DrivetrainSplineTrajectoryGenerator::Generate(
-          std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
-                      Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
-                      Pose2d{0_m, 0_m, 45_deg}},
-          TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+  auto result = UnicycleTrajectoryGenerator::Generate(
+      std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
+                  Pose2d{0_m, 0_m, 45_deg}},
+      5.0_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
+  if (!result.has_value()) {
+    UNSCOPED_INFO(std::format("{}", result.error()));
+  }
+  REQUIRE(result.has_value());
+  auto trajectory = result.value();
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
@@ -229,16 +240,16 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   double errorSum = 0;
 
   while (t < trajectory.Duration()) {
-    DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+    HolonomicSample groundTruthState = trajectory.SampleAt(t);
 
-    fl.distance += groundTruthState.ForwardVelocity() * dt +
-                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
-    fr.distance += groundTruthState.ForwardVelocity() * dt +
-                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
-    bl.distance += groundTruthState.ForwardVelocity() * dt +
-                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
-    br.distance += groundTruthState.ForwardVelocity() * dt +
-                   0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    auto robot_vel = groundTruthState.velocity.ToRobotRelative(
+        groundTruthState.pose.Rotation());
+    auto robot_accel = groundTruthState.acceleration.ToRobotRelative(
+        groundTruthState.pose.Rotation());
+    fl.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
+    fr.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
+    bl.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
+    br.distance += robot_vel.vx * dt + 0.5 * robot_accel.ax * dt * dt;
 
     fl.angle = groundTruthState.pose.Rotation();
     fr.angle = groundTruthState.pose.Rotation();

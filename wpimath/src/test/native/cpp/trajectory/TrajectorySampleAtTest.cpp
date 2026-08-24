@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
-#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -11,28 +10,16 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/curvature.hpp"
-#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
 
 namespace {
-
-DrivetrainSplineSample SplineSample(
-    wpi::units::second_t time, wpi::units::meter_t x,
-    wpi::units::meters_per_second_t velocity,
-    wpi::units::meters_per_second_squared_t acceleration) {
-  return DrivetrainSplineSample{time, Pose2d{x, 0_m, 0_deg}, velocity,
-                                acceleration, wpi::units::curvature_t{0.0}};
-}
 
 HolonomicSample HolonomicSampleWithAccel(
     wpi::units::second_t time, wpi::units::meters_per_second_squared_t ax) {
@@ -41,21 +28,6 @@ HolonomicSample HolonomicSampleWithAccel(
 }
 
 }  // namespace
-
-TEST_CASE("TrajectorySampleAtTest ExactTimestampReturnsStoredSample",
-          "[wpimath]") {
-  // Waits at x = 0 from 0 s to 1 s, then accelerates to x = 1 at 2 s. The first
-  // segment has zero length, so interpolating to its far end divides by zero.
-  DrivetrainSplineTrajectory trajectory{std::vector<DrivetrainSplineSample>{
-      SplineSample(0_s, 0_m, 0_mps, 0_mps_sq),
-      SplineSample(1_s, 0_m, 0_mps, 2_mps_sq),
-      SplineSample(2_s, 1_m, 2_mps, 0_mps_sq)}};
-
-  auto sample = trajectory.SampleAt(1_s);
-
-  CHECK_FALSE(std::isnan(sample.pose.X().value()));
-  CHECK(sample == trajectory.Samples()[1]);
-}
 
 TEST_CASE("TrajectorySampleAtTest ExactTimestampOfEverySample", "[wpimath]") {
   HolonomicTrajectory trajectory{

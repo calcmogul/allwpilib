@@ -1,8 +1,0 @@
-classes:
-  wpi::math::DifferentialDriveVoltageConstraint:
-    typealias:
-    - wpi::math::TrajectoryConstraint::MinMax
-    methods:
-      DifferentialDriveVoltageConstraint:
-      MaxVelocity:
-      MinMaxAcceleration:
