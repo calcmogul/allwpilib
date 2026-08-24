@@ -2,15 +2,15 @@ import pytest
 import random
 
 from wpimath import (
-    DrivetrainSplineTrajectoryGenerator,
     MecanumDriveKinematics,
     MecanumDriveOdometry,
     MecanumDriveWheelPositions,
     Pose2d,
     Rotation2d,
-    TrajectoryConfig,
     Translation2d,
 )
+
+from trajectory.unicycle_trajectory_generator import generate_from_poses
 
 
 @pytest.fixture
@@ -108,7 +108,7 @@ def test_accuracy_facing_trajectory():
 
     odometry = MecanumDriveOdometry(kinematics, Rotation2d(), wheel_positions)
 
-    trajectory = DrivetrainSplineTrajectoryGenerator.generate(
+    trajectory = generate_from_poses(
         [
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
             Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),
@@ -116,7 +116,10 @@ def test_accuracy_facing_trajectory():
             Pose2d(x=-3, y=0, rotation=Rotation2d.from_degrees(-90)),
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
         ],
-        TrajectoryConfig(max_velocity=0.5, max_acceleration=2.0),
+        0.5,
+        1.0,
+        2.0,
+        1.0,
     )
 
     random.seed(4915)
@@ -175,7 +178,7 @@ def test_accuracy_facing_x_axis():
 
     odometry = MecanumDriveOdometry(kinematics, Rotation2d(), wheel_positions)
 
-    trajectory = DrivetrainSplineTrajectoryGenerator.generate(
+    trajectory = generate_from_poses(
         [
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
             Pose2d(x=3, y=0, rotation=Rotation2d.from_degrees(-90)),
@@ -183,7 +186,10 @@ def test_accuracy_facing_x_axis():
             Pose2d(x=-3, y=0, rotation=Rotation2d.from_degrees(-90)),
             Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(45)),
         ],
-        TrajectoryConfig(5.0, 2.0),
+        5.0,
+        1.0,
+        2.0,
+        1.0,
     )
 
     random.seed(4915)

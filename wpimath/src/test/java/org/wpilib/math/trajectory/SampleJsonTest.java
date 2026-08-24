@@ -11,7 +11,6 @@ import io.avaje.jsonb.Jsonb;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
@@ -23,9 +22,7 @@ class SampleJsonTest {
   void testBaseSample(@TempDir Path tempDir) throws IOException {
     HolonomicTrajectory trajectory =
         new HolonomicTrajectory(
-            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-                .getSamples()
-                .stream()
+            TestHolonomicTrajectory.getTrajectory().getSamples().stream()
                 .map(s -> new HolonomicSample(s.time, s.pose, s.velocity, s.acceleration))
                 .toArray(HolonomicSample[]::new));
 
@@ -54,8 +51,7 @@ class SampleJsonTest {
   void testDifferentialSamples(@TempDir Path tempDir) throws IOException {
     Trajectory<DifferentialSample> trajectory =
         new DifferentialTrajectory(
-            new DifferentialDriveKinematics(0.5),
-            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+            new DifferentialDriveKinematics(0.5), TestHolonomicTrajectory.getTrajectory().samples);
 
     int index = 0;
     for (DifferentialSample sample : trajectory.samples) {

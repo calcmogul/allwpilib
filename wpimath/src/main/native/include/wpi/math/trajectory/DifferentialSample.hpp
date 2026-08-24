@@ -12,7 +12,6 @@
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -105,25 +104,6 @@ class DifferentialSample : public HolonomicSample {
                                const DifferentialDriveKinematics& kinematics)
       : DifferentialSample{sample.time, sample.pose, sample.velocity,
                            sample.acceleration, kinematics} {}
-
-  /**
-   * Constructs a DifferentialSample from a SplineSample.
-   *
-   * @param sample The SplineSample to copy.
-   * @param kinematics The kinematics of the drivetrain.
-   */
-  constexpr DifferentialSample(const DrivetrainSplineSample& sample,
-                               const DifferentialDriveKinematics& kinematics)
-      : HolonomicSample{sample.time, sample.pose, sample.velocity,
-                        sample.acceleration},
-        leftVelocity{kinematics
-                         .ToWheelVelocities(sample.velocity.ToRobotRelative(
-                             sample.pose.Rotation()))
-                         .left},
-        rightVelocity{kinematics
-                          .ToWheelVelocities(sample.velocity.ToRobotRelative(
-                              sample.pose.Rotation()))
-                          .right} {}
 
   /**
    * Transforms the pose of this sample by the given transform.
