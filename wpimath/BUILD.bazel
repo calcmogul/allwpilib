@@ -312,6 +312,9 @@ cc_test(
 wpilib_java_junit5_test(
     name = "wpimath-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
+    javacopts = [
+        "-Xep:UnicodeInCode:OFF",
+    ],
     deps = [
         ":wpimath-java",
         "//telemetry:telemetry-java",
@@ -453,5 +456,6 @@ robotpy_py_test(
         "//tunables:robotpy-tunables",
         requirement("numpy"),
         requirement("pytest"),
+        requirement("sleipnirgroup-jormungandr"),
     ],
 )

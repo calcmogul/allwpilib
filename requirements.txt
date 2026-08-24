@@ -8,3 +8,4 @@ numpy
 opencv-python~=4.6
 robotpy-cli~=2027.0.0a1
 black
+sleipnirgroup-jormungandr==0.6.5

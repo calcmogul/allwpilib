@@ -8,18 +8,20 @@
 #include <random>
 #include <vector>
 
+#include <Eigen/Core>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectory.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectoryGenerator.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
@@ -126,14 +128,14 @@ TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
   auto xWheelPos = 0_m;
   auto yWheelPos = 0_m;
 
-  wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
+  wpi::math::HolonomicTrajectory trajectory =
+      wpi::math::HolonomicTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{20_m, 20_m, -90_deg},
                       wpi::math::Pose2d{10_m, 10_m, 135_deg},
                       wpi::math::Pose2d{30_m, 30_m, -90_deg},
                       wpi::math::Pose2d{20_m, 20_m, 45_deg}},
-          wpi::math::TrajectoryConfig(0.5_mps, 2.0_mps_sq));
+          0.5_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
 
   odometry.ResetPosition(xWheelPos, yWheelPos,
                          trajectory.InitialPose().Rotation(),
@@ -152,17 +154,18 @@ TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
   wpi::units::meter_t trajectoryDistanceTravelled = 0_m;
 
   while (t <= trajectory.Duration()) {
-    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+    wpi::math::HolonomicSample groundTruthState = trajectory.SampleAt(t);
 
-    trajectoryDistanceTravelled +=
-        groundTruthState.ForwardVelocity() * dt +
-        0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    auto vel = groundTruthState.velocity.ToRobotRelative(
+        groundTruthState.pose.Rotation());
+    auto accel = groundTruthState.acceleration.ToRobotRelative(
+        groundTruthState.pose.Rotation());
+
+    trajectoryDistanceTravelled += vel.vx * dt + 0.5 * accel.ax * dt * dt;
 
     Eigen::Vector2d wheelVelocities =
         m_inverseKinematicsMatrix *
-        Eigen::Vector3d{groundTruthState.ForwardVelocity().value(), 0,
-                        groundTruthState.ForwardVelocity().value() *
-                            groundTruthState.curvature.value()};
+        Eigen::Vector3d{vel.vx.value(), 0, vel.omega.value()};
 
     auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0, 0)} +
                      distribution(generator) * 0.05_mps;
@@ -205,14 +208,14 @@ TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
   auto xWheelPos = 0_m;
   auto yWheelPos = 0_m;
 
-  wpi::math::DrivetrainSplineTrajectory trajectory =
-      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
+  wpi::math::HolonomicTrajectory trajectory =
+      wpi::math::HolonomicTrajectoryGenerator::Generate(
           std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
                       wpi::math::Pose2d{20_m, 20_m, -90_deg},
                       wpi::math::Pose2d{10_m, 10_m, 135_deg},
                       wpi::math::Pose2d{30_m, 30_m, -90_deg},
                       wpi::math::Pose2d{20_m, 20_m, 45_deg}},
-          wpi::math::TrajectoryConfig(0.5_mps, 2.0_mps_sq));
+          0.5_mps, 1.0_rad_per_s, 2.0_mps_sq, 1.0_rad_per_s_sq);
 
   odometry.ResetPosition(xWheelPos, yWheelPos, Rotation2d{}, Pose2d{});
 
@@ -229,19 +232,19 @@ TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
   wpi::units::meter_t trajectoryDistanceTravelled = 0_m;
 
   while (t <= trajectory.Duration()) {
-    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+    wpi::math::HolonomicSample groundTruthState = trajectory.SampleAt(t);
 
-    trajectoryDistanceTravelled +=
-        groundTruthState.ForwardVelocity() * dt +
-        0.5 * groundTruthState.ForwardAcceleration() * dt * dt;
+    auto vel = groundTruthState.velocity.ToRobotRelative(
+        groundTruthState.pose.Rotation());
+    auto accel = groundTruthState.acceleration.ToRobotRelative(
+        groundTruthState.pose.Rotation());
+
+    trajectoryDistanceTravelled += vel.vx * dt + 0.5 * accel.ax * dt * dt;
 
     Eigen::Vector2d wheelVelocities =
         m_inverseKinematicsMatrix *
-        Eigen::Vector3d{groundTruthState.ForwardVelocity().value() *
-                            groundTruthState.pose.Rotation().Cos(),
-                        groundTruthState.ForwardVelocity().value() *
-                            groundTruthState.pose.Rotation().Sin(),
-                        0};
+        Eigen::Vector3d{groundTruthState.velocity.vx.value(),
+                        groundTruthState.velocity.vy.value(), 0};
 
     auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0, 0)} +
                      distribution(generator) * 0.05_mps;

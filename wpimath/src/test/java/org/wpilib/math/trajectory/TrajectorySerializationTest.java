@@ -10,7 +10,6 @@ import io.avaje.jsonb.Jsonb;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
@@ -51,9 +50,7 @@ class TrajectorySerializationTest {
 
     HolonomicTrajectory trajectory =
         new HolonomicTrajectory(
-            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>())
-                .getSamples()
-                .stream()
+            TestHolonomicTrajectory.getTrajectory().getSamples().stream()
                 .map(s -> new HolonomicSample(s.time, s.pose, s.velocity, s.acceleration))
                 .toArray(HolonomicSample[]::new));
 
@@ -72,8 +69,7 @@ class TrajectorySerializationTest {
 
     DifferentialTrajectory trajectory =
         new DifferentialTrajectory(
-            new DifferentialDriveKinematics(12.0),
-            DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(new ArrayList<>()).samples);
+            new DifferentialDriveKinematics(12.0), TestHolonomicTrajectory.getTrajectory().samples);
 
     try (var os = Files.newOutputStream(tempFile)) {
       Jsonb.instance().type(DifferentialTrajectory.class).toJson(trajectory, os);

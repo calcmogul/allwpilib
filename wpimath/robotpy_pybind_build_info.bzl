@@ -1119,46 +1119,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "DrivetrainSplineSample",
-            yml_file = "semiwrap/DrivetrainSplineSample.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineSample.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::DrivetrainSplineSample", "wpi__math__DrivetrainSplineSample.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "DrivetrainSplineTrajectory",
-            yml_file = "semiwrap/DrivetrainSplineTrajectory.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineTrajectory.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::DrivetrainSplineTrajectory", "wpi__math__DrivetrainSplineTrajectory.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "DrivetrainSplineTrajectoryGenerator",
-            yml_file = "semiwrap/DrivetrainSplineTrajectoryGenerator.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::DrivetrainSplineTrajectoryGenerator", "wpi__math__DrivetrainSplineTrajectoryGenerator.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "DrivetrainSplineTrajectoryParameterizer",
-            yml_file = "semiwrap/DrivetrainSplineTrajectoryParameterizer.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::DrivetrainSplineTrajectoryParameterizer", "wpi__math__DrivetrainSplineTrajectoryParameterizer.hpp"),
-            ],
-        ),
-        struct(
             class_name = "ExponentialProfile",
             yml_file = "semiwrap/ExponentialProfile.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -1200,21 +1160,10 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/Trajectory.hpp",
             tmpl_class_names = [
                 ("Trajectory_tmpl1", "DifferentialTrajectoryBase"),
-                ("Trajectory_tmpl2", "DrivetrainSplineTrajectoryBase"),
-                ("Trajectory_tmpl3", "HolonomicTrajectoryBase"),
+                ("Trajectory_tmpl2", "HolonomicTrajectoryBase"),
             ],
             trampolines = [
                 ("wpi::math::Trajectory", "wpi__math__Trajectory.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "TrajectoryConfig",
-            yml_file = "semiwrap/TrajectoryConfig.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectoryConfig.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::TrajectoryConfig", "wpi__math__TrajectoryConfig.hpp"),
             ],
         ),
         struct(
@@ -1243,106 +1192,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("wpi::math::detail::TrapezoidProfileConstraints", "wpi__math__detail__TrapezoidProfileConstraints.hpp"),
                 ("wpi::math::TrapezoidProfile::State", "wpi__math__TrapezoidProfile__State.hpp"),
                 ("wpi::math::TrapezoidProfile::ProfileTiming", "wpi__math__TrapezoidProfile__ProfileTiming.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "CentripetalAccelerationConstraint",
-            yml_file = "semiwrap/CentripetalAccelerationConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::CentripetalAccelerationConstraint", "wpi__math__CentripetalAccelerationConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "DifferentialDriveKinematicsConstraint",
-            yml_file = "semiwrap/DifferentialDriveKinematicsConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::DifferentialDriveKinematicsConstraint", "wpi__math__DifferentialDriveKinematicsConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "DifferentialDriveVoltageConstraint",
-            yml_file = "semiwrap/DifferentialDriveVoltageConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::DifferentialDriveVoltageConstraint", "wpi__math__DifferentialDriveVoltageConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "EllipticalRegionConstraint",
-            yml_file = "semiwrap/EllipticalRegionConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp",
-            tmpl_class_names = [
-                ("EllipticalRegionConstraint_tmpl1", "EllipticalRegionConstraint"),
-            ],
-            trampolines = [
-                ("wpi::math::EllipticalRegionConstraint", "wpi__math__EllipticalRegionConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "MaxVelocityConstraint",
-            yml_file = "semiwrap/MaxVelocityConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::MaxVelocityConstraint", "wpi__math__MaxVelocityConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "MecanumDriveKinematicsConstraint",
-            yml_file = "semiwrap/MecanumDriveKinematicsConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::MecanumDriveKinematicsConstraint", "wpi__math__MecanumDriveKinematicsConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "RectangularRegionConstraint",
-            yml_file = "semiwrap/RectangularRegionConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/RectangularRegionConstraint.hpp",
-            tmpl_class_names = [
-                ("RectangularRegionConstraint_tmpl1", "RectangularRegionConstraint"),
-            ],
-            trampolines = [
-                ("wpi::math::RectangularRegionConstraint", "wpi__math__RectangularRegionConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SwerveDriveKinematicsConstraint",
-            yml_file = "semiwrap/SwerveDriveKinematicsConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.hpp",
-            tmpl_class_names = [
-                ("SwerveDriveKinematicsConstraint_tmpl1", "SwerveDrive2KinematicsConstraint"),
-                ("SwerveDriveKinematicsConstraint_tmpl2", "SwerveDrive3KinematicsConstraint"),
-                ("SwerveDriveKinematicsConstraint_tmpl3", "SwerveDrive4KinematicsConstraint"),
-                ("SwerveDriveKinematicsConstraint_tmpl4", "SwerveDrive6KinematicsConstraint"),
-            ],
-            trampolines = [
-                ("wpi::math::SwerveDriveKinematicsConstraint", "wpi__math__SwerveDriveKinematicsConstraint.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "TrajectoryConstraint",
-            yml_file = "semiwrap/TrajectoryConstraint.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/constraint/TrajectoryConstraint.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::TrajectoryConstraint", "wpi__math__TrajectoryConstraint.hpp"),
-                ("wpi::math::TrajectoryConstraint::MinMax", "wpi__math__TrajectoryConstraint__MinMax.hpp"),
             ],
         ),
     ]

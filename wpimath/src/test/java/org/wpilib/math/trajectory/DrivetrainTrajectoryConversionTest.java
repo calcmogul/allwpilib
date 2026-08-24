@@ -27,7 +27,7 @@ class DrivetrainTrajectoryConversionTest {
    *
    * @return A spline trajectory for testing.
    */
-  static Trajectory<DrivetrainSplineSample> generateTestTrajectory() {
+  static Trajectory<HolonomicSample> generateTestTrajectory() {
     final double maxVelocity = feetToMeters(12.0);
     final double maxAccel = feetToMeters(12);
 
@@ -48,9 +48,7 @@ class DrivetrainTrajectoryConversionTest {
                 new Translation2d(feetToMeters(-19.5), feetToMeters(5)), Rotation2d.CW_PI_2)));
     waypoints.add(crossScale);
 
-    TrajectoryConfig config = new TrajectoryConfig(maxVelocity, maxAccel).setReversed(true);
-
-    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
+    return HolonomicTrajectoryGenerator.generate(waypoints, maxVelocity, 1.0, maxAccel, 1.0);
   }
 
   /**
@@ -58,16 +56,14 @@ class DrivetrainTrajectoryConversionTest {
    *
    * @return A simple trajectory for testing.
    */
-  static Trajectory<DrivetrainSplineSample> generateStraightTrajectory() {
+  static Trajectory<HolonomicSample> generateStraightTrajectory() {
     var waypoints =
         List.of(
             new Pose2d(0, 0, Rotation2d.ZERO),
             new Pose2d(1, 0, Rotation2d.ZERO),
             new Pose2d(2, 0, Rotation2d.ZERO));
 
-    TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
-
-    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
+    return HolonomicTrajectoryGenerator.generate(waypoints, 2.0, 1.0, 2.0, 1.0);
   }
 
   /**
@@ -75,7 +71,7 @@ class DrivetrainTrajectoryConversionTest {
    *
    * @return A circular trajectory for testing.
    */
-  static Trajectory<DrivetrainSplineSample> generateCircularTrajectory() {
+  static Trajectory<HolonomicSample> generateCircularTrajectory() {
     var waypoints =
         List.of(
             new Pose2d(1, 0, Rotation2d.CCW_PI_2),
@@ -84,15 +80,13 @@ class DrivetrainTrajectoryConversionTest {
             new Pose2d(0, -1, Rotation2d.ZERO),
             new Pose2d(1, 0, Rotation2d.CCW_PI_2));
 
-    TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
-
-    return DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
+    return HolonomicTrajectoryGenerator.generate(waypoints, 2.0, 1.0, 2.0, 1.0);
   }
 
   @Test
   void testDifferentialTrajectoryConversionCrossScale() {
     // Generate base trajectory
-    Trajectory<DrivetrainSplineSample> baseTrajectory = generateTestTrajectory();
+    Trajectory<HolonomicSample> baseTrajectory = generateTestTrajectory();
 
     // Create differential drive kinematics with 0.6m trackwidth
     DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.6);
@@ -151,7 +145,7 @@ class DrivetrainTrajectoryConversionTest {
 
   @Test
   void testDifferentialTrajectoryConversionStraight() {
-    Trajectory<DrivetrainSplineSample> baseTrajectory = generateStraightTrajectory();
+    Trajectory<HolonomicSample> baseTrajectory = generateStraightTrajectory();
     DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.7);
 
     DifferentialTrajectory diffTrajectory =

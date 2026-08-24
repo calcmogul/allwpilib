@@ -8,18 +8,19 @@
 
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectoryGenerator.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
 void TestSameShapedTrajectory(
-    const std::vector<wpi::math::DrivetrainSplineSample>& statesA,
-    const std::vector<wpi::math::DrivetrainSplineSample>& statesB) {
+    const std::vector<wpi::math::HolonomicSample>& statesA,
+    const std::vector<wpi::math::HolonomicSample>& statesB) {
   for (unsigned int i = 0; i < statesA.size() - 1; i++) {
     auto a1 = statesA[i].pose;
     auto a2 = statesA[i + 1].pose;
@@ -42,23 +43,29 @@ void TestSameShapedTrajectory(
 // scalars (and curvature) are invariant. This would fail if
 // TransformBy/RelativeTo rotated the pose but not the velocity/acceleration.
 void TestSameForwardScalars(
-    const std::vector<wpi::math::DrivetrainSplineSample>& statesA,
-    const std::vector<wpi::math::DrivetrainSplineSample>& statesB) {
+    const std::vector<wpi::math::HolonomicSample>& statesA,
+    const std::vector<wpi::math::HolonomicSample>& statesB) {
   REQUIRE(statesA.size() == statesB.size());
   for (unsigned int i = 0; i < statesA.size(); i++) {
-    CHECK_NEAR(statesA[i].ForwardVelocity().value(),
-               statesB[i].ForwardVelocity().value(), 1E-9);
-    CHECK_NEAR(statesA[i].ForwardAcceleration().value(),
-               statesB[i].ForwardAcceleration().value(), 1E-9);
-    CHECK_NEAR(statesA[i].curvature.value(), statesB[i].curvature.value(),
+    CHECK_NEAR(statesA[i].velocity.vx.value(), statesB[i].velocity.vx.value(),
                1E-9);
+    CHECK_NEAR(statesA[i].velocity.vy.value(), statesB[i].velocity.vy.value(),
+               1E-9);
+    CHECK_NEAR(statesA[i].velocity.omega.value(),
+               statesB[i].velocity.omega.value(), 1E-9);
+    CHECK_NEAR(statesA[i].acceleration.ax.value(),
+               statesB[i].acceleration.ax.value(), 1E-9);
+    CHECK_NEAR(statesA[i].acceleration.ay.value(),
+               statesB[i].acceleration.ay.value(), 1E-9);
+    CHECK_NEAR(statesA[i].acceleration.alpha.value(),
+               statesB[i].acceleration.alpha.value(), 1E-9);
   }
 }
 
 TEST_CASE("TrajectoryTransformsTest TransformBy", "[wpimath]") {
-  wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
-  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      wpi::math::Pose2d{}, {}, wpi::math::Pose2d{1_m, 1_m, 90_deg}, config);
+  auto trajectory = wpi::math::HolonomicTrajectoryGenerator::Generate(
+      wpi::math::Pose2d{}, {}, wpi::math::Pose2d{1_m, 1_m, 90_deg}, 3_mps,
+      1_rad_per_s, 3_mps_sq, 1_rad_per_s_sq);
 
   auto transformedTrajectory = trajectory.TransformBy({{1_m, 2_m}, 30_deg});
 
@@ -74,10 +81,10 @@ TEST_CASE("TrajectoryTransformsTest TransformBy", "[wpimath]") {
 }
 
 TEST_CASE("TrajectoryTransformsTest RelativeTo", "[wpimath]") {
-  wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
-  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
+  auto trajectory = wpi::math::HolonomicTrajectoryGenerator::Generate(
       wpi::math::Pose2d{1_m, 2_m, 30_deg}, {},
-      wpi::math::Pose2d{5_m, 7_m, 90_deg}, config);
+      wpi::math::Pose2d{5_m, 7_m, 90_deg}, 3_mps, 1_rad_per_s, 3_mps_sq,
+      1_rad_per_s_sq);
 
   auto transformedTrajectory = trajectory.RelativeTo({1_m, 2_m, 30_deg});
 

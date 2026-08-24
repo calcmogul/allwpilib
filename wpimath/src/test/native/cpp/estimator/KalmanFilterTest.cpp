@@ -4,15 +4,23 @@
 
 #include "wpi/math/estimator/KalmanFilter.hpp"
 
+#include <vector>
+
 #include <Eigen/Core>
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/HolonomicTrajectoryGenerator.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
 TEST_CASE("KalmanFilterTest SwerveStationary", "[wpimath]") {
   constexpr wpi::units::second_t dt = 20_ms;
@@ -108,9 +116,10 @@ TEST_CASE("KalmanFilterTest SwerveMovingOverTrajectory", "[wpimath]") {
   wpi::math::KalmanFilter<6, 3, 3> filter{
       plant, {0.1, 0.1, 0.1, 0.1, 0.1, 0.1}, {0.2, 0.2, 1.0 / 3.0}, dt};
 
-  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      {wpi::math::Pose2d{0_m, 0_m, 0_rad}, wpi::math::Pose2d{5_m, 5_m, 0_rad}},
-      wpi::math::TrajectoryConfig{2_mps, 2_mps_sq});
+  auto trajectory = wpi::math::HolonomicTrajectoryGenerator::Generate(
+      std::vector{wpi::math::Pose2d{0_m, 0_m, 0_rad},
+                  wpi::math::Pose2d{5_m, 5_m, 0_rad}},
+      2_mps, 1_rad_per_s, 2_mps_sq, 1_rad_per_s_sq);
 
   Eigen::Vector3d lastVelocity{0.0, 0.0, 0.0};
 

@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
@@ -21,8 +22,7 @@ import org.wpilib.math.random.Normal;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
-import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.trajectory.HolonomicTrajectoryGenerator;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -116,8 +116,7 @@ class ExtendedKalmanFilterTest {
         List.of(
             new Pose2d(2.75, 22.521, Rotation2d.ZERO),
             new Pose2d(24.73, 19.68, Rotation2d.fromRadians(5.846)));
-    var trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(waypoints, new TrajectoryConfig(8.8, 0.1));
+    var trajectory = HolonomicTrajectoryGenerator.generate(waypoints, 8.8, 1.0, 0.1, 1.0);
 
     Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
 
@@ -142,11 +141,15 @@ class ExtendedKalmanFilterTest {
 
     var groundTruthX = observer.getXhat();
 
+    var kinematics = new DifferentialDriveKinematics(rb);
+
     double duration = trajectory.duration;
     for (int i = 0; i < (duration / dt); ++i) {
       var ref = trajectory.sampleAt(dt * i);
-      double vl = ref.forwardVelocity() * (1 - (ref.curvature * rb));
-      double vr = ref.forwardVelocity() * (1 + (ref.curvature * rb));
+      var wheelVelocities =
+          kinematics.toWheelVelocities(ref.velocity.toRobotRelative(ref.pose.getRotation()));
+      double vl = wheelVelocities.left;
+      double vr = wheelVelocities.right;
 
       nextR.set(0, 0, ref.pose.getTranslation().getX());
       nextR.set(1, 0, ref.pose.getTranslation().getY());

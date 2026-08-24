@@ -16,15 +16,18 @@ class TrajectoryConcatenateTest {
   @Test
   void testStates() {
     var t1 =
-        DrivetrainSplineTrajectoryGenerator.generate(
-            Pose2d.ZERO, List.of(), new Pose2d(1, 1, Rotation2d.ZERO), new TrajectoryConfig(2, 2));
+        HolonomicTrajectoryGenerator.generate(
+            Pose2d.ZERO, List.of(), new Pose2d(1, 1, Rotation2d.ZERO), 2, 1, 2, 1);
 
     var t2 =
-        DrivetrainSplineTrajectoryGenerator.generate(
+        HolonomicTrajectoryGenerator.generate(
             new Pose2d(1, 1, Rotation2d.ZERO),
             List.of(),
             new Pose2d(2, 2, Rotation2d.fromDegrees(45)),
-            new TrajectoryConfig(2, 2));
+            2,
+            1,
+            2,
+            1);
 
     var t = t1.concatenate(t2);
 
