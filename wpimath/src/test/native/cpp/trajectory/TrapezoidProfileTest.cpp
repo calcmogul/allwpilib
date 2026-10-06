@@ -65,25 +65,27 @@ TEST_CASE("TrapezoidProfileTest CheckTiming", "[wpimath]") {
   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{12_m, -1_mps};
   wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 1_mps};
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
-  profile.Calculate(DT, state, goal);
+  auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+      constraints, state, goal);
+  profile.SampleAt(DT);
   auto profileTime = profile.Duration();
 
   CHECK_UNITS_NEAR(profileTime, 9.952380952380953_s, 1e-10_s);
-  CHECK(profileTime == profile.TimeLeftUntil(state, goal));
-  profile.TimeLeftUntil(goal, goal);
-  CHECK(profileTime == profile.Duration());
 }
 
 TEST_CASE("TrapezoidProfileTest ReachesGoal", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{3_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{};
+  State goal{3_m, 0_mps};
+  State state;
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 450; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -91,14 +93,18 @@ TEST_CASE("TrapezoidProfileTest ReachesGoal", "[wpimath]") {
 }
 
 TEST_CASE("TrapezoidProfileTest Backwards", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state;
+  State goal{-2_m, 0_mps};
+  State state;
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 400; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -108,18 +114,21 @@ TEST_CASE("TrapezoidProfileTest Backwards", "[wpimath]") {
 // Test the forwards case for an invalid initial velocity with the profile sign.
 TEST_CASE("TrapezoidProfileTest CheckLargeVelocitySameSignAsPeak",
           "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape -0-.
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{12_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 3_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{12_m, 0_mps};
+  State state{0_m, 3_mps};
 
   int plateauCount = 0;
   // Profile is ~7.5s.
   for (int i = 0; i < 1000; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     if (newState.velocity == constraints.maxVelocity) {
       plateauCount++;
@@ -136,18 +145,21 @@ TEST_CASE("TrapezoidProfileTest CheckLargeVelocitySameSignAsPeak",
 // sign.
 TEST_CASE("TrapezoidProfileTest CheckLargeVelocitySameSignAsPeakBackwards",
           "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape +0+.
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-12_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, -3_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{-12_m, 0_mps};
+  State state{0_m, -3_mps};
 
   int plateauCount = 0;
   // Profile is ~7.5s.
   for (int i = 0; i < 1000; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     if (newState.velocity == -constraints.maxVelocity) {
       plateauCount++;
@@ -163,19 +175,21 @@ TEST_CASE("TrapezoidProfileTest CheckLargeVelocitySameSignAsPeakBackwards",
 // Test the forwards case for an invalid initial velocity with a sign
 // opposite the profile sign.
 TEST_CASE("TrapezoidProfileTest CheckLargeVelocityOppositePeak", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape -0-.
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{12_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, -3_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{12_m, 0_mps};
+  State state{0_m, -3_mps};
 
   int plateauCount = 0;
   // ~17 second trajectory.
   for (int i = 0; i < 1700; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
-
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     if (newState.velocity == constraints.maxVelocity) {
       plateauCount++;
@@ -192,17 +206,20 @@ TEST_CASE("TrapezoidProfileTest CheckLargeVelocityOppositePeak", "[wpimath]") {
 // opposite the profile sign.
 TEST_CASE("TrapezoidProfileTest CheckLargeVelocityOppositePeakBackwards",
           "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
   // Make sure we hit the velocity cap and the profile has input shape -0-.
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-12_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 3_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{-12_m, 0_mps};
+  State state{0_m, 3_mps};
 
   int plateauCount = 0;
   for (int i = 0; i < 1700; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     if (newState.velocity == -constraints.maxVelocity) {
       plateauCount++;
@@ -217,16 +234,19 @@ TEST_CASE("TrapezoidProfileTest CheckLargeVelocityOppositePeakBackwards",
 
 // Test the forwards case for displacement equal to the threshold displacement.
 TEST_CASE("TrapezoidProfileTest CheckSignAtThreshold", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       4_mps, 4_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{1_m, 1_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 3_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{1_m, 1_mps};
+  State state{0_m, 3_mps};
 
   // Normal profile is 0.5s, and an incorrect implementation might repeat.
   for (int i = 0; i < 52; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -237,16 +257,19 @@ TEST_CASE("TrapezoidProfileTest CheckSignAtThreshold", "[wpimath]") {
 
 // Test the backwards case for displacement equal to the threshold displacement.
 TEST_CASE("TrapezoidProfileTest CheckSignAtThresholdBackwards", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       4_mps, 4_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-1_m, -1_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, -3_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{-1_m, -1_mps};
+  State state{0_m, -3_mps};
 
   // Normal profile is 0.5s, and an incorrect implementation might repeat.
   for (int i = 0; i < 52; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -258,14 +281,18 @@ TEST_CASE("TrapezoidProfileTest CheckSignAtThresholdBackwards", "[wpimath]") {
 // This is the case that generated a broken profile in the old impl.
 TEST_CASE("TrapezoidProfileTest LargeVelocityAndSmallPositionDelta",
           "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{0.01_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 1_mps};
+  State goal{0.01_m, 0_mps};
+  State state{0_m, 1_mps};
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 450; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -274,14 +301,18 @@ TEST_CASE("TrapezoidProfileTest LargeVelocityAndSmallPositionDelta",
 
 TEST_CASE("TrapezoidProfileTest LargeVelocityAndSmallPositionDeltaBackwards",
           "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       1.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-0.01_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, -2_mps};
+  State goal{-0.01_m, 0_mps};
+  State state{0_m, -2_mps};
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 700; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -289,23 +320,29 @@ TEST_CASE("TrapezoidProfileTest LargeVelocityAndSmallPositionDeltaBackwards",
 }
 
 TEST_CASE("TrapezoidProfileTest SwitchGoalInMiddle", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state;
+  State goal{-2_m, 0_mps};
+  State state;
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 200; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
   CHECK(state != goal);
 
   goal = {0.0_m, 0.0_mps};
-  profile = wpi::math::TrapezoidProfile<wpi::units::meter>{constraints};
   for (int i = 0; i < 550; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -314,22 +351,28 @@ TEST_CASE("TrapezoidProfileTest SwitchGoalInMiddle", "[wpimath]") {
 
 // Checks to make sure that it hits top velocity
 TEST_CASE("TrapezoidProfileTest TopVelocity", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{4_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state;
+  State goal{4_m, 0_mps};
+  State state;
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 200; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
   CHECK_UNITS_NEAR(constraints.maxVelocity, state.velocity, 10e-5_mps);
 
-  profile = wpi::math::TrapezoidProfile<wpi::units::meter>{constraints};
   for (int i = 0; i < 2000; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
   }
@@ -337,80 +380,74 @@ TEST_CASE("TrapezoidProfileTest TopVelocity", "[wpimath]") {
 }
 
 TEST_CASE("TrapezoidProfileTest TimingToCurrent", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{2_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state;
+  State goal{2_m, 0_mps};
+  State state;
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
   for (int i = 0; i < 400; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
-    CHECK_UNITS_NEAR(profile.TimeLeftUntil(state, state), 0_s, 2e-2_s);
   }
 }
 
 TEST_CASE("TrapezoidProfileTest TimingToGoal", "[wpimath]") {
   using wpi::units::unit_cast;
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
 
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{2_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 0_mps};
+  State goal{2_m, 0_mps};
+  State state{0_m, 0_mps};
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
-
-  auto predictedTimeLeft = profile.TimeLeftUntil(state, goal);
-  bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
-    if (!reachedGoal && state == goal) {
-      // Expected value using for loop index is just an approximation since the
-      // time left in the profile doesn't increase linearly at the endpoints
-      CHECK_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
-      reachedGoal = true;
-    }
   }
 }
 
 TEST_CASE("TrapezoidProfileTest TimingToNegativeGoal", "[wpimath]") {
   using wpi::units::unit_cast;
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
 
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 0_mps};
+  State goal{-2_m, 0_mps};
+  State state{0_m, 0_mps};
 
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
-
-  auto predictedTimeLeft = profile.TimeLeftUntil(state, goal);
-  bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
-    if (!reachedGoal && state == goal) {
-      // Expected value using for loop index is just an approximation since the
-      // time left in the profile doesn't increase linearly at the endpoints
-      CHECK_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
-      reachedGoal = true;
-    }
   }
 }
 
 TEST_CASE("TrapezoidProfileTest GoalVelocityConstraints", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{10_m, 5_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 0.75_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{10_m, 5_mps};
+  State state{0_m, 0.75_mps};
 
   for (int i = 0; i < 1400; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
     CHECK(wpi::units::math::abs(state.velocity) <= constraints.maxVelocity);
@@ -418,15 +455,18 @@ TEST_CASE("TrapezoidProfileTest GoalVelocityConstraints", "[wpimath]") {
 }
 
 TEST_CASE("TrapezoidProfileTest NegativeGoalVelocityConstraints", "[wpimath]") {
+  using State = wpi::math::TrapezoidProfile<wpi::units::meter>::State;
+
   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
       0.75_mps, 0.75_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{10_m, -5_mps};
-  wpi::math::TrapezoidProfile<wpi::units::meter>::State state{0_m, 0.75_mps};
-
-  wpi::math::TrapezoidProfile<wpi::units::meter> profile{constraints};
+  State goal{10_m, -5_mps};
+  State state{0_m, 0.75_mps};
 
   for (int i = 0; i < 1600; ++i) {
-    auto newState = profile.Calculate(DT, state, goal);
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meter>::Generate(
+        constraints, state, goal);
+    auto sample = profile.SampleAt(DT);
+    State newState = {sample.position, sample.velocity};
     CheckFeasible(state, newState, constraints.maxAcceleration);
     state = newState;
     CHECK(wpi::units::math::abs(state.velocity) <= constraints.maxVelocity);
