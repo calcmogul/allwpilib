@@ -7,6 +7,7 @@ include(AddTest)
 file(
     GLOB wpimath_jni_src
     src/main/native/cpp/jni/DAREJNI.cpp
+    src/main/native/cpp/jni/DiscretizationJNI.cpp
     src/main/native/cpp/jni/EigenJNI.cpp
     src/main/native/cpp/jni/Exceptions.cpp
     src/main/native/cpp/jni/Transform3dJNI.cpp
